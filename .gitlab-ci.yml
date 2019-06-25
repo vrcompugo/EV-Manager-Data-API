@@ -9,8 +9,8 @@ build1:
   stage: build
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN dev.hbbx.de:4300
-    - docker-compose -f docker-compose-dev.yml build
-    - docker-compose -f docker-compose-dev.yml push
+    - docker-compose build
+    - docker-compose push
   tags:
   - builder1
    
