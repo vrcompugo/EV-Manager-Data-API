@@ -1,5 +1,6 @@
+import os
 from flask_restplus import Api, apidoc
-from flask import Blueprint, Response
+from flask import Blueprint, Response, url_for
 from flask_httpauth import HTTPBasicAuth
 
 from app.modules.user.user_routes import api as user_ns
@@ -17,7 +18,17 @@ authorizations = {
     }
 }
 
-api = Api(blueprint,
+
+class MyApi(Api):
+    @property
+    def specs_url(self):
+        """Monkey patch for HTTPS"""
+        env = os.getenv('ENVIRONMENT') or 'dev'
+        scheme = 'http' if env == "dev" else 'https'
+        return url_for(self.endpoint('specs'), _external=True, _scheme=scheme)
+
+
+api = MyApi(blueprint,
           doc=None,
           title='EV-Manager Data API',
           contact="hb&b Werbeagentur und Unternehmensberatung-GmbH",
