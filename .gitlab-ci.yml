@@ -20,6 +20,7 @@ deploy1:
     - curl https://web3.hbbx.de/deployment/schoen/ev-manager-data-api/pITaR3m6FoWfE9VYeyw9QuaJfDwI9DmC
     - rm -r ./*
     - rm -r .g*
+    - rm -r .d*
   tags:
     - builder1
 

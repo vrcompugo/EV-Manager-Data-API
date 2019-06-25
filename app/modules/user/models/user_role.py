@@ -12,5 +12,5 @@ class UserRole(db.Model):
     permissions = db.Column(JSONB)
 
     def __repr__(self):
-        return "<UserRole '{}'>".format(self.username)
+        return "<UserRole '{}'>".format(self.code)
 

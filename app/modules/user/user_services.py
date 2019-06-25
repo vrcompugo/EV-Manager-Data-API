@@ -4,53 +4,39 @@ import datetime
 from app import db
 from app.modules.user.models.user import User, UserSchema
 from app.exceptions import ApiException
-from app.utils.get_items_by_model import get_items_by_model
+from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
+from app.utils.set_attr_by_dict import set_attr_by_dict
 
 
 def add_item(data):
-    user = User.query.filter_by(email=data['email']).first()
-    if not user:
-        new_user = User(
-            public_id=str(uuid.uuid4()),
-            email=data['email'],
-            username=data['username'],
-            password=data['password'],
-            registered_on=datetime.datetime.utcnow()
-        )
-        save_changes(new_user)
-        return new_user
+    new_item = User.query.filter(User.username == data["username"]).first()
+    if new_item is None:
+        new_item = User()
+        new_item = set_attr_by_dict(new_item, data, ["id", "registered_on"])
+        new_item.password = data["password"]
+        new_item.registered_on = datetime.datetime.utcnow()
+        db.session.add(new_item)
+        db.session.commit()
+        return new_item
     else:
         raise ApiException("item_already_exists", "User already exists.", 409)
 
 
-def update_item(public_id, data):
-    user = User.query.filter_by(public_id=public_id).first()
+def update_item(id, data):
+    user = db.session.query(User).get(id)
     if user is not None:
         user.email=data['email']
         user.username=data['username']
         user.password=data['password']
-        save_changes(user)
-        response_object = {
-            'status': 'success',
-            'message': 'Successfully updated.'
-        }
-        return response_object, 201
+        db.session.commit()
+        return user
     else:
-        response_object = {
-            'status': 'error',
-            'message': "User doesn't exist.",
-        }
-        return response_object, 409
+        raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
 
 
 def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(User, UserSchema, tree, sort, offset, limit, fields)
 
 
-def get_one_item(public_id):
-    return User.query.filter_by(public_id=public_id).first()
-
-
-def save_changes(data):
-    db.session.add(data)
-    db.session.commit()
+def get_one_item(id, fields = None):
+    return get_one_item_by_model(User, UserSchema, id, fields, [db.subqueryload("role")])

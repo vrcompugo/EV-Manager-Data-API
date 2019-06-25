@@ -12,21 +12,9 @@ api = Namespace('Users')
 _user_input = api.model("User_", model={
     'email': fields.String(required=True, description='user email address'),
     'username': fields.String(required=True, description='user username'),
-    'password': fields.String(required=True, description='user password')
+    'password': fields.String(required=True, description='user password'),
+    'role_id': fields.Integer(required=True, description='')
 })
-_user_output = api.model("User", model={
-    'email': fields.String(description='user email address'),
-    'username': fields.String(description='user username'),
-    'registered_on': fields.String(description='registered_on'),
-    'public_id': fields.String(description='user Identifier')
-})
-_user_output_list = api.model("UserList", model={
-    "status": fields.Raw(example="success"),
-    "offset": fields.Integer(),
-    "limit": fields.Integer(example=10),
-    "data": fields.List(fields.Nested(_user_output))
-})
-
 
 @api.route('/')
 class Items(Resource):
@@ -66,8 +54,8 @@ class Items(Resource):
                 "data": data}
 
     @api_response
-    @token_required("create_user")
     @api.expect(_user_input, validate=True)
+    @token_required("create_user")
     def post(self):
         """Creates a new User """
         data = request.json
@@ -76,23 +64,30 @@ class Items(Resource):
             user_role = UserRole.query.get(data["role_id"])
             if user_role is None or (user_role.code == "root" and user["permissions"][0] != "all"):
                 raise ApiException("invalid_permission", "Invalid Permission.", 401)
+        print("asd1")
         item = add_item(data=data)
-        return item
+        print("asd2")
+        item_dict = get_one_item(item.id)
+        print("asd3")
+        return {"status":"success",
+                "data": item_dict}
 
 
 @api.route('/<id>')
-@api.param('public_id', 'The User identifier')
-@api.response(404, 'User not found.')
 class User(Resource):
-    @api.doc('get a user')
+    @api_response
+    @api.doc(params={
+        "fields": {"type":"string", "default": "_default_"},
+    })
     @token_required("show_user")
-    def get(self, public_id):
+    def get(self, id):
         """get a user given its identifier"""
-        user = get_one_item(public_id)
-        if not user:
+        fields = request.args.get("fields") or "_default_"
+        item_dict = get_one_item(id, fields)
+        if not item_dict:
             api.abort(404)
         else:
-            return user
+            return item_dict
 
     @api.response(201, 'User successfully updated.')
     @api.doc('update user')

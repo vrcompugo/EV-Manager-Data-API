@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import Migrate, MigrateCommand, upgrade
 from flask_script import Manager
 
 from app import create_app, db
@@ -22,6 +22,7 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def run():
+    upgrade()
     app.run(host="0.0.0.0")
 
 

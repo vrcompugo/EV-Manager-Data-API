@@ -39,10 +39,13 @@ def get_items_by_model(model, model_schema, tree, sort, offset, limit, fields):
     return datas
 
 
-def get_one_item_by_model(model, model_schema, id, fields):
+def get_one_item_by_model(model, model_schema, id, fields, options=None):
     if fields is None:
         fields = "_default_"
-    item = model.query.get(id)
+    query = model.query
+    if options is not None:
+        query = query.options(*options)
+    item = query.get(id)
     fields = fields.split(",")
     item_schema = model_schema()
     data = item_schema.dump(item, many=False).data

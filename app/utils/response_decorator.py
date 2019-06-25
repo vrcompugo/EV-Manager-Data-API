@@ -7,7 +7,6 @@ def api_response(f):
     def decorated(*args, **kwargs):
 
         try:
-            print(f(*args, **kwargs))
             return f(*args, **kwargs)
         except ApiException as e:
             print(e)
