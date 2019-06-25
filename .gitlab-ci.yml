@@ -12,7 +12,7 @@ build1:
     - docker-compose -f docker-compose-dev.yml build
     - docker-compose -f docker-compose-dev.yml push
   tags:
-  - builder1.hbbx.de
+  - builder1
    
 deploy1:
   stage: deploy
@@ -21,5 +21,5 @@ deploy1:
     - rm -r ./*
     - rm -r .g*
   tags:
-    - builder1.hbbx.de
+    - builder1
 
