@@ -1,0 +1,52 @@
+version: '2'
+
+services:
+  postgres:
+    image: postgres:11
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: evdata
+      POSTGRES_USER: evdata
+      POSTGRES_PASSWORD: tagtag
+
+  minio:
+    image: minio/minio
+    volumes:
+      - minio_data:/data
+      - minio_config:/root/.minio
+    command: "server /data"
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: "minio_dev"
+      MINIO_SECRET_KEY: "tagtagtag"
+
+  ev-data-api:
+    build: .
+    image: dev.hbbx.de:4300/ev-manager/ev-manager-data-api:latest
+    environment:
+      SECRET_KEY: "392pfheoap2ho2ufb"
+      ENVIRONMENT: "dev"
+      DATABASE_URI: "postgresql+psycopg2://evdata:tagtag@db/evdata"
+      S3_ACCESS_KEY: "minio_dev"
+      S3_SECRET_KEY: "tagtagtag"
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 5000:5000
+    links:
+      - postgres:db
+      - minio:s3
+    depends_on:
+      - postgres
+      - minio
+
+
+
+volumes:
+  postgres_data:
+  minio_data:
+  minio_config:
