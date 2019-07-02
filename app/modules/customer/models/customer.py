@@ -1,5 +1,6 @@
 from app import db
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 
 
 class Customer(db.Model):
@@ -29,5 +30,8 @@ class Customer(db.Model):
 
 
 class CustomerSchema(ModelSchema):
+
+    versions = fields.Constant([])
+
     class Meta:
         model = Customer

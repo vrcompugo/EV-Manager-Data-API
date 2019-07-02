@@ -1,22 +1,29 @@
 from flask import request
 from flask_restplus import Resource
 from flask_restplus import Namespace, fields
-from app.decorators import token_required, api_response
 from luqum.parser import parser
 
-from .user_services import *
-from .models import UserRole
-from app.modules.auth.auth_services import get_logged_in_user
+from app.decorators import token_required, api_response
 
-api = Namespace('Users')
-api2 = Namespace('UserRoles')
+from .task_services import add_item, update_item, get_items, get_one_item
 
-_user_input = api.model("User_", model={
-    'email': fields.String(required=True, description='user email address'),
-    'username': fields.String(required=True, description='user username'),
-    'password': fields.String(required=True, description='user password'),
-    'roles': fields.List(required=True, description='', cls_or_instance=fields.Integer())
+
+api = Namespace('Tasks')
+_item_input = api.model("Task_", model={
+    'datetime': fields.DateTime(description=''),
+    'reminder_datetime': fields.DateTime(description=''),
+    'description': fields.String(description=''),
+    'customer_id': fields.Integer(description=''),
+    'role_id': fields.Integer(description=''),
+    'reseller_id': fields.Integer(description=''),
+    'survey_id': fields.Integer(description=''),
+    'offer_id': fields.Integer(description=''),
+    'project_id': fields.Integer(description=''),
+    'contract_id': fields.Integer(description=''),
+    'pv_system_id': fields.Integer(description=''),
+    'product_id': fields.Integer(description='')
 })
+
 
 @api.route('/')
 class Items(Resource):
@@ -28,10 +35,10 @@ class Items(Resource):
         "fields": {"type":"string", "default": "_default_"},
         "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
     })
-    @token_required("list_user")
+    @token_required("list_task")
     def get(self):
         """
-            List users
+            List tasks
             sort:
                 - "column1,column2" -> column1 asc, column2 asc
                 - "+column1,-column2" -> column1 asc, column2 desc
@@ -58,16 +65,11 @@ class Items(Resource):
                 "data": data}
 
     @api_response
-    @api.expect(_user_input, validate=True)
-    @token_required("create_user")
+    @api.expect(_item_input, validate=True)
+    @token_required("create_task")
     def post(self):
         """Creates a new User """
         data = request.json
-        user = get_logged_in_user(request)
-        if "roles" in data:
-            root_role = UserRole.query.filter(UserRole.code == "root").first()
-            if root_role.id in data["roles"] and "create_root_user" != user["permissions"]:
-                raise ApiException("invalid_permission", "Invalid Permission.", 401)
         item = add_item(data=data)
         item_dict = get_one_item(item.id)
         return {"status":"success",
@@ -80,9 +82,9 @@ class User(Resource):
     @api.doc(params={
         "fields": {"type":"string", "default": "_default_"},
     })
-    @token_required("show_user")
+    @token_required("show_task")
     def get(self, id):
-        """get a user given its identifier"""
+        """get a task given its identifier"""
         fields = request.args.get("fields") or "_default_"
         item_dict = get_one_item(id, fields)
         if not item_dict:
@@ -91,26 +93,10 @@ class User(Resource):
             return item_dict
 
     @api.response(201, 'User successfully updated.')
-    @api.doc('update user')
-    @api.expect(_user_input, validate=True)
-    @token_required("update_user")
+    @api.doc('update task')
+    @api.expect(_item_input, validate=True)
+    @token_required("update_task")
     def post(self, id):
         """Update User """
         data = request.json
-        user = get_logged_in_user(request)
-        if "roles" in data:
-            root_role = UserRole.query.filter(UserRole.code == "root").first()
-            if root_role.id in data["roles"] and "create_root_user" != user["permissions"]:
-                raise ApiException("invalid_permission", "Invalid Permission.", 401)
         return update_item(id, data=data)
-
-
-@api2.route('/')
-class Items2(Resource):
-    @api_response
-    @api.doc()
-    @token_required("list_user_roles")
-    def get(self):
-        data = get_role_items()
-        return {"status": "success",
-                "data": data}

@@ -32,6 +32,7 @@ class Index(Resource):
         "limit":{"type":'integer', "default": 10},
         "sort": {"type":"string", "default": ""},
         "fields": {"type":"string", "default": "_default_"},
+        "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
     })
     @token_required("list_customer")
     def get(self):
@@ -59,6 +60,7 @@ class Index(Resource):
                 "sort": sort,
                 "offset": offset,
                 "limit": limit,
+                "query": query,
                 "data": data}
 
     @api_response

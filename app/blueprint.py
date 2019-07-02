@@ -6,6 +6,7 @@ from flask_httpauth import HTTPBasicAuth
 from app.modules.user.user_routes import api as user_ns, api2 as user_role_ns
 from app.modules.customer.routes import api as customer_ns
 from app.modules.auth.auth_routes import api as auth_ns
+from app.modules.task.task_routes import api as task_ns
 
 auth = HTTPBasicAuth()
 blueprint = Blueprint('api', __name__)
@@ -59,4 +60,5 @@ def version_number():
 api.add_namespace(user_ns, path='/users')
 api.add_namespace(user_role_ns, path='/user_roles')
 api.add_namespace(customer_ns, path='/customers')
+api.add_namespace(task_ns, path='/tasks')
 api.add_namespace(auth_ns, path='/auth')

@@ -16,8 +16,12 @@ class UserRole(db.Model):
     def __repr__(self):
         return "<UserRole '{}'>".format(self.code)
 
-class UserRoleSchema(ModelSchema):
+
+class UserRoleShortSchema(ModelSchema):
     id = fields.Integer()
     code = fields.String()
     label = fields.String()
+
+
+class UserRoleSchema(UserRoleShortSchema):
     permissions = fields.Dict()
