@@ -5,11 +5,11 @@ from luqum.parser import parser
 
 from app.decorators import token_required, api_response
 
-from .task_services import add_item, update_item, get_items, get_one_item
+from .survey_services import add_item, update_item, get_items, get_one_item
 
 
-api = Namespace('Tasks')
-_item_input = api.model("Task_", model={
+api = Namespace('Survey')
+_item_input = api.model("Survey_", model={
     'datetime': fields.DateTime(description=''),
     'reminder_datetime': fields.DateTime(description=''),
     'description': fields.String(description=''),
@@ -35,10 +35,10 @@ class Items(Resource):
         "fields": {"type":"string", "default": "_default_"},
         "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
     })
-    @token_required("list_task")
+    @token_required("list_survey")
     def get(self):
         """
-            List tasks
+            List surveys
             sort:
                 - "column1,column2" -> column1 asc, column2 asc
                 - "+column1,-column2" -> column1 asc, column2 desc
@@ -66,7 +66,7 @@ class Items(Resource):
 
     @api_response
     @api.expect(_item_input, validate=True)
-    @token_required("create_task")
+    @token_required("create_survey")
     def post(self):
         """Creates a new User """
         data = request.json
@@ -82,9 +82,9 @@ class User(Resource):
     @api.doc(params={
         "fields": {"type":"string", "default": "_default_"},
     })
-    @token_required("show_task")
+    @token_required("show_survey")
     def get(self, id):
-        """get a task given its identifier"""
+        """get a survey given its identifier"""
         fields = request.args.get("fields") or "_default_"
         item_dict = get_one_item(id, fields)
         if not item_dict:
@@ -93,9 +93,9 @@ class User(Resource):
             return item_dict
 
     @api.response(201, 'User successfully updated.')
-    @api.doc('update task')
+    @api.doc('update survey')
     @api.expect(_item_input, validate=True)
-    @token_required("update_task")
+    @token_required("update_survey")
     def put(self, id):
         """Update User """
         data = request.json

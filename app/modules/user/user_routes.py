@@ -94,7 +94,7 @@ class User(Resource):
     @api.doc('update user')
     @api.expect(_user_input, validate=True)
     @token_required("update_user")
-    def post(self, id):
+    def put(self, id):
         """Update User """
         data = request.json
         user = get_logged_in_user(request)
@@ -108,7 +108,6 @@ class User(Resource):
 @api2.route('/')
 class Items2(Resource):
     @api_response
-    @api.doc()
     @token_required("list_user_roles")
     def get(self):
         data = get_role_items()

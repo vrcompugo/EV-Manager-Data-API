@@ -1,5 +1,6 @@
 from app import db
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class CustomerPaymentAccount(db.Model):
@@ -12,5 +13,4 @@ class CustomerPaymentAccount(db.Model):
     address = db.relationship("CustomerAddress")
     type = db.Column(db.String(30))
     data = db.Column(JSONB)
-
 

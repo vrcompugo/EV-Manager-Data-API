@@ -1,0 +1,26 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
+
+from app import db
+from ..models.reseller_group import ResellerGroupSchema
+
+
+class Reseller(db.Model):
+    __versioned__ = {}
+    __tablename__ = "reseller"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    group_id = db.Column(db.Integer, db.ForeignKey("reseller_group.id"))
+    group = db.relationship("ResellerGroup")
+    email = db.Column(db.String(120))
+    name = db.Column(db.String(120))
+    number = db.Column(db.String(120))
+    access_key = db.Column(db.String(60))
+    phone = db.Column(db.String(120))
+
+
+class ResellerSchema(ModelSchema):
+
+    class Meta:
+        model = Reseller

@@ -1,8 +1,6 @@
-from functools import wraps
-from flask import request
-from app.utils.response_decorator import api_response
-
 from .auth_services import *
+
+full_permission_list = []
 
 
 class token_required(object):
@@ -11,6 +9,7 @@ class token_required(object):
 
     def __init__(self, permission = None):
         self.permission = permission
+        full_permission_list.append(permission)
 
     def __call__(self, f):
         def decorated(*args, **kwargs):

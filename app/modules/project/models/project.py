@@ -1,0 +1,61 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
+
+from app import db
+from app.modules.customer.models.customer import CustomerSchema
+from app.modules.user.models.user_role import UserRoleShortSchema
+
+class Project(db.Model):
+    __versioned__ = {}
+    __tablename__ = "project"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    number = db.Column(db.String(20))
+    customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"))
+    customer = db.relationship("Customer")
+    address_id = db.Column(db.Integer, db.ForeignKey("customer_address.id"))
+    address = db.relationship("CustomerAddress")
+    payment_account_id = db.Column(db.Integer, db.ForeignKey("customer_payment_account.id"))
+    payment_account = db.relationship("CustomerPaymentAccount")
+    reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
+    reseller = db.relationship("Reseller")
+    datetime = db.Column(db.DateTime)
+
+    @hybrid_property
+    def reseller_name(self):
+        if self.reseller is not None:
+            return self.reseller.name
+        return None
+
+    @hybrid_property
+    def reseller_group(self):
+        if self.reseller is not None:
+            return self.reseller.group.name
+        return None
+
+    @hybrid_property
+    def lead_number(self):
+        if self.customer is not None:
+            return self.customer.lead_number
+        return None
+
+    @hybrid_property
+    def customer_number(self):
+        if self.customer is not None:
+            return self.customer.customer_number
+        return None
+
+
+class ProjectSchema(ModelSchema):
+
+    lead_number = fields.String()
+    customer_number = fields.String()
+    reseller_name = fields.String()
+    reseller_group = fields.String()
+    role = fields.Nested(UserRoleShortSchema)
+    customer = fields.Nested(CustomerSchema)
+    versions = fields.Constant([])
+
+    class Meta:
+        model = Project

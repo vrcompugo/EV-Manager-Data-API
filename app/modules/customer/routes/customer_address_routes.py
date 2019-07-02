@@ -1,10 +1,11 @@
 from flask import request
 from flask_restplus import Resource
-from flask_restplus import Namespace, fields
-from app.decorators import token_required
+from flask_restplus import fields
+from app.decorators import token_required, api_response
+from luqum.parser import parser
 
 from ._customer_ns import api
-from app.modules.user.user_services import *
+from ..services.customer_address_services import *
 
 
 _item_input = api.model("CustomerAddress_", model={
@@ -21,67 +22,96 @@ _item_input = api.model("CustomerAddress_", model={
 })
 
 
-_item_output = api.model("CustomerAddress", model={
-    'email': fields.String(description='user email address'),
-    'username': fields.String(description='user username'),
-    'registered_on': fields.String(description='registered_on'),
-    'public_id': fields.String(description='user Identifier')
-})
-
-
 @api.route('/<customer_id>/addresses')
-@api.param('customer_public_id', 'The Customer ID')
 class Index(Resource):
-    @api.marshal_list_with(_item_output, envelope='data')
-    @token_required
+
+    @api_response
+    @api.doc(params={
+        'offset': {"type":'integer', "default": 0},
+        "limit":{"type":'integer', "default": 10},
+        "sort": {"type":"string", "default": ""},
+        "fields": {"type":"string", "default": "_default_"},
+        "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
+    })
+    @token_required("list_customer_address")
     def get(self):
-        """List all registered customers"""
-        return get_all_items()
+        """
+            List customers
+            sort:
+                - "column1,column2" -> column1 asc, column2 asc
+                - "+column1,-column2" -> column1 asc, column2 desc
+            fields:
+                Filter output to only needed fields
+                - "column1,column2" -> {column1: "", column2: ""}
 
-    @api.response(201, 'User successfully loaded.')
-    @api.doc('add new customer address')
+        """
+        offset = int(request.args.get("offset")) or 0
+        limit = int(request.args.get("limit")) or 10
+        sort = request.args.get("sort") or ""
+        fields = request.args.get("fields") or "_default_"
+        query = request.args.get("q") or None
+        tree = None
+        if query is not None:
+            tree = parser.parse(query)
+        data = get_items(tree, sort, offset, limit, fields)
+        return {"status":"success",
+                "fields": fields,
+                "sort": sort,
+                "offset": offset,
+                "limit": limit,
+                "query": query,
+                "data": data}
+
+    @api_response
     @api.expect(_item_input, validate=True)
-    @token_required
+    @token_required("create_customer_address")
     def post(self):
-        """Load a new Customer by Customer number/Lead Number/E-Mail """
+        """Create new Customer """
         data = request.json
-        return save_new_item(data=data)
+        item = add_item(data=data)
+        item_dict = get_one_item(item.id)
+        return {"status":"success",
+                "data": item_dict}
 
 
-@api.route('/<customer_id>/addresses/<customer_address_id>')
-@api.param('customer_public_id', 'The Customer ID')
-@api.param('customer_address_public_id', 'The Customer ID')
-@api.response(404, 'Address not found.')
+@api.route('/<customer_id>/addresses/<id>')
 class Detail(Resource):
-    @api.doc('get customer address data')
-    @api.marshal_with(_item_output)
-    @token_required
-    def get(self, public_id):
-        """get a user given its identifier"""
-        user = get_one_item(public_id)
-        if not user:
+    @api_response
+    @api.doc(params={
+        "fields": {"type":"string", "default": "_default_"},
+    })
+    @token_required("show_customer_address")
+    def get(self, id):
+        """get one customer by id"""
+        fields = request.args.get("fields") or "_default_"
+        item_dict = get_one_item(id, fields)
+        if item_dict is None:
             api.abort(404)
         else:
-            return user
+            return {"status":"success",
+                "data": item_dict}
 
-    @api.doc('update customer address data')
-    @api.marshal_with(_item_output)
-    @token_required
-    def put(self, public_id):
-        """get a user given its identifier"""
-        user = get_one_item(public_id)
-        if not user:
+    @api_response
+    @api.expect(_item_input, validate=True)
+    @token_required("update_customer_address")
+    def put(self, id):
+        """update one customer by id"""
+        item = get_one_item(id)
+        if item is None:
             api.abort(404)
         else:
-            return user
+            data = request.json
+            item = update_item(id, data=data)
+            item_dict = get_one_item(item.id, fields)
+            return {"status":"success",
+                "data": item_dict}
 
-    @api.doc('delete customer address')
-    @api.marshal_with(_item_output)
-    @token_required
-    def delete(self, public_id):
+    @api_response
+    @token_required("delete_customer_address")
+    def delete(self, id):
         """get a user given its identifier"""
-        user = get_one_item(public_id)
-        if not user:
+        item = get_one_item(id)
+        if not item:
             api.abort(404)
         else:
-            return user
+            return item

@@ -44,6 +44,7 @@ class User(db.Model):
 class UserSchema(ModelSchema):
 
     roles = fields.Nested(UserRoleSchema, many=True)
+    password_hash = fields.Constant("")
     versions = fields.Constant([])
 
     class Meta:

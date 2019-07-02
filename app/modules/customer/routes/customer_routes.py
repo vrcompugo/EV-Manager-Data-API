@@ -5,7 +5,7 @@ from app.decorators import token_required, api_response
 from luqum.parser import parser
 
 from ._customer_ns import api
-from app.modules.customer.customer_services import *
+from ..services.customer_services import *
 from .customer_address_routes import _item_input as customer_address_input
 from .customer_payment_account_routes import _item_input as customer_payment_account_input
 
@@ -22,6 +22,7 @@ _item_input = api.model("Customer_", model={
     'default_address': fields.Nested(customer_address_input),
     'default_payment_account': fields.Nested(customer_payment_account_input)
 })
+
 
 @api.route('/')
 class Index(Resource):

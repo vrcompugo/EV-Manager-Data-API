@@ -1,5 +1,5 @@
 from app import db
-from .models import Customer, CustomerSchema, CustomerAddress, CustomerPaymentAccount
+from ..models import Customer, CustomerSchema, CustomerAddress, CustomerPaymentAccount
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict

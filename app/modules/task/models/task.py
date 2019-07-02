@@ -18,7 +18,7 @@ class Task(db.Model):
     customer = db.relationship("Customer")
     role_id = db.Column(db.Integer, db.ForeignKey("user_role.id"))
     role = db.relationship("UserRole")
-    '''reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
+    reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
     reseller = db.relationship("Reseller")
     survey_id = db.Column(db.Integer, db.ForeignKey("survey.id"))
     survey = db.relationship("Survey")
@@ -31,7 +31,7 @@ class Task(db.Model):
     pv_system_id = db.Column(db.Integer, db.ForeignKey("pv_system.id"))
     pv_system = db.relationship("PVSystem")
     product_id = db.Column(db.Integer, db.ForeignKey("product.id"))
-    product = db.relationship("Product")'''
+    product = db.relationship("Product")
 
     @hybrid_property
     def lead_number(self):
@@ -47,15 +47,15 @@ class Task(db.Model):
 
     @hybrid_property
     def project_number(self):
-        return None
         if self.project is not None:
             return self.project.number
+        return None
 
     @hybrid_property
     def contract_number(self):
-        return None
         if self.contract is not None:
             return self.contract.number
+        return None
 
 
 class TaskSchema(ModelSchema):
