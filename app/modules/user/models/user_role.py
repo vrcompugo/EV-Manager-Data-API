@@ -1,4 +1,6 @@
 from app import db
+from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 from sqlalchemy.dialects.postgresql import JSONB
 
 
@@ -14,3 +16,8 @@ class UserRole(db.Model):
     def __repr__(self):
         return "<UserRole '{}'>".format(self.code)
 
+class UserRoleSchema(ModelSchema):
+    id = fields.Integer()
+    code = fields.String()
+    label = fields.String()
+    permissions = fields.Dict()

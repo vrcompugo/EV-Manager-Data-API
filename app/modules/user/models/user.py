@@ -1,5 +1,14 @@
 from app import db, flask_bcrypt
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import Schema, fields
+
+from .user_role import UserRoleSchema
+
+
+association_table = db.Table('user_role_association',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('user_role_id', db.Integer, db.ForeignKey('user_role.id'))
+)
 
 
 class User(db.Model):
@@ -12,8 +21,7 @@ class User(db.Model):
     registered_on = db.Column(db.DateTime, nullable=False)
     username = db.Column(db.String(50), unique=True)
     password_hash = db.Column(db.String(100))
-    role_id = db.Column(db.Integer, db.ForeignKey("user_role.id"))
-    role = db.relationship("UserRole")
+    roles = db.relationship("UserRole", secondary=association_table, backref="users")
 
     @property
     def password(self):
@@ -30,6 +38,13 @@ class User(db.Model):
         return "<User '{}'>".format(self.username)
 
 
+
+
+
 class UserSchema(ModelSchema):
+
+    roles = fields.Nested(UserRoleSchema, many=True)
+    versions = fields.Constant([])
+
     class Meta:
         model = User

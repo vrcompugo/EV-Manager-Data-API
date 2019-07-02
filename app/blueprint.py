@@ -3,7 +3,7 @@ from flask_restplus import Api, apidoc
 from flask import Blueprint, Response, url_for
 from flask_httpauth import HTTPBasicAuth
 
-from app.modules.user.user_routes import api as user_ns
+from app.modules.user.user_routes import api as user_ns, api2 as user_role_ns
 from app.modules.customer.routes import api as customer_ns
 from app.modules.auth.auth_routes import api as auth_ns
 
@@ -57,5 +57,6 @@ def version_number():
     return Response('{"version":"1.0.0"}', mimetype='application/json')
 
 api.add_namespace(user_ns, path='/users')
+api.add_namespace(user_role_ns, path='/user_roles')
 api.add_namespace(customer_ns, path='/customers')
 api.add_namespace(auth_ns, path='/auth')

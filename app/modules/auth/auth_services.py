@@ -43,7 +43,10 @@ def login_user(data):
     if user and user.check_password(data.get('password')):
         auth_token = encode_auth_token(user.id)
         if auth_token:
-            return {"token": auth_token.decode(), "role": user.role.code}
+            roles = []
+            for role in user.roles:
+                roles.append(role.code)
+            return {"token": auth_token.decode(), "roles": roles}
     else:
         raise ApiException("invalid_credentials", "Invalid Credentials. Please log in again.", 401)
 
@@ -64,11 +67,16 @@ def get_logged_in_user(new_request):
     if auth_token:
         resp = decode_auth_token(auth_token)
         user = User.query.filter_by(id=resp.get("sub")).first()
+        roles = []
+        permissions = []
+        for role in user.roles:
+            roles.append(role.code)
+            permissions += role.permissions
         return {
                 'user_id': user.id,
                 'email': user.email,
-                'role': user.role.code,
-                'permissions': user.role.permissions,
+                'roles': roles,
+                'permissions': permissions,
                 'registered_on': str(user.registered_on)
             }
     raise ApiException("invalid_token", "Invalid Token. Please log in again.", 401)

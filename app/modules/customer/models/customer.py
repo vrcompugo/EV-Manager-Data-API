@@ -17,6 +17,7 @@ class Customer(db.Model):
     email = db.Column(db.String(120))
     pending_email = db.Column(db.String(120))
     email_status = db.Column(db.String(20))
+    last_change = db.Column(db.DateTime)
     default_address_id = db.Column(db.Integer, db.ForeignKey('customer_address.id'))
     default_address = db.relationship("CustomerAddress", foreign_keys=[default_address_id])
     default_payment_account_id = db.Column(db.Integer, db.ForeignKey('customer_payment_account.id'))
