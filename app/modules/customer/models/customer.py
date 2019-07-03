@@ -19,10 +19,10 @@ class Customer(db.Model):
     pending_email = db.Column(db.String(120))
     email_status = db.Column(db.String(20))
     last_change = db.Column(db.DateTime)
-    default_address_id = db.Column(db.Integer, db.ForeignKey('customer_address.id'))
-    default_address = db.relationship("CustomerAddress", foreign_keys=[default_address_id])
-    default_payment_account_id = db.Column(db.Integer, db.ForeignKey('customer_payment_account.id'))
-    default_payment_account = db.relationship("CustomerPaymentAccount", foreign_keys=[default_payment_account_id])
+    default_address_id = db.Column(db.Integer, db.ForeignKey('customer_address.id', use_alter=True))
+    default_address = db.relationship("CustomerAddress", foreign_keys=[default_address_id], post_update=True)
+    default_payment_account_id = db.Column(db.Integer, db.ForeignKey('customer_payment_account.id', use_alter=True))
+    default_payment_account = db.relationship("CustomerPaymentAccount", foreign_keys=[default_payment_account_id], post_update=True)
 
 
     def __repr__(self):

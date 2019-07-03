@@ -1,14 +1,13 @@
 import os
 import unittest
-
 from flask_migrate import Migrate, MigrateCommand, upgrade
-from flask_script import Manager
-
-from app import create_app, db
+from flask_script import Manager, prompt_bool
 import sqlalchemy as sa
 
-app = create_app(os.getenv('ENVIRONMENT') or 'dev')
+from app import create_app, db
 from app.blueprint import blueprint
+
+app = create_app(os.getenv('ENVIRONMENT') or 'dev')
 app.register_blueprint(blueprint)
 
 
@@ -28,18 +27,28 @@ def run():
 
 @manager.command
 def install():
-    from app.models import User, UserRole
-    import datetime
-    admin_role = UserRole(label="root", code="root",permissions=["all"])
-    user = User(
-        email="a.hedderich@hbundb.de",
-        username="root",
-        password="Mw05mTGkew7bYTH7W5UF7G5mBpisCF2M",
-        role=admin_role,
-        registered_on=datetime.datetime.now()
-    )
-    db.session.add(user)
-    db.session.commit()
+    upgrade()
+    from app.modules.user import install as user_install
+    user_install()
+
+
+@manager.option("-m", "--module", dest='module', default=None)
+def deploy_test_data(module):
+    if prompt_bool(
+            "Are you sure you want to import test data"):
+        if module is None or module == "user":
+            from app.modules.user import import_test_data as user_test_data
+            user_test_data()
+        if module is None or module == "customer":
+            from app.modules.customer import import_test_data as customer_test_data
+            customer_test_data()
+        if module is None or module == "reseller":
+            from app.modules.reseller import import_test_data as reseller_test_data
+            reseller_test_data()
+        if module is None or module == "survey":
+            from app.modules.survey import import_test_data as survey_test_data
+            survey_test_data()
+
 
 @manager.command
 def test():
@@ -49,6 +58,7 @@ def test():
     if result.wasSuccessful():
         return 0
     return 1
+
 
 if __name__ == '__main__':
     sa.orm.configure_mappers()

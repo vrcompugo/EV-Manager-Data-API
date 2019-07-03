@@ -1,10 +1,23 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
+from enum import Enum
 
 from app import db
 from app.modules.customer.models.customer import CustomerSchema
 from app.modules.user.models.user_role import UserRoleShortSchema
+
+
+class DATA_STATUSES(Enum):
+    COMPLETE = "complete"
+    INCOMPLETE = "incomplete"
+
+
+class OFFER_STATUSES(Enum):
+    OPEN = "open"
+    MISSING_DATA = "missing_data"
+    CREATED = "created"
+
 
 class Survey(db.Model):
     __versioned__ = {}
@@ -17,6 +30,8 @@ class Survey(db.Model):
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
     reseller = db.relationship("Reseller")
     datetime = db.Column(db.DateTime)
+    data_status = db.Column(db.String(30))
+    offer_status = db.Column(db.String(30))
     offer_until = db.Column(db.Date)
     last_updated = db.Column(db.DateTime)
     data = db.Column(db.JSON)

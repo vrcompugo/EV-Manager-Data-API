@@ -14,3 +14,4 @@ psycopg2
 marshmallow
 luqum
 marshmallow_sqlalchemy
+barnum

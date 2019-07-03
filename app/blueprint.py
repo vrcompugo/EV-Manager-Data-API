@@ -27,7 +27,7 @@ authorizations = {
         'name': 'Authorization'
     }
 }
-
+full_permission_list = [x for x in full_permission_list if x is not None]
 
 class MyApi(Api):
     @property
@@ -82,5 +82,3 @@ api.add_namespace(product_ns, path='/product')
 api.add_namespace(pv_system_ns, path='/pv_system')
 api.add_namespace(task_ns, path='/tasks')
 api.add_namespace(auth_ns, path='/auth')
-
-print(full_permission_list)

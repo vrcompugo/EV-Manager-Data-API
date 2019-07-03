@@ -26,6 +26,13 @@ def update_item(id, data):
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
 
 
+def delete_items_except(items, excepted_items):
+    for item in items:
+        if item not in excepted_items:
+            #item.delete()
+            pass
+
+
 def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(Task, TaskSchema, tree, sort, offset, limit, fields)
 
@@ -33,3 +40,5 @@ def get_items(tree, sort, offset, limit, fields):
 def get_one_item(id, fields = None):
     return get_one_item_by_model(Task, TaskSchema, id, fields, [db.subqueryload("role")])
 
+
+from .tasks.survey_tasks import *

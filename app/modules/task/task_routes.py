@@ -33,7 +33,7 @@ class Items(Resource):
         "limit":{"type":'integer', "default": 10},
         "sort": {"type":"string", "default": ""},
         "fields": {"type":"string", "default": "_default_"},
-        "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
+        "q": {"type":"string", "default": "", "description": "Lucene syntax search query. Ex: role_id: 3 AND (user_id: 7 OR user_id: ISNULL)"}
     })
     @token_required("list_task")
     def get(self):

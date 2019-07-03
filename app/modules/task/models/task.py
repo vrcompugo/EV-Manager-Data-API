@@ -16,6 +16,8 @@ class Task(db.Model):
     description = db.Column(db.String(255))
     customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"))
     customer = db.relationship("Customer")
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user = db.relationship("User")
     role_id = db.Column(db.Integer, db.ForeignKey("user_role.id"))
     role = db.relationship("UserRole")
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))

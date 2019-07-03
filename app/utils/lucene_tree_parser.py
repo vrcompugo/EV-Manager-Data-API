@@ -21,5 +21,7 @@ def parse_tree(model, query, tree):
     if isinstance(tree, SearchField):
         if isinstance(tree.children[0], Range):
             return and_(getattr(model, tree.name) >= int(str(tree.children[0].low)), getattr(model, tree.name) <= int(str(tree.children[0].high)))
+        if str(tree.children[0].value).strip('"') == "ISNULL":
+            return getattr(model, tree.name) == None
         return getattr(model, tree.name) == str(tree.children[0].value).strip('"')
     return None
