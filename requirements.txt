@@ -1,10 +1,11 @@
 flask
-werkzeug==0.14.1
+werkzeug
 flask_login
 flask-bcrypt
 flask-restplus
 Flask-Migrate
 Flask-Script
+Flask-cors
 flask_testing
 SQLAlchemy-Continuum
 pyjwt

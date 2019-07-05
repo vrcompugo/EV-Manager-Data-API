@@ -7,10 +7,13 @@ WORKDIR /usr/src/app
 
 COPY . .
 
+RUN chmod 644 manage.py
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 USER appuser
 
 ENV PYTHONUNBUFFERED 1
 
-CMD [ "python", "manage.py", "run" ]
+
+CMD ["python3", "manage.py", "run" ]
