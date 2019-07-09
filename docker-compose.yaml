@@ -35,6 +35,7 @@ services:
       S3_SECRET_KEY: "tagtagtag"
     volumes:
       - ./app:/usr/src/app/app
+      - ./migrations:/usr/src/app/migrations
     ports:
       - 5000:5000
     links:

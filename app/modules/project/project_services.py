@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from app import db
 from app.exceptions import ApiException
@@ -11,6 +12,7 @@ from .models.project import Project, ProjectSchema
 def add_item(data):
     new_item = Project()
     new_item = set_attr_by_dict(new_item, data, ["id"])
+    new_item.number = "P{}".format(random.randint(100000, 999999))
     db.session.add(new_item)
     db.session.commit()
     return new_item

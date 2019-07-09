@@ -15,7 +15,7 @@ def import_test_data():
     resellers = db.session.query(Reseller).all()
     data_statuses = [str(DATA_STATUSES.COMPLETE.value), str(DATA_STATUSES.INCOMPLETE.value)]
     offer_statuses = [str(OFFER_STATUSES.OPEN.value), str(OFFER_STATUSES.MISSING_DATA.value), str(OFFER_STATUSES.CREATED.value)]
-    for index in range(30):
+    for index in range(800):
         customer = customers[random.randint(0,len(customers)-1)]
         reseller = resellers[random.randint(0,len(resellers)-1)]
         data_status = data_statuses[random.randint(0, len(data_statuses) - 1)]

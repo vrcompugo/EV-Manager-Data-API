@@ -13,6 +13,7 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     number = db.Column(db.String(20))
+    name = db.Column(db.String(80))
 
 
 class ProductSchema(ModelSchema):

@@ -48,6 +48,15 @@ def deploy_test_data(module):
         if module is None or module == "survey":
             from app.modules.survey import import_test_data as survey_test_data
             survey_test_data()
+        if module is None or module == "product":
+            from app.modules.product import import_test_data as product_test_data
+            product_test_data()
+        if module is None or module == "offer":
+            from app.modules.offer import import_test_data as offer_test_data
+            offer_test_data()
+        if module is None or module == "contract":
+            from app.modules.contract import import_test_data as contract_test_data
+            contract_test_data()
 
 
 @manager.command

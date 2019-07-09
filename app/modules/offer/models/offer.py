@@ -6,6 +6,7 @@ from app import db
 from app.modules.customer.models.customer import CustomerSchema
 from app.modules.reseller.models.reseller import ResellerSchema
 
+
 class Offer(db.Model):
     __versioned__ = {}
     __tablename__ = "offer"

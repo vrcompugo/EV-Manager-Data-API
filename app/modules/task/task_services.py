@@ -41,4 +41,7 @@ def get_one_item(id, fields = None):
     return get_one_item_by_model(Task, TaskSchema, id, fields, [db.subqueryload("role")])
 
 
+def update_all_tasks():
+    pass
+
 from .tasks.survey_tasks import *

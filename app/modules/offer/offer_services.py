@@ -12,6 +12,7 @@ def add_item(data):
     new_item = Offer()
     new_item = set_attr_by_dict(new_item, data, ["id"])
     db.session.add(new_item)
+    new_item.last_updated = datetime.datetime.now()
     db.session.commit()
     return new_item
 
