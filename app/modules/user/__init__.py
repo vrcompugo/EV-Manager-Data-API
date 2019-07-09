@@ -35,16 +35,23 @@ def install():
          insurance_role, maintenance_role])
     db.session.flush()
 
+    role_ids = []
+    roles = db.session.query(UserRole).all()
+    for role in roles:
+        role_ids.append(role.id)
     add_item({
         "username": "root",
         "password": password,
         "email": "a.hedderich@hbundb.de",
-        "roles": [admin_role.id]
+        "roles": role_ids
     })
 
 
 def import_test_data():
-    dev_role = db.session.query(UserRole).filter(UserRole.code == "dev").one()
+    role_ids = []
+    roles = db.session.query(UserRole).all()
+    for role in roles:
+        role_ids.append(role.id)
     username = prompt("dev username")
     if username is None:
         print("import canceled")
@@ -61,6 +68,6 @@ def import_test_data():
         "username": username,
         "password": password,
         "email": email,
-        "roles": [dev_role.id]
+        "roles": role_ids
     })
 

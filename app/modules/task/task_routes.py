@@ -6,6 +6,7 @@ from luqum.parser import parser
 from app.decorators import token_required, api_response
 
 from .task_services import add_item, update_item, get_items, get_one_item
+from ..auth.auth_services import get_logged_in_user
 
 
 api = Namespace('Tasks')
@@ -52,6 +53,11 @@ class Items(Resource):
         sort = request.args.get("sort") or ""
         fields = request.args.get("fields") or "_default_"
         query = request.args.get("q") or None
+        if query is None:
+            logged_in_user = get_logged_in_user(request)
+            print(logged_in_user)
+            query = "(role_id: " + " OR role_id: ".join(str(x) for x in logged_in_user["role_ids"]) + ") AND (user_id: ISNULL OR user_id: {})".format(logged_in_user["user_id"])
+            print(query)
         tree = None
         if query is not None:
             tree = parser.parse(query)

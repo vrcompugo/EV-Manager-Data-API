@@ -68,14 +68,17 @@ def get_logged_in_user(new_request):
         resp = decode_auth_token(auth_token)
         user = User.query.filter_by(id=resp.get("sub")).first()
         roles = []
+        role_ids = []
         permissions = []
         for role in user.roles:
             roles.append(role.code)
+            role_ids.append(role.id)
             permissions += role.permissions
         return {
                 'user_id': user.id,
                 'email': user.email,
                 'roles': roles,
+                'role_ids': role_ids,
                 'permissions': permissions,
                 'registered_on': str(user.registered_on)
             }
