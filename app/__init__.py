@@ -8,6 +8,7 @@ from .config import config_by_name
 
 db = SQLAlchemy()
 flask_bcrypt = Bcrypt()
+make_versioned(user_cls="User", plugins=[FlaskPlugin()])
 
 
 def create_app(config_name):
@@ -16,7 +17,6 @@ def create_app(config_name):
     app.config.from_object(config_by_name[config_name])
     db.init_app(app)
     flask_bcrypt.init_app(app)
-    make_versioned(user_cls="User", plugins=[FlaskPlugin()])
     CORS(app, origins="*", allow_headers=[
         "Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
          supports_credentials=True)

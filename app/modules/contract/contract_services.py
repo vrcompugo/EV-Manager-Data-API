@@ -12,22 +12,28 @@ from .models.contract import Contract, ContractSchema
 
 
 def add_item(data):
-    offer = db.session.query(Offer).get(data["offer_id"])
+    offer = None
+    if data["offer_id"] is not None:
+        offer = db.session.query(Offer).get(data["offer_id"])
     if offer is not None:
-        project = add_project({
-            "customer_id": offer.customer_id,
-            "address_id": offer.address_id,
-            "payment_account_id": offer.payment_account_id,
-            "reseller_id": offer.reseller_id,
-            "datetime": data["datetime"]
-        })
-        data["project_id"] = project.id
-        new_item = Contract()
-        new_item = set_attr_by_dict(new_item, data, ["id"])
-        new_item.number = "C{}".format(random.randint(100000, 999999))
-        db.session.add(new_item)
-        db.session.commit()
-        return new_item
+        data["customer_id"] = offer.customer_id
+        data["address_id"] = offer.address_id
+        data["payment_account_id"] = offer.payment_account_id
+        data["reseller_id"] = offer.reseller_id
+    project = add_project({
+        "customer_id": data["customer_id"],
+        "address_id": data["address_id"],
+        "payment_account_id": data["payment_account_id"],
+        "reseller_id": data["reseller_id"],
+        "datetime": data["datetime"]
+    })
+    data["project_id"] = project.id
+    new_item = Contract()
+    new_item = set_attr_by_dict(new_item, data, ["id"])
+    new_item.number = "C{}".format(random.randint(100000, 999999))
+    db.session.add(new_item)
+    db.session.commit()
+    return new_item
 
 
 def update_item(id, data):

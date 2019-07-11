@@ -36,6 +36,9 @@ services:
     volumes:
       - ./app:/usr/src/app/app
       - ./migrations:/usr/src/app/migrations
+    networks:
+      - default
+      - shared
     ports:
       - 5000:5000
     links:
@@ -51,3 +54,8 @@ volumes:
   postgres_data:
   minio_data:
   minio_config:
+
+networks:
+  shared:
+    external:
+      name: kez_default

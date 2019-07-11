@@ -23,6 +23,7 @@ class Contract(db.Model):
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
     reseller = db.relationship("Reseller")
     datetime = db.Column(db.DateTime)
+    delivery_begin = db.Column(db.Date)
     status = db.Column(db.String(20))
     data = db.Column(db.JSON)
     calculation = db.Column(db.JSON)

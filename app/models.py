@@ -8,3 +8,5 @@ from app.modules.project.models import *
 from app.modules.pv_system.models import *
 from app.modules.survey.models import *
 from app.modules.task.models import *
+from app.modules.importer.models import *
+

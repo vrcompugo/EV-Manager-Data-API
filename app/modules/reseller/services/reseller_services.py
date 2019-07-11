@@ -1,6 +1,8 @@
 import datetime
 
 from app import db
+from app.models import UserRole
+from app.modules.user.user_services import add_item as add_user_item
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
@@ -9,8 +11,16 @@ from ..models.reseller import Reseller, ResellerSchema
 
 
 def add_item(data):
+    sales_role = db.session.query(UserRole).filter(UserRole.code == "sales").one()
+    user = add_user_item({
+        "username": data["email"],
+        "password": "test",
+        "email": data["email"],
+        "roles": [sales_role.id]
+    })
     new_item = Reseller()
     new_item = set_attr_by_dict(new_item, data, ["id"])
+    new_item.user_id = user.id
     db.session.add(new_item)
     db.session.commit()
     return new_item

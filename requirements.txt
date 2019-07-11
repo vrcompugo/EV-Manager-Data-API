@@ -16,3 +16,4 @@ marshmallow
 luqum
 marshmallow_sqlalchemy
 barnum
+requests

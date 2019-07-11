@@ -1,13 +1,22 @@
+from sqlalchemy import or_
+
 from app import db
-from ..models import Customer, CustomerSchema, CustomerAddress, CustomerPaymentAccount
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
 
+from ..models import Customer, CustomerSchema, CustomerAddress, CustomerPaymentAccount
+
 
 def add_item(data):
-    item = Customer.query.filter_by(email=data['email']).first()
-    if not item:
+    item = None
+    if data['email'] is not None:
+        item = Customer.query.filter_by(email=data['email']).first()
+    if item is None and data['customer_number'] is not None:
+        item = Customer.query.filter_by(customer_number=data['customer_number']).first()
+    if item is None and data['lead_number'] is not None:
+        item = Customer.query.filter_by(lead_number=data['lead_number']).first()
+    if item is None:
         new_item = Customer()
         new_item = set_attr_by_dict(new_item, data, ["id", "default_address", "default_payment_account"])
         db.session.add(new_item)
@@ -37,6 +46,23 @@ def update_item(id, data):
         return item
     else:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 404)
+
+
+def merge_items(data):
+    item = None
+    if data['email'] is not None and data['email'] != "":
+        item = Customer.query.filter(Customer.email == data['email']).first()
+    if item is None and data['customer_number'] is not None and data['customer_number'] != "":
+        item = Customer.query.filter(Customer.customer_number == data['customer_number']).first()
+    if item is None and data['lead_number'] is not None and data['lead_number'] != "":
+        item = Customer.query.filter(Customer.lead_number == data['lead_number']).first()
+
+    if item is None:
+        item = add_item(data)
+    else:
+        item = set_attr_by_dict(item, data, ["id"], merge=True)
+        db.session.commit()
+    return item
 
 
 def get_items(tree, sort, offset, limit, fields):
