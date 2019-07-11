@@ -56,7 +56,7 @@ def revalidate_user():
     user = get_logged_in_user(request)
     auth_token = encode_auth_token(user["user_id"])
     if auth_token:
-        return {"token": auth_token.decode(), "role": user["role"]}
+        return {"token": auth_token.decode(), "roles": user["roles"]}
     else:
         raise ApiException("invalid_credentials", "Invalid Credentials. Please log in again.", 401)
 
