@@ -13,7 +13,6 @@ association_table = db.Table('user_role_association',
 
 class User(db.Model):
     """ User Model for storing user related details """
-    __versioned__ = {}
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

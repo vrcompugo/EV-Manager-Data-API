@@ -16,24 +16,24 @@ def install():
 
     admin_role = UserRole(label="root", code="root", permissions=full_permission_list + ["create_root_user"])
     dev_role = UserRole(label="Entwickler", code="dev", permissions=full_permission_list)
-    sales_role = UserRole(label=u"Verkäufer", code="sales", permissions=[])
-    sales_lead_role = UserRole(label="Verkaufsleiter", code="sales_lead", permissions=[])
-    front_office_role = UserRole(label="Front Office", code="front_office", permissions=[])
-    bookkeeping_role = UserRole(label="Buchhaltung", code="bookkeeping", permissions=[])
-    cloud_manager_role = UserRole(label="Cloud Manager", code="cloud_manager", permissions=[])
-    evu_manager_role = UserRole(label="EVU Manager", code="evu_manager", permissions=[])
-    construction_lead_role = UserRole(label="Montageleiter", code="construction_lead", permissions=[])
-    construction_role = UserRole(label="Monteur", code="construction", permissions=[])
-    warehouse_role = UserRole(label="Lagerverwaltung", code="warehouse", permissions=[])
-    customer_service_role = UserRole(label="Kunden Service", code="customer_service", permissions=[])
-    insurance_role = UserRole(label="Versicherung", code="insurance", permissions=[])
-    maintenance_role = UserRole(label="Wartung", code="maintenance", permissions=[])
+    sales_role = UserRole(label=u"Verkäufer", code="sales", permissions=full_permission_list)
+    sales_lead_role = UserRole(label="Verkaufsleiter", code="sales_lead", permissions=full_permission_list)
+    front_office_role = UserRole(label="Front Office", code="front_office", permissions=full_permission_list)
+    bookkeeping_role = UserRole(label="Buchhaltung", code="bookkeeping", permissions=full_permission_list)
+    cloud_manager_role = UserRole(label="Cloud Manager", code="cloud_manager", permissions=full_permission_list)
+    evu_manager_role = UserRole(label="EVU Manager", code="evu_manager", permissions=full_permission_list)
+    construction_lead_role = UserRole(label="Montageleiter", code="construction_lead", permissions=full_permission_list)
+    construction_role = UserRole(label="Monteur", code="construction", permissions=full_permission_list)
+    warehouse_role = UserRole(label="Lagerverwaltung", code="warehouse", permissions=full_permission_list)
+    customer_service_role = UserRole(label="Kunden Service", code="customer_service", permissions=full_permission_list)
+    insurance_role = UserRole(label="Versicherung", code="insurance", permissions=full_permission_list)
+    maintenance_role = UserRole(label="Wartung", code="maintenance", permissions=full_permission_list)
 
     db.session.add_all(
         [admin_role, dev_role, sales_role, sales_lead_role, front_office_role, bookkeeping_role, cloud_manager_role,
          evu_manager_role, construction_lead_role, construction_role, warehouse_role, customer_service_role,
          insurance_role, maintenance_role])
-    db.session.flush()
+    db.session.commit()
 
     role_ids = []
     roles = db.session.query(UserRole).all()
@@ -42,7 +42,7 @@ def install():
     add_item({
         "username": "root",
         "password": password,
-        "email": "a.hedderich@hbundb.de",
+        "email": "root@hbundb.de",
         "roles": role_ids
     })
 

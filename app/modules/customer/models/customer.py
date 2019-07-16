@@ -25,10 +25,6 @@ class Customer(db.Model):
     default_payment_account = db.relationship("CustomerPaymentAccount", foreign_keys=[default_payment_account_id], post_update=True)
 
 
-    def __repr__(self):
-        return "<User '{}'>".format(self.username)
-
-
 class CustomerSchema(ModelSchema):
 
     versions = fields.Constant([])

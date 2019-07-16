@@ -10,7 +10,7 @@ def import_test_data():
     from .offer_services import add_item, update_item
 
     statuses = [
-        "created", "sent_out", "declined", "approved"
+        "created", "sent_out", "declined", "accepted"
     ]
 
     surveys = db.session.query(Survey).filter(Survey.offer_status == "open").all()

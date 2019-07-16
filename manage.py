@@ -60,22 +60,16 @@ def deploy_remote_import_data(module):
 
 
 @manager.option("-m", "--module", dest='module', default=None)
-def import_remote_data(module):
-    if prompt_bool(
-            "Are you sure you want to import from remote source"):
+@manager.option("-s", "--source", dest='source', default=None)
+@manager.option("-y", "--y", dest='yes', default=None)
+def import_remote_data(yes, source, module):
+    if source is None:
+        print("No source parameter given -s or --source")
+        return
+    if yes is not None or prompt_bool(
+            "Are you sure you want to import from remote source: {}".format(source)):
         from app.modules.importer.import_services import import_by_source_module
-        if module is None or module == "customer":
-            import_by_source_module("data.efi-strom.de", "customer")
-        if module is None or module == "reseller":
-            import_by_source_module("data.efi-strom.de", "reseller")
-        if module is None or module == "survey":
-            import_by_source_module("data.efi-strom.de", "survey")
-        if module is None or module == "product":
-            import_by_source_module("data.efi-strom.de", "product")
-        if module is None or module == "offer":
-            import_by_source_module("data.efi-strom.de", "offer")
-        if module is None or module == "contract":
-            import_by_source_module("data.efi-strom.de", "contract")
+        import_by_source_module(source, module)
 
 
 @manager.command

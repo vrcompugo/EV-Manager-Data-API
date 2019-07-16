@@ -28,7 +28,7 @@ def filter_input(data):
     if "lead_number" in data and data["lead_number"] == "":
         data["lead_number"] = None
 
-    if "default_paymentinfo" in data:
+    if "default_paymentinfo" in data and data["default_paymentinfo"] is not None:
         data["default_payment_account"] = {
             "id": data["default_paymentinfo"]["id"],
             "type": "bankaccount",
@@ -55,12 +55,14 @@ def run_import():
                 item = merge_items(item_data)
                 if item is not None:
                     associate_item(model="Customer", remote_id=item_data["id"], local_id=item.id)
-                    associate_item(model="CustomerAddress",
-                                   remote_id=default_address_id,
-                                   local_id=item.default_address.id)
-                    associate_item(model="CustomerPaymentAccount",
-                                   remote_id=default_paymentinfo_id,
-                                   local_id=item.default_payment_account.id)
+                    if item.default_address is not None:
+                        associate_item(model="CustomerAddress",
+                                       remote_id=default_address_id,
+                                       local_id=item.default_address.id)
+                    if item.default_payment_account is not None:
+                        associate_item(model="CustomerPaymentAccount",
+                                       remote_id=default_paymentinfo_id,
+                                       local_id=item.default_payment_account.id)
             else:
                 customer = db.session.query(Customer).get(item.local_id)
                 if customer.default_address is not None:

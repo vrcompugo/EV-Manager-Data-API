@@ -41,7 +41,23 @@ def get_one_item(id, fields = None):
     return get_one_item_by_model(Task, TaskSchema, id, fields, [db.subqueryload("role")])
 
 
-def update_all_tasks():
-    pass
+def update_task_list(old_task_list, new_task_list):
+    for new_task in new_task_list:
+        old_tasks = find_new_task_in_list(old_task_list, new_task)
+        for old_task in old_tasks:
+            old_task_list.remove(old_task)
+        if len(old_tasks) == 0:
+            add_item(new_task)
+    for old_task in old_task_list:
+        db.session.remove(old_task)
 
-from .tasks.survey_tasks import *
+
+def find_new_task_in_list(old_task_list, new_task):
+    old_tasks = []
+    for old_task in old_task_list:
+        if old_task.action == new_task["action"] and \
+                old_task.user_id and new_task["user_id"] and\
+                old_task.role_id == new_task["role_id"]:
+            old_tasks.append(old_task)
+    return old_tasks
+

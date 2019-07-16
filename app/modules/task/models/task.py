@@ -3,8 +3,7 @@ from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
 from app import db
-from app.modules.customer.models.customer import CustomerSchema
-from app.modules.user.models.user_role import UserRoleShortSchema
+
 
 class Task(db.Model):
     __versioned__ = {}
@@ -13,6 +12,8 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     datetime = db.Column(db.DateTime)
     reminder_datetime = db.Column(db.DateTime)
+    action = db.Column(db.String(50))
+    link = db.Column(db.String(50))
     description = db.Column(db.String(255))
     customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"))
     customer = db.relationship("Customer")
@@ -66,8 +67,9 @@ class TaskSchema(ModelSchema):
     customer_number = fields.String()
     project_number = fields.String()
     contract_number = fields.String()
-    role = fields.Nested(UserRoleShortSchema)
-    customer = fields.Nested(CustomerSchema)
+    customer = fields.Nested("CustomerSchema")
+    role = fields.Nested("UserRoleShortSchema")
+    survey = fields.Nested("SurveySchema")
     versions = fields.Constant([])
 
     class Meta:

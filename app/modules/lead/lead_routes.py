@@ -5,21 +5,23 @@ from luqum.parser import parser
 
 from app.decorators import token_required, api_response
 
-from .offer_services import add_item, update_item, get_items, get_one_item
+from .project_services import add_item, update_item, get_items, get_one_item
 
 
-api = Namespace('Offer')
-_item_input = api.model("Offer_", model={
-    'product_number': fields.String(description=''),
-    'survey_id': fields.Integer(description=''),
-    'customer_id': fields.Integer(description=''),
-    'address_id': fields.Integer(description=''),
-    'payment_account_id': fields.Integer(description=''),
-    'reseller_id': fields.Integer(description=''),
+api = Namespace('Project')
+_item_input = api.model("Project_", model={
     'datetime': fields.DateTime(description=''),
-    'status': fields.String(description=''),
-    'data': fields.Raw(description=''),
-    'price_definition': fields.Raw(description='')
+    'reminder_datetime': fields.DateTime(description=''),
+    'description': fields.String(description=''),
+    'customer_id': fields.Integer(description=''),
+    'role_id': fields.Integer(description=''),
+    'reseller_id': fields.Integer(description=''),
+    'project_id': fields.Integer(description=''),
+    'offer_id': fields.Integer(description=''),
+    'project_id': fields.Integer(description=''),
+    'contract_id': fields.Integer(description=''),
+    'pv_system_id': fields.Integer(description=''),
+    'product_id': fields.Integer(description='')
 })
 
 
@@ -33,10 +35,10 @@ class Items(Resource):
         "fields": {"type":"string", "default": "_default_"},
         "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
     })
-    @token_required("list_offer")
+    @token_required("list_project")
     def get(self):
         """
-            List offers
+            List projects
             sort:
                 - "column1,column2" -> column1 asc, column2 asc
                 - "+column1,-column2" -> column1 asc, column2 desc
@@ -64,7 +66,7 @@ class Items(Resource):
 
     @api_response
     @api.expect(_item_input, validate=True)
-    @token_required("create_offer")
+    @token_required("create_project")
     def post(self):
         """Creates a new User """
         data = request.json
@@ -80,9 +82,9 @@ class User(Resource):
     @api.doc(params={
         "fields": {"type":"string", "default": "_default_"},
     })
-    @token_required("show_offer")
+    @token_required("show_project")
     def get(self, id):
-        """get a offer given its identifier"""
+        """get a project given its identifier"""
         fields = request.args.get("fields") or "_default_"
         item_dict = get_one_item(id, fields)
         if not item_dict:
@@ -91,9 +93,9 @@ class User(Resource):
             return item_dict
 
     @api.response(201, 'User successfully updated.')
-    @api.doc('update offer')
+    @api.doc('update project')
     @api.expect(_item_input, validate=True)
-    @token_required("update_offer")
+    @token_required("update_project")
     def put(self, id):
         """Update User """
         data = request.json

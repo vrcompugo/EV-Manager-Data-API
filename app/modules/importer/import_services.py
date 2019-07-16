@@ -1,23 +1,17 @@
 
 
 def import_by_source_module(source, model):
+
     if source == "data.efi-strom.de":
-        if model == "customer":
-            from .sources.data_efi_strom.customer import run_import
-            return run_import()
-        if model == "reseller":
-            from .sources.data_efi_strom.reseller import run_import
-            return run_import()
-        if model == "survey":
-            from .sources.data_efi_strom.survey import run_import
-            return run_import()
-        if model == "product":
-            from .sources.data_efi_strom.product import run_import
-            return run_import()
-        if model == "offer":
-            from .sources.data_efi_strom.offer import run_import
-            return run_import()
-        if model == "contract":
-            from .sources.data_efi_strom.contract import run_import
-            return run_import()
+        from .sources.data_efi_strom import run_import_by_model
+        run_import_by_model(model)
+
+    if source == "nocrm.io":
+        from .sources.nocrm_io import run_import_by_model
+        run_import_by_model(model)
+
+    if source == "orgamaxx":
+        from .sources.orgamaxx import run_import_by_model
+        run_import_by_model(model)
+
     return None

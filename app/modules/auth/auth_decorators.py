@@ -17,7 +17,7 @@ class token_required(object):
             if logged_in_user is not None:
                 if self.permission is None or \
                         self.permission in logged_in_user["permissions"] or \
-                        logged_in_user["permissions"][0] == "all":
+                        "all" in logged_in_user["permissions"]:
                     return f(*args, **kwargs)
                 raise ApiException("invalid_permission", "Invalid Permission.", 401)
             raise ApiException("invalid_token", "Invalid Token. Please log in again.", 401)

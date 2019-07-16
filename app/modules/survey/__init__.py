@@ -1,15 +1,16 @@
-import random
-from datetime import timedelta, datetime as dt
 
-from app import db
-from app.models import Customer, Reseller
-
-from .survey_services import add_item, update_item
-from .models.survey import DATA_STATUSES, OFFER_STATUSES
 
 
 def import_test_data():
     from barnum import gen_data
+    import random
+    from datetime import timedelta, datetime as dt
+
+    from app import db
+    from app.models import Customer, Reseller
+
+    from .survey_services import add_item, update_item
+    from .models.survey import DATA_STATUSES, OFFER_STATUSES
 
     customers = db.session.query(Customer).all()
     resellers = db.session.query(Reseller).all()

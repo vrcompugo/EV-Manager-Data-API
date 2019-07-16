@@ -21,12 +21,12 @@ def add_item(data):
         new_item = set_attr_by_dict(new_item, data, ["id", "default_address", "default_payment_account"])
         db.session.add(new_item)
         db.session.flush()
-        if "default_address" in data:
+        if "default_address" in data and data["default_address"] is not None:
             customer_address = CustomerAddress(**data["default_address"])
             customer_address.customer_id = new_item.id
             customer_address.status = "ok"
             new_item.default_address = customer_address
-            if "default_payment_account" in data:
+            if "default_payment_account" in data and data["default_payment_account"] is not None:
                 default_payment_account = CustomerPaymentAccount(**data["default_payment_account"])
                 default_payment_account.customer_id = new_item.id
                 default_payment_account.address = customer_address
@@ -60,7 +60,7 @@ def merge_items(data):
     if item is None:
         item = add_item(data)
     else:
-        item = set_attr_by_dict(item, data, ["id"], merge=True)
+        item = set_attr_by_dict(item, data, ["id", "default_address", "default_payment_account"], merge=True)
         db.session.commit()
     return item
 

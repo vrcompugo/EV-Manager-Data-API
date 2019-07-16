@@ -55,9 +55,7 @@ class Items(Resource):
         query = request.args.get("q") or None
         if query is None:
             logged_in_user = get_logged_in_user(request)
-            print(logged_in_user)
             query = "(role_id: " + " OR role_id: ".join(str(x) for x in logged_in_user["role_ids"]) + ") AND (user_id: ISNULL OR user_id: {})".format(logged_in_user["user_id"])
-            print(query)
         tree = None
         if query is not None:
             tree = parser.parse(query)

@@ -1,10 +1,18 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
+from enum import Enum
 
 from app import db
 from app.modules.customer.models.customer import CustomerSchema
 from app.modules.reseller.models.reseller import ResellerSchema
+
+
+class STATUSES(Enum):
+    created = "created"
+    sent_out = "sent_out"
+    declined = "declined"
+    accepted = "accepted"
 
 
 class Offer(db.Model):
@@ -22,6 +30,8 @@ class Offer(db.Model):
     payment_account = db.relationship("CustomerPaymentAccount")
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
     reseller = db.relationship("Reseller")
+    survey_id = db.Column(db.Integer, db.ForeignKey("survey.id"))
+    survey = db.relationship("Survey")
     datetime = db.Column(db.DateTime)
     status = db.Column(db.String(20))
     data = db.Column(db.JSON)
