@@ -33,5 +33,5 @@ def get_items(tree, sort, offset, limit, fields):
 
 
 def get_one_item(id, fields = None):
-    return get_one_item_by_model(Project, ProjectSchema, id, fields, [db.subqueryload("role")])
+    return get_one_item_by_model(Project, ProjectSchema, id, fields, [])
 
