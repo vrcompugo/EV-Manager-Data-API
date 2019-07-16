@@ -90,7 +90,8 @@ class User(Resource):
         if not item_dict:
             api.abort(404)
         else:
-            return item_dict
+            return {"status":"success",
+                "data": item_dict}
 
     @api.response(201, 'User successfully updated.')
     @api.doc('update reseller')
