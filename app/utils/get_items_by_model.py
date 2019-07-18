@@ -22,6 +22,7 @@ def get_items_by_model(model, model_schema, tree, sort, offset, limit, fields):
                     sort_list.append(column.asc())
         if len(sort_list) > 0:
             query = query.order_by(*sort_list)
+    total_count = query.count()
     query = query.offset(offset).limit(limit)
     items = query.all()
     item_schema = model_schema()
@@ -36,7 +37,7 @@ def get_items_by_model(model, model_schema, tree, sort, offset, limit, fields):
                     item[field] = data[field]
             list.append(item)
         datas = list
-    return datas
+    return datas, total_count
 
 
 def get_one_item_by_model(model, model_schema, id, fields, options=None):
