@@ -66,6 +66,7 @@ def run_import():
 
 
 def update_lead_by_offer(offer):
+    print("update lead", offer)
     if "pv_offer" in offer.data and "files" in offer.data["pv_offer"]:
         lead = db.session.query(Lead).filter(Lead.number == offer.customer.lead_number).first()
         if lead is not None:
