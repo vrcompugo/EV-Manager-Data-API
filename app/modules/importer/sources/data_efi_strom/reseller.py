@@ -23,9 +23,11 @@ def filter_input_reseller(data):
 
 
 def run_import():
+    print("Import Reseller")
     data = post("ResellerGroup")
     if "items" in data:
         for item_data in data["items"]:
+            print("Group: ", item_data["name"])
 
             item_data = filter_input_group(item_data)
             item = find_association(model="ResellerGroup", remote_id=item_data["id"])
@@ -39,6 +41,7 @@ def run_import():
     data = post("Reseller")
     if "items" in data:
         for item_data in data["items"]:
+            print("Reseller: ", item_data["email"])
 
             item_data = filter_input_reseller(item_data)
             item = find_association(model="Reseller", remote_id=item_data["id"])

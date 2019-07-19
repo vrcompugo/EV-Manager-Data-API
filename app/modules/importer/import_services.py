@@ -1,5 +1,6 @@
 from .sources.nocrm_io.lead import update_lead_by_offer as nocrm_update_lead_by_offer
 
+
 def import_by_source_module(source, model, remote_id=None, local_id=None):
 
     if source == "data.efi-strom.de":
