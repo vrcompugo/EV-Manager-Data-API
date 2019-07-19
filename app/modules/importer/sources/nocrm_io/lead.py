@@ -61,7 +61,7 @@ def run_import():
         else:
             data = filter_input(item_data)
             if data is not None:
-                update_item(lead_association.remote_id, data)
+                update_item(lead_association.local_id, data)
     return False
 
 
