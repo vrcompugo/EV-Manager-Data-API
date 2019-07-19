@@ -8,6 +8,8 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN chmod 644 manage.py
+RUN mkdir /usr/src/app/tmp
+RUN chmod 777 /usr/src/app/tmp
 
 RUN pip install --no-cache-dir -r requirements.txt
 

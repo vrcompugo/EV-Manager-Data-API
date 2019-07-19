@@ -1,6 +1,6 @@
 
 
-def run_import_by_model(model):
+def run_import_by_model(model, remote_id=None, local_id=None):
 
     if model is None or model == "customer":
         from .customer import run_import
@@ -20,7 +20,7 @@ def run_import_by_model(model):
 
     if model is None or model == "offer":
         from .offer import run_import
-        return run_import()
+        return run_import(remote_id=remote_id, local_id=local_id)
 
     if model is None or model == "contract":
         from .contract import run_import

@@ -6,6 +6,8 @@ from flask_httpauth import HTTPBasicAuth
 from app.modules.auth.auth_routes import api as auth_ns
 from app.modules.contract.contract_routes import api as contract_ns
 from app.modules.customer.routes import api as customer_ns
+from app.modules.file.file_routes import api as file_ns
+from app.modules.importer.import_routes import api as import_ns
 from app.modules.offer.offer_routes import api as offer_ns
 from app.modules.product.product_routes import api as product_ns
 from app.modules.project.project_routes import api as project_ns
@@ -76,6 +78,8 @@ api.add_namespace(reseller_ns, path='/resellers')
 api.add_namespace(reseller_group_ns, path='/reseller_groups')
 api.add_namespace(survey_ns, path='/surveys')
 api.add_namespace(project_ns, path='/projects')
+api.add_namespace(file_ns, path='/files')
+api.add_namespace(import_ns, path='/imports')
 api.add_namespace(offer_ns, path='/offers')
 api.add_namespace(contract_ns, path='/contracts')
 api.add_namespace(product_ns, path='/product')

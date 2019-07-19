@@ -55,13 +55,14 @@ class Items(Resource):
         tree = None
         if query is not None:
             tree = parser.parse(query)
-        data = get_items(tree, sort, offset, limit, fields)
+        data, total_count = get_items(tree, sort, offset, limit, fields)
         return {"status":"success",
                 "fields": fields,
                 "sort": sort,
                 "offset": offset,
                 "limit": limit,
                 "query": query,
+                "total_count": total_count,
                 "data": data}
 
     @api_response

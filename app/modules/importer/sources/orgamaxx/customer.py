@@ -9,10 +9,16 @@ from ._association import find_association, associate_item
 
 
 def filter_input(item_data):
+    company_name = ""
+    if item_data["CUSTKIND"] == 0:
+        company_name = item_data["NAME1"]
+        if item_data["NAME3"] is not None:
+            company_name += " " + item_data["NAME3"]
+
     data = {
         "customer_number": str(item_data["CUSTNO"]) if item_data["CUSTNO"] is not None else None,
         "lead_number": str(item_data["INTERESTEDNO"]) if item_data["INTERESTEDNO"] is not None else None,
-        "company": (item_data["NAME1"] + " " + item_data["NAME3"]) if item_data["CUSTKIND"] == 0 else "",
+        "company": company_name,
         "salutation": item_data["CUSTNO"],
         "title": item_data["TITLE"],
         "firstname": item_data["NAME2"],
@@ -22,7 +28,7 @@ def filter_input(item_data):
         "birthday": item_data["BIRTHDAY"],
         "comment": item_data["NOTES"],
         "default_address": {
-            "company": (item_data["NAME1"] + " " + item_data["NAME3"]) if item_data["CUSTKIND"] == 0 else "",
+            "company": company_name,
             "salutation": item_data["CUSTNO"],
             "title": item_data["TITLE"],
             "firstname": item_data["NAME2"],

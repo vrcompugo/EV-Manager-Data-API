@@ -33,43 +33,45 @@ def install():
 
 
 @manager.option("-m", "--module", dest='module', default=None)
-def deploy_remote_import_data(module):
+def deploy_test_data(module):
     if prompt_bool(
             "Are you sure you want to import test data"):
         if module is None or module == "user":
-            from app.modules.user import remote_import_data as user_remote_import_data
+            from app.modules.user import import_test_data as user_remote_import_data
             user_remote_import_data()
         if module is None or module == "customer":
-            from app.modules.customer import remote_import_data as customer_remote_import_data
+            from app.modules.customer import import_test_data as customer_remote_import_data
             customer_remote_import_data()
         if module is None or module == "reseller":
-            from app.modules.reseller import remote_import_data as reseller_remote_import_data
+            from app.modules.reseller import import_test_data as reseller_remote_import_data
             reseller_remote_import_data()
         if module is None or module == "survey":
-            from app.modules.survey import remote_import_data as survey_remote_import_data
+            from app.modules.survey import import_test_data as survey_remote_import_data
             survey_remote_import_data()
         if module is None or module == "product":
-            from app.modules.product import remote_import_data as product_remote_import_data
+            from app.modules.product import import_test_data as product_remote_import_data
             product_remote_import_data()
         if module is None or module == "offer":
-            from app.modules.offer import remote_import_data as offer_remote_import_data
+            from app.modules.offer import import_test_data as offer_remote_import_data
             offer_remote_import_data()
         if module is None or module == "contract":
-            from app.modules.contract import remote_import_data as contract_remote_import_data
+            from app.modules.contract import import_test_data as contract_remote_import_data
             contract_remote_import_data()
 
 
 @manager.option("-m", "--module", dest='module', default=None)
 @manager.option("-s", "--source", dest='source', default=None)
+@manager.option("-l", "--local_id", dest='local_id', default=None)
+@manager.option("-r", "--remote_id", dest='remote_id', default=None)
 @manager.option("-y", "--y", dest='yes', default=None)
-def import_remote_data(yes, source, module):
+def import_remote_data(yes, source, module, local_id, remote_id):
     if source is None:
         print("No source parameter given -s or --source")
         return
     if yes is not None or prompt_bool(
             "Are you sure you want to import from remote source: {}".format(source)):
         from app.modules.importer.import_services import import_by_source_module
-        import_by_source_module(source, module)
+        import_by_source_module(source=source, model=module, local_id=local_id, remote_id=remote_id)
 
 
 @manager.command

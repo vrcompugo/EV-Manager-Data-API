@@ -6,7 +6,7 @@ class CustomerAddress(db.Model):
     __tablename__ = "customer_address"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    customer_id = db.Column(db.Integer(), db.ForeignKey('customer.id'), index=True)
+    customer_id = db.Column(db.Integer(), db.ForeignKey('customer.id'))
     salutation = db.Column(db.String(30))
     title = db.Column(db.String(30))
     firstname = db.Column(db.String(100))

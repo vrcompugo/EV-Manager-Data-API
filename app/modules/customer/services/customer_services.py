@@ -21,7 +21,7 @@ def add_item(data):
         new_item = set_attr_by_dict(new_item, data, ["id", "default_address", "default_payment_account"])
         db.session.add(new_item)
         db.session.flush()
-        if "default_address" in data and data["default_address"] is not None:
+        if False and "default_address" in data and data["default_address"] is not None:
             customer_address = CustomerAddress(**data["default_address"])
             customer_address.customer_id = new_item.id
             customer_address.status = "ok"

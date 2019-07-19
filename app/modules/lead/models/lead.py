@@ -24,6 +24,8 @@ class Lead(db.Model):
     value = db.Column(db.Numeric(scale=4, precision=12))
     last_update = db.Column(db.DateTime)
     status = db.Column(db.String(20))
+    data = db.Column(db.JSON)
+
 
     @hybrid_property
     def reseller_name(self):
@@ -50,9 +52,8 @@ class LeadSchema(ModelSchema):
     customer_number = fields.String()
     reseller_name = fields.String()
     reseller_group = fields.String()
-    role = fields.Nested(UserRoleShortSchema)
     customer = fields.Nested(CustomerSchema)
     versions = fields.Constant([])
 
     class Meta:
-        model = Project
+        model = Lead

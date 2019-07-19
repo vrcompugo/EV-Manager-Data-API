@@ -1,6 +1,6 @@
 import requests
 
-API_URL = "https://2ei3scwibnc5bkfm.myfritz.net:5000/v1/"
+API_URL = "http://2ei3scwibnc5bkfm.myfritz.net:4000/v1/"
 
 
 def authenticate():

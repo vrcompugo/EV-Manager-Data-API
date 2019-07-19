@@ -2,9 +2,12 @@ import requests
 import json
 import base64
 
+API_URL = "http://efidata"
+#API_URL = "https://data.efi-strom.de"
+
 
 def authenticate():
-    response = requests.get("https://data.efi-strom.de/AuthToken",
+    response = requests.get(API_URL + "/AuthToken",
                             auth=('ahedderich', 'iYfXea3Vg1VuGzyJDl3FaBUiR5psJsAw'))
 
     if response.status_code == 200:
@@ -21,10 +24,27 @@ def post(url, post_data = None):
     token = authenticate()
 
     if token is not None:
-        response = requests.post("https://data.efi-strom.de/v1/{}".format(url),
+        response = requests.post(API_URL + "/v1/{}".format(url),
                                      headers={'Authorization': "Basic {}".format(token)},
                                      json=post_data)
         try:
+            return response.json()
+        except:
+            print(response.text)
+    return {}
+
+
+def get(url, parameters=None, raw=False):
+
+    token = authenticate()
+
+    if token is not None:
+        response = requests.get(API_URL + "/v1/{}".format(url),
+                                     headers={'Authorization': "Basic {}".format(token)},
+                                     params=parameters)
+        try:
+            if raw:
+                return response
             return response.json()
         except:
             print(response.text)

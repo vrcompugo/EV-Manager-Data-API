@@ -5,11 +5,11 @@ from luqum.parser import parser
 
 from app.decorators import token_required, api_response
 
-from .project_services import add_item, update_item, get_items, get_one_item
+from .lead_services import add_item, update_item, get_items, get_one_item
 
 
-api = Namespace('Project')
-_item_input = api.model("Project_", model={
+api = Namespace('Lead')
+_item_input = api.model("Lead_", model={
     'datetime': fields.DateTime(description=''),
     'reminder_datetime': fields.DateTime(description=''),
     'description': fields.String(description=''),
@@ -55,13 +55,14 @@ class Items(Resource):
         tree = None
         if query is not None:
             tree = parser.parse(query)
-        data = get_items(tree, sort, offset, limit, fields)
+        data, total_count = get_items(tree, sort, offset, limit, fields)
         return {"status":"success",
                 "fields": fields,
                 "sort": sort,
                 "offset": offset,
                 "limit": limit,
                 "query": query,
+                "total_count": total_count,
                 "data": data}
 
     @api_response

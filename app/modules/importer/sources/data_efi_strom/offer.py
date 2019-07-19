@@ -1,9 +1,9 @@
 from app import db
-from app.models import Contract
-from app.modules.offer.offer_services import add_item , update_item
+from app.modules.offer.offer_services import add_item , update_item, get_one_item
 
-from ._connector import post
+from ._connector import post, get
 from ._association import find_association, associate_item
+from .file import run_import as run_file_import
 
 
 def filter_input(data):
@@ -37,19 +37,35 @@ def filter_input(data):
     return data
 
 
-def run_import():
+def run_import(remote_id=None, local_id=None):
+    if remote_id is not None:
+        item_data = get("Offer/{}".format(remote_id))["item"]
+        if item_data is not None:
+            if "pv_offer" in item_data["data"] and "files" in item_data["data"]["pv_offer"]:
+                for i in range(len(item_data["data"]["pv_offer"]["files"])):
+                    file = item_data["data"]["pv_offer"]["files"][i]
+                    local_file = run_file_import("Offer", model_id=None, id=file["id"])
+                    item_data["data"]["pv_offer"]["files"][i]["id"] = local_file.id
+                    item_data["data"]["pv_offer"]["files"][i]["uuid"] = str(local_file.uuid)
+            import_item(item_data)
+        return
     data = post("Offer", {"page": 0, "limit": 1000})
     if "items" in data:
         for item_data in data["items"]:
-
-            item_data = filter_input(item_data)
-
-            item = find_association(model="Offer", remote_id=item_data["id"])
-            if item is None:
-                item = add_item(item_data)
-                if item is not None:
-                    associate_item(model="Offer", remote_id=item_data["id"], local_id=item.id)
-            else:
-                update_item(id=item.local_id, data=item_data)
+            import_item(item_data)
 
     return False
+
+
+def import_item(item_data):
+
+    item_data = filter_input(item_data)
+
+    item = find_association(model="Offer", remote_id=item_data["id"])
+    if item is None:
+        item = add_item(item_data)
+        if item is not None:
+            associate_item(model="Offer", remote_id=item_data["id"], local_id=item.id)
+    else:
+        item = update_item(id=item.local_id, data=item_data)
+    return item

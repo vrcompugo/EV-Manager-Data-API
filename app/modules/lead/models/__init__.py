@@ -1,1 +1,1 @@
-from .project import Project
+from .lead import Lead
