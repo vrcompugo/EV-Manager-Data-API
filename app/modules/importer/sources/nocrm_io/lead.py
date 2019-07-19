@@ -66,7 +66,7 @@ def run_import():
 
 
 def update_lead_by_offer(offer):
-    if "pv_offer" in offer.data and "files" in offer.data["pv_offer"]:
+    if "pv_offer" in offer.data:
         lead = db.session.query(Lead).filter(Lead.number == offer.customer.lead_number).first()
         if lead is not None:
             print("update lead", lead)
@@ -76,15 +76,16 @@ def update_lead_by_offer(offer):
                     "amount": float(offer.data["pv_offer"]["offer_amount"])
                 })
                 print("update lead response", response, remote_link.__dict__)
-                for file in offer.data["pv_offer"]["files"]:
-                    s3_file = db.session.query(S3File).get(file["id"])
-                    file_link = find_association(model="LeadUpload", local_id=s3_file.id)
-                    if file_link is None:
-                        s3_file_content = s3_file.get_file()
-                        with open("tmp/" + s3_file.filename, 'wb') as file_data:
-                            for d in s3_file_content.stream(32 * 1024):
-                                file_data.write(d)
-                        with open("tmp/" + s3_file.filename, 'rb') as file_data:
-                            response = post("leads/{}/attachments".format(remote_link.remote_id), files={"attachment": file_data})
-                            associate_item(model="LeadUpload", local_id=s3_file.id, remote_id=response["id"])
-                        os.remove("tmp/" + s3_file.filename)
+                if "files" in offer.data["pv_offer"]:
+                    for file in offer.data["pv_offer"]["files"]:
+                        s3_file = db.session.query(S3File).get(file["id"])
+                        file_link = find_association(model="LeadUpload", local_id=s3_file.id)
+                        if file_link is None:
+                            s3_file_content = s3_file.get_file()
+                            with open("tmp/" + s3_file.filename, 'wb') as file_data:
+                                for d in s3_file_content.stream(32 * 1024):
+                                    file_data.write(d)
+                            with open("tmp/" + s3_file.filename, 'rb') as file_data:
+                                response = post("leads/{}/attachments".format(remote_link.remote_id), files={"attachment": file_data})
+                                associate_item(model="LeadUpload", local_id=s3_file.id, remote_id=response["id"])
+                            os.remove("tmp/" + s3_file.filename)
