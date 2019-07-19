@@ -41,7 +41,7 @@ def run_import():
     pp = pprint.PrettyPrinter(indent=2)
     print("Loading Lead List")
     items = get("leads", {
-        "limit": 1,
+        "limit": 500,
         "offset": 0,
         "order": "last_update",
         "direction": "desc",
