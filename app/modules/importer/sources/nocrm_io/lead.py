@@ -66,15 +66,16 @@ def run_import():
 
 
 def update_lead_by_offer(offer):
-    print("update lead", offer)
     if "pv_offer" in offer.data and "files" in offer.data["pv_offer"]:
         lead = db.session.query(Lead).filter(Lead.number == offer.customer.lead_number).first()
         if lead is not None:
+            print("update lead", lead)
             remote_link = find_association("Lead", local_id=lead.id)
             if remote_link is not None:
-                put("leads/{}".format(remote_link.remote_id), post_data={
+                response = put("leads/{}".format(remote_link.remote_id), post_data={
                     "amount": float(offer.data["pv_offer"]["offer_amount"])
                 })
+                print("update lead response", response, remote_link.__dict__)
                 for file in offer.data["pv_offer"]["files"]:
                     s3_file = db.session.query(S3File).get(file["id"])
                     file_link = find_association(model="LeadUpload", local_id=s3_file.id)
