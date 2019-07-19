@@ -57,7 +57,7 @@ def run_import():
                 associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
                 print(data)
             else:
-                print(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."], item_data["user_id"], item_data["user"]["email"])
+                print(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."], item_data["user_id"], item_data["extended_info"]["user"]["email"])
         else:
             data = filter_input(item_data)
             if data is not None:
