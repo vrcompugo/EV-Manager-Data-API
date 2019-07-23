@@ -39,9 +39,10 @@ def get_filename_from_header(response):
     Get filename from content-disposition
     """
     content_disposition = response.headers.get("Content-Disposition")
+    print("cd:", content_disposition)
     if not content_disposition:
-        return None
+        return "unnamed"
     fname = re.findall('filename=(.+)', content_disposition)
     if len(fname) == 0:
-        return None
+        return "unnamed"
     return fname[0]
