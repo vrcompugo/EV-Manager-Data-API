@@ -1,6 +1,7 @@
 import tempfile
 import re
 from io import StringIO
+import uuid
 
 from app import db
 from app.modules.file.file_services import add_item , update_item, get_one_item
@@ -19,6 +20,7 @@ def run_import(model, model_id, id):
     item_data = {
         "filename": get_filename_from_header(response),
         "content-type": response.headers.get("Content-Type"),
+        "uuid": uuid.uuid4(),
         "model": model,
         "model_id": model_id,
         "file_content": response.content
