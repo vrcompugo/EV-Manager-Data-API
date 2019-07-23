@@ -47,6 +47,18 @@ def install():
     })
 
 
+def update_role_permissions():
+    from app.blueprint import full_permission_list
+    admin_role = db.session.query(UserRole).filter(UserRole.code == "root").first()
+    admin_role.permissions=full_permission_list + ["create_root_user"]
+    for role in ["dev", "sales", "sales_lead", "front_office", "bookkeeping", "cloud_manager",
+                 "evu_manager", "construction_lead", "construction", "warehouse", "customer_service",
+                 "insurance", "maintenance"]:
+        role_object = db.session.query(UserRole).filter(UserRole.code == role).first()
+        role_object.permissions=full_permission_list
+    db.session.commit()
+
+
 def import_test_data():
     role_ids = []
     roles = db.session.query(UserRole).all()

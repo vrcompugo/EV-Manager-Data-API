@@ -20,17 +20,37 @@ def filter_input(item_data):
         customer = import_by_lead_number(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."])
     if customer is None:
         return None
+
     reseller_accociation = find_association("Reseller", remote_id=item_data["user_id"])
     if reseller_accociation is None:
         print("reseller: ", item_data["user_id"])
         return None
+
+    status = "new"
+    if item_data["step"] == "Kontaktiert":
+        status = "contacted"
+    if item_data["step"] == "Analyse durchgeführt":
+        status = "survey_created"
+    if item_data["step"] == "Angebot erstellt":
+        status = "offer_created"
+    if item_data["step"] == "Angebot präsentiert":
+        status = "offer_presented"
+    if item_data["step"] == "Vertragsverhandlung":
+        status = "offer_negotiation"
+    if item_data["step"] == "Verloren":
+        status = "lost"
+    if item_data["step"] == "Verkauft":
+        status = "won"
 
     data = {
         "reseller_id": reseller_accociation.local_id,
         "customer_id": customer.id,
         "value": item_data["amount"],
         "number": item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."],
-        "status": item_data["step"]
+        "status": status,
+        "data": item_data["extended_info"]["fields_by_name"],
+        "description": item_data["description"],
+        "description_html": item_data["html_description"]
     }
     if customer.default_address is not None:
         data["address_id"] = customer.default_address.id
@@ -38,30 +58,37 @@ def filter_input(item_data):
 
 
 def run_import():
-    pp = pprint.PrettyPrinter(indent=2)
     print("Loading Lead List")
-    items = get("leads", {
-        "limit": 500,
-        "offset": 0,
-        "order": "last_update",
-        "direction": "desc",
-        "step": "Neu"
-    })
-    for item_data in items:
-        item_data = get("leads/{}".format(item_data["id"]))
-        lead_association = find_association("Lead", remote_id=item_data["id"])
-        if lead_association is None:
-            data = filter_input(item_data)
-            if data is not None:
-                item = add_item(data)
-                associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
-                print(data)
+    load_more = True
+    offset = 0
+    limit = 100
+    while load_more:
+        items = get("leads", {
+            "limit": limit,
+            "offset": offset,
+            "order": "last_update",
+            "direction": "desc"
+        })
+        load_more = len(items) == limit
+        offset = offset + limit
+        print("Count: ", len(items))
+        print("Offset: ", offset)
+        for item_data in items:
+            item_data = get("leads/{}".format(item_data["id"]))
+            lead_association = find_association("Lead", remote_id=item_data["id"])
+            if lead_association is None:
+                data = filter_input(item_data)
+                if data is not None:
+                    item = add_item(data)
+                    associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
+                    print(item.id)
+                else:
+                    pass
+                    #print(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."], item_data["user_id"], item_data["extended_info"]["user"]["email"])
             else:
-                print(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."], item_data["user_id"], item_data["extended_info"]["user"]["email"])
-        else:
-            data = filter_input(item_data)
-            if data is not None:
-                update_item(lead_association.local_id, data)
+                data = filter_input(item_data)
+                if data is not None:
+                    update_item(lead_association.local_id, data)
     return False
 
 

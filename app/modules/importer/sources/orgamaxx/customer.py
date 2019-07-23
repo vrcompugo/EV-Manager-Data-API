@@ -2,7 +2,7 @@ from app import db
 import pprint
 
 from app.models import Customer
-from app.modules.customer.services.customer_services import add_item
+from app.modules.customer.services.customer_services import add_item, update_item
 
 from ._connector import post, get
 from ._association import find_association, associate_item
@@ -49,5 +49,13 @@ def import_by_lead_number(lead_number):
 
     item = get("leads/{}".format(lead_number))
     if "data" in item and len(item["data"]) > 0:
-        return add_item(filter_input(item["data"][0]))
+        customer = None
+        if "data" not in item or len(item["data"]) == 0 or "lead_number" not in item["data"][0]:
+            return None
+        if item["data"][0]['lead_number'] is not None:
+            customer = Customer.query.filter_by(lead_number=item["data"][0]['lead_number']).first()
+        if customer is None:
+            return add_item(filter_input(item["data"][0]))
+        else:
+            return update_item(customer.id, filter_input(item["data"][0]))
     return None

@@ -1,10 +1,10 @@
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects.postgresql import TEXT
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
 from app import db
 from app.modules.customer.models.customer import CustomerSchema
-from app.modules.user.models.user_role import UserRoleShortSchema
 
 
 class Lead(db.Model):
@@ -25,6 +25,8 @@ class Lead(db.Model):
     last_update = db.Column(db.DateTime)
     status = db.Column(db.String(20))
     data = db.Column(db.JSON)
+    description = db.Column(TEXT)
+    description_html = db.Column(TEXT)
 
 
     @hybrid_property
@@ -52,6 +54,7 @@ class LeadSchema(ModelSchema):
     customer_number = fields.String()
     reseller_name = fields.String()
     reseller_group = fields.String()
+    value = fields.Float()
     customer = fields.Nested(CustomerSchema)
     versions = fields.Constant([])
 

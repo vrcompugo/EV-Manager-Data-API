@@ -32,6 +32,12 @@ def install():
     user_install()
 
 
+@manager.command
+def update_role_permissions():
+    from app.modules.user import update_role_permissions
+    update_role_permissions()
+
+
 @manager.option("-m", "--module", dest='module', default=None)
 def deploy_test_data(module):
     if prompt_bool(
