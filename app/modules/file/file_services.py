@@ -13,7 +13,7 @@ from .minio import put_file
 def add_item(data):
     new_item = S3File()
     new_item = set_attr_by_dict(new_item, data, ["id", "file"])
-    if "uuid" not in data or data["uuid"] is None:
+    if "uuid" not in data or data["uuid"] is None or len(data["uuid"]) < 10:
         new_item.uuid = uuid.uuid4()
     new_item.uploaded = datetime.datetime.now()
     db.session.add(new_item)
@@ -26,6 +26,9 @@ def add_item(data):
 def update_item(id, data):
     item = db.session.query(S3File).get(id)
     if item is not None:
+        if "uuid" not in data or data["uuid"] is None or len(data["uuid"]) < 10:
+            item.uuid = uuid.uuid4()
+        db.session.commit()
         return item
     else:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
