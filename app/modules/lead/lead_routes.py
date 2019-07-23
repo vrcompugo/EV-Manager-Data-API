@@ -16,9 +16,8 @@ _item_input = api.model("Lead_", model={
     'customer_id': fields.Integer(description=''),
     'role_id': fields.Integer(description=''),
     'reseller_id': fields.Integer(description=''),
-    'project_id': fields.Integer(description=''),
+    'lead_id': fields.Integer(description=''),
     'offer_id': fields.Integer(description=''),
-    'project_id': fields.Integer(description=''),
     'contract_id': fields.Integer(description=''),
     'pv_system_id': fields.Integer(description=''),
     'product_id': fields.Integer(description='')
@@ -35,10 +34,10 @@ class Items(Resource):
         "fields": {"type":"string", "default": "_default_"},
         "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
     })
-    @token_required("list_project")
+    @token_required("list_lead")
     def get(self):
         """
-            List projects
+            List leads
             sort:
                 - "column1,column2" -> column1 asc, column2 asc
                 - "+column1,-column2" -> column1 asc, column2 desc
@@ -67,7 +66,7 @@ class Items(Resource):
 
     @api_response
     @api.expect(_item_input, validate=True)
-    @token_required("create_project")
+    @token_required("create_lead")
     def post(self):
         """Creates a new User """
         data = request.json
@@ -83,9 +82,9 @@ class User(Resource):
     @api.doc(params={
         "fields": {"type":"string", "default": "_default_"},
     })
-    @token_required("show_project")
+    @token_required("show_lead")
     def get(self, id):
-        """get a project given its identifier"""
+        """get a lead given its identifier"""
         fields = request.args.get("fields") or "_default_"
         item_dict = get_one_item(id, fields)
         if not item_dict:
@@ -95,9 +94,9 @@ class User(Resource):
                 "data": item_dict}
 
     @api.response(201, 'User successfully updated.')
-    @api.doc('update project')
+    @api.doc('update lead')
     @api.expect(_item_input, validate=True)
-    @token_required("update_project")
+    @token_required("update_lead")
     def put(self, id):
         """Update User """
         data = request.json

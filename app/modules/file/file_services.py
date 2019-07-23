@@ -13,7 +13,7 @@ from .minio import put_file
 def add_item(data):
     new_item = S3File()
     new_item = set_attr_by_dict(new_item, data, ["id", "file"])
-    if "uuid" not in data:
+    if "uuid" not in data or data["uuid"] is None:
         new_item.uuid = uuid.uuid4()
     new_item.uploaded = datetime.datetime.now()
     db.session.add(new_item)
@@ -33,7 +33,7 @@ def update_item(id, data):
 
 def sync_item(data):
     item = None
-    if "uuid" in data:
+    if "uuid" in data and data["uuid"] is not None and len(data["uuid"]) > 8:
         item = db.session.query(S3File).filter(S3File.uuid == data["uuid"]).first()
     if item is None:
         return add_item(data)
