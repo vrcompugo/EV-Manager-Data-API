@@ -20,7 +20,7 @@ def run_import(model, model_id, id):
     item_data = {
         "filename": get_filename_from_header(response),
         "content-type": response.headers.get("Content-Type"),
-        "uuid": uuid.uuid4(),
+        "uuid": str(uuid.uuid4()),
         "model": model,
         "model_id": model_id,
         "file_content": response.content
