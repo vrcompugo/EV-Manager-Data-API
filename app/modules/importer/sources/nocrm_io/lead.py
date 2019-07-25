@@ -102,17 +102,29 @@ def update_lead_by_offer(offer):
                 response = put("leads/{}".format(remote_link.remote_id), post_data={
                     "amount": float(offer.data["pv_offer"]["offer_amount"])
                 })
-                print("update lead response", response, remote_link.__dict__)
+                attachment_list = []
                 if "files" in offer.data["pv_offer"]:
                     for file in offer.data["pv_offer"]["files"]:
                         s3_file = db.session.query(S3File).get(file["id"])
-                        file_link = find_association(model="LeadUpload", local_id=s3_file.id)
-                        if file_link is None:
-                            s3_file_content = s3_file.get_file()
-                            with open("tmp/" + s3_file.filename, 'wb') as file_data:
-                                for d in s3_file_content.stream(32 * 1024):
-                                    file_data.write(d)
-                            with open("tmp/" + s3_file.filename, 'rb') as file_data:
-                                response = post("leads/{}/attachments".format(remote_link.remote_id), files={"attachment": file_data})
-                                associate_item(model="LeadUpload", local_id=s3_file.id, remote_id=response["id"])
-                            os.remove("tmp/" + s3_file.filename)
+                        s3_file_content = s3_file.get_file()
+                        with open("tmp/" + s3_file.filename, 'wb') as file_data:
+                            for d in s3_file_content.stream(32 * 1024):
+                                file_data.write(d)
+                        attachment_list.append(("attachments[]", (s3_file.filename, open("tmp/" + s3_file.filename, 'rb'))))
+                if "cloud_offer" in offer.calculation and "pdf_id" in offer.calculation["cloud_offer"]:
+                    s3_file = db.session.query(S3File).get(offer.calculation["cloud_offer"]["pdf_id"])
+                    s3_file_content = s3_file.get_file()
+                    with open("tmp/" + s3_file.filename, 'wb') as file_data:
+                        for d in s3_file_content.stream(32 * 1024):
+                            file_data.write(d)
+                    attachment_list.append(("attachments[]", (s3_file.filename, open("tmp/" + s3_file.filename, 'rb'))))
+
+                response = post("leads/{}/comments".format(remote_link.remote_id), post_data={
+                    "user_id": 40297,
+                    "content": offer.data["pv_offer"]["comment"]
+                }, files=attachment_list)
+                print(response)
+                if "files" in offer.data["pv_offer"]:
+                    for file in offer.data["pv_offer"]["files"]:
+                        s3_file = db.session.query(S3File).get(file["id"])
+                        os.remove("tmp/" + s3_file.filename)

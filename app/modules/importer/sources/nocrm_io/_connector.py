@@ -18,7 +18,7 @@ def post(url, post_data = None, files=None):
             response = requests.post(API_URL + format(url),
                                          headers={'X-API-KEY': token},
                                          files=files,
-                                         data={})
+                                         data=post_data)
         else:
             response = requests.post(API_URL + format(url),
                                      headers={'X-API-KEY': token},

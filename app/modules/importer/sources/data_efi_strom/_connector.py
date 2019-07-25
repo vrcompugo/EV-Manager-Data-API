@@ -2,8 +2,8 @@ import requests
 import json
 import base64
 
-#API_URL = "http://efidata"
-API_URL = "https://data.efi-strom.de"
+API_URL = "http://efidata"
+#API_URL = "https://data.efi-strom.de"
 
 
 def authenticate():

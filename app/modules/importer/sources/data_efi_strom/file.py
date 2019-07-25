@@ -16,7 +16,10 @@ def filter_input(data):
 
 
 def run_import(model, model_id, id):
-    response = get("{}/Download/{}".format(model, id), raw=True)
+    if model == "OfferPDF":
+        response = get("Offer/{}/Print".format(id), raw=True)
+    else:
+        response = get("{}/Download/{}".format(model, id), raw=True)
     item_data = {
         "filename": get_filename_from_header(response),
         "content-type": response.headers.get("Content-Type"),
