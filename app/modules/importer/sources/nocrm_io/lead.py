@@ -43,6 +43,9 @@ def filter_input(item_data):
         status = "won"
 
     data = {
+        "datetime": item_data["created_at"],
+        "last_update": item_data["updated_at"],
+        "reminder_datetime": item_data["reminder_at"],
         "reseller_id": reseller_accociation.local_id,
         "customer_id": customer.id,
         "value": item_data["amount"],

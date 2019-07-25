@@ -2,11 +2,12 @@ from app.utils.lucene_tree_parser import parse_tree
 
 
 def get_items_by_model(model, model_schema, tree, sort, offset, limit, fields):
-    query = model.query
+    query = model.search_query
     fields = fields.split(",")
     if tree is not None:
         filters = parse_tree(model, query, tree)
         query = query.filter(filters)
+        print(query)
     if sort != "":
         sorts = sort.split(",")
         sort_list = []

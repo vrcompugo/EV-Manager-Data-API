@@ -4,7 +4,7 @@ from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
 from app import db
-from app.modules.customer.models.customer import CustomerSchema
+from app.modules.customer.models.customer import Customer, CustomerSchema
 
 
 class Lead(db.Model):
@@ -12,6 +12,8 @@ class Lead(db.Model):
     __tablename__ = "lead"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    datetime = db.Column(db.DateTime())
+    reminder_datetime = db.Column(db.DateTime())
     number = db.Column(db.String(20))
     customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"))
     customer = db.relationship("Customer")
@@ -28,6 +30,13 @@ class Lead(db.Model):
     description = db.Column(TEXT)
     description_html = db.Column(TEXT)
 
+    @hybrid_property
+    def search_query(self):
+        return db.session.query(Lead).outerjoin(Customer)
+
+    @hybrid_property
+    def fulltext(self):
+        return Lead.number + " " + Customer.firstname + " " + Customer.lastname
 
     @hybrid_property
     def reseller_name(self):

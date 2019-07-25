@@ -23,5 +23,14 @@ def parse_tree(model, query, tree):
             return and_(getattr(model, tree.name) >= int(str(tree.children[0].low)), getattr(model, tree.name) <= int(str(tree.children[0].high)))
         if str(tree.children[0].value).strip('"') == "ISNULL":
             return getattr(model, tree.name) == None
-        return getattr(model, tree.name) == str(tree.children[0].value).strip('"')
+        if tree.name == "fulltext":
+            return getattr(model, tree.name).like(
+                "%" +
+                str(tree.children[0].value)
+                    .strip('"')
+                    .replace("-","%")
+                    .replace(" ","%")
+                    .replace("*","%")
+                + "%")
+        return getattr(model, tree.name).like(str(tree.children[0].value).strip('"').replace("*","%"))
     return None
