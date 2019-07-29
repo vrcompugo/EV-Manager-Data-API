@@ -21,6 +21,10 @@ class Reseller(db.Model):
     access_key = db.Column(db.String(60))
     phone = db.Column(db.String(120))
 
+    @hybrid_property
+    def search_query(self):
+        return db.session.query(Reseller)
+
 
 class ResellerSchema(ModelSchema):
 

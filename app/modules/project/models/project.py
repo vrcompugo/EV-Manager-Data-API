@@ -23,6 +23,10 @@ class Project(db.Model):
     datetime = db.Column(db.DateTime)
 
     @hybrid_property
+    def search_query(self):
+        return db.session.query(Project)
+
+    @hybrid_property
     def reseller_name(self):
         if self.reseller is not None:
             return self.reseller.name

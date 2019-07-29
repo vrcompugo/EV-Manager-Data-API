@@ -16,6 +16,10 @@ class Product(db.Model):
     type = db.Column(db.String(80))
     name = db.Column(db.String(80))
 
+    @hybrid_property
+    def search_query(self):
+        return db.session.query(Product)
+
 
 class ProductSchema(ModelSchema):
 

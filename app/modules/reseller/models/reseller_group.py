@@ -14,6 +14,10 @@ class ResellerGroup(db.Model):
     price_definition = db.Column(db.JSON)
     products = db.Column(db.JSON)
 
+    @hybrid_property
+    def search_query(self):
+        return db.session.query(ResellerGroup)
+
 
 class ResellerGroupSchema(ModelSchema):
 

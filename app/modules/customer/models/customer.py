@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy.ext.hybrid import hybrid_property
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
@@ -24,6 +25,9 @@ class Customer(db.Model):
     default_payment_account_id = db.Column(db.Integer, db.ForeignKey('customer_payment_account.id', use_alter=True))
     default_payment_account = db.relationship("CustomerPaymentAccount", foreign_keys=[default_payment_account_id], post_update=True)
 
+    @hybrid_property
+    def search_query(self):
+        return db.session.query(Customer)
 
 class CustomerSchema(ModelSchema):
 
