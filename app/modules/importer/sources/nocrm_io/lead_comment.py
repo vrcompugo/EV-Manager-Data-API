@@ -93,3 +93,32 @@ def run_import():
                 if data is not None:
                     update_item(lead_association.local_id, data)
     return False
+
+
+def update_lead_comment(lead_comment):
+    print("update lead", lead_comment)
+    remote_link = find_association("Lead", local_id=lead_comment.lead_id)
+    if remote_link is not None:
+        lead_data = {
+            "amount": float(lead_comment.lead.value)
+        }
+        if lead_comment.change_to_offer_created:
+            lead_data["step"] = "Angebot erstellt"
+        response = put("leads/{}".format(remote_link.remote_id), post_data=lead_data)
+        attachment_list = []
+        for file in lead_comment.attachments:
+            s3_file = db.session.query(S3File).get(file["id"])
+            s3_file_content = s3_file.get_file()
+            with open("tmp/" + s3_file.filename, 'wb') as file_data:
+                for d in s3_file_content.stream(32 * 1024):
+                    file_data.write(d)
+            attachment_list.append(("attachments[]", (s3_file.filename, open("tmp/" + s3_file.filename, 'rb'))))
+
+        response = post("leads/{}/comments".format(remote_link.remote_id), post_data={
+            "user_id": 40297,
+            "content": lead_comment.comment
+        }, files=attachment_list)
+        print(response)
+        for file in lead_comment.attachments:
+            s3_file = db.session.query(S3File).get(file["id"])
+            os.remove("tmp/" + s3_file.filename)

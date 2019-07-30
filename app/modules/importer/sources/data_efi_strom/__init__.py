@@ -25,3 +25,7 @@ def run_import_by_model(model, remote_id=None, local_id=None):
     if model is None or model == "contract":
         from .contract import run_import
         run_import()
+
+    if model is None or model == "lead_comment":
+        from .lead_comment import run_import
+        run_import(remote_id=remote_id)

@@ -13,7 +13,9 @@ class LeadComment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"))
+    lead = db.relationship("Lead")
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    change_to_offer_created = db.Column(db.Boolean())
     datetime = db.Column(db.DateTime())
     comment = db.Column(TEXT)
     attachments = db.Column(db.JSON)

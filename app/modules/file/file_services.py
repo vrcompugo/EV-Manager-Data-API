@@ -28,6 +28,8 @@ def update_item(id, data):
     if item is not None:
         if "uuid" not in data or data["uuid"] is None or len(data["uuid"]) < 10:
             item.uuid = str(uuid.uuid4())
+        item = set_attr_by_dict(item, data, ["id", "file"])
+        put_file(str(item.uuid), item.filename, data)
         db.session.commit()
         return item
     else:

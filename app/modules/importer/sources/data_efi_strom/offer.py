@@ -51,7 +51,7 @@ def run_import(remote_id=None, local_id=None):
                     local_file = run_file_import("OfferPDF", model_id=None, id=item_data["calculation"]["cloud_offer"]["id"])
                     item_data["calculation"]["cloud_offer"]["pdf_id"] = local_file.id
 
-            import_item(item_data)
+            return import_item(item_data)
         return
     data = post("Offer", {"page": 0, "limit": 1000})
     if "items" in data:
