@@ -10,9 +10,9 @@ def api_response(f):
             return f(*args, **kwargs)
         except ApiException as e:
             print(e)
-            return {"status": "error", "code": e.code, "messsage": e.message}, e.http_status
+            return {"status": "error", "code": e.code, "message": e.message}, e.http_status
         except Exception as e:
             print(str(e))
-            return {"status": "error", "code": "unkown", "messsage": "Unknown Error"}, 500
+            return {"status": "error", "code": "unkown", "message": "Unknown Error"}, 500
 
     return decorated
