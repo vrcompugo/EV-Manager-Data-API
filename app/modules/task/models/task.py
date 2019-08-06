@@ -37,6 +37,10 @@ class Task(db.Model):
     product = db.relationship("Product")
 
     @hybrid_property
+    def search_query(self):
+        return db.session.query(Task)
+
+    @hybrid_property
     def lead_number(self):
         if self.customer is not None:
             return self.customer.lead_number

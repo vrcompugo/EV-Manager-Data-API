@@ -24,13 +24,17 @@ def parse_tree(model, query, tree):
         if str(tree.children[0].value).strip('"') == "ISNULL":
             return getattr(model, tree.name) == None
         if tree.name == "fulltext":
-            return getattr(model, tree.name).like(
-                "%" +
-                str(tree.children[0].value)
-                    .strip('"')
-                    .replace("-","%")
-                    .replace(" ","%")
-                    .replace("*","%")
-                + "%")
-        return getattr(model, tree.name).like(str(tree.children[0].value).strip('"').replace("*","%"))
+            searchquery = "%" + \
+                str(tree.children[0].value) \
+                    .strip('"') \
+                    .replace("-","%") \
+                    .replace(" ","%") \
+                    .replace("*","%") \
+                + "%"
+            return getattr(model, tree.name).ilike(searchquery)
+        searchquery = str(tree.children[0].value).strip('"').replace("*","%")
+        if searchquery.find("%") >= 0:
+            return getattr(model, tree.name).ilike(searchquery)
+        else:
+            return getattr(model, tree.name) == searchquery
     return None

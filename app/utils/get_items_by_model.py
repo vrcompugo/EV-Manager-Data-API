@@ -7,7 +7,6 @@ def get_items_by_model(model, model_schema, tree, sort, offset, limit, fields):
     if tree is not None:
         filters = parse_tree(model, query, tree)
         query = query.filter(filters)
-        print(query)
     if sort != "":
         sorts = sort.split(",")
         sort_list = []
