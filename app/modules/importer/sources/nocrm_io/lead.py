@@ -69,7 +69,7 @@ def run_import(minutes=None):
         "order": "last_update",
         "direction": "desc"
     }
-    if timedelta is not None:
+    if minutes is not None:
         options["updated_after"] = datetime.now() - timedelta(minutes=minutes)
     while load_more:
         options["limit"] = limit
