@@ -1,6 +1,6 @@
 from app import db
 import pprint
-import os
+from datetime import datetime, timedelta
 
 from app.models import Customer, Lead, S3File
 from app.modules.lead.lead_services import add_item, update_item
@@ -60,18 +60,21 @@ def filter_input(item_data):
     return data
 
 
-def run_import():
+def run_import(minutes=None):
     print("Loading Lead List")
     load_more = True
     offset = 0
     limit = 100
+    options = {
+        "order": "last_update",
+        "direction": "desc"
+    }
+    if timedelta is not None:
+        options["updated_after"] = datetime.now() - timedelta(minutes=minutes)
     while load_more:
-        items = get("leads", {
-            "limit": limit,
-            "offset": offset,
-            "order": "last_update",
-            "direction": "desc"
-        })
+        options["limit"] = limit
+        options["offset"] = offset
+        items = get("leads", options)
         load_more = len(items) == limit
         offset = offset + limit
         print("Count: ", len(items))

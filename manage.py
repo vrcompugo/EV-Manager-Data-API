@@ -38,6 +38,12 @@ def update_role_permissions():
     update_role_permissions()
 
 
+@manager.command
+def cron():
+    from app.modules.importer import cron
+    cron()
+
+
 @manager.option("-m", "--module", dest='module', default=None)
 def deploy_test_data(module):
     if prompt_bool(

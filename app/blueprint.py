@@ -18,6 +18,7 @@ from app.modules.reseller.routes.reseller_routes import api as reseller_ns
 from app.modules.survey.survey_routes import api as survey_ns
 from app.modules.task.task_routes import api as task_ns
 from app.modules.user.user_routes import api as user_ns, api2 as user_role_ns
+from app.modules.settings.settings_routes import api as settings_ns
 from .modules.auth.auth_decorators import full_permission_list
 
 auth = HTTPBasicAuth()
@@ -87,4 +88,5 @@ api.add_namespace(contract_ns, path='/contracts')
 api.add_namespace(product_ns, path='/product')
 api.add_namespace(pv_system_ns, path='/pv_system')
 api.add_namespace(task_ns, path='/tasks')
+api.add_namespace(settings_ns, path='/settings')
 api.add_namespace(auth_ns, path='/auth')
