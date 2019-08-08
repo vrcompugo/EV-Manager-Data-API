@@ -122,4 +122,4 @@ def update_lead_comment(lead_comment):
             s3_file = db.session.query(S3File).get(file["id"])
             if os.path.exists("tmp/" + s3_file.filename):
                 os.remove("tmp/" + s3_file.filename)
-        return response.status_code
+        return response

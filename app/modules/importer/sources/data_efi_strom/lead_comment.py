@@ -81,7 +81,7 @@ def import_item(item_data):
         item = add_item(item_data)
         if item is not None:
             associate_item(model="LeadComment", remote_id=item_data["id"], local_id=item.id)
-        if item.status_code != 200:
+        if item.status_code is None:
             raise ApiException("upload_failed", "nocrm.io upload failed", 409)
     else:
         item = update_item(id=item.local_id, data=item_data)
