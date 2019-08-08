@@ -72,6 +72,8 @@ def run_import(remote_id=None, local_id=None):
 def import_item(item_data):
 
     item_data = filter_input(item_data)
+    if item_data is None:
+        return None
 
     item = find_association(model="LeadComment", remote_id=item_data["id"])
     if item is None:

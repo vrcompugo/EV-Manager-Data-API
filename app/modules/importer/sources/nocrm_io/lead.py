@@ -19,6 +19,7 @@ def filter_input(item_data):
     if customer is None:
         customer = import_by_lead_number(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."])
     if customer is None:
+        print("customer: ", item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."])
         return None
 
     reseller_accociation = find_association("Reseller", remote_id=item_data["user_id"])
@@ -79,20 +80,24 @@ def run_import(minutes=None):
         offset = offset + limit
         print("Count: ", len(items))
         print("Offset: ", offset)
+
         for item_data in items:
-            item_data = get("leads/{}".format(item_data["id"]))
+            #item_data = get("leads/{}".format(item_data["id"]))
+            item_data = get("leads/{}".format(8556730))
             lead_association = find_association("Lead", remote_id=item_data["id"])
             if lead_association is None:
                 data = filter_input(item_data)
+
                 if data is not None:
                     item = add_item(data)
                     associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
                     print(item.id)
                 else:
-                    pass
-                    #print(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."], item_data["user_id"], item_data["extended_info"]["user"]["email"])
+                    #pass
+                    print(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."], item_data["user_id"], item_data["extended_info"]["user"]["email"])
             else:
                 data = filter_input(item_data)
                 if data is not None:
                     update_item(lead_association.local_id, data)
+            return
     return False
