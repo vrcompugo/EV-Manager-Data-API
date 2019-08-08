@@ -97,7 +97,6 @@ def run_import():
 
 def update_lead_comment(lead_comment):
     print("update lead", lead_comment)
-    return None
     remote_link = find_association("Lead", local_id=lead_comment.lead_id)
     if remote_link is not None:
         lead_data = {
