@@ -25,7 +25,9 @@ def filter_input(item_data):
     reseller_accociation = find_association("Reseller", remote_id=item_data["user_id"])
     if reseller_accociation is None:
         print("reseller: ", item_data["user_id"])
-        return None
+        reseller_id = 0
+    else:
+        reseller_id = reseller_accociation.local_id
 
     status = "new"
     if item_data["step"] == "Kontaktiert":
@@ -47,7 +49,7 @@ def filter_input(item_data):
         "datetime": item_data["created_at"],
         "last_update": item_data["updated_at"],
         "reminder_datetime": item_data["reminder_at"],
-        "reseller_id": reseller_accociation.local_id,
+        "reseller_id": reseller_id,
         "customer_id": customer.id,
         "value": item_data["amount"],
         "number": item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."],
