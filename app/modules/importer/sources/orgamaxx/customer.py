@@ -52,10 +52,15 @@ def import_by_lead_number(lead_number):
         customer = None
         if "data" not in item or len(item["data"]) == 0 or "INTERESTEDNO" not in item["data"][0]:
             return None
-        if item["data"][0]['INTERESTEDNO'] is not None:
-            customer = Customer.query.filter_by(lead_number=str(item["data"][0]['INTERESTEDNO'])).first()
+        data = filter_input(item["data"][0])
+        if data['email'] is not None:
+            customer = Customer.query.filter_by(email=data['email']).first()
+        if customer is None and data['customer_number'] is not None:
+            customer = Customer.query.filter_by(customer_number=data['customer_number']).first()
+        if customer is None and data['lead_number'] is not None:
+            customer = Customer.query.filter_by(lead_number=data['lead_number']).first()
         if customer is None:
-            return add_item(filter_input(item["data"][0]))
+            return add_item(data)
         else:
-            return update_item(customer.id, filter_input(item["data"][0]))
+            return update_item(customer.id, filter_input(data))
     return None
