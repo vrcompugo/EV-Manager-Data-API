@@ -71,5 +71,5 @@ def import_by_lead_number(lead_number):
         if customer is None:
             return add_item(data)
         else:
-            return update_item(customer.id, filter_input(data))
+            return update_item(customer.id, data)
     return None
