@@ -41,7 +41,7 @@ def add_item(data):
 def update_item(id, data):
     item = db.session.query(Customer).get(id)
     if item is not None:
-        item = set_attr_by_dict(item, data, ["id"])
+        item = set_attr_by_dict(item, data, ["id", "default_address", "default_payment_account"])
         db.session.commit()
         return item
     else:
