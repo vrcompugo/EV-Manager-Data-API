@@ -9,6 +9,12 @@ from ._association import find_association, associate_item
 
 
 def filter_input(item_data):
+    if "INTERESTEDNO" not in item_data:
+        return None
+    if "CUSTKIND" not in item_data:
+        return None
+    if "EMAIL" not in item_data:
+        return None
     company_name = ""
     if item_data["CUSTKIND"] == 0:
         company_name = item_data["NAME1"]
@@ -50,9 +56,12 @@ def import_by_lead_number(lead_number):
     item = get("leads/{}".format(lead_number))
     if "data" in item and len(item["data"]) > 0:
         customer = None
-        if "data" not in item or len(item["data"]) == 0 or "INTERESTEDNO" not in item["data"][0]:
+        if "data" not in item or len(item["data"]) == 0:
             return None
         data = filter_input(item["data"][0])
+        if data is None:
+            print(item["data"][0])
+            return None
         if data['email'] is not None:
             customer = Customer.query.filter_by(email=data['email']).first()
         if customer is None and data['customer_number'] is not None:
