@@ -3,6 +3,7 @@ from app import db
 from app.modules.lead.lead_comment_services import add_item , update_item, get_one_item
 from app.models import Lead
 from app.modules.file.models.s3_file import S3FileSchema
+from app.exceptions import ApiException
 
 from ._connector import post, get
 from ._association import find_association, associate_item
@@ -80,6 +81,8 @@ def import_item(item_data):
         item = add_item(item_data)
         if item is not None:
             associate_item(model="LeadComment", remote_id=item_data["id"], local_id=item.id)
+        if item.status_code != 200:
+            raise ApiException("upload_failed", "nocrm.io upload failed", 409)
     else:
         item = update_item(id=item.local_id, data=item_data)
     return item

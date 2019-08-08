@@ -15,7 +15,7 @@ def add_item(data):
     new_item = set_attr_by_dict(new_item, data, ["id"])
     db.session.add(new_item)
     db.session.commit()
-    update_lead_comment(new_item)
+    new_item.status_code = update_lead_comment(new_item)
     return new_item
 
 

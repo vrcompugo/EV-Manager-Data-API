@@ -97,6 +97,7 @@ def run_import():
 
 def update_lead_comment(lead_comment):
     print("update lead", lead_comment)
+    return None
     remote_link = find_association("Lead", local_id=lead_comment.lead_id)
     if remote_link is not None:
         lead_data = {
@@ -118,8 +119,8 @@ def update_lead_comment(lead_comment):
             "user_id": 40297,
             "content": lead_comment.comment
         }, files=attachment_list)
-        print(response)
         for file in lead_comment.attachments:
             s3_file = db.session.query(S3File).get(file["id"])
             if os.path.exists("tmp/" + s3_file.filename):
                 os.remove("tmp/" + s3_file.filename)
+        return response.status_code
