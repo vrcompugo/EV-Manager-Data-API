@@ -25,7 +25,7 @@ def filter_input(item_data):
     reseller_accociation = find_association("Reseller", remote_id=item_data["user_id"])
     if reseller_accociation is None:
         print("reseller: ", item_data["user_id"])
-        reseller_id = 0
+        reseller_id = None
     else:
         reseller_id = reseller_accociation.local_id
 
