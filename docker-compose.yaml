@@ -33,6 +33,9 @@ services:
       DATABASE_URI: "postgresql+psycopg2://evdata:tagtag@db/evdata"
       S3_ACCESS_KEY: "minio_dev"
       S3_SECRET_KEY: "tagtagtag"
+      DATA_EFI_STROM_HOST: "http://efidata"
+      MINIO_HOST: "minio:9000"
+      MINIO_SECURE: "False"
     volumes:
       - ./app:/usr/src/app/app
       - ./migrations:/usr/src/app/migrations

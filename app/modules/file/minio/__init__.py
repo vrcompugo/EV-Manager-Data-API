@@ -5,12 +5,14 @@ from datetime import timedelta
 from minio import Minio
 from minio.error import ResponseError, BucketAlreadyOwnedByYou, BucketAlreadyExists
 
+MINIO_HOST = os.getenv('MINIO_HOST', 'minio:9000')
+MINIO_SECURE = os.getenv('MINIO_SECURE', "False") == "True"
 
 def connect():
-    return Minio('minio:9000',
+    return Minio(MINIO_HOST,
                         access_key=os.environ.get("S3_ACCESS_KEY"),
                         secret_key=os.environ.get("S3_SECRET_KEY"),
-                        secure=False)
+                        secure=MINIO_SECURE)
 
 def put_file(bucket, filename, data):
     minioClient = connect()

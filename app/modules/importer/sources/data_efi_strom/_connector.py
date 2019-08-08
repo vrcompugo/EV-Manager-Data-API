@@ -1,10 +1,11 @@
 import requests
 import json
 import base64
+import os
+
 
 #API_URL = "http://efidata"
-API_URL = "https://data.efi-strom.de"
-
+API_URL = os.getenv('DATA_EFI_STROM_HOST', "https://data.efi-strom.de")
 
 def authenticate():
     response = requests.get(API_URL + "/AuthToken",

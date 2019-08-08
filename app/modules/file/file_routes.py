@@ -1,6 +1,7 @@
 from flask import request
-from flask_restplus import Resource
+from flask_restplus import Resource, reqparse
 from flask_restplus import Namespace, fields
+import werkzeug
 from luqum.parser import parser
 
 from app.decorators import token_required, api_response
@@ -10,23 +11,39 @@ from .file_services import sync_item, update_item, get_items, get_one_item
 
 api = Namespace('File')
 _item_input = api.model("File_", model={
+    'company': fields.String(required=True, description=''),
 })
+file_upload = reqparse.RequestParser()
+file_upload.add_argument('file',
+                         type=werkzeug.datastructures.FileStorage,
+                         location='files',
+                         required=True,
+                         help='File')
+file_upload.add_argument('filename',
+                         type=str,
+                         required=True,
+                         help='')
+file_upload.add_argument('filename',
+                         type=str,
+                         required=False,
+                         help='')
 
 
 @api.route('/')
 class Items(Resource):
 
     @api_response
-    @api.expect(_item_input)
-    #@token_required("create_file")
+    @api.expect(file_upload)
+    @token_required()
     def post(self):
+        filename = request.form.get("filename")
+        if filename is None:
+            filename = request.files["file"].filename
         data = {
-            "filename": request.form.get("filename"),
-            "uuid": request.form.get("uuid"),
-            "content-type": request.form.get("content-type"),
+            "filename": filename,
+            "content-type": request.files["file"].content_type,
             "file": request.files["file"]
         }
-        print(data)
         item = sync_item(data=data)
         item_dict = get_one_item(id=item.id)
         return {"status":"success",
@@ -44,6 +61,7 @@ class User(Resource):
         """get a project given its identifier"""
         fields = request.args.get("fields") or "_default_"
         item_dict = get_one_item(id, fields)
+
         if not item_dict:
             api.abort(404)
         else:

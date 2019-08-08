@@ -3,6 +3,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 import uuid
+from ..minio import get_file_public
 
 from app import db
 
@@ -19,14 +20,18 @@ class S3File(db.Model):
     uploaded = db.Column(db.DateTime)
     filename = db.Column(db.String(120))
 
+    @hybrid_property
+    def public_link(self):
+        return get_file_public(str(self.uuid), self.filename, 30)
+
     def get_file(self):
         return get_file(str(self.uuid), self.filename)
-
 
 
 class S3FileSchema(ModelSchema):
 
     versions = fields.Constant([])
+    public_link = fields.String()
 
     class Meta:
         model = S3File

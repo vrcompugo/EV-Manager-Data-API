@@ -26,6 +26,7 @@ class Lead(db.Model):
     value = db.Column(db.Numeric(scale=4, precision=12))
     last_update = db.Column(db.DateTime)
     status = db.Column(db.String(20))
+    attachments = db.Column(db.JSON)
     data = db.Column(db.JSON)
     description = db.Column(TEXT)
     description_html = db.Column(TEXT)

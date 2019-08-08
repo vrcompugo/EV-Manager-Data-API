@@ -20,23 +20,19 @@ def filter_input(data):
     attachments = []
     if "offers" in data:
         for offer in data["offers"]:
-            if "pv_offer" in offer["data"] and "files" in offer["data"]["pv_offer"]:
-                data["amount"] = offer["data"]["pv_offer"]["offer_amount"]
-                for i in range(len(offer["data"]["pv_offer"]["files"])):
-                    file = offer["data"]["pv_offer"]["files"][i]
-                    local_file = run_file_import("Offer", model_id=None, id=file["id"])
-                    attachments.append(file_schema.dump(local_file, many=False).data)
-            else:
-                local_file = run_file_import("OfferPDF", 0, offer["id"])
-                if local_file is not None:
-                    attachments.append(file_schema.dump(local_file, many=False).data)
+            if "calculation" in offer and "monthly_cost" in offer["calculation"]:
+                data["amount"] = offer["calculation"]["monthly_cost"]
+            local_file = run_file_import("OfferPDF", 0, offer["id"])
+            if local_file is not None:
+                attachments.append(file_schema.dump(local_file, many=False).data)
         del data["offers"]
 
     lead = db.session.query(Lead).filter(Lead.number == data["lead_number"]).first()
     if lead is None:
         return None
     data["lead_id"] = lead.id
-    lead.value = float(data["amount"])
+    if "amount" in data:
+        lead.value = float(data["amount"])
     db.session.commit()
 
     if "customer_files" in data:

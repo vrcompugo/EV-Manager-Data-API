@@ -121,4 +121,5 @@ def update_lead_comment(lead_comment):
         print(response)
         for file in lead_comment.attachments:
             s3_file = db.session.query(S3File).get(file["id"])
-            os.remove("tmp/" + s3_file.filename)
+            if os.path.exists("tmp/" + s3_file.filename):
+                os.remove("tmp/" + s3_file.filename)
