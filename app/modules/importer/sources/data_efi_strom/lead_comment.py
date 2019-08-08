@@ -20,7 +20,7 @@ def filter_input(data):
     attachments = []
     if "offers" in data:
         for offer in data["offers"]:
-            if "calculation" in offer and "monthly_cost" in offer["calculation"]:
+            if "calculation" in offer and "monthly_cost" in offer["calculation"] and str(offer["form_id"]) == "7":
                 data["amount"] = offer["calculation"]["monthly_cost"]
             local_file = run_file_import("OfferPDF", 0, offer["id"])
             if local_file is not None:
