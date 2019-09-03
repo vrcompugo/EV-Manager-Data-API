@@ -2,7 +2,7 @@ from app import db
 import pprint
 from datetime import datetime, timedelta
 
-from app.models import Customer, Lead, S3File
+from app.models import Customer, Lead, Reseller
 from app.modules.lead.lead_services import add_item, update_item
 
 from ._connector import post, get, put
@@ -44,6 +44,22 @@ def filter_input(item_data):
         status = "lost"
     if item_data["step"] == "Verkauft":
         status = "won"
+    activities = []
+    for activity in item_data["activities"]:
+        activity_data = {
+            "user_id": None,
+            "datetime": activity["created_at"],
+            "action": activity["action_type"],
+            "action_data": activity["action_item"]
+        }
+        activity_accociation = find_association("LeadActivity", remote_id=activity["id"])
+        if activity_accociation is not None:
+            activity_data["id"] = activity_accociation.local_id
+        user_accociation = find_association("Reseller", remote_id=item_data["user_id"])
+        if user_accociation is not None:
+            reseller = Reseller.query.filter(Reseller.id == user_accociation.local_id).first()
+            activity_data["user_id"] = None if reseller is None else reseller.user_id
+        activities.append(activity_data)
 
     data = {
         "datetime": item_data["created_at"],
@@ -56,7 +72,8 @@ def filter_input(item_data):
         "status": status,
         "data": item_data["extended_info"]["fields_by_name"],
         "description": item_data["description"],
-        "description_html": item_data["html_description"]
+        "description_html": item_data["html_description"],
+        "activities": activities
     }
     if customer.default_address is not None:
         data["address_id"] = customer.default_address.id
@@ -85,10 +102,10 @@ def run_import(minutes=None):
 
         for item_data in items:
             item_data = get("leads/{}".format(item_data["id"]))
+            item_data["activities"] = get("leads/{}/action_histories".format(item_data["id"]))
+            data = filter_input(item_data)
             lead_association = find_association("Lead", remote_id=item_data["id"])
             if lead_association is None:
-                data = filter_input(item_data)
-
                 if data is not None:
                     item = add_item(data)
                     associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
@@ -96,7 +113,6 @@ def run_import(minutes=None):
                 else:
                     print(item_data["id"], item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."], item_data["user_id"], item_data["extended_info"]["user"]["email"])
             else:
-                data = filter_input(item_data)
                 if data is not None:
                     update_item(lead_association.local_id, data)
     return False

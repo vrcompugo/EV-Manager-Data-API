@@ -67,6 +67,7 @@ class LeadSchema(ModelSchema):
     value = fields.Float()
     customer = fields.Nested(CustomerSchema)
     versions = fields.Constant([])
+    activities = fields.Constant([])
 
     class Meta:
         model = Lead
