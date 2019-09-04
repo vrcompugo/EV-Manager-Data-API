@@ -24,7 +24,9 @@ def filter_input(data):
             if "calculation" in offer and "monthly_cost" in offer["calculation"] and str(offer["form_id"]) == "7":
                 data["amount"] = offer["calculation"]["monthly_cost"]
             local_file = run_file_import("OfferPDF", 0, offer["id"])
+            print(local_file)
             if local_file is not None:
+                print("dump", file_schema.dump(local_file, many=False))
                 attachments.append(file_schema.dump(local_file, many=False).data)
         del data["offers"]
 
