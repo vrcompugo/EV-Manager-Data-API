@@ -24,10 +24,8 @@ def filter_input(data):
             if "calculation" in offer and "monthly_cost" in offer["calculation"] and str(offer["form_id"]) == "7":
                 data["amount"] = offer["calculation"]["monthly_cost"]
             local_file = run_file_import("OfferPDF", 0, offer["id"])
-            print(local_file)
             if local_file is not None:
-                print("dump", file_schema.dump(local_file, many=False))
-                attachments.append(file_schema.dump(local_file, many=False).data)
+                attachments.append(file_schema.dump(local_file, many=False))
         del data["offers"]
 
     lead = db.session.query(Lead).filter(Lead.number == data["lead_number"]).first()
@@ -42,14 +40,14 @@ def filter_input(data):
         for customer_file in data["customer_files"]:
             local_file = run_file_import("Customer", data["customer_id"], customer_file["id"])
             if local_file is not None:
-                attachments.append(file_schema.dump(local_file, many=False).data)
+                attachments.append(file_schema.dump(local_file, many=False))
         del data["customer_files"]
 
     if "pv_files" in data:
         for pv_file in data["pv_files"]:
             local_file = run_file_import("PVFile", 0, pv_file["id"])
             if local_file is not None:
-                attachments.append(file_schema.dump(local_file, many=False).data)
+                attachments.append(file_schema.dump(local_file, many=False))
         del data["pv_files"]
     data["attachments"] = attachments
 

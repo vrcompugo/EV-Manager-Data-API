@@ -44,7 +44,7 @@ def get_one_item(section, fields = None, options = None):
         return None
     fields = fields.split(",")
     item_schema = SettingsSchema()
-    data = item_schema.dump(item, many=False).data
+    data = item_schema.dump(item, many=False)
     if fields[0] != "_default_":
         data_filtered = {}
         for field in fields:

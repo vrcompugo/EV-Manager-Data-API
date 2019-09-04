@@ -26,7 +26,7 @@ def get_items_by_model(model, model_schema, tree, sort, offset, limit, fields):
     query = query.offset(offset).limit(limit)
     items = query.all()
     item_schema = model_schema()
-    datas = item_schema.dump(items, many=True).data
+    datas = item_schema.dump(items, many=True)
     if fields[0] != "_default_":
         list = []
         for data in datas:
@@ -49,7 +49,7 @@ def get_one_item_by_model(model, model_schema, id, fields, options=None):
     item = query.get(id)
     fields = fields.split(",")
     item_schema = model_schema()
-    data = item_schema.dump(item, many=False).data
+    data = item_schema.dump(item, many=False)
     if fields[0] != "_default_":
         data_filtered = {}
         for field in fields:

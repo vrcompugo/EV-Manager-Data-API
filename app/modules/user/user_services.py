@@ -58,4 +58,4 @@ def get_one_item(id, fields = None):
 def get_role_items():
     roles = UserRole.query.all()
     item_schema = UserRoleSchema()
-    return item_schema.dump(roles, many=True).data
+    return item_schema.dump(roles, many=True)
