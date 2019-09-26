@@ -11,6 +11,8 @@ from .models.lead_comment import LeadComment, LeadCommentSchema
 
 
 def add_item(data):
+    if datetime not in data:
+        data["datetime"] = datetime.datetime.now()
     new_item = LeadComment()
     new_item = set_attr_by_dict(new_item, data, ["id"])
     db.session.add(new_item)
