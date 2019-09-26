@@ -5,6 +5,7 @@ from app import db
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
+from app.modules.email.email_services import generate_email, send_email
 from app.modules.settings.settings_services import get_one_item as get_settings
 
 from .models.lead import Lead, LeadSchema
@@ -23,6 +24,9 @@ def add_item(data):
         new_item.attachments = attachments
         new_item.activities = generate_activity_list(data)
     db.session.add(new_item)
+    db.session.flush()
+    #if new_item.status == "new":
+    #    send_welcome_email(new_item)
     db.session.commit()
     return new_item
 
@@ -67,3 +71,26 @@ def get_items(tree, sort, offset, limit, fields):
 def get_one_item(id, fields = None):
     return get_one_item_by_model(Lead, LeadSchema, id, fields)
 
+
+def send_welcome_email(lead):
+    from .lead_comment_services import add_item as add_comment_item
+
+    if lead is None or lead.customer is None:
+        raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
+
+    if lead.customer.email is None or lead.customer.email == "":
+        return False
+
+    schema = LeadSchema()
+    email = generate_email("lead_welcome_email", schema.dump(lead, many=False))
+    email.recipients = [lead.customer.email]
+    send_email(email=email)
+
+    add_comment_item({
+        "lead_id": lead.id,
+        "user_id": None,
+        "change_to_offer_created": False,
+        "comment": "Automatische Willkommens E-Mail versendet an {}".format(lead.customer.email)
+    })
+
+    return True
