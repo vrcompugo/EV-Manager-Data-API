@@ -33,7 +33,7 @@ services:
       DATABASE_URI: "postgresql+psycopg2://evdata:tagtag@db/evdata"
       S3_ACCESS_KEY: "minio_dev"
       S3_SECRET_KEY: "tagtagtag"
-      DATA_EFI_STROM_HOST: "http://efidata"
+      IMPORT_DATA_EFI_STROM_API: "http://efidata"
       MINIO_HOST: "minio:9000"
       MINIO_SECURE: "False"
       EMAIL_HOST: "smtp.mailtrap.io"

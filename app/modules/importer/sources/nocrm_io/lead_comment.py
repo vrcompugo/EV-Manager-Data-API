@@ -5,7 +5,7 @@ import os
 from app.models import Customer, Lead, S3File
 from app.modules.lead.lead_services import add_item, update_item
 
-from ._connector import post, get, put
+from ._connector import post, get, put, remote_user_id
 from ._association import find_association, associate_item
 from ..orgamaxx.customer import import_by_lead_number
 
@@ -106,20 +106,23 @@ def update_lead_comment(lead_comment):
             lead_data["step"] = "Angebot erstellt"
         response = put("leads/{}".format(remote_link.remote_id), post_data=lead_data)
         attachment_list = []
-        for file in lead_comment.attachments:
-            s3_file = db.session.query(S3File).get(file["id"])
-            s3_file_content = s3_file.get_file()
-            with open("tmp/" + s3_file.filename, 'wb') as file_data:
-                for d in s3_file_content.stream(32 * 1024):
-                    file_data.write(d)
-            attachment_list.append(("attachments[]", (s3_file.filename, open("tmp/" + s3_file.filename, 'rb'))))
+        if lead_comment.attachments is not None:
+            for file in lead_comment.attachments:
+                s3_file = db.session.query(S3File).get(file["id"])
+                s3_file_content = s3_file.get_file()
+                with open("tmp/" + s3_file.filename, 'wb') as file_data:
+                    for d in s3_file_content.stream(32 * 1024):
+                        file_data.write(d)
+                attachment_list.append(("attachments[]", (s3_file.filename, open("tmp/" + s3_file.filename, 'rb'))))
 
         response = post("leads/{}/comments".format(remote_link.remote_id), post_data={
-            "user_id": 40297,
+            "user_id": remote_user_id,
             "content": lead_comment.comment
         }, files=attachment_list)
-        for file in lead_comment.attachments:
-            s3_file = db.session.query(S3File).get(file["id"])
-            if os.path.exists("tmp/" + s3_file.filename):
-                os.remove("tmp/" + s3_file.filename)
+
+        if lead_comment.attachments is not None:
+            for file in lead_comment.attachments:
+                s3_file = db.session.query(S3File).get(file["id"])
+                if os.path.exists("tmp/" + s3_file.filename):
+                    os.remove("tmp/" + s3_file.filename)
         return response

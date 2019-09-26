@@ -3,14 +3,15 @@ import json
 import base64
 import os
 
+from app.modules.settings.settings_services import get_one_item
 
-#API_URL = "http://efidata"
-API_URL = os.getenv('DATA_EFI_STROM_HOST', "https://data.efi-strom.de")
+API_URL = os.getenv('IMPORT_DATA_EFI_STROM_API', "https://data.efi-strom.de")
+config = get_one_item("importer/data.efi-strom.de")
+
 
 def authenticate():
     response = requests.get(API_URL + "/AuthToken",
-                            auth=('ahedderich', 'iYfXea3Vg1VuGzyJDl3FaBUiR5psJsAw'))
-
+                            auth=(config["data"]["api_user"], config["data"]["api_password"]))
     if response.status_code == 200:
 
         data = json.loads(response.text)

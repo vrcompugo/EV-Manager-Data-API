@@ -1,12 +1,18 @@
 import requests
-import json
+import os
 import base64
 
-API_URL = "https://kez.nocrm.io/api/v2/"
+from app.modules.settings.settings_services import get_one_item
+
+
+API_URL = os.getenv('IMPORT_NOCRM_API', "https://kez.nocrm.io/api/v2/")
+
+config = get_one_item("importer/nocrm_io")
+remote_user_id = config["data"]["bot_user_id"]
 
 
 def authenticate():
-    return "3b7be58e5c8a7e38a496f5adafd5062e1ec51502e6d3e281"
+    return config["data"]["api_key"]
 
 
 def post(url, post_data = None, files=None):

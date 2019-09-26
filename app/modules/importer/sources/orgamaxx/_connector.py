@@ -1,16 +1,20 @@
 import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+import os
 
-API_URL = "https://2ei3scwibnc5bkfm.myfritz.net:5000/v1/"
+from app.modules.settings.settings_services import get_one_item
+
+API_URL = os.getenv('IMPORT_ORGAMAXX_API', "https://2ei3scwibnc5bkfm.myfritz.net:5000/v1/")
+config = get_one_item("importer/orgamaxx")
 
 
 def authenticate():
     response = requests.post(
         API_URL + "login",
         json={
-            "USER": "ahedderich",
-            "PASSWORD": "R834IutVlxBSuUBIRO2b"
+            "USER": config["data"]["api_user"],
+            "PASSWORD": config["data"]["api_password"]
         },
         verify=False
     )
