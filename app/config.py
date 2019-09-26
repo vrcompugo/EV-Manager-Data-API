@@ -1,4 +1,5 @@
 import os
+from flask_emails import EmailsConfig
 
 # uncomment the line below for postgres database url from environment variable
 # postgres_local_base = os.environ['DATABASE_URL']
@@ -40,5 +41,13 @@ config_by_name = dict(
     test=TestingConfig,
     prod=ProductionConfig
 )
+
+email_config = EmailsConfig(config={
+    "EMAIL_HOST": str(os.environ["EMAIL_HOST"]),
+    "EMAIL_PORT": str(os.environ["EMAIL_PORT"]),
+    "EMAIL_HOST_USER": str(os.environ["EMAIL_HOST_USER"]),
+    "EMAIL_HOST_PASSWORD": str(os.environ["EMAIL_HOST_PASSWORD"]),
+    "EMAIL_USE_TLS": True
+})
 
 key = Config.SECRET_KEY

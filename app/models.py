@@ -12,4 +12,5 @@ from app.modules.task.models import *
 from app.modules.importer.models import *
 from app.modules.file.models import *
 from app.modules.settings.models import *
+from app.modules.email.models import *
 

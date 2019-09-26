@@ -36,6 +36,11 @@ services:
       DATA_EFI_STROM_HOST: "http://efidata"
       MINIO_HOST: "minio:9000"
       MINIO_SECURE: "False"
+      EMAIL_HOST: "smtp.mailtrap.io"
+      EMAIL_PORT: "2525"
+      EMAIL_HOST_USER: "4917ba2a999d71"
+      EMAIL_HOST_PASSWORD: "916afe6444d771"
+      EMAIL_USE_TLS: "True"
     volumes:
       - ./app:/usr/src/app/app
       - ./migrations:/usr/src/app/migrations
