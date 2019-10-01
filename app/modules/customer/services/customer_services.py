@@ -35,7 +35,10 @@ def add_item(data):
         db.session.commit()
         return new_item
     else:
-        raise ApiException("item_already_exists", "Item already exists.", 409)
+        if "UPDATE_IF_EXISTS" in data and data["UPDATE_IF_EXISTS"]:
+            update_item(item.id, data=data)
+        else:
+            raise ApiException("item_already_exists", "Item already exists.", 409)
 
 
 def update_item(id, data):
