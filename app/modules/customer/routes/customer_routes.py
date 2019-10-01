@@ -12,16 +12,16 @@ from .customer_payment_account_routes import _item_input as customer_payment_acc
 
 _item_input = api.model("Customer_", model={
     'UPDATE_IF_EXISTS': fields.Boolean(required=False, description=''),
-    'customer_number': fields.String(required=True, description=''),
-    'lead_number': fields.String(required=True, description=''),
+    'customer_number': fields.String(required=False, description=''),
+    'lead_number': fields.String(required=False, description=''),
     'company': fields.String(required=True, description=''),
     'salutation': fields.String(required=True, description=''),
     'title': fields.String(required=True, description=''),
     'firstname': fields.String(required=True, description=''),
     'lastname': fields.String(required=True, description=''),
     'email': fields.String(required=True, description=''),
-    'default_address': fields.Nested(customer_address_input),
-    'default_payment_account': fields.Nested(customer_payment_account_input)
+    'default_address': fields.Nested(customer_address_input, required=False),
+    'default_payment_account': fields.Nested(customer_payment_account_input, required=False)
 })
 
 
