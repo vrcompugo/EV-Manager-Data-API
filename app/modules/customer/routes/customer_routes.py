@@ -11,6 +11,7 @@ from .customer_payment_account_routes import _item_input as customer_payment_acc
 
 
 _item_input = api.model("Customer_", model={
+    'UPDATE_IF_EXISTS': fields.Boolean(required=False, description=''),
     'customer_number': fields.String(required=True, description=''),
     'lead_number': fields.String(required=True, description=''),
     'company': fields.String(required=True, description=''),
