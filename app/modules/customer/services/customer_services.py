@@ -10,18 +10,18 @@ from ..models import Customer, CustomerSchema, CustomerAddress, CustomerPaymentA
 
 def add_item(data):
     item = None
-    if data['email'] is not None:
+    if 'email' in data and data['email'] is not None and data['email'] != "":
         item = Customer.query.filter_by(email=data['email']).first()
-    if item is None and data['customer_number'] is not None:
+    if item is None and 'customer_number' in data and data['customer_number'] is not None and data['customer_number'] != "":
         item = Customer.query.filter_by(customer_number=data['customer_number']).first()
-    if item is None and data['lead_number'] is not None:
+    if item is None and 'lead_number' in data and data['lead_number'] is not None and data['lead_number'] != "":
         item = Customer.query.filter_by(lead_number=data['lead_number']).first()
     if item is None:
         new_item = Customer()
         new_item = set_attr_by_dict(new_item, data, ["id", "default_address", "default_payment_account"])
         db.session.add(new_item)
         db.session.flush()
-        if False and "default_address" in data and data["default_address"] is not None:
+        if "default_address" in data and data["default_address"] is not None:
             customer_address = CustomerAddress(**data["default_address"])
             customer_address.customer_id = new_item.id
             customer_address.status = "ok"
@@ -36,15 +36,27 @@ def add_item(data):
         return new_item
     else:
         if "UPDATE_IF_EXISTS" in data and data["UPDATE_IF_EXISTS"]:
-            update_item(item.id, data=data)
-        else:
-            raise ApiException("item_already_exists", "Item already exists.", 409)
+            return update_item(item.id, data=data)
+        raise ApiException("item_already_exists", "Item already exists.", 409)
 
 
 def update_item(id, data):
     item = db.session.query(Customer).get(id)
     if item is not None:
         item = set_attr_by_dict(item, data, ["id", "default_address", "default_payment_account"])
+        if "default_address" in data and data["default_address"] is not None:
+            customer_address = None
+            if item.default_address_id is not None and item.default_address_id > 0:
+                customer_address = CustomerAddress.query\
+                    .filter(CustomerAddress.id == item.default_address_id ).first()
+            if customer_address is None:
+                customer_address = CustomerAddress()
+                db.session.add(customer_address)
+            customer_address = set_attr_by_dict(customer_address, data["default_address"], ["id", "customer_id"])
+            customer_address.customer_id = item.id
+            customer_address.status = "ok"
+            db.session.flush()
+            item.default_address = customer_address
         db.session.commit()
         return item
     else:

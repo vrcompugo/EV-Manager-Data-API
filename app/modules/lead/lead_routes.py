@@ -12,15 +12,17 @@ api = Namespace('Lead')
 _item_input = api.model("Lead_", model={
     'datetime': fields.DateTime(description=''),
     'reminder_datetime': fields.DateTime(description=''),
-    'description': fields.String(description=''),
+    'number': fields.String(description=''),
     'customer_id': fields.Integer(description=''),
-    'role_id': fields.Integer(description=''),
+    'address_id': fields.Integer(description=''),
     'reseller_id': fields.Integer(description=''),
-    'lead_id': fields.Integer(description=''),
-    'offer_id': fields.Integer(description=''),
-    'contract_id': fields.Integer(description=''),
-    'pv_system_id': fields.Integer(description=''),
-    'product_id': fields.Integer(description='')
+    'project_id': fields.Integer(description=''),
+    'value': fields.Float(description=''),
+    'last_update': fields.DateTime(description=''),
+    'status': fields.String(description='', max_length=20),
+    'data':  fields.Raw(description=''),
+    'description':  fields.String(description=''),
+    'description_html':  fields.String(description='')
 })
 
 
@@ -99,5 +101,9 @@ class User(Resource):
     @token_required("update_lead")
     def put(self, id):
         """Update User """
+        fields = request.args.get("fields") or "_default_"
         data = request.json
-        return update_item(id, data=data)
+        item = update_item(id, data=data)
+        item_dict = get_one_item(item.id, fields)
+        return {"status":"success",
+                "data": item_dict}

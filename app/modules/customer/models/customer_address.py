@@ -13,7 +13,7 @@ class CustomerAddress(db.Model):
     lastname = db.Column(db.String(100))
     company = db.Column(db.String(100))
     street = db.Column(db.String(100))
-    street_nb = db.Column(db.String(20))
+    street_nb = db.Column(db.String(80))
     street_extra = db.Column(db.String(50))
     zip = db.Column(db.String(20))
     city = db.Column(db.String(60))

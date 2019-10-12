@@ -51,16 +51,17 @@ def update_item(id, data):
 
 def generate_activity_list(data):
     activities = []
-    for activity in data["activities"]:
-        if "id" in activity and activity["id"] > 0:
-            activity_item = db.session.query(LeadActivity).filter(LeadActivity.id == activity["id"]).first()
-            if activity_item is not None:
+    if "activities" in data:
+        for activity in data["activities"]:
+            if "id" in activity and activity["id"] > 0:
+                activity_item = db.session.query(LeadActivity).filter(LeadActivity.id == activity["id"]).first()
+                if activity_item is not None:
+                    activity_item = set_attr_by_dict(activity_item, activity, ["id"])
+                    activities.append(activity_item)
+            else:
+                activity_item = LeadActivity()
                 activity_item = set_attr_by_dict(activity_item, activity, ["id"])
                 activities.append(activity_item)
-        else:
-            activity_item = LeadActivity()
-            activity_item = set_attr_by_dict(activity_item, activity, ["id"])
-            activities.append(activity_item)
     return activities
 
 
