@@ -7,7 +7,6 @@ from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_mod
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.email.email_services import generate_email, send_email
 from app.modules.settings.settings_services import get_one_item as get_settings
-from app.modules.importer.sources.nocrm_io.lead import run_export
 
 from .models.lead import Lead, LeadSchema
 from .models.lead_comment import LeadComment
@@ -103,7 +102,7 @@ def send_welcome_email(lead):
         "change_to_offer_created": False,
         "code": "welcome_email",
         "automated": True,
-        "comment": "Automatische Willkommens E-Mail versendet an {}".format(lead.customer.email)
+        "comment": comment
     })
 
     return True
