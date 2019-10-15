@@ -4,8 +4,7 @@ def cron():
     from sqlalchemy import not_
 
     from app import db
-    from app.modules.importer.sources.nocrm_io.lead import run_export
-    from app.modules.importer.models.import_id_association import ImportIdAssociation
+    from app.modules.importer.sources.nocrm_io.lead import run_export, find_association
 
     from .models import Lead, LeadComment
 
@@ -24,4 +23,6 @@ def cron():
         .filter(Lead.status == "new")\
         .filter(not_(Lead.comments.any(code="welcome_email"))).all()
     for lead in leads:
-        print("send_welcome ", lead.id)
+        association = find_association(model="Lead", local_id=lead.id)
+        if association is not None:
+            print("send_welcome ", lead.id)
