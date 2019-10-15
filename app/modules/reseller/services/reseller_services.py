@@ -13,7 +13,7 @@ from ..models.reseller import Reseller, ResellerSchema
 
 def add_item(data):
     sales_role = db.session.query(UserRole).filter(UserRole.code == "sales").one()
-    user = User.query.filter(or_(User.username == data["username"], User.email == data["email"])).first()
+    user = User.query.filter(or_(User.username == data["email"], User.email == data["email"])).first()
     if user is None:
         user = add_user_item({
             "username": data["email"],
