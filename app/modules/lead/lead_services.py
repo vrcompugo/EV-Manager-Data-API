@@ -78,13 +78,22 @@ def send_welcome_email(lead):
     if lead is None or lead.customer is None:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
 
-    if lead.customer.email is None or lead.customer.email == "":
-        return False
-
     existing_comment = LeadComment.query\
         .filter(LeadComment.lead_id == lead.id)\
         .filter(LeadComment.code == "welcome_email").first()
     if existing_comment is not None:
+        return False
+
+    if lead.customer.email is None or lead.customer.email == "":
+        add_comment_item({
+            "lead_id": lead.id,
+            "user_id": None,
+            "change_to_offer_created": False,
+            "code": "welcome_email",
+            "automated": True,
+            "comment": "Achtung!!!: Automatischer Versand der Willkommens E-Mail an fehlgeschlagen, "
+                       "da keine E-Mail angegeben ist"
+        })
         return False
 
     schema = LeadSchema()

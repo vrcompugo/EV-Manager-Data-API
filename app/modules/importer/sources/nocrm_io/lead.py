@@ -154,8 +154,9 @@ def run_export(remote_id=None, local_id=None):
             lead_association = find_association("Lead", local_id=lead.id)
             if lead_association is None:
                 response = post("leads", post_data=post_data)
-                print(response)
                 if "id" in response:
                     associate_item(model="Lead", local_id=lead.id, remote_id=response["id"])
                     post_data["id"] = response["id"]
                     put("leads/{}".format(post_data["id"]), post_data=post_data)
+                else:
+                    print(response)
