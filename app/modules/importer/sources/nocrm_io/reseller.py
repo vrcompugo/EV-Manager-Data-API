@@ -35,7 +35,14 @@ def run_import():
         "TS Verkauf": "TS Solar",
         "KEZ": "KEZ",
         "HV": "KEZ",
+        "HDV 1": "HV",
+        "HDV 2": "HV",
+        "HDV 3": "HV",
+        "HDV 4": "HV",
+        "HDV 5": "HV",
         "HDV 6": "HV",
+        "HDV 7": "HV",
+        "HDV 8": "HV",
     }
     for remote_group in remote_groups:
         local_group = db.session.query(ResellerGroup).filter(ResellerGroup.name == group_name_translation[remote_group["name"]]).first()
