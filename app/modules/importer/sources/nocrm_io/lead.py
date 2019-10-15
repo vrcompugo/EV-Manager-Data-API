@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from app.models import Customer, Lead, Reseller
 from app.modules.lead.lead_services import add_item, update_item
 
-from ._connector import post, get, put
+from ._connector import post, get, put, remote_user_id
 from ._association import find_association, associate_item
 from ..orgamaxx.customer import import_by_lead_number
 
@@ -80,6 +80,16 @@ def filter_input(item_data):
     return data
 
 
+def filter_export_input(lead):
+    data = {
+        "title": lead.customer.lastname,
+        "description": lead.description,
+        "user_id": remote_user_id,
+        "amount": float(lead.value)
+    }
+    return data
+
+
 def run_import(minutes=None):
     print("Loading Lead List")
     load_more = True
@@ -104,15 +114,40 @@ def run_import(minutes=None):
             item_data = get("leads/{}".format(item_data["id"]))
             item_data["activities"] = get("leads/{}/action_histories".format(item_data["id"]))
             data = filter_input(item_data)
+            if data is None:
+                print(item_data["id"], item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."],
+                      item_data["user_id"], item_data["extended_info"]["user"]["email"])
+                continue
             lead_association = find_association("Lead", remote_id=item_data["id"])
             if lead_association is None:
-                if data is not None:
-                    item = add_item(data)
-                    associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
-                    print("success", item.id)
-                else:
-                    print(item_data["id"], item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."], item_data["user_id"], item_data["extended_info"]["user"]["email"])
+                existing_lead = Lead.query.filter(Lead.number == data["number"]).first()
+                if existing_lead is not None:
+                    associate_item(model="Lead", local_id=existing_lead.id, remote_id=item_data["id"])
+                    lead_association = find_association("Lead", remote_id=item_data["id"])
+            if lead_association is None:
+                item = add_item(data)
+                associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
+                print("success", item.id)
+
             else:
-                if data is not None:
-                    update_item(lead_association.local_id, data)
+                update_item(lead_association.local_id, data)
     return False
+
+
+def run_export(remote_id=None, local_id=None):
+    lead = None
+    if local_id is not None:
+        lead = Lead.query.get(local_id)
+    if remote_id is not None:
+        lead_association = find_association("Lead", remote_id=remote_id)
+        lead = Lead.query.get(lead_association.local_id)
+    if lead is not None:
+        post_data = filter_export_input(lead)
+        print(post_data)
+        lead_association = find_association("Lead", local_id=lead.id)
+        if lead_association is None:
+            response = post("leads", post_data=post_data)
+            associate_item(model="Lead", local_id=lead.id, remote_id=response["id"])
+            post_data["id"] = response["id"]
+            response = put("leads/{}".format(post_data["id"]), post_data=post_data)
+            print(response)
