@@ -15,7 +15,7 @@ def cron():
                              "where lead.id > 12664 and link.id is null")
 
     for row in rows:
-        #run_export(local_id=lead.id)
+        run_export(local_id=row[0])
         print("export ", row[0])
 
     leads = db.session().query(Lead).filter(Lead.id > 12664)\

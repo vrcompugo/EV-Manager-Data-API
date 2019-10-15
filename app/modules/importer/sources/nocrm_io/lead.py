@@ -81,10 +81,16 @@ def filter_input(item_data):
 
 
 def filter_export_input(lead):
+
+    reseller_link = find_association("Reseller", local_id=lead.reseller_id)
+    if reseller_link is None:
+        print("reseller doesn't exist at nocrm.io", lead.reseller_id)
+        return None
+
     data = {
         "title": lead.customer.lastname,
         "description": lead.description,
-        "user_id": remote_user_id,
+        "user_id": reseller_link.remote_id,
         "amount": float(lead.value)
     }
     return data
