@@ -150,11 +150,12 @@ def run_export(remote_id=None, local_id=None):
     if lead is not None:
         post_data = filter_export_input(lead)
         print(post_data)
-        lead_association = find_association("Lead", local_id=lead.id)
-        if lead_association is None:
-            response = post("leads", post_data=post_data)
-            print(response)
-            if "id" in response:
-                associate_item(model="Lead", local_id=lead.id, remote_id=response["id"])
-                post_data["id"] = response["id"]
-                put("leads/{}".format(post_data["id"]), post_data=post_data)
+        if post_data is not None:
+            lead_association = find_association("Lead", local_id=lead.id)
+            if lead_association is None:
+                response = post("leads", post_data=post_data)
+                print(response)
+                if "id" in response:
+                    associate_item(model="Lead", local_id=lead.id, remote_id=response["id"])
+                    post_data["id"] = response["id"]
+                    put("leads/{}".format(post_data["id"]), post_data=post_data)
