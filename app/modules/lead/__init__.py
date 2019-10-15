@@ -7,6 +7,7 @@ def cron():
     from app.modules.importer.sources.nocrm_io.lead import run_export, find_association
 
     from .models import Lead, LeadComment
+    from .lead_services import send_welcome_email
 
     rows = db.engine.execute("select * from "
                              "lead left join ("
@@ -25,4 +26,5 @@ def cron():
     for lead in leads:
         association = find_association(model="Lead", local_id=lead.id)
         if association is not None:
+            send_welcome_email(lead)
             print("send_welcome ", lead.id)

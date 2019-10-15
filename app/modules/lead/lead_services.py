@@ -103,7 +103,7 @@ def send_welcome_email(lead):
     if email.status == "sent":
         comment = "Automatische Willkommens E-Mail versendet an {}".format(lead.customer.email)
     else:
-        comment = "Achtung!!!: Automatischer Versand der Willkommens E-Mail an {} fehlgeschlagen".format(lead.customer.email)
+        comment = "Achtung!!!: Automatischer Versand der Willkommens E-Mail an {} fehlgeschlagen.\nFehler: {}".format(lead.customer.email, email.status)
 
     add_comment_item({
         "lead_id": lead.id,
