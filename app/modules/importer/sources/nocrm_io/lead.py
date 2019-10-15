@@ -88,7 +88,7 @@ def filter_export_input(lead):
         return None
 
     data = {
-        "title": lead.customer.lastname,
+        "title": (lead.customer.company + " "+ lead.customer.lastname).strip(),
         "description": lead.description,
         "user_id": reseller_link.remote_id,
         "amount": float(lead.value)
