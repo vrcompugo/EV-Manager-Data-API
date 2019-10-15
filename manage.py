@@ -42,6 +42,8 @@ def update_role_permissions():
 def cron():
     from app.modules.importer import cron
     cron()
+    from app.modules.lead import cron
+    cron()
 
 
 @manager.option("-m", "--module", dest='module', default=None)
@@ -84,6 +86,21 @@ def import_remote_data(yes, source, module, local_id, remote_id):
             "Are you sure you want to import from remote source: {}".format(source)):
         from app.modules.importer.import_services import import_by_source_module
         import_by_source_module(source=source, model=module, local_id=local_id, remote_id=remote_id)
+
+
+@manager.option("-m", "--module", dest='module', default=None)
+@manager.option("-s", "--source", dest='source', default=None)
+@manager.option("-l", "--local_id", dest='local_id', default=None)
+@manager.option("-r", "--remote_id", dest='remote_id', default=None)
+@manager.option("-y", "--y", dest='yes', default=None)
+def export_remote_data(yes, source, module, local_id, remote_id):
+    if source is None:
+        print("No source parameter given -s or --source")
+        return
+    if yes is not None or prompt_bool(
+            "Are you sure you want to import from remote source: {}".format(source)):
+        from app.modules.importer.export_services import export_by_source_module
+        export_by_source_module(source=source, model=module, local_id=local_id, remote_id=remote_id)
 
 
 @manager.command

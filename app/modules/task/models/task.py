@@ -13,7 +13,7 @@ class Task(db.Model):
     datetime = db.Column(db.DateTime)
     reminder_datetime = db.Column(db.DateTime)
     action = db.Column(db.String(50))
-    link = db.Column(db.String(50))
+    link = db.Column(db.JSON)
     description = db.Column(db.String(255))
     customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"))
     customer = db.relationship("Customer")

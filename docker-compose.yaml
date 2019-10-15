@@ -24,7 +24,7 @@ services:
       MINIO_ACCESS_KEY: "minio_dev"
       MINIO_SECRET_KEY: "tagtagtag"
 
-  ev-data-api:
+  app:
     build: .
     image: dev.hbbx.de:4300/ev-manager/ev-manager-data-api:latest
     environment:
@@ -42,6 +42,7 @@ services:
       EMAIL_HOST_PASSWORD: "916afe6444d771"
       EMAIL_USE_TLS: "True"
     volumes:
+      - appuser:/home/appuser
       - ./app:/usr/src/app/app
       - ./migrations:/usr/src/app/migrations
     networks:
@@ -62,6 +63,7 @@ volumes:
   postgres_data:
   minio_data:
   minio_config:
+  appuser:
 
 networks:
   shared:

@@ -7,8 +7,10 @@ from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_mod
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.email.email_services import generate_email, send_email
 from app.modules.settings.settings_services import get_one_item as get_settings
+from app.modules.importer.sources.nocrm_io.lead import run_export
 
 from .models.lead import Lead, LeadSchema
+from .models.lead_comment import LeadComment
 from .models.lead_activity import LeadActivity
 
 
@@ -25,8 +27,6 @@ def add_item(data):
         new_item.activities = generate_activity_list(data)
     db.session.add(new_item)
     db.session.flush()
-    #if new_item.status == "new":
-    #    send_welcome_email(new_item)
     db.session.commit()
     return new_item
 
@@ -82,15 +82,27 @@ def send_welcome_email(lead):
     if lead.customer.email is None or lead.customer.email == "":
         return False
 
+    existing_comment = LeadComment.query\
+        .filter(LeadComment.lead_id == lead.id)\
+        .filter(LeadComment.code == "welcome_email").first()
+    if existing_comment is not None:
+        return False
+
     schema = LeadSchema()
     email = generate_email("lead_welcome_email", schema.dump(lead, many=False))
     email.recipients = [lead.customer.email]
-    send_email(email=email)
+    email = send_email(email=email)
+    if email.status == "sent":
+        comment = "Automatische Willkommens E-Mail versendet an {}".format(lead.customer.email)
+    else:
+        comment = "Achtung!!!: Automatischer Versand der Willkommens E-Mail an {} fehlgeschlagen".format(lead.customer.email)
 
     add_comment_item({
         "lead_id": lead.id,
         "user_id": None,
         "change_to_offer_created": False,
+        "code": "welcome_email",
+        "automated": True,
         "comment": "Automatische Willkommens E-Mail versendet an {}".format(lead.customer.email)
     })
 
