@@ -24,7 +24,7 @@ services:
       MINIO_ACCESS_KEY: "minio_dev"
       MINIO_SECRET_KEY: "tagtagtag"
 
-  app:
+  ev-data-api:
     build: .
     image: dev.hbbx.de:4300/ev-manager/ev-manager-data-api:latest
     environment:
