@@ -20,6 +20,7 @@ _item_input = api.model("Lead_", model={
     'value': fields.Float(description=''),
     'last_update': fields.DateTime(description=''),
     'status': fields.String(description='', max_length=20),
+    'contact_source': fields.String(description=''),
     'data':  fields.Raw(description=''),
     'description':  fields.String(description=''),
     'description_html':  fields.String(description='')

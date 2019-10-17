@@ -25,6 +25,7 @@ class Lead(db.Model):
     project = db.relationship("Project")
     value = db.Column(db.Numeric(scale=4, precision=12))
     last_update = db.Column(db.DateTime)
+    contact_source = db.Column(db.String(80))
     status = db.Column(db.String(20))
     attachments = db.Column(db.JSON)
     data = db.Column(db.JSON)
