@@ -1,4 +1,5 @@
 from app.utils.lucene_tree_parser import parse_tree
+from app.exceptions import ApiException
 
 
 def get_items_by_model(model, model_schema, tree, sort, offset, limit, fields):
@@ -46,7 +47,10 @@ def get_one_item_by_model(model, model_schema, id, fields, options=None):
     query = model.query
     if options is not None:
         query = query.options(*options)
-    item = query.get(id)
+    try:
+        item = query.get(id)
+    except Exception as e:
+        raise ApiException("item_doesnt_exist", "Item doesn't exist.", 404)
     fields = fields.split(",")
     item_schema = model_schema()
     data = item_schema.dump(item, many=False)

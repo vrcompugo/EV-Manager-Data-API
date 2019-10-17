@@ -4,6 +4,7 @@ from flask_restplus import Namespace, fields
 from luqum.parser import parser
 
 from app.decorators import token_required, api_response
+from app.exceptions import ApiException
 
 from ..services.reseller_services import add_item, update_item, get_items, get_one_item
 
@@ -89,7 +90,7 @@ class User(Resource):
         fields = request.args.get("fields") or "_default_"
         item_dict = get_one_item(id, fields)
         if not item_dict:
-            api.abort(404)
+            raise ApiException("item_doesnt_exist", "Item doesn't exist.", 404)
         else:
             return {"status":"success",
                 "data": item_dict}
