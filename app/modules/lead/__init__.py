@@ -1,6 +1,9 @@
+import os
 
 
 def cron():
+    if os.getenv('ENVIRONMENT') != "prod":
+        return
     from sqlalchemy import not_
 
     from app import db

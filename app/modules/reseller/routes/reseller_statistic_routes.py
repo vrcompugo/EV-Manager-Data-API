@@ -41,14 +41,20 @@ class Items(Resource):
         if data["total_leads"] > 0:
             data["total_win_rate"] = round((data["total_won_leads"] / data["total_leads"]) * 100, 2)
         for i in range(0,4):
-            month = leads_base\
+            month_created = leads_base\
                 .filter(and_(
                         Lead.datetime >= datetime.date(now.year, now.month - i, 1),
                         Lead.datetime < datetime.date(now.year, now.month - i + 1, 1)
                     )
                 )
+            month = leads_base\
+                .filter(and_(
+                        Lead.last_status_update >= datetime.date(now.year, now.month - i, 1),
+                        Lead.last_status_update < datetime.date(now.year, now.month - i + 1, 1)
+                    )
+                )
             data["months"].append({})
-            data["months"][i]["total_leads"] = month.count()
+            data["months"][i]["total_leads"] = month_created.count()
             data["months"][i]["total_won_leads"] = month.filter(Lead.status == "won").count()
             data["months"][i]["total_lost_leads"] = month.filter(Lead.status == "lost").count()
             data["months"][i]["total_pending_leads"] = data["months"][i]["total_leads"] \

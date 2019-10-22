@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from app.models import Customer, Lead, Reseller
 from app.modules.lead.lead_services import add_item, update_item
+from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 
 from ._connector import post, get, put, remote_user_id
 from ._association import find_association, associate_item
@@ -107,6 +108,11 @@ def run_import(minutes=None):
     }
     if minutes is not None:
         options["updated_after"] = datetime.now() - timedelta(minutes=minutes)
+    else:
+        config = get_config_item("importer/nocrm_io")
+        if config is not None and "data" in config and "last_import" in config["data"]:
+            options["updated_after"] = config["data"]["last_import"]
+    print(options)
     while load_more:
         options["limit"] = limit
         options["offset"] = offset
@@ -137,7 +143,12 @@ def run_import(minutes=None):
 
             else:
                 update_item(lead_association.local_id, data)
-    return False
+    if minutes is None:
+        config = get_config_item("importer/nocrm_io")
+        if config is not None and "data" in config:
+            config["data"]["last_import"] = datetime.now()
+        update_config_item("importer/nocrm_io", config["data"])
+    return True
 
 
 def run_export(remote_id=None, local_id=None):

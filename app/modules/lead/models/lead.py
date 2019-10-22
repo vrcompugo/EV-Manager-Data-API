@@ -27,6 +27,8 @@ class Lead(db.Model):
     last_update = db.Column(db.DateTime)
     contact_source = db.Column(db.String(80))
     status = db.Column(db.String(20))
+    last_status_update = db.Column(db.DateTime)
+    reseller_billed = db.Column(db.Boolean)
     attachments = db.Column(db.JSON)
     data = db.Column(db.JSON)
     description = db.Column(TEXT)

@@ -15,6 +15,10 @@ from .models.lead_activity import LeadActivity
 
 def add_item(data):
     new_item = Lead()
+    if "datetime" in data:
+        data["last_status_update"] = data["datetime"]
+    else:
+        data["last_status_update"] = datetime.datetime.now()
     new_item = set_attr_by_dict(new_item, data, ["id", "activities"])
     settings = get_settings("leads")
     if settings is not None and "static_file_attachments" in settings["data"]:
@@ -33,6 +37,8 @@ def add_item(data):
 def update_item(id, data):
     item = db.session.query(Lead).get(id)
     if item is not None:
+        if "status" in data and item.status != data["status"]:
+            data["last_status_update"] = datetime.datetime.now()
         item = set_attr_by_dict(item, data, ["id", "activities"])
         settings = get_settings("leads")
         if settings is not None and "static_file_attachments" in settings["data"]:
