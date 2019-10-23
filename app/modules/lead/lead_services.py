@@ -38,6 +38,8 @@ def add_item(data):
 def update_item(id, data):
     item = db.session.query(Lead).get(id)
     if item is not None:
+        schema = LeadSchema()
+        old_data = schema.dump(item, many=False)
         if "status" in data and item.status != data["status"]:
             data["last_status_update"] = datetime.datetime.now()
         item = set_attr_by_dict(item, data, ["id", "activities"])
@@ -52,7 +54,11 @@ def update_item(id, data):
         db.session.commit()
         add_trigger({
             "name": "lead_updated",
-            "data": {"lead_id": item.id}
+            "data": {
+                "lead_id": item.id,
+                "old_data": old_data,
+                "new_data": schema.dump(item, many=False)
+            }
         })
         return item
     else:

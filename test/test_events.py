@@ -47,15 +47,35 @@ class TestEventCycle(TestCase):
         db.session.delete(action)
         db.session.commit()
 
-    def test_event_email(self):
+    def test_event_lead_update(self):
         trigger = add_trigger({
             "name": "lead_updated",
-            "data": {"lead_id": 241}
+            "data": {
+                "lead_id": 241,
+                "old_data":{
+                    "status": "contacted"
+                },
+                "new_data":{
+                    "status": "won"
+                }
+            }
         })
         run_trigger(trigger)
         self.assertEqual(trigger.status == "done", True)
         db.session.commit()
 
+    def test_event_lead_export(self):
+        trigger = add_trigger({
+            "name": "lead_exported",
+            "data": {
+                "lead_id": 241,
+                "operation": "add",
+                "source": "nocrm.io"
+            }
+        })
+        run_trigger(trigger)
+        self.assertEqual(trigger.status == "done", True)
+        db.session.commit()
 
 if __name__ == '__main__':
     unittest.main()

@@ -170,7 +170,11 @@ def run_export(remote_id=None, local_id=None):
                     put("leads/{}".format(post_data["id"]), post_data=post_data)
                     add_trigger({
                         "name": "lead_exported",
-                        "data": {"lead_id": lead.id}
+                        "data": {
+                            "lead_id": lead.id,
+                            "operation": "add",
+                            "source": "nocrm.io"
+                        }
                     })
                 else:
                     print(response)

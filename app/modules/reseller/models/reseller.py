@@ -20,6 +20,7 @@ class Reseller(db.Model):
     number = db.Column(db.String(120))
     access_key = db.Column(db.String(60))
     phone = db.Column(db.String(120))
+    lead_balance = db.Column(db.Integer)
 
     @hybrid_property
     def search_query(self):
