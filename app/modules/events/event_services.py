@@ -45,7 +45,7 @@ def run_trigger(trigger):
             trigger.error = trigger.error + "\n" + traceback.format_exc()
     if trigger.error is None:
         trigger.status = "done"
-        db.session.delete(trigger)
+        #db.session.delete(trigger)
     else:
         trigger.status = "error"
     db.session.commit()
