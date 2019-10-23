@@ -9,7 +9,8 @@ class Email(db.Model):
     __tablename__ = "email"
 
     id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer)
+    customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"))
+    template_id = db.Column(db.Integer, db.ForeignKey("email_template.id"))
     status = db.Column(db.String(250))
     datetime = db.Column(db.DateTime)
     from_email = db.Column(db.String(60))

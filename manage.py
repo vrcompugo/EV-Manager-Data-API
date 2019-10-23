@@ -40,6 +40,8 @@ def update_role_permissions():
 
 @manager.command
 def cron():
+    from app.modules.events import cron
+    cron()
     from app.modules.importer import cron
     cron()
     from app.modules.lead import cron
@@ -104,9 +106,13 @@ def export_remote_data(yes, source, module, local_id, remote_id):
 
 
 @manager.command
-def test():
+@manager.option("-t", "--test", dest='test_name', default=None)
+def test(test_name=None):
     """Runs the unit tests."""
-    tests = unittest.TestLoader().discover('test', pattern='test*.py')
+    if test_name is not None:
+        tests = unittest.TestLoader().discover('test', pattern=f'test_{test_name}.py')
+    else:
+        tests = unittest.TestLoader().discover('test', pattern='test*.py')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
     if result.wasSuccessful():
         return 0

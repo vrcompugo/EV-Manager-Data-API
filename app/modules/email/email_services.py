@@ -57,6 +57,7 @@ def generate_email(template_code, data):
 
     email = Email(
         status="created",
+        template_id=email_template.id,
         datetime=datetime.datetime.now(),
         from_email=email_template.from_email,
         from_name=email_template.from_name,
@@ -66,6 +67,8 @@ def generate_email(template_code, data):
         html_body=html_body,
         attachments=email_template.attachments
     )
+    if "customer_id" in data:
+        email.customer_id = data["customer_id"]
     db.session.add(email)
     return email
 

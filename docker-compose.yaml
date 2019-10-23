@@ -45,6 +45,7 @@ services:
       - appuser:/home/appuser
       - ./app:/usr/src/app/app
       - ./migrations:/usr/src/app/migrations
+      - ./test:/usr/src/app/test
     networks:
       - default
       - shared
