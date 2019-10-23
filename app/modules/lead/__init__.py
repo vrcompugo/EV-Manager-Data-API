@@ -22,7 +22,7 @@ def cron():
         run_export(local_id=row[0])
         print("export ", row[0])
 
-    leads = db.session().query(Lead).filter(Lead.id > 12664)\
+    '''leads = db.session().query(Lead).filter(Lead.id > 12664)\
         .filter(Lead.reseller_id > 0)\
         .filter(Lead.status == "new")\
         .filter(not_(Lead.comments.any(code="welcome_email"))).all()
@@ -30,4 +30,4 @@ def cron():
         association = find_association(model="Lead", local_id=lead.id)
         if association is not None:
             send_welcome_email(lead)
-            print("send_welcome ", lead.id)
+            print("send_welcome ", lead.id)'''
