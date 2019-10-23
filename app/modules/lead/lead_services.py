@@ -92,7 +92,8 @@ def get_one_item(id, fields = None):
 def send_welcome_email(lead):
     from .lead_comment_services import add_item as add_comment_item
     from app.modules.importer.sources.nocrm_io._association import find_association as nocrm_link
-
+    if lead.id < 12664:
+        return False
     if lead is None or lead.customer is None:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
 
