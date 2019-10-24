@@ -16,7 +16,7 @@ def cron():
                              "lead left join ("
                                 "select * from import_id_association where source = 'nocrm.io' and model = 'Lead'"
                              ") as link on link.local_id = lead.id "
-                             "where lead.id > 12664 and link.id is null")
+                             "where lead.id > 12664 and lead.reseller_id > 0 and link.id is null")
 
     for row in rows:
         run_export(local_id=row[0])
