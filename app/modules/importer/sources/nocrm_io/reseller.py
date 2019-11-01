@@ -47,6 +47,8 @@ def run_import():
         "Südkurve": "HV",
     }
     for remote_group in remote_groups:
+        if remote_group["name"] not in group_name_translation:
+            group_name_translation[remote_group["name"]] = "HV"
         local_group = db.session.query(ResellerGroup).filter(ResellerGroup.name == group_name_translation[remote_group["name"]]).first()
         if local_group is None:
             print(local_group)
