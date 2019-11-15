@@ -12,5 +12,9 @@ def export_by_source_module(source, model, remote_id=None, local_id=None):
         from .sources.orgamaxx import run_export_by_model
         run_export_by_model(model=model, remote_id=remote_id, local_id=local_id)
 
+    if source == "bitrix24":
+        from .sources.bitrix24 import run_export_by_model
+        run_export_by_model(model=model, remote_id=remote_id, local_id=local_id)
+
     return None
 
