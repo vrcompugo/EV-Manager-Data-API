@@ -47,6 +47,12 @@ def cron():
     from app.modules.lead import cron
     cron()
 
+@manager.command
+def bitrix_init():
+    from app.modules.importer.sources.bitrix24.reseller import run_import
+    run_import()
+    from app.modules.importer.sources.bitrix24.lead import run_full_export
+    run_full_export()
 
 @manager.option("-m", "--module", dest='module', default=None)
 def deploy_test_data(module):

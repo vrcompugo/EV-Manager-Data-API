@@ -2,7 +2,7 @@ from app import db
 import pprint
 from datetime import datetime, timedelta
 
-from app.models import Lead
+from app.models import Reseller
 from app.modules.lead.lead_services import add_item, update_item
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 
@@ -25,10 +25,15 @@ def filter_export_data(lead):
 def run_import(minutes=None):
     print("Loading Reseller List")
     users = post("user.search", {
-        "fields[USER_TYPE ]": "employee"
+        "fields[USER_TYPE]": "employee"
     })
-    pp = pprint.PrettyPrinter()
-    pp.pprint(users)
+    if "result" in users:
+        users = users["result"]
+        for user in users:
+            print(user["EMAIL"])
+            reseller = Reseller.query.filter(Reseller.email == user["EMAIL"]).first()
+            if reseller is not None:
+                associate_item(model="Reseller", local_id=reseller.id, remote_id=user["ID"])
 
 
 def run_export(remote_id=None, local_id=None):
