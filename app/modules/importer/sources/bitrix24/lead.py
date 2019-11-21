@@ -112,6 +112,7 @@ def run_import(minutes=None):
 
 
 def run_export(remote_id=None, local_id=None):
+    print("Lead Export", remote_id, local_id)
     lead = None
 
     if local_id is not None:
@@ -146,6 +147,7 @@ def run_export(remote_id=None, local_id=None):
 
 
 def run_full_export():
+    print("Full Lead Export")
     leads = Lead.query.filter(and_(Lead.status != "won", Lead.status != "lost")).all()
     for lead in leads:
         run_export(local_id=lead.id)
