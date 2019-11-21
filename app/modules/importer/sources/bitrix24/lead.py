@@ -21,7 +21,7 @@ def filter_import_input(item_data):
 
 def filter_export_input(lead):
 
-    if lead.reseller_id is None or not lead.reseller_id == 0:
+    if lead.reseller_id is None or lead.reseller_id == 0:
         return None
 
     reseller_link = find_association("Reseller", local_id=lead.reseller_id)
@@ -112,7 +112,6 @@ def run_import(minutes=None):
 
 
 def run_export(remote_id=None, local_id=None):
-    print("Lead Export", remote_id, local_id)
     lead = None
 
     if local_id is not None:
@@ -121,6 +120,7 @@ def run_export(remote_id=None, local_id=None):
         lead_association = find_association("Lead", remote_id=remote_id)
         lead = Lead.query.get(lead_association.local_id)
     if lead is not None:
+        print("Lead Export", lead.id)
         post_data = filter_export_input(lead)
         if post_data is not None:
             lead_association = find_association("Lead", local_id=lead.id)
