@@ -21,7 +21,7 @@ def filter_import_input(item_data):
 
 def filter_export_input(lead):
 
-    if not lead.reseller_id > 0:
+    if lead.reseller_id is None or not lead.reseller_id == 0:
         return None
 
     reseller_link = find_association("Reseller", local_id=lead.reseller_id)
