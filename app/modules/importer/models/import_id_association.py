@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy.ext.hybrid import hybrid_property
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
@@ -12,6 +13,10 @@ class ImportIdAssociation(db.Model):
     model = db.Column(db.String(60))
     local_id = db.Column(db.Integer)
     remote_id = db.Column(db.Integer)
+
+    @hybrid_property
+    def search_query(self):
+        return db.session.query(ImportIdAssociation)
 
 
 class ImportIdAssociationSchema(ModelSchema):
