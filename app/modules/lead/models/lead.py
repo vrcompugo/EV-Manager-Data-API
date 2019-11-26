@@ -43,6 +43,15 @@ class Lead(db.Model):
         return Lead.number + " " + Customer.firstname + " " + Customer.lastname
 
     @hybrid_property
+    def bitrix_remote_id(self):
+        from app.modules.importer.sources.bitrix24._association import find_association
+        link = find_association("Lead", local_id=self.id)
+        if link is None:
+            return None
+        else:
+            return link.remote_id
+
+    @hybrid_property
     def reseller_name(self):
         if self.reseller is not None:
             return self.reseller.name
