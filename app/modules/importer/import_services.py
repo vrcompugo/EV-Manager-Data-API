@@ -1,3 +1,7 @@
+from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
+
+from .models.import_id_association import ImportIdAssociation, ImportIdAssociationSchema
+
 
 def import_by_source_module(source, model, remote_id=None, local_id=None):
     if source == "data.efi-strom.de":
@@ -18,3 +22,6 @@ def import_by_source_module(source, model, remote_id=None, local_id=None):
 
     return None
 
+
+def get_items(tree, sort, offset, limit, fields):
+    return get_items_by_model(ImportIdAssociation, ImportIdAssociationSchema, tree, sort, offset, limit, fields)
