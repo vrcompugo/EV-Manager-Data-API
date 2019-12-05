@@ -1,0 +1,7 @@
+kubectl apply -f deployment.yaml
+telepresence \
+--swap-deployment api \
+--namespace schoen \
+--docker-run --rm -it \
+-v $(pwd):/usr/src/app \
+dev.hbbx.de:4300/ev-manager/ev-manager-data-api:latest

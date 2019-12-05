@@ -1,0 +1,269 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-svc
+  namespace: schoen
+  labels:
+    app: api
+spec:
+  ports:
+    - port: 5000
+  selector:
+    app: api
+    tier: frontend
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: api-ingress
+  namespace: schoen
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - api.korbacher-energiezentrum.de.ah.hbbx.de
+      secretName: api.korbacher-energiezentrum.de.ah.hbbx.de-tls
+  rules:
+    - host: api.korbacher-energiezentrum.de.ah.hbbx.de
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: api-svc
+              servicePort: 5000
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dev-web-auth
+  namespace: schoen
+type: Opaque
+data:
+  auth: ZGV2OiRhcHIxJFZtLzlWTlFCJDA5b05hQi9WRVhZODBYNW5CR29ZTzE=
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-pass
+  namespace: schoen
+type: Opaque
+data:
+  password: dGFndGFn #tagtag
+  uri: cG9zdGdyZXNxbCtwc3ljb3BnMjovL2V2ZGF0YTp0YWd0YWdAcG9zdGdyZXMtc3ZjL2V2ZGF0YQ== #postgresql+psycopg2://evdata:tagtag@postgres-svc/evdata
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-pass
+  namespace: schoen
+type: Opaque
+data:
+  accesskey: bWluaW9fZGV2 #minio_dev
+  password: dGFndGFndGFn #tagtagtag
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: schoen
+  labels:
+    app: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: api
+        tier: frontend
+    spec:
+      imagePullSecrets:
+        - name: gitlab-credentials
+      containers:
+        - image: dev.hbbx.de:4300/ev-manager/ev-manager-data-api:latest
+          name: api
+          env:
+            - name: DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-pass
+                  key: uri
+            - name: SECRET_KEY
+              value: "392pfheoap2ho2ufb"
+            - name: ENVIRONMENT
+              value: "dev"
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-pass
+                  key: accesskey
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-pass
+                  key: password
+            - name: MINIO_HOST
+              value: "minio.api.korbacher-energiezentrum.de.ah.hbbx.de"
+            - name: MINIO_SECURE
+              value: "True"
+            - name: EMAIL_HOST
+              value: "smtp.mailtrap.io"
+            - name: EMAIL_PORT
+              value: "2525"
+            - name: EMAIL_HOST_USER
+              value: "4917ba2a999d71"
+            - name: EMAIL_HOST_PASSWORD
+              value: "916afe6444d771"
+            - name: EMAIL_USE_TLS
+              value: "True"
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: schoen
+  labels:
+    app: postgres
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+    tier: database
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: schoen
+  labels:
+    app: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+      tier: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres
+        tier: database
+    spec:
+      containers:
+        - image: postgres:11
+          name: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-pass
+                  key: password
+            - name: POSTGRES_DB
+              value: "evdata"
+            - name: POSTGRES_USER
+              value: "evdata"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/data"
+            - name: lala
+              value: "alskd"
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - name: postgres-pv
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-pv
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-svc
+  namespace: schoen
+  labels:
+    app: minio
+spec:
+  ports:
+    - port: 9000
+  selector:
+    app: minio
+    tier: frontend
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: minio-ingress
+  namespace: schoen
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - minio.api.korbacher-energiezentrum.de.ah.hbbx.de
+      secretName: minio.api.korbacher-energiezentrum.de.ah.hbbx.de-tls
+  rules:
+    - host: minio.api.korbacher-energiezentrum.de.ah.hbbx.de
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: minio-svc
+              servicePort: 9000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: schoen
+  labels:
+    app: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio
+        tier: frontend
+    spec:
+      containers:
+        - image: minio/minio
+          name: minio
+          args: ["server", "/data"]
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-pass
+                  key: accesskey
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-pass
+                  key: password
+          ports:
+            - containerPort: 9000
+              name: minio
+          volumeMounts:
+            - name: minio-pv
+              mountPath: /data
+      volumes:
+        - name: minio-pv
+          persistentVolumeClaim:
+            claimName: minio-pvc
