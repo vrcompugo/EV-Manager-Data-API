@@ -101,7 +101,10 @@ def filter_export_input(lead):
     return data
 
 
-def run_import(minutes=None):
+def run_import(minutes=None, remote_id=None):
+    if remote_id is not None:
+        run_single_import(remote_id)
+        return
     print("Loading Lead List")
     load_more = True
     offset = 0
@@ -126,32 +129,37 @@ def run_import(minutes=None):
         print("Offset: ", offset)
 
         for item_data in items:
-            item_data = get("leads/{}".format(item_data["id"]))
-            item_data["activities"] = get("leads/{}/action_histories".format(item_data["id"]))
-            data = filter_input(item_data)
-            if data is None:
-                print(item_data["id"], item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."],
-                      item_data["user_id"], item_data["extended_info"]["user"]["email"])
-                continue
-            lead_association = find_association("Lead", remote_id=item_data["id"])
-            if lead_association is None:
-                existing_lead = Lead.query.filter(Lead.number == data["number"]).first()
-                if existing_lead is not None:
-                    associate_item(model="Lead", local_id=existing_lead.id, remote_id=item_data["id"])
-                    lead_association = find_association("Lead", remote_id=item_data["id"])
-            if lead_association is None:
-                item = add_item(data)
-                associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
-                print("success", item.id)
+            run_single_import(item_data["id"])
 
-            else:
-                update_item(lead_association.local_id, data)
     if minutes is None:
         config = get_config_item("importer/nocrm_io")
         if config is not None and "data" in config:
             config["data"]["last_import"] = str(datetime.now())
         update_config_item("importer/nocrm_io", config)
     return True
+
+
+def run_single_import(remote_id):
+    item_data = get("leads/{}".format(remote_id))
+    item_data["activities"] = get("leads/{}/action_histories".format(item_data["id"]))
+    data = filter_input(item_data)
+    if data is None:
+        print(item_data["id"], item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."],
+              item_data["user_id"], item_data["extended_info"]["user"]["email"])
+        return
+    lead_association = find_association("Lead", remote_id=item_data["id"])
+    if lead_association is None:
+        existing_lead = Lead.query.filter(Lead.number == data["number"]).first()
+        if existing_lead is not None:
+            associate_item(model="Lead", local_id=existing_lead.id, remote_id=item_data["id"])
+            lead_association = find_association("Lead", remote_id=item_data["id"])
+    if lead_association is None:
+        item = add_item(data)
+        associate_item(model="Lead", local_id=item.id, remote_id=item_data["id"])
+        print("success", item.id)
+
+    else:
+        update_item(lead_association.local_id, data)
 
 
 def run_export(remote_id=None, local_id=None):
