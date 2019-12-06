@@ -38,7 +38,7 @@ class MyApi(Api):
     def specs_url(self):
         """Monkey patch for HTTPS"""
         env = os.getenv('ENVIRONMENT') or 'dev'
-        scheme = 'http' if env == "dev" else 'https'
+        scheme = 'https'
         return url_for(self.endpoint('specs'), _external=True, _scheme=scheme)
 
 
