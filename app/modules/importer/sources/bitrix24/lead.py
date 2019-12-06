@@ -1,5 +1,6 @@
 from app import db
 import pprint
+import time
 from datetime import datetime, timedelta
 from sqlalchemy import and_
 
@@ -128,13 +129,9 @@ def run_export(remote_id=None, local_id=None):
                 response = post("crm.lead.add", post_data=post_data)
                 if "result" in response:
                     associate_item(model="Lead", local_id=lead.id, remote_id=response["result"])
-                pp = pprint.PrettyPrinter(indent=2)
-                pp.pprint(response)
             else:
                 post_data["id"] = lead_association.remote_id
                 response = post("crm.lead.get", post_data=post_data)
-                pp = pprint.PrettyPrinter(indent=2)
-                pp.pprint(response)
                 if "result" in response and "EMAIL" in response["result"]:
                     for email in response["result"]["EMAIL"]:
                         if email["VALUE"] == post_data["email"]:
@@ -145,8 +142,6 @@ def run_export(remote_id=None, local_id=None):
                             if "fields[EMAIL][0][VALUE_TYPE]" in post_data:
                                 del post_data["fields[EMAIL][0][VALUE_TYPE]"]
                 response = post("crm.lead.update", post_data=post_data)
-                pp = pprint.PrettyPrinter(indent=2)
-                pp.pprint(response)
 
 
 def run_cron_export():
@@ -159,6 +154,7 @@ def run_cron_export():
     if leads is not None:
         for lead in leads:
             run_export(local_id=lead.id)
+            time.sleep(1)
 
         config = get_config_item("importer/bitrix24")
         if config is not None and "data" in config:
