@@ -13,8 +13,24 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     number = db.Column(db.String(20))
-    type = db.Column(db.String(80))
+    tollnumber = db.Column(db.String(80))
+    product_group = db.Column(db.String(80))
     name = db.Column(db.String(80))
+    weight = db.Column(db.Numeric(scale=4, precision=12))
+    width = db.Column(db.Numeric(scale=4, precision=12))
+    length = db.Column(db.Numeric(scale=4, precision=12))
+    height = db.Column(db.Numeric(scale=4, precision=12))
+    ean = db.Column(db.String(120))
+    purchase_unit = db.Column(db.Numeric(scale=4, precision=12))
+    reference_unit = db.Column(db.Numeric(scale=4, precision=12))
+    pack_unit = db.Column(db.String(40))
+    shipping_time = db.Column(db.String(60))
+    tax_rate = db.Column(db.Integer)
+    min_purchase = db.Column(db.Integer)
+    price_net = db.Column(db.Numeric(scale=4, precision=12))
+    discount_percent = db.Column(db.Numeric(scale=4, precision=12))
+    cost = db.Column(db.Numeric(scale=4, precision=12))
+    active = db.Column(db.Boolean)
 
     @hybrid_property
     def search_query(self):

@@ -64,7 +64,7 @@ def filter_export_input(lead):
             street_nb = street[last_space+1:]
             street = street[0:last_space]
     data = {
-        "fields[TITLE]": (lead.customer.company + " " + lead.customer.lastname).strip(),
+        "fields[TITLE]": (("" if lead.customer.company is None else lead.customer.company + " ") + lead.customer.lastname).strip(),
         "fields[COMPANY_TITLE]": lead.customer.company,
         "fields[HONORIFIC]": salutation,
         "fields[NAME]": lead.customer.firstname,
@@ -122,6 +122,7 @@ def run_export(remote_id=None, local_id=None):
     if lead is not None:
         print("Lead Export", lead.id)
         post_data = filter_export_input(lead)
+        print(post_data)
         if post_data is not None:
             lead_association = find_association("Lead", local_id=lead.id)
             if lead_association is None:

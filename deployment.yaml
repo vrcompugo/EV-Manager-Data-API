@@ -108,6 +108,8 @@ spec:
                 secretKeyRef:
                   name: minio-pass
                   key: password
+            - name: IMPORT_DATA_EFI_STROM_API
+              value: "https://data.efi-strom.de.ah.hbbx.de"
             - name: MINIO_HOST
               value: "minio.api.korbacher-energiezentrum.de.ah.hbbx.de"
             - name: MINIO_SECURE
