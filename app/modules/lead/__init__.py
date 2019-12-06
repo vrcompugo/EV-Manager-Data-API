@@ -22,6 +22,10 @@ def cron():
         run_export(local_id=row[0])
         print("export ", row[0])
 
+
+    from app.modules.importer.sources.bitrix24.lead import run_cron_export
+    run_cron_export()
+
     '''leads = db.session().query(Lead).filter(Lead.id > 12664)\
         .filter(Lead.reseller_id > 0)\
         .filter(Lead.status == "new")\

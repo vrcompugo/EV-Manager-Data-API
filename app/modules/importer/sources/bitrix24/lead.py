@@ -147,6 +147,23 @@ def run_export(remote_id=None, local_id=None):
                 pp.pprint(response)
 
 
+def run_cron_export():
+    config = get_config_item("importer/bitrix24")
+    if config is not None and "data" in config and "last_export" in config["data"]:
+        leads = Lead.query.filter(Lead.last_update >= config["data"]["last_export"]).all()
+    else:
+        leads = None
+
+    if leads is not None:
+        for lead in leads:
+            run_export(local_id=lead.id)
+
+        config = get_config_item("importer/bitrix24")
+        if config is not None and "data" in config:
+            config["data"]["last_export"] = str(datetime.now())
+        update_config_item("importer/bitrix24", config)
+
+
 def run_full_export():
     print("Full Lead Export")
     leads = Lead.query.filter(and_(Lead.status != "won", Lead.status != "lost")).all()
