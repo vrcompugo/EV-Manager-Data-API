@@ -122,7 +122,6 @@ def run_export(remote_id=None, local_id=None):
     if lead is not None:
         print("Lead Export", lead.id)
         post_data = filter_export_input(lead)
-        print(post_data)
         if post_data is not None:
             lead_association = find_association("Lead", local_id=lead.id)
             if lead_association is None:
@@ -139,9 +138,12 @@ def run_export(remote_id=None, local_id=None):
                 if "result" in response and "EMAIL" in response["result"]:
                     for email in response["result"]["EMAIL"]:
                         if email["VALUE"] == post_data["email"]:
-                            del post_data["fields[EMAIL][0][TYPE_ID]"]
-                            del post_data["fields[EMAIL][0][VALUE]"]
-                            del post_data["fields[EMAIL][0][VALUE_TYPE]"]
+                            if "fields[EMAIL][0][TYPE_ID]" in post_data:
+                                del post_data["fields[EMAIL][0][TYPE_ID]"]
+                            if "fields[EMAIL][0][VALUE]" in post_data:
+                                del post_data["fields[EMAIL][0][VALUE]"]
+                            if "fields[EMAIL][0][VALUE_TYPE]" in post_data:
+                                del post_data["fields[EMAIL][0][VALUE_TYPE]"]
                 response = post("crm.lead.update", post_data=post_data)
                 pp = pprint.PrettyPrinter(indent=2)
                 pp.pprint(response)
