@@ -13,6 +13,7 @@ from ..orgamaxx.customer import import_by_lead_number
 
 
 def filter_input(item_data):
+    item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."] = item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."].strip()
     if item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."] == "":
         return None
     customer = db.session.query(Customer)\
