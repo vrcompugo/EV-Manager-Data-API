@@ -98,6 +98,12 @@ def filter_export_input(lead):
         if source_id == "OTHER":
             data["fields[SOURCE_DESCRIPTION]"] = lead.data["Quelle"]
 
+    if lead.data["Telefon 1"] is not None and lead.data["Telefon 1"] != "" and lead.data["Telefon 1"] != "None":
+        data["fields[PHONE][0][TYPE_ID]"] = "PHONE"
+        data["fields[PHONE][0][VALUE]"] = lead.data["Telefon 1"]
+        data["fields[PHONE][0][VALUE_TYPE]"] = "WORK"
+        data["phone"] = lead.data["Telefon 1"]
+
     if reseller_link is not None:
         data["fields[ASSIGNED_BY_ID]"] = reseller_link.remote_id
     if customer_link is not None:
@@ -134,13 +140,22 @@ def run_export(remote_id=None, local_id=None):
                 response = post("crm.lead.get", post_data=post_data)
                 if "result" in response and "EMAIL" in response["result"]:
                     for email in response["result"]["EMAIL"]:
-                        if email["VALUE"] == post_data["email"]:
+                        if post_data["email"] is not None and email["VALUE"] == post_data["email"]:
                             if "fields[EMAIL][0][TYPE_ID]" in post_data:
                                 del post_data["fields[EMAIL][0][TYPE_ID]"]
                             if "fields[EMAIL][0][VALUE]" in post_data:
                                 del post_data["fields[EMAIL][0][VALUE]"]
                             if "fields[EMAIL][0][VALUE_TYPE]" in post_data:
                                 del post_data["fields[EMAIL][0][VALUE_TYPE]"]
+                if "result" in response and "PHONE" in response["result"]:
+                    for phone in response["result"]["PHONE"]:
+                        if post_data["phone"] is not None and phone["VALUE"] == post_data["phone"]:
+                            if "fields[PHONE][0][TYPE_ID]" in post_data:
+                                del post_data["fields[PHONE][0][TYPE_ID]"]
+                            if "fields[PHONE][0][VALUE]" in post_data:
+                                del post_data["fields[PHONE][0][VALUE]"]
+                            if "fields[PHONE][0][VALUE_TYPE]" in post_data:
+                                del post_data["fields[PHONE][0][VALUE_TYPE]"]
                 response = post("crm.lead.update", post_data=post_data)
 
 
