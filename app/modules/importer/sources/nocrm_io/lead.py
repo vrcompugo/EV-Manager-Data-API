@@ -13,9 +13,9 @@ from ..orgamaxx.customer import import_by_lead_number
 
 
 def filter_input(item_data):
-    item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."] = item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."].strip()
-    if item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."] == "":
+    if "Interessenten-Nr." not in item_data["extended_info"]["fields_by_name"] or item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."] == "":
         return None
+    item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."] = item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."].strip()
     customer = db.session.query(Customer)\
         .filter(Customer.lead_number == str(item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."]))\
         .first()
