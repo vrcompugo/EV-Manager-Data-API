@@ -29,5 +29,7 @@ class Reseller(db.Model):
 
 class ResellerSchema(ModelSchema):
 
+    versions = fields.Constant([])
+
     class Meta:
         model = Reseller
