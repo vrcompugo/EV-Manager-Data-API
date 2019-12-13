@@ -1,7 +1,15 @@
-kubectl apply -f deployment.yaml
-telepresence \
---swap-deployment api \
---namespace schoen \
---docker-run --rm -it \
--v $(pwd):/usr/src/app \
-dev.hbbx.de:4300/ev-manager/ev-manager-data-api:latest
+ksync create --local-read-only --reload=false \
+--selector=app=api,tier=frontend \
+-n schoen \
+$(pwd) /usr/src/app \
+--name ev-data-api-api
+
+trap ctrl_c INT
+ctrl_c () {
+  echo ""
+  ksync delete ev-data-api-api
+  exit 0
+}
+
+read -p "ksync is running any key to stop..." val
+ctrl_c
