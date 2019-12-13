@@ -39,7 +39,7 @@ def filter_export_input(offer: OfferV2):
         'fields[CONTACT_ID]': customer_link.remote_id,
         'fields[CURRENCY_ID]': 'EUR',
         'fields[LEAD_ID]': lead_link.remote_id,
-        'fields[OPPORTUNITY]': offer.total,
+        'fields[OPPORTUNITY]': float(offer.total),
         'fields[PERSON_TYPE_ID]': config["data"]["customer_person_type_id"],
         'fields[STATUS_ID]': 'DRAFT',
         "fields[TITLE]": (("" if offer.customer.company is None else offer.customer.company + " ") + offer.customer.lastname).strip(),
@@ -51,8 +51,8 @@ def filter_export_input(offer: OfferV2):
         data["products"]['rows[{}][PRODUCT_ID]'.format(index)] = product_link.remote_id
         data["products"]['rows[{}][PRICE]'.format(index)] = float(item.single_price)
         data["products"]['rows[{}][PRICE_ACCOUNT]'.format(index)] = float(item.single_price)
-        data["products"]['rows[{}][PRICE_BRUTTO]'.format(index)] = float(item.total_price)
-        data["products"]['rows[{}][PRICE_EXCLUSIVE]'.format(index)] = float(item.total_price)
+        data["products"]['rows[{}][PRICE_BRUTTO]'.format(index)] = float(item.single_price)
+        data["products"]['rows[{}][PRICE_EXCLUSIVE]'.format(index)] = float(item.single_price)
         data["products"]['rows[{}][PRICE_NETTO]'.format(index)] = float(item.total_price_net)
         data["products"]['rows[{}][QUANTITY]'.format(index)] = float(item.quantity)
         data["products"]['rows[{}][TAX_INCLUDED]'.format(index)] = 'Y'
