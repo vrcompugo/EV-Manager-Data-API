@@ -18,6 +18,8 @@ def filter_import_input(item_data):
 
 
 def filter_export_input(offer: OfferV2):
+    config = get_config_item("importer/bitrix24")
+
     lead_link = find_association("Lead", local_id=offer.lead_id)
     customer_link = find_association("Customer", local_id=offer.customer_id)
     if customer_link is None:
@@ -38,7 +40,7 @@ def filter_export_input(offer: OfferV2):
         'fields[CURRENCY_ID]': 'EUR',
         'fields[LEAD_ID]': lead_link.remote_id,
         'fields[OPPORTUNITY]': offer.total,
-        'fields[PERSON_TYPE_ID]': '4',
+        'fields[PERSON_TYPE_ID]': config["data"]["customer_person_type_id"],
         'fields[STATUS_ID]': 'DRAFT',
         "fields[TITLE]": (("" if offer.customer.company is None else offer.customer.company + " ") + offer.customer.lastname).strip(),
         "products": {}
@@ -58,7 +60,7 @@ def filter_export_input(offer: OfferV2):
         index = index + 1
     if customer_company_link is not None:
         data['fields[COMPANY_ID]'] = customer_company_link.remote_id
-        data['fields[PERSON_TYPE_ID]'] = 2
+        data['fields[PERSON_TYPE_ID]'] = config["data"]["company_person_type_id"]
     return data
 
 
