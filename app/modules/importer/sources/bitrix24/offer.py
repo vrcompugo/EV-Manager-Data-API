@@ -35,7 +35,7 @@ def filter_export_input(offer: OfferV2):
         'fields[CLIENT_CONTACT]': (offer.customer.firstname + " " + offer.customer.lastname).strip(),
         'fields[CLIENT_EMAIL]': None,
         'fields[CLIENT_PHONE]': None,
-        'fields[CLIENT_TITLE]': 'Test IT',
+        'fields[CLIENT_TITLE]': '',
         'fields[CONTACT_ID]': customer_link.remote_id,
         'fields[CURRENCY_ID]': 'EUR',
         'fields[LEAD_ID]': lead_link.remote_id,
@@ -54,7 +54,7 @@ def filter_export_input(offer: OfferV2):
         data["products"]['rows[{}][PRICE_BRUTTO]'.format(index)] = float(item.total_price)
         data["products"]['rows[{}][PRICE_EXCLUSIVE]'.format(index)] = float(item.total_price)
         data["products"]['rows[{}][PRICE_NETTO]'.format(index)] = float(item.total_price_net)
-        data["products"]['rows[{}][QUANTITY]'.format(index)] = item.quantity
+        data["products"]['rows[{}][QUANTITY]'.format(index)] = float(item.quantity)
         data["products"]['rows[{}][TAX_INCLUDED]'.format(index)] = 'Y'
         data["products"]['rows[{}][TAX_RATE]'.format(index)] = item.tax_rate
         index = index + 1
