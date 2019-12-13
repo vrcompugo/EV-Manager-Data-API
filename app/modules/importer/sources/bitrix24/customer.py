@@ -42,6 +42,7 @@ def run_export(remote_id=None, local_id=None):
         customer = Customer.query.get(remote_association.local_id)
     if customer is not None:
         post_data = filter_export_data(customer)
+        print("export customer: ", post_data)
         if post_data is not None:
             remote_association = find_association("Customer", local_id=customer.id)
             if remote_association is None:

@@ -81,6 +81,7 @@ def run_export(remote_id=None, local_id=None):
         return None
 
     post_data = filter_export_input(offer=offer)
+    print("export offer: ", post_data)
     if post_data is not None:
         response = post("crm.quote.add", post_data=post_data)
         if "result" in response:
@@ -100,6 +101,6 @@ def run_export(remote_id=None, local_id=None):
                     counter = counter + 1
                     time.sleep(5)
 
-            pp.pprint(response)
+        pp.pprint(response)
 
 
