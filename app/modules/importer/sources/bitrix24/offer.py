@@ -62,8 +62,13 @@ def filter_export_input(offer: OfferV2):
     return data
 
 
-def run_import(minutes=None):
-    pass
+def run_import(remote_id=None, local_id=None):
+    print("run _import")
+    response = post("crm.quote.get", post_data={
+        "ID": remote_id
+    })
+    pp = pprint.PrettyPrinter(indent=2)
+    pp.pprint(response)
 
 
 def run_export(remote_id=None, local_id=None):
