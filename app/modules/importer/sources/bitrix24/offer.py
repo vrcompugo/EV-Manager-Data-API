@@ -22,6 +22,9 @@ def filter_export_input(offer: OfferV2):
     customer_link = find_association("Customer", local_id=offer.customer_id)
     if customer_link is None:
         run_customer_export(local_id=offer.customer_id)
+        customer_link = find_association("Customer", local_id=offer.customer_id)
+        if customer_link is None:
+            return None
     customer_company_link = find_association("CustomerCompany", local_id=offer.customer_id)
     reseller_link = find_association("Reseller", local_id=offer.reseller_id)
     data = {
