@@ -59,18 +59,8 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
             survey.data["pv_usage"] != "" and \
             int(survey.data["pv_usage"]) > 0 and \
             (old_data is None or survey.data["pv_usage"] != old_data["data"]["pv_usage"]):
-        if survey.data["pv_module_type"] == "390":
-            product_name = "Paket {} (390)".format(survey.data["packet_number"])
-        else:
-            product_name = "PV Paket {}".format(survey.data["packet_number"])
-        product = Product.query.filter(Product.name == product_name).first()
-        if product is None:
-            return None
-        tax_rate = 19
-        single_price = round(float(product.price_net) * (1 + tax_rate/100), 4)
-        single_price_net = float(product.price_net)
-        single_tax_amount = single_price - single_price_net
-        data = {
+
+        offer_data = {
             "customer_id": survey.customer_id,
             "address_id": survey.customer.default_address_id,
             "payment_account_id": survey.customer.default_payment_account_id,
@@ -79,43 +69,94 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
             "offer_group": "pv-offer",
             "datetime": datetime.datetime.now(),
             "currency": "eur",
-            "tax_rate": tax_rate,
-            "subtotal": single_price,
-            "subtotal_net": single_price_net,
+            "tax_rate": 19,
+            "subtotal": 0,
+            "subtotal_net": 0,
             "shipping_cost": 0,
             "shipping_cost_net": 0,
             "discount_total": 0,
-            "total_tax": single_tax_amount,
-            "total": single_price,
+            "total_tax": 0,
+            "total": 0,
             "status": "created",
-            "items": [
-                {
-                    "product_id": product.id,
-                    "sort": 0,
-                    "number": product.number,
-                    "label": product.name,
-                    "description": "",
-                    "weight_single": 0,
-                    "weight_total": 0,
-                    "quantity": 1,
-                    "cost": 0,
-                    "tax_rate": 19,
-                    "single_price": single_price,
-                    "single_price_net": single_price_net,
-                    "single_tax_amount": single_tax_amount,
-                    "discount_rate": 0,
-                    "discount_single_amount": 0,
-                    "discount_single_price": single_price,
-                    "discount_single_price_net": single_price_net,
-                    "discount_single_tax_amount": single_tax_amount,
-                    "total_price": single_price,
-                    "total_price_net": single_price_net,
-                    "total_tax_amount": single_tax_amount
-                }
-            ]
+            "items": []
         }
+
+        product_name = "PV Paket {}".format(survey.data["packet_number"])
+        if survey.data["pv_module_type"] == "390":
+            product_name = "Paket {} (390)".format(survey.data["packet_number"])
+        if survey.data["pv_module_type"] == "400":
+            product_name = "Paket {} (400)".format(survey.data["packet_number"])
+
+        offer_data = add_item_to_offer(offer_data, product_name, 1)
+
+        if int(survey.data["packet_number"]) >= 35:
+            quantity = 1
+            if 65 <= int(survey.data["packet_number"]) <= 70:
+                quantity = 2
+            if 75 <= int(survey.data["packet_number"]) <= 85:
+                quantity = 3
+            if 90 <= int(survey.data["packet_number"]) <= 125:
+                quantity = 4
+            if 130 <= int(survey.data["packet_number"]) <= 155:
+                quantity = 5
+            if 160 <= int(survey.data["packet_number"]) <= 180:
+                quantity = 6
+            if 185 <= int(survey.data["packet_number"]) <= 220:
+                quantity = 7
+            if 230 <= int(survey.data["packet_number"]) <= 300:
+                quantity = 9
+            offer_data = add_item_to_offer(offer_data, "Akku Stag 2,5 kW", quantity)
+
+        offer_data = add_item_to_offer(offer_data, "Wechselrichter & Optimizer", 0)
+        offer_data = add_item_to_offer(offer_data, "Neuer Zählerschrank inkl. Montage", 0)
+        offer_data = add_item_to_offer(offer_data, "WaLLbox  400V 11kW", 0)
+        offer_data = add_item_to_offer(offer_data, "ecoSTAR taglio 100", 0)
+        offer_data = add_item_to_offer(offer_data, "Technik & Service Paket", 0)
+        offer_data = add_item_to_offer(offer_data, "ZERO-Paket", 0)
+
+        if int(survey.data["packet_number"]) >= 60:
+            offer_data = add_item_to_offer(offer_data, "zus. digitaler Zähler", 1)
+
         lead = Lead.query.filter(Lead.customer_id == survey.customer.id).first()
         if lead is not None:
-            data["lead_id"] = lead.id
-        offer = add_item_v2(data)
+            offer_data["lead_id"] = lead.id
+        add_item_v2(offer_data)
 
+
+def add_item_to_offer(offer_data, product_name, quantity):
+    product = Product.query.filter(Product.name == product_name).first()
+    if product is None:
+        raise Exception("Product not found: {}".format(product_name))
+    tax_rate = 19
+    single_price = round(float(product.price_net) * (1 + tax_rate/100), 4)
+    single_price_net = float(product.price_net)
+    single_tax_amount = single_price - single_price_net
+    item_data = {
+        "product_id": product.id,
+        "sort": 0,
+        "number": product.number,
+        "label": product.name,
+        "description": "",
+        "weight_single": 0,
+        "weight_total": 0,
+        "quantity": quantity,
+        "cost": 0,
+        "tax_rate": 19,
+        "single_price": single_price,
+        "single_price_net": single_price_net,
+        "single_tax_amount": single_tax_amount,
+        "discount_rate": 0,
+        "discount_single_amount": 0,
+        "discount_single_price": single_price,
+        "discount_single_price_net": single_price_net,
+        "discount_single_tax_amount": single_tax_amount,
+        "total_price": quantity * single_price,
+        "total_price_net": quantity * single_price_net,
+        "total_tax_amount": quantity * single_tax_amount
+    }
+    offer_data["subtotal"] = offer_data["subtotal"] + item_data["total_price"]
+    offer_data["subtotal_net"] = offer_data["subtotal_net"] + item_data["total_price_net"]
+    offer_data["total_tax"] = offer_data["total_tax"] + item_data["total_tax_amount"]
+    offer_data["total"] = offer_data["total"] + item_data["total_price"]
+    offer_data["items"].append(item_data)
+    return offer_data

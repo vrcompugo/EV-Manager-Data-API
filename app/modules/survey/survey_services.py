@@ -25,7 +25,10 @@ def update_item(id, data):
         old_data = item_schema.dump(item, many=False)
         updated_item = set_attr_by_dict(item, data, ["id"])
         db.session.commit()
-        automatic_offer_creation_by_survey(survey=updated_item, old_data=old_data)
+        try:
+            automatic_offer_creation_by_survey(survey=updated_item, old_data=old_data)
+        except Exception as e:
+            print(e)
         return item
     else:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
