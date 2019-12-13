@@ -1,3 +1,4 @@
+import pprint
 from app.models import Customer
 
 from ._connector import post, get
@@ -63,4 +64,5 @@ def run_export(remote_id=None, local_id=None):
                             "fields[IS_PRIMARY ]": 0,
                             "fields[SORT]": 0,
                         }))
-            print(response)
+            pp = pprint.PrettyPrinter()
+            pp.pprint("resp: " + response)
