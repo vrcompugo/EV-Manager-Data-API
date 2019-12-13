@@ -15,7 +15,7 @@ class Product(db.Model):
     number = db.Column(db.String(20))
     tollnumber = db.Column(db.String(80))
     product_group = db.Column(db.String(80))
-    name = db.Column(db.String(80))
+    name = db.Column(db.String(120))
     weight = db.Column(db.Numeric(scale=4, precision=12))
     width = db.Column(db.Numeric(scale=4, precision=12))
     length = db.Column(db.Numeric(scale=4, precision=12))
