@@ -61,9 +61,10 @@ def run_import(minutes=None):
                     if item is not None:
                         associate_item("Product", remote_id=product_raw_data["ID"], local_id=item.id)
                 else:
-                    item = db.session.query(Product).get(id)
+                    item = db.session.query(Product).get(local_link.local_id)
                     if item is not None:
                         update_item(local_link.local_id, product_data)
+
 
 def run_export(remote_id=None, local_id=None):
     pass
