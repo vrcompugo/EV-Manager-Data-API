@@ -2,7 +2,7 @@ from app import db
 import pprint
 from datetime import datetime, timedelta
 
-from app.models import Reseller
+from app.models import Reseller, Product
 from app.modules.product.product_services import add_item, update_item
 
 from ._connector import post, get
@@ -61,7 +61,9 @@ def run_import(minutes=None):
                     if item is not None:
                         associate_item("Product", remote_id=product_raw_data["ID"], local_id=item.id)
                 else:
-                    update_item(local_link.local_id, product_data)
+                    item = db.session.query(Product).get(id)
+                    if item is not None:
+                        update_item(local_link.local_id, product_data)
 
 def run_export(remote_id=None, local_id=None):
     pass
