@@ -13,11 +13,20 @@ def filter_import_data(item_data):
     return data
 
 
-def filter_export_data(customer):
+def filter_export_data(customer: Customer):
+
 
     data = {
+        "fields[HONORIFIC]": "HNR_DE_1" if customer.salutation == "ms" else "HNR_DE_2",
         "fields[NAME]": customer.firstname,
         "fields[LAST_NAME]": customer.lastname,
+        "fields[UF_CRM_1572950758]": customer.default_address.street,
+        "fields[UF_CRM_1572950777]": customer.default_address.street_nb,
+        "fields[UF_CRM_1572963448]": customer.default_address.city,
+        "fields[UF_CRM_1572963458]": customer.default_address.zip,
+        "fields[EMAIL][0][TYPE_ID]": "EMAIL",
+        "fields[EMAIL][0][VALUE]": customer.email,
+        "fields[EMAIL][0][VALUE_TYPE]": "WORK",
         "fields[TYPE_ID]": "CLIENT",
     }
     if customer.company is not None and customer.company != "":
@@ -29,8 +38,12 @@ def filter_export_data(customer):
     return data
 
 
-def run_import(minutes=None):
-
+def run_import(remote_id=None, local_id=None):
+    response = post("crm.contact.get", post_data={
+        "ID": remote_id
+    })
+    pp = pprint.PrettyPrinter()
+    pp.pprint(response)
     return True
 
 
@@ -64,5 +77,3 @@ def run_export(remote_id=None, local_id=None):
                             "fields[IS_PRIMARY ]": 0,
                             "fields[SORT]": 0,
                         }))
-            pp = pprint.PrettyPrinter()
-            pp.pprint("resp: " + response)
