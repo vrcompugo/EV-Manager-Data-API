@@ -83,9 +83,9 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
 
         product_name = "PV Paket {}".format(survey.data["packet_number"])
         if survey.data["pv_module_type"] == "390":
-            product_name = "Paket {} (390)".format(survey.data["packet_number"])
+            product_name = "PV Paket {} (390)".format(survey.data["packet_number"])
         if survey.data["pv_module_type"] == "400":
-            product_name = "Paket {} (400)".format(survey.data["packet_number"])
+            product_name = "PV Paket {} (400)".format(survey.data["packet_number"])
 
         offer_data = add_item_to_offer(offer_data, product_name, 1)
 
