@@ -64,7 +64,7 @@ def register_routes(api: Blueprint):
                 if s3_file is None:
                     attachment["public_link"] = "#"
                 else:
-                    attachment["public_link"] = s3_file.public_link()
+                    attachment["public_link"] = s3_file.public_link
         return render_template("downloads/lead_downloads_list.html", offers=offers_data, lead_comment=lead_comment)
 
     @api.route("/downloads/install/", methods=[ "POST"])
