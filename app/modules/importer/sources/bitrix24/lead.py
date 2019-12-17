@@ -120,6 +120,7 @@ def run_import(minutes=None):
 
 def run_export(remote_id=None, local_id=None):
     lead = None
+    pp = pprint.PrettyPrinter()
 
     if local_id is not None:
         lead = Lead.query.get(local_id)
@@ -135,6 +136,8 @@ def run_export(remote_id=None, local_id=None):
                 response = post("crm.lead.add", post_data=post_data)
                 if "result" in response:
                     associate_item(model="Lead", local_id=lead.id, remote_id=response["result"])
+                else:
+                    pp.pprint(response)
             else:
                 post_data["id"] = lead_association.remote_id
                 response = post("crm.lead.get", post_data=post_data)
@@ -157,6 +160,8 @@ def run_export(remote_id=None, local_id=None):
                             if "fields[PHONE][0][VALUE_TYPE]" in post_data:
                                 del post_data["fields[PHONE][0][VALUE_TYPE]"]
                 response = post("crm.lead.update", post_data=post_data)
+                if "result" not in response:
+                    pp.pprint(response)
 
 
 def run_cron_export():
