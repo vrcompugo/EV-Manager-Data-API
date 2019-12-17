@@ -1,4 +1,4 @@
-ksync create --local-read-only --reload=false \
+ksync create --local-read-only --reload=true \
 --selector=app=api,tier=frontend \
 -n schoen \
 $(pwd) /usr/src/app \
