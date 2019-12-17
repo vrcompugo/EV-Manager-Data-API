@@ -24,16 +24,21 @@ def filter_export_data(lead):
 
 def run_import(minutes=None):
     print("Loading Reseller List")
-    users = post("user.search", {
-        "fields[USER_TYPE]": "employee"
-    })
-    if "result" in users:
-        users = users["result"]
-        for user in users:
-            print(user["EMAIL"])
-            reseller = Reseller.query.filter(Reseller.email == user["EMAIL"]).first()
-            if reseller is not None:
-                associate_item(model="Reseller", local_id=reseller.id, remote_id=user["ID"])
+    users_data = {
+        "next": 0
+    }
+    while "next" in users_data:
+        users_data = post("user.search", {
+            "fields[USER_TYPE]": "employee",
+            "start": users_data["next"]
+        })
+        if "result" in users_data:
+            users = users_data["result"]
+            for user in users:
+                print(user["EMAIL"])
+                reseller = Reseller.query.filter(Reseller.email == user["EMAIL"]).first()
+                if reseller is not None:
+                    associate_item(model="Reseller", local_id=reseller.id, remote_id=user["ID"])
 
 
 def run_export(remote_id=None, local_id=None):
