@@ -12,10 +12,14 @@ def register_routes(api: Blueprint):
 
     @api.route("/downloads/", methods=["GET", "POST"])
     def downloads():
+        from app.modules.importer.sources.bitrix24._association import find_association
 
         if request.form.get("PLACEMENT") == "CRM_LEAD_DETAIL_TAB":
             lead_id = json.loads(request.form.get("PLACEMENT_OPTIONS"))["ID"]
-            lead = Lead.query.filter(Lead.id == lead_id).first()
+            lead_link = find_association("Lead", remote_id=lead_id)
+            if lead_link is None:
+                return "Lead not found"
+            lead = Lead.query.filter(Lead.id == lead_link.local_id).first()
             if lead is None:
                 return "Lead not found2"
             return render_template("downloads/lead_downloads.html", lead=lead)
@@ -23,14 +27,17 @@ def register_routes(api: Blueprint):
 
     @api.route("/downloads/reload/", methods=["GET"])
     def reload():
-        from app.modules.importer.sources.bitrix24._connector import post, get
+        from app.modules.importer.sources.bitrix24._connector import post
+        from app.modules.importer.sources.bitrix24._association import find_association
+
         lead_id = request.args.get("lead_id")
         lead = Lead.query.filter(Lead.id == lead_id).first()
-        if lead is None:
-            return "Lead not found2"
+        lead_link = find_association("Lead", local_id=lead_id)
+        if lead is None or lead_link is None:
+            return "Lead not found"
 
         response = post("crm.quote.list", post_data={
-            "filter[LEAD_ID]": 400,
+            "filter[LEAD_ID]": lead_link.remote_id,
             "order[id]": "desc"
         })
         offers_data = []
