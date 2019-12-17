@@ -9,12 +9,17 @@
         "placement.unbind",
         {
           "PLACEMENT": "CRM_LEAD_DETAIL_TAB",
-          "HANDLER": "https://api.korbacher-energiezentrum.de/bitrix24/downloads/",
+          "HANDLER": "https://api.korbacher-energiezentrum.de.ah.hbbx.de/bitrix24/downloads/",
         },
+        function(result) {
+
+        }
+      );
+      BX24.callMethod(
         "placement.unbind",
         {
           "PLACEMENT": "CRM_LEAD_DETAIL_TAB",
-          "HANDLER": "https://api.korbacher-energiezentrum.de.ah.hbbx.de/bitrix24/downloads/",
+          "HANDLER": "https://api.korbacher-energiezentrum.de/bitrix24/downloads/",
         },
         function(result) {
           BX24.callMethod(
