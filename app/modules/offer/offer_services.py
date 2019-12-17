@@ -5,6 +5,7 @@ from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.models import Lead, Product
+from app.modules.importer.sources.bitrix24.offer import run_export
 
 from .models.offer import Offer, OfferSchema
 from .models.offer_v2 import OfferV2
@@ -120,7 +121,8 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
         lead = Lead.query.filter(Lead.customer_id == survey.customer.id).first()
         if lead is not None:
             offer_data["lead_id"] = lead.id
-        add_item_v2(offer_data)
+        offer = add_item_v2(offer_data)
+        run_export(local_id=offer.id)
 
 
 def add_item_to_offer(offer_data, product_name, quantity):
