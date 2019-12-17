@@ -70,10 +70,7 @@ def filter_export_input(lead):
         "fields[HONORIFIC]": salutation,
         "fields[NAME]": lead.customer.firstname,
         "fields[LAST_NAME]": lead.customer.lastname,
-        "fields[EMAIL][0][TYPE_ID]": "EMAIL",
-        "fields[EMAIL][0][VALUE]": lead.customer.email,
-        "fields[EMAIL][0][VALUE_TYPE]": "WORK",
-        "fields[HAS_EMAIL]": "Y",
+        "fields[HAS_EMAIL]": "N",
         "fields[UF_CRM_5DD4020221169]": street,
         "fields[UF_CRM_5DD402022E300]": street_nb,
         "fields[UF_CRM_5DD4020242167]": lead.customer.default_address.zip,
@@ -84,6 +81,11 @@ def filter_export_input(lead):
         "email": lead.customer.email
         #"fields[ASSIGNED_BY_ID]": reseller_link.remote_id
     }
+    if lead.customer.email and lead.customer.email != "folgt":
+        data["fields[EMAIL][0][TYPE_ID]"] = "EMAIL"
+        data["fields[EMAIL][0][VALUE]"] = lead.customer.email
+        data["fields[EMAIL][0][VALUE_TYPE]"] = "WORK"
+        data["fields[HAS_EMAIL]"] = "Y"
     if "Telefon 1" in lead.data:
         data["fields[PHONE]"] = lead.data["Telefon 1"]
     if "Quelle" in lead.data:
