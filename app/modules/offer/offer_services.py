@@ -5,7 +5,6 @@ from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.models import Lead, Product
-from app.modules.importer.sources.bitrix24.offer import run_export
 
 from .models.offer import Offer, OfferSchema
 from .models.offer_v2 import OfferV2
@@ -55,6 +54,9 @@ def get_one_item(id, fields = None):
 
 
 def automatic_offer_creation_by_survey(survey, old_data=None):
+
+    from app.modules.importer.sources.bitrix24.offer import run_export
+
     if ("offer_comment" not in survey.data or survey.data["offer_comment"] == "") and \
             survey.data["pv_usage"] is not None and \
             survey.data["pv_usage"] != "" and \
