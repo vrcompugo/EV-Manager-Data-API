@@ -1,12 +1,5 @@
-<h3>PV-Angebote</h3>
-{% for item in offers %}
-    <div class="offer">
-      <b>{{ item.datetime }} - {{ item.number }}</b><br>
-      <a href="{{ item.download_link }}" target="_blank">PV-Anlage</a><br>
-    </div>
-{% endfor %}
 
-<h3>Cloud Angebote &amp; Zusatz</h3>
+<h3>Angebote &amp; Zusatz</h3>
 
 {% for attachment in lead_comment.attachments %}
       <a href="{{ attachment.public_link }}" target="_blank">{{ attachment.filename }}</a><br>
