@@ -146,7 +146,7 @@ def run_single_import(remote_id):
     item_data = get("leads/{}".format(remote_id))
     item_data["activities"] = get("leads/{}/action_histories".format(item_data["id"]))
     data = filter_input(item_data)
-    if data["reseller_id"] in [47, 10, 17, 3]:
+    if data["reseller_id"] is not None and data["reseller_id"] in [47, 10, 17, 3]:
         return None
     if data is None:
         print(item_data["id"], item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."],
