@@ -56,6 +56,7 @@ def get_one_item(id, fields = None):
 def automatic_offer_creation_by_survey(survey, old_data=None):
 
     from app.modules.importer.sources.bitrix24.offer import run_export
+    from app.modules.importer.sources.bitrix24.lead import run_status_update_export
 
     if ("offer_comment" not in survey.data or survey.data["offer_comment"] == "") and \
             survey.data["pv_usage"] is not None and \
@@ -125,6 +126,9 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
             offer_data["lead_id"] = lead.id
         offer = add_item_v2(offer_data)
         run_export(local_id=offer.id)
+        lead.value = offer.total
+        db.session.commit()
+        run_status_update_export(local_id=lead.id)
 
 
 def add_item_to_offer(offer_data, product_name, quantity):
@@ -132,7 +136,7 @@ def add_item_to_offer(offer_data, product_name, quantity):
     if product is None:
         raise Exception("Product not found: {}".format(product_name))
     tax_rate = 19
-    single_price = round(float(product.price_net) * (1 + tax_rate/100), 4)
+    single_price = round(float(product.price_net) * (1 + tax_rate / 100), 4)
     single_price_net = float(product.price_net)
     single_tax_amount = single_price - single_price_net
     item_data = {

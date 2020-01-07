@@ -20,18 +20,7 @@ def filter_import_input(item_data):
     return data
 
 
-def filter_export_input(lead):
-
-    if lead.reseller_id is None or lead.reseller_id == 0:
-        return None
-
-    reseller_link = find_association("Reseller", local_id=lead.reseller_id)
-    customer_link = find_association("Customer", local_id=lead.customer_id)
-    #if customer_link is None:
-        #run_customer_export(local_id=lead.customer_id)
-        #customer_link = find_association("Customer", local_id=lead.customer_id)
-        #if customer_link is None:
-        #    return None
+def get_remote_lead_status(lead):
     status = "NEW"
     if lead.status == "contacted":
         status = "IN_PROCESS"
@@ -49,6 +38,22 @@ def filter_export_input(lead):
         status = "JUNK"
     if lead.status == "won":
         status = "CONVERTED"
+    return status
+
+
+def filter_export_input(lead):
+
+    if lead.reseller_id is None or lead.reseller_id == 0:
+        return None
+
+    reseller_link = find_association("Reseller", local_id=lead.reseller_id)
+    customer_link = find_association("Customer", local_id=lead.customer_id)
+    #if customer_link is None:
+        #run_customer_export(local_id=lead.customer_id)
+        #customer_link = find_association("Customer", local_id=lead.customer_id)
+        #if customer_link is None:
+        #    return None
+    status = get_remote_lead_status(lead)
     salutation = "0"
     if lead.customer.salutation is not None:
         if lead.customer.salutation == "mr":
@@ -164,6 +169,31 @@ def run_export(remote_id=None, local_id=None):
                 response = post("crm.lead.update", post_data=post_data)
                 if "result" not in response:
                     pp.pprint(response)
+
+
+def run_status_update_export(remote_id=None, local_id=None):
+    if remote_id is not None:
+        lead_association = find_association("Lead", remote_id=remote_id)
+    if local_id is not None:
+        lead_association = find_association("Lead", local_id=local_id)
+    if lead_association is None:
+        print("lead link not found", local_id, remote_id)
+        return
+    lead = Lead.query.get(lead_association.local_id)
+    status = get_remote_lead_status(lead)
+    post_data = {}
+    post_data["id"] = lead_association.remote_id
+    post_data["fields[STATUS_ID]"] = status
+    post_data["fields[OPPORTUNITY]"] = float(lead.value)
+    customer_link = find_association("Customer", local_id=lead.customer_id)
+    if customer_link is not None:
+        data["fields[CONTACT_ID]"] = customer_link.remote_id
+    company_link = find_association("CustomerCompany", local_id=lead.customer_id)
+    if company_link is not None:
+        data["fields[COMPANY_ID]"] = company_link.remote_id
+    response = post("crm.lead.update", post_data=post_data)
+    if "result" not in response:
+        pp.pprint(response)
 
 
 def run_cron_export():
