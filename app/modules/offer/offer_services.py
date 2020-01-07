@@ -126,9 +126,12 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
             offer_data["lead_id"] = lead.id
         offer = add_item_v2(offer_data)
         run_export(local_id=offer.id)
-        lead.value = offer.total
-        db.session.commit()
-        run_status_update_export(local_id=lead.id)
+        if lead is not None:
+            lead.value = offer.total
+            lead.status = "offer_created"
+            db.session.add(lead)
+            db.session.commit()
+            run_status_update_export(local_id=lead.id)
 
 
 def add_item_to_offer(offer_data, product_name, quantity):
