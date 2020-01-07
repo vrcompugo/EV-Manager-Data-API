@@ -187,10 +187,10 @@ def run_status_update_export(remote_id=None, local_id=None):
     post_data["fields[OPPORTUNITY]"] = float(lead.value)
     customer_link = find_association("Customer", local_id=lead.customer_id)
     if customer_link is not None:
-        data["fields[CONTACT_ID]"] = customer_link.remote_id
+        dapost_datata["fields[CONTACT_ID]"] = customer_link.remote_id
     company_link = find_association("CustomerCompany", local_id=lead.customer_id)
     if company_link is not None:
-        data["fields[COMPANY_ID]"] = company_link.remote_id
+        post_data["fields[COMPANY_ID]"] = company_link.remote_id
     response = post("crm.lead.update", post_data=post_data)
     if "result" not in response:
         pp.pprint(response)
