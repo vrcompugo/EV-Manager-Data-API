@@ -1,0 +1,4 @@
+KUBE_POD=`kubectl get pods -n schoen --selector=app=api,tier=frontend | grep "x-cluster-manager-api" | sed 's/|/ /' | awk '{print $1}'`
+
+rm -r ./migrations
+kubectl cp -n schoen $KUBE_POD:/usr/src/app/migrations ./migrations
