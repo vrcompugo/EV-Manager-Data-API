@@ -9,6 +9,7 @@ class Customer(db.Model):
     __tablename__ = "customer"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    reseller_id = db.Column(db.Integer, db.ForeignKey('reseller.id'))
     customer_number = db.Column(db.String(30), unique=True)
     lead_number = db.Column(db.String(30), unique=True)
     company = db.Column(db.String(100))
