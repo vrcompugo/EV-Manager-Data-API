@@ -1,0 +1,8 @@
+venv
+.idea
+.git
+.vscode
+__pycache__
+*.pyc
+telepresence.log
+migrations

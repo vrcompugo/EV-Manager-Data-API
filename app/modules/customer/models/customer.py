@@ -19,6 +19,7 @@ class Customer(db.Model):
     email = db.Column(db.String(120))
     pending_email = db.Column(db.String(120))
     email_status = db.Column(db.String(20))
+    phone = db.Column(db.String(80))
     last_change = db.Column(db.DateTime)
     default_address_id = db.Column(db.Integer, db.ForeignKey('customer_address.id', use_alter=True))
     default_address = db.relationship("CustomerAddress", foreign_keys=[default_address_id], post_update=True)
@@ -28,6 +29,7 @@ class Customer(db.Model):
     @hybrid_property
     def search_query(self):
         return db.session.query(Customer)
+
 
 class CustomerSchema(ModelSchema):
 

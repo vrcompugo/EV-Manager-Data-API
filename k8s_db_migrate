@@ -3,4 +3,4 @@ read commit_message
 
 kubectl exec -it -n schoen svc/api-svc -- python manage.py db migrate -m "$commit_message"
 
-./k8s_download_migrations
+./k8s_db_download
