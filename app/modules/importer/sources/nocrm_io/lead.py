@@ -96,7 +96,7 @@ def filter_export_input(lead):
         return None
 
     data = {
-        "title": (lead.customer.company + " "+ lead.customer.lastname).strip(),
+        "title": (lead.customer.company + " " + lead.customer.lastname).strip(),
         "description": lead.description,
         "user_id": reseller_link.remote_id,
         "amount": float(lead.value)
@@ -175,6 +175,8 @@ def run_export(remote_id=None, local_id=None):
         lead_association = find_association("Lead", remote_id=remote_id)
         lead = Lead.query.get(lead_association.local_id)
     if lead is not None:
+        if len(lead.number) > 5:
+            return
         post_data = filter_export_input(lead)
         if post_data is not None:
             lead_association = find_association("Lead", local_id=lead.id)
