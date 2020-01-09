@@ -1,0 +1,48 @@
+<html>
+<head></head>
+<body>
+  installer
+  <script src="//api.bitrix24.com/api/v1/"></script>
+  <script>
+    BX24.init(function(){
+      BX24.callMethod(
+        "placement.unbind",
+        {
+          "PLACEMENT": "CRM_LEAD_DETAIL_TAB",
+          "HANDLER": "https://api.korbacher-energiezentrum.de.ah.hbbx.de/bitrix24/downloads/",
+        },
+        function(result) {
+
+        }
+      );
+      BX24.callMethod(
+        "placement.unbind",
+        {
+          "PLACEMENT": "CRM_LEAD_DETAIL_TAB",
+          "HANDLER": "https://api.korbacher-energiezentrum.de/bitrix24/downloads/",
+        },
+        function(result) {
+          BX24.callMethod(
+            "placement.bind",
+            {
+              "PLACEMENT": "CRM_LEAD_DETAIL_TAB",
+              "TITLE": "Downloads",
+              "HANDLER": "https://api.korbacher-energiezentrum.de/bitrix24/downloads/",
+            },
+            function(result) {
+              if (result.error()){
+                console.error(result.error());
+              }else{
+                console.dir(result.data());
+                BX24.installFinish();
+              }
+              console.log(BX24.placement.info());
+            }
+          );
+        }
+      );
+
+  });
+  </script>
+</body>
+</html>
