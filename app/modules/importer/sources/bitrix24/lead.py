@@ -56,15 +56,12 @@ def filter_import_input(item_data):
     if item_data["STATUS_ID"] in inv_map:
         status = inv_map[item_data["STATUS_ID"]]
 
-    lead_number = "bitrix" + str(random.randint(100000000, 999999999))
-
     data = {
         "datetime": item_data["DATE_CREATE"],
         "last_update": item_data["DATE_MODIFY"],
         "reseller_id": reseller_id,
         "customer_id": customer_id,
         "value": item_data["OPPORTUNITY"],
-        "number": lead_number,
         "status": status,
         "data": {
             "Vorname": item_data["NAME"],
@@ -72,7 +69,6 @@ def filter_import_input(item_data):
             "Stra\u00dfe": item_data["UF_CRM_5DD4020221169"] + " " + item_data["UF_CRM_5DD402022E300"],
             "PLZ": "" if item_data["UF_CRM_5DD4020242167"] is None else item_data["UF_CRM_5DD4020242167"],
             "Ort": "" if item_data["UF_CRM_5DD4020239456"] is None else item_data["UF_CRM_5DD4020239456"],
-            "Interessenten-Nr.": lead_number,
             "Quelle": "bitrix24",
             "Land": None,
             "Mobil": "",
@@ -83,7 +79,6 @@ def filter_import_input(item_data):
                        + "Stra\u00dfe: {}\n".format(item_data["UF_CRM_5DD4020221169"] + " " + item_data["UF_CRM_5DD402022E300"])
                        + "PLZ: {}\n".format(item_data["UF_CRM_5DD4020242167"])
                        + "Ort: {}\n".format(item_data["UF_CRM_5DD4020239456"])
-                       + "Interessenten-Nr.: {}\n".format(lead_number)
                        + "Quelle: {}\n".format("bitrix24")
                        + "Angelegt am: {}\n".format(item_data["DATE_CREATE"])
     }
@@ -133,6 +128,7 @@ def filter_export_input(lead):
         "fields[UF_CRM_5DD402022E300]": street_nb,
         "fields[UF_CRM_5DD4020242167]": lead.customer.default_address.zip,
         "fields[UF_CRM_5DD4020239456]": lead.customer.default_address.city,
+        "fields[UF_CRM_1578581226149]": lead.number,
         "fields[OPPORTUNITY]": lead.value,
         "fields[STATUS_ID]": status,
         "fields[OPENED]": "Y",
@@ -188,8 +184,12 @@ def run_import(remote_id=None, local_id=None):
                 if lead_link is None:
                     lead = add_item(data)
                     associate_item(model="Lead", local_id=lead.id, remote_id=remote_id)
+                    post_data = {
+                        "id": remote_id,
+                        "fields[UF_CRM_1578581226149]": lead.number
+                    }
+                    post("crm.lead.update", post_data=post_data)
                 else:
-                    del data["number"]
                     lead = update_item(lead_link.local_id, data)
                 if lead is not None:
                     run_data_efi_export(local_id=lead.id)

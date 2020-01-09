@@ -20,6 +20,12 @@ def add_item(data):
         data["last_status_update"] = data["datetime"]
     else:
         data["last_status_update"] = datetime.datetime.now()
+    while "number" not in data or data["number"] is None or data["number"] == "":
+        data["number"] = str(random.randint(100000, 999999))
+        existing = db.session.query(Lead).filter(Lead.number == data["number"]).first()
+        if existing is not None:
+            data["number"] = None
+    data["last_status_update"] = datetime.datetime.now()
     new_item = set_attr_by_dict(new_item, data, ["id", "activities"])
     settings = get_settings("leads")
     if settings is not None and "static_file_attachments" in settings["data"]:
@@ -38,6 +44,12 @@ def add_item(data):
 def update_item(id, data):
     item = db.session.query(Lead).get(id)
     if item is not None:
+        if item.number is None or item.number == "":
+            while "number" not in data or data["number"] is None or data["number"] == "":
+                item.number = str(random.randint(100000, 999999))
+                existing = db.session.query(Lead).filter(Lead.number == data["number"]).first()
+                if existing is not None:
+                    data["number"] = None
         schema = LeadSchema()
         old_data = schema.dump(item, many=False)
         if "status" in data and item.status != data["status"]:
@@ -85,7 +97,7 @@ def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(Lead, LeadSchema, tree, sort, offset, limit, fields)
 
 
-def get_one_item(id, fields = None):
+def get_one_item(id, fields=None):
     return get_one_item_by_model(Lead, LeadSchema, id, fields)
 
 
