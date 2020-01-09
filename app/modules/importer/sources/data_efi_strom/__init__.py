@@ -32,4 +32,7 @@ def run_import_by_model(model, remote_id=None, local_id=None):
 
 
 def run_export_by_model(model, remote_id=None, local_id=None):
-    pass
+
+    if model is None or model == "lead":
+        from .lead import run_export
+        run_export(remote_id=remote_id, local_id=local_id)

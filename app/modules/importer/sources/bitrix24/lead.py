@@ -1,43 +1,102 @@
 from app import db
 import pprint
 import time
+import random
 from datetime import datetime, timedelta
 from sqlalchemy import and_
 
-from app.models import Lead
+from app.models import Lead, Customer
 from app.modules.lead.lead_services import add_item, update_item
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 
 from ._connector import post, get
 from ._association import find_association, associate_item
-from .customer import run_export as run_customer_export
+from .customer import run_export as run_customer_export, run_import as run_customer_import
+
+
+LEAD_STATUS_CONVERT = {
+    "new": "NEW",
+    "contacted": "IN_PROCESS",
+    "tel_not_connected": "5",
+    "survey_created": "4",
+    "offer_created": "PROCESSED",
+    "offer_presented": "1",
+    "offer_negotiation": "1",
+    "lost": "JUNK",
+    "won": "CONVERTED",
+}
 
 
 def filter_import_input(item_data):
-    data = {
+    customer_id = None
+    customer = None
+    customer_accociation = find_association("Customer", remote_id=item_data["CONTACT_ID"])
+    if customer_accociation is None:
+        customer = run_customer_import(remote_id=item_data["CONTACT_ID"])
+        customer_id = customer.id
 
+    else:
+        customer_id = customer_accociation.local_id
+        customer = Customer.query.get(customer_accociation.local_id)
+    if customer is not None and customer.default_address.street == "false":
+        customer.default_address.street = item_data["UF_CRM_5DD4020221169"]
+        customer.default_address.street_nb = item_data["UF_CRM_5DD402022E300"]
+        customer.default_address.zip = item_data["UF_CRM_5DD4020242167"]
+        customer.default_address.city = item_data["UF_CRM_5DD4020239456"]
+        db.session.commit()
+
+    reseller_accociation = find_association("Reseller", remote_id=item_data["ASSIGNED_BY_ID"])
+    if reseller_accociation is None:
+        reseller_id = None
+    else:
+        reseller_id = reseller_accociation.local_id
+
+    inv_map = {v: k for k, v in LEAD_STATUS_CONVERT.items()}
+    status = "new"
+    if item_data["STATUS_ID"] in inv_map:
+        status = inv_map[item_data["STATUS_ID"]]
+
+    lead_number = "bitrix" + str(random.randint(100000000, 999999999))
+
+    data = {
+        "datetime": item_data["DATE_CREATE"],
+        "last_update": item_data["DATE_MODIFY"],
+        "reseller_id": reseller_id,
+        "customer_id": customer_id,
+        "value": item_data["OPPORTUNITY"],
+        "number": lead_number,
+        "status": status,
+        "data": {
+            "Vorname": item_data["NAME"],
+            "Nachname/Firma": item_data["LAST_NAME"],
+            "Stra\u00dfe": item_data["UF_CRM_5DD4020221169"] + " " + item_data["UF_CRM_5DD402022E300"],
+            "PLZ": "" if item_data["UF_CRM_5DD4020242167"] is None else item_data["UF_CRM_5DD4020242167"],
+            "Ort": "" if item_data["UF_CRM_5DD4020239456"] is None else item_data["UF_CRM_5DD4020239456"],
+            "Interessenten-Nr.": lead_number,
+            "Quelle": "bitrix24",
+            "Land": None,
+            "Mobil": "",
+            "Notiz": ""
+        },
+        "description": "Vorname: {}\n".format(item_data["NAME"])
+                       + "Nachname/Firma: {}\n".format(item_data["LAST_NAME"])
+                       + "Stra\u00dfe: {}\n".format(item_data["UF_CRM_5DD4020221169"] + " " + item_data["UF_CRM_5DD402022E300"])
+                       + "PLZ: {}\n".format(item_data["UF_CRM_5DD4020242167"])
+                       + "Ort: {}\n".format(item_data["UF_CRM_5DD4020239456"])
+                       + "Interessenten-Nr.: {}\n".format(lead_number)
+                       + "Quelle: {}\n".format("bitrix24")
+                       + "Angelegt am: {}\n".format(item_data["DATE_CREATE"])
     }
+    data["description_html"] = data["description"].replace("\n", "<br>\n")
+    if customer is not None and customer.default_address is not None:
+        data["address_id"] = customer.default_address.id
     return data
 
 
 def get_remote_lead_status(lead):
     status = "NEW"
-    if lead.status == "contacted":
-        status = "IN_PROCESS"
-    if lead.status == "tel_not_connected":
-        status = "5"
-    if lead.status == "survey_created":
-        status = "4"
-    if lead.status == "offer_created":
-        status = "PROCESSED"
-    if lead.status == "offer_presented":
-        status = "1"
-    if lead.status == "offer_negotiation":
-        status = "1"
-    if lead.status == "lost":
-        status = "JUNK"
-    if lead.status == "won":
-        status = "CONVERTED"
+    if lead.status in LEAD_STATUS_CONVERT:
+        status = LEAD_STATUS_CONVERT[lead.status]
     return status
 
 
@@ -48,11 +107,6 @@ def filter_export_input(lead):
 
     reseller_link = find_association("Reseller", local_id=lead.reseller_id)
     customer_link = find_association("Customer", local_id=lead.customer_id)
-    #if customer_link is None:
-        #run_customer_export(local_id=lead.customer_id)
-        #customer_link = find_association("Customer", local_id=lead.customer_id)
-        #if customer_link is None:
-        #    return None
     status = get_remote_lead_status(lead)
     salutation = "0"
     if lead.customer.salutation is not None:
@@ -66,8 +120,7 @@ def filter_export_input(lead):
     if street_nb is None:
         last_space = street.rfind(" ")
         if last_space > 0:
-            print(last_space)
-            street_nb = street[last_space+1:]
+            street_nb = street[last_space + 1:]
             street = street[0:last_space]
     data = {
         "fields[TITLE]": (("" if lead.customer.company is None else lead.customer.company + " ") + lead.customer.lastname).strip(),
@@ -83,16 +136,15 @@ def filter_export_input(lead):
         "fields[OPPORTUNITY]": lead.value,
         "fields[STATUS_ID]": status,
         "fields[OPENED]": "Y",
-        "email": lead.customer.email
-        #"fields[ASSIGNED_BY_ID]": reseller_link.remote_id
+        "email": lead.customer.email,
+        "phone": lead.data["Telefon 1"]
+        # "fields[ASSIGNED_BY_ID]": reseller_link.remote_id
     }
     if lead.customer.email and lead.customer.email != "folgt":
         data["fields[EMAIL][0][TYPE_ID]"] = "EMAIL"
         data["fields[EMAIL][0][VALUE]"] = lead.customer.email
         data["fields[EMAIL][0][VALUE_TYPE]"] = "WORK"
         data["fields[HAS_EMAIL]"] = "Y"
-    if "Telefon 1" in lead.data:
-        data["fields[PHONE]"] = lead.data["Telefon 1"]
     if "Quelle" in lead.data:
         source_id = "OTHER"
         if lead.data["Quelle"] == "DAA":
@@ -109,7 +161,6 @@ def filter_export_input(lead):
         data["fields[PHONE][0][TYPE_ID]"] = "PHONE"
         data["fields[PHONE][0][VALUE]"] = lead.data["Telefon 1"]
         data["fields[PHONE][0][VALUE_TYPE]"] = "WORK"
-        data["phone"] = lead.data["Telefon 1"]
 
     if reseller_link is not None:
         data["fields[ASSIGNED_BY_ID]"] = reseller_link.remote_id
@@ -121,8 +172,27 @@ def filter_export_input(lead):
     return data
 
 
-def run_import(minutes=None):
-    pass
+def run_import(remote_id=None, local_id=None):
+    from app.modules.importer.sources.data_efi_strom.lead import run_export as run_data_efi_export
+    pp = pprint.PrettyPrinter()
+    if local_id is not None:
+        lead_association = find_association("Lead", local_id=local_id)
+        remote_id = lead_association.remote_id
+    if remote_id is not None:
+        response = post("crm.lead.get", post_data={"id": remote_id})
+        if "result" in response:
+            data = filter_import_input(response["result"])
+            if data is not None:
+                print("importing lead")
+                lead_link = find_association("Lead", remote_id=remote_id)
+                if lead_link is None:
+                    lead = add_item(data)
+                    associate_item(model="Lead", local_id=lead.id, remote_id=remote_id)
+                else:
+                    del data["number"]
+                    lead = update_item(lead_link.local_id, data)
+                if lead is not None:
+                    run_data_efi_export(local_id=lead.id)
 
 
 def run_export(remote_id=None, local_id=None):

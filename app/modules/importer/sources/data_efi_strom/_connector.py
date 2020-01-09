@@ -21,12 +21,27 @@ def authenticate():
     return None
 
 
-def post(url, post_data = None):
+def post(url, post_data=None):
 
     token = authenticate()
 
     if token is not None:
         response = requests.post(API_URL + "/v1/{}".format(url),
+                                     headers={'Authorization': "Basic {}".format(token)},
+                                     json=post_data)
+        try:
+            return response.json()
+        except:
+            print(response.text)
+    return {}
+
+
+def put(url, post_data=None):
+
+    token = authenticate()
+
+    if token is not None:
+        response = requests.put(API_URL + "/v1/{}".format(url),
                                      headers={'Authorization': "Basic {}".format(token)},
                                      json=post_data)
         try:

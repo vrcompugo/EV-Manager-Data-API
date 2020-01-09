@@ -3,6 +3,8 @@ from app.modules.importer.models.import_id_association import ImportIdAssociatio
 
 
 def find_association(model, remote_id=None, local_id=None):
+    if remote_id is None and local_id is None:
+        return None
     query = db.session.query(ImportIdAssociation)\
         .filter(ImportIdAssociation.source == "bitrix24")\
         .filter(ImportIdAssociation.model == model)
