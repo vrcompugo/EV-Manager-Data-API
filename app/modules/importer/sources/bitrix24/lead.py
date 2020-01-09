@@ -133,7 +133,7 @@ def filter_export_input(lead):
         "fields[STATUS_ID]": status,
         "fields[OPENED]": "Y",
         "email": lead.customer.email,
-        "phone": lead.data["Telefon 1"]
+        "phone": lead.customer.phone
         # "fields[ASSIGNED_BY_ID]": reseller_link.remote_id
     }
     if lead.customer.email and lead.customer.email != "folgt":
@@ -153,9 +153,9 @@ def filter_export_input(lead):
         if source_id == "OTHER":
             data["fields[SOURCE_DESCRIPTION]"] = lead.data["Quelle"]
 
-    if lead.data["Telefon 1"] is not None and lead.data["Telefon 1"] != "" and lead.data["Telefon 1"] != "None":
+    if lead.customer.phone is not None and lead.customer.phone != "" and lead.customer.phone != "None":
         data["fields[PHONE][0][TYPE_ID]"] = "PHONE"
-        data["fields[PHONE][0][VALUE]"] = lead.data["Telefon 1"]
+        data["fields[PHONE][0][VALUE]"] = lead.customer.phone
         data["fields[PHONE][0][VALUE_TYPE]"] = "WORK"
 
     if reseller_link is not None:
