@@ -23,6 +23,7 @@ deploy1:
     - rm -r .e*
     - rm -r .g*
     - rm -r .d*
+    - rm -r .s*
   tags:
     - builder1
 
