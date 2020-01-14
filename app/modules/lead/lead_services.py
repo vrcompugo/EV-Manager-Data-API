@@ -39,6 +39,7 @@ def add_item(data):
     db.session.flush()
     if new_item.customer is not None:
         new_item.customer.lead_number = new_item.number
+        new_item.customer.reseller_id = new_item.reseller_id
     db.session.commit()
     return new_item
 
@@ -67,6 +68,7 @@ def update_item(id, data):
         item.activities = generate_activity_list(data)
         if item.customer is not None:
             item.customer.lead_number = item.number
+            item.customer.reseller_id = item.reseller_id
         db.session.commit()
         add_trigger({
             "name": "lead_updated",
