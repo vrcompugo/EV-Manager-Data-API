@@ -150,7 +150,7 @@ def run_single_import(remote_id):
         print(item_data["id"], item_data["extended_info"]["fields_by_name"]["Interessenten-Nr."],
               item_data["user_id"], item_data["extended_info"]["user"]["email"])
         return
-    if data["reseller_id"] is not None and data["reseller_id"] in [47, 10, 17, 3, 12, 2]:
+    if data["reseller_id"] is not None and data["reseller_id"] in [47, 10, 17, 3, 12, 2, 59, 41]:
         return None
     lead_association = find_association("Lead", remote_id=item_data["id"])
     if lead_association is None:
