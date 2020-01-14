@@ -11,7 +11,7 @@ from app.modules.settings.settings_services import get_one_item as get_config_it
 
 from ._connector import post, get
 from ._association import find_association, associate_item
-from .customer import run_export as run_customer_export, run_import as run_customer_import
+from .customer import run_export as run_customer_export, run_import as run_customer_import, run_customer_lead_import
 
 
 LEAD_STATUS_CONVERT = {
@@ -30,16 +30,24 @@ LEAD_STATUS_CONVERT = {
 def filter_import_input(item_data):
     customer_id = None
     customer = None
-    customer_accociation = find_association("Customer", remote_id=item_data["CONTACT_ID"])
-    if customer_accociation is None:
-        if item_data["CONTACT_ID"] is not None and int(item_data["CONTACT_ID"]) > 0:
+    if item_data["CONTACT_ID"] is not None and int(item_data["CONTACT_ID"]) > 0:
+        customer_accociation = find_association("Customer", remote_id=item_data["CONTACT_ID"])
+        if customer_accociation is None:
             customer = run_customer_import(remote_id=item_data["CONTACT_ID"])
             if customer is not None:
                 customer_id = customer.id
+        else:
+            customer_id = customer_accociation.local_id
+            customer = Customer.query.get(customer_accociation.local_id)
     else:
-        customer_id = customer_accociation.local_id
-        customer = Customer.query.get(customer_accociation.local_id)
-    if customer is not None and customer.default_address.street == "false":
+        customer_accociation = find_association("LeadCustomer", remote_id=item_data["ID"])
+        if customer_accociation is None:
+            customer = run_customer_lead_import(item_data)
+            customer_id = customer.id
+        else:
+            customer_id = customer_accociation.local_id
+            customer = Customer.query.get(customer_accociation.local_id)
+    if customer.default_address.street == "false":
         customer.default_address.street = item_data["UF_CRM_5DD4020221169"]
         customer.default_address.street_nb = item_data["UF_CRM_5DD402022E300"]
         customer.default_address.zip = item_data["UF_CRM_5DD4020242167"]

@@ -119,6 +119,28 @@ def run_import(remote_id=None, local_id=None):
     return None
 
 
+def run_customer_lead_import(lead_item_data):
+    remote_id = lead_item_data["ID"]
+    lead_item_data["UF_CRM_1572950758"] = lead_item_data["UF_CRM_5DD4020221169"]
+    lead_item_data["UF_CRM_1572950777"] = lead_item_data["UF_CRM_5DD402022E300"]
+    lead_item_data["UF_CRM_1572963458"] = lead_item_data["UF_CRM_5DD4020242167"]
+    lead_item_data["UF_CRM_1572963448"] = lead_item_data["UF_CRM_5DD4020239456"]
+    data = filter_import_data(lead_item_data)
+    if data is not None:
+        print("importing customer")
+        customer_link = find_association("LeadCustomer", remote_id=remote_id)
+        if customer_link is None:
+            customer = add_item(data)
+            associate_item(model="LeadCustomer", local_id=customer.id, remote_id=remote_id)
+        else:
+            del data["number"]
+            customer = update_item(customer_link.local_id, data)
+        return customer
+    else:
+        print("data is not customer import: ", response["result"])
+    return None
+
+
 def run_export(remote_id=None, local_id=None):
     customer = None
     if local_id is not None:

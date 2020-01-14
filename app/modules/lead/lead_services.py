@@ -37,6 +37,8 @@ def add_item(data):
         new_item.activities = generate_activity_list(data)
     db.session.add(new_item)
     db.session.flush()
+    if new_item.customer is not None:
+        new_item.customer.lead_number = new_item.number
     db.session.commit()
     return new_item
 
@@ -63,6 +65,8 @@ def update_item(id, data):
                 attachments.append(attachment)
             item.attachments = attachments
         item.activities = generate_activity_list(data)
+        if item.customer is not None:
+            item.customer.lead_number = item.number
         db.session.commit()
         add_trigger({
             "name": "lead_updated",
