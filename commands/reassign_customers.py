@@ -22,7 +22,7 @@ def reassign_customers():
                     "ID": customer_link.remote_id,
                     "fields[ASSIGNED_BY_ID]": reseller_link.remote_id
                 }
-                response = post("crm.contact.update", post_data=post_data)
+                response = post("crm.contact.update", post_data=data)
                 print(response)
                 exported = True
 
