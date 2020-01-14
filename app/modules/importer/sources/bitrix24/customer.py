@@ -114,6 +114,8 @@ def run_import(remote_id=None, local_id=None):
                     del data["number"]
                     customer = update_item(customer_link.local_id, data)
                 return customer
+            else:
+                print("data is not customer import: ", response["result"])
     return None
 
 
