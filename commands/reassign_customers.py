@@ -23,13 +23,9 @@ def reassign_customers():
                     "fields[ASSIGNED_BY_ID]": reseller_link.remote_id
                 }
                 response = post("crm.contact.update", post_data=data)
-                print(response)
-                exported = True
 
         printProgressBar(i, total, prefix='Progress:', suffix='Complete', length=50)
         i = i + 1
-        if exported:
-            return
 
 
 def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd="\r"):
