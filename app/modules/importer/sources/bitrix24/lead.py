@@ -32,7 +32,7 @@ def filter_import_input(item_data):
     customer = None
     customer_accociation = find_association("Customer", remote_id=item_data["CONTACT_ID"])
     if customer_accociation is None:
-        if int(item_data["CONTACT_ID"]) > 0:
+        if item_data["CONTACT_ID"] is not None int(item_data["CONTACT_ID"]) > 0:
             customer = run_customer_import(remote_id=item_data["CONTACT_ID"])
             if customer is not None:
                 customer_id = customer.id
