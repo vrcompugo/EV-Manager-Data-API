@@ -28,9 +28,7 @@ def filter_export_input(offer: OfferV2):
         if customer_link is None:
             return None
     customer_company_link = find_association("CustomerCompany", local_id=offer.customer_id)
-    reseller_link = find_association("Reseller", local_id=offer.reseller_id)
     data = {
-        'fields[ASSIGNED_BY_ID]': reseller_link.remote_id,
         'fields[CLIENT_ADDR]': '',
         'fields[CLIENT_CONTACT]': (offer.customer.firstname + " " + offer.customer.lastname).strip(),
         'fields[CLIENT_EMAIL]': None,
@@ -45,6 +43,9 @@ def filter_export_input(offer: OfferV2):
         "fields[TITLE]": (("" if offer.customer.company is None else offer.customer.company + " ") + offer.customer.lastname).strip(),
         "products": {}
     }
+    reseller_link = find_association("Reseller", local_id=offer.reseller_id)
+    if reseller_link is not None:
+        data['fields[ASSIGNED_BY_ID]'] = reseller_link.remote_id
     index = 0
     for item in offer.items:
         product_link = find_association("Product", local_id=item.product_id)
