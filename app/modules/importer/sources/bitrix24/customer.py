@@ -17,7 +17,7 @@ def filter_import_data(item_data):
         reseller_id = reseller_accociation.local_id
 
     company = ""
-    if item_data["COMPANY_ID"] is not None and item_data["COMPANY_ID"] > 0:
+    if item_data["COMPANY_ID"] is not None and int(item_data["COMPANY_ID"]) > 0:
         response = post("crm.company.get", post_data={
             "ID": item_data["COMPANY_ID"]
         })
