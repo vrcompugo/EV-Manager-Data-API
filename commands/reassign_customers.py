@@ -9,6 +9,7 @@ def reassign_customers():
     total = len(customers)
     printProgressBar(0, total, prefix='Progress:', suffix='Complete', length=50)
     i = 0
+    exported = False
     for customer in customers:
         lead = Lead.query.filter(Lead.customer_id == customer.id).first()
         if lead is not None and lead.reseller_id is not None and lead.reseller_id > 0:
@@ -23,10 +24,11 @@ def reassign_customers():
                 }
                 response = post("crm.contact.update", post_data=post_data)
                 print(response)
+                exported = True
 
         printProgressBar(i, total, prefix='Progress:', suffix='Complete', length=50)
         i = i + 1
-        if i > 1:
+        if exported:
             return
 
 
