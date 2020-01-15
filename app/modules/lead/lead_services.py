@@ -26,6 +26,7 @@ def add_item(data):
         existing = db.session.query(Lead).filter(Lead.number == data["number"]).first()
         if existing is not None:
             data["number"] = None
+    data["last_update"] = datetime.datetime.now()
     data["last_status_update"] = datetime.datetime.now()
     new_item = set_attr_by_dict(new_item, data, ["id", "activities"])
     settings = get_settings("leads")
@@ -56,6 +57,8 @@ def update_item(id, data):
                     data["number"] = None
         schema = LeadSchema()
         old_data = schema.dump(item, many=False)
+        if "last_update" not in data:
+            data["last_update"] = datetime.datetime.now()
         if "status" in data and item.status != data["status"]:
             data["last_status_update"] = datetime.datetime.now()
         item = set_attr_by_dict(item, data, ["id", "activities"])
