@@ -1,0 +1,32 @@
+version: v1beta6
+images:
+  default:
+    image: dev.hbbx.de:4300/ev-manager/ev-manager-data-api
+    tag: dev-${DEVSPACE_GIT_COMMIT}
+    build:
+      docker:
+        disableFallback: true
+deployments:
+- name: api
+  kubectl:
+    manifests:
+    - deployment.yaml
+dev:
+  ports:
+  - labelSelector:
+      app: postgres
+      tier: database
+    forward:
+    - port: 5432
+      remotePort: 5432
+  sync:
+  - imageName: default
+    containerPath: /usr/src/app
+    excludePaths:
+    - .git
+    - .idea
+    - .vscode
+    - __pycache__
+    - "*.pyc"
+    - venv
+    - devspace.yaml

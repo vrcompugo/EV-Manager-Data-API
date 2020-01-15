@@ -4,3 +4,4 @@ telepresence.log
 __pycache__
 *.pyc
 .stfolder
+.devspace
