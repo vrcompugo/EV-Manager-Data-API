@@ -175,6 +175,7 @@ def lead_reseller_auto_assignment(lead: Lead):
     location = geocode_address(f"${lead.customer.default_address.street} ${lead.customer.default_address.zip}  ${lead.customer.default_address.city}")
     if location is not None:
         reseller_in_range = []
+        resellers = db.session.query(Reseller).all()
         for reseller in resellers:
             if reseller.sales_lat is not None and reseller.sales_lng is not None:
                 distance = calculate_distance(
