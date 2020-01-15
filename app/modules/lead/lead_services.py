@@ -8,6 +8,7 @@ from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.email.email_services import generate_email, send_email
 from app.modules.settings.settings_services import get_one_item as get_settings
 from app.modules.events.event_services import add_trigger
+from app.models import Reseller
 
 from .models.lead import Lead, LeadSchema
 from .models.lead_comment import LeadComment
@@ -164,3 +165,57 @@ def send_welcome_email(lead):
     })
 
     return True
+
+
+def lead_reseller_auto_assignment(lead: Lead):
+    from app.utils.google_geocoding import geocode_address
+
+    if lead.reseller_id is not None and lead.reseller_id > 0:
+        return lead
+    location = geocode_address(f"${lead.customer.default_address.street} ${lead.customer.default_address.zip}  ${lead.customer.default_address.city}")
+    if location is not None:
+        reseller_in_range = []
+        for reseller in resellers:
+            if reseller.sales_lat is not None and reseller.sales_lng is not None:
+                distance = calculate_distance(
+                    {
+                        "lat": reseller.sales_lat,
+                        "lng": reseller.sales_lng
+                    },
+                    location
+                )
+                if distance <= reseller.sales_range and reseller.lead_balance is not None and reseller.lead_balance < 0:
+                    reseller_in_range.append(reseller)
+        if len(reseller_in_range) == 1:
+            lead.reseller_id = reseller_in_range[0].id
+        if len(reseller_in_range) > 1:
+            least_balance_reseller = reseller_in_range[0]
+            for reseller in reseller_in_range:
+                if least_balance_reseller.lead_balance < reseller.lead_balance:
+                    least_balance_reseller = reseller
+            lead.reseller_id = least_balance_reseller.id
+        db.session.add(lead)
+        db.session.commit()
+    return lead
+
+
+def calculate_distance(location1, location2):
+    from math import sin, cos, sqrt, atan2, radians
+
+    # approximate radius of earth in km
+    R = 6373.0
+
+    lat1 = radians(location1["lat"])
+    lon1 = radians(location1["lng"])
+    lat2 = radians(location2["lat"])
+    lon2 = radians(location2["lng"])
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c
+
+    return distance

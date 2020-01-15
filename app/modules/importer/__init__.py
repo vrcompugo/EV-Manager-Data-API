@@ -10,3 +10,6 @@ def cron():
 
     from .sources.nocrm_io.lead import run_import
     run_import()
+
+    from .sources.bitrix24.reseller import run_import
+    run_import()
