@@ -188,13 +188,13 @@ def lead_reseller_auto_assignment(lead: Lead):
                 if distance <= reseller.sales_range and reseller.lead_balance is not None and reseller.lead_balance < 0:
                     reseller_in_range.append(reseller)
         if len(reseller_in_range) == 1:
-            lead.reseller_id = reseller_in_range[0].id
+            update_item(lead.id, {"reseller_id": reseller_in_range[0].id})
         if len(reseller_in_range) > 1:
             least_balance_reseller = reseller_in_range[0]
             for reseller in reseller_in_range:
                 if least_balance_reseller.lead_balance < reseller.lead_balance:
                     least_balance_reseller = reseller
-            lead.reseller_id = least_balance_reseller.id
+            update_item(lead.id, {"reseller_id": least_balance_reseller.id})
         db.session.add(lead)
         db.session.commit()
     return lead
