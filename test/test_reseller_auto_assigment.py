@@ -15,7 +15,7 @@ class TestApiException(TestCase):
         return app
 
     def test_lead_reseller_auto_assignment(self):
-        lead = db.session.query(Lead).get(3101)
+        lead = db.session.query(Lead).get(13611)
         result = lead_reseller_auto_assignment(lead)
         self.assertEqual(result.reseller_id, 1)
 
