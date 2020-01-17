@@ -37,7 +37,7 @@ def filter_import_input(item_data):
         "value": 25000,
         "status": "new",
         "data": item_data,
-        "contact_source": "DAA"
+        "contact_source": "DAA",
         "description": ""
     }
     data["description_html"] = data["description"].replace("\n", "<br>\n")
