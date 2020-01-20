@@ -32,7 +32,7 @@ def filter_import_data(item_data):
         "company": company,
         "salutation": "ms" if item_data["HONORIFIC"] == "HNR_DE_1" else "mr",
         "title": "",
-        "firstname": item_data["NAME"],
+        "firstname": company if item_data["NAME"] == "" else item_data["NAME"],
         "lastname": item_data["LAST_NAME"],
         "pending_email": None,
         "email_status": None,
