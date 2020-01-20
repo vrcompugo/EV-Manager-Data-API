@@ -42,6 +42,12 @@ def update_role_permissions():
 
 
 @manager.command
+def bitrix_export_all_customer():
+    from commands.bitrix_export_all_customer import bitrix_export_all_customer
+    bitrix_export_all_customer()
+
+
+@manager.command
 def reassign_customers():
     from commands.reassign_customers import reassign_customers
     reassign_customers()
