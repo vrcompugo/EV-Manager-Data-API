@@ -2,8 +2,10 @@
 <h3>Angebote &amp; Zusatz</h3>
 
 {% for lead_comment in lead_comments %}
-    <b>Angebot {{ lead_comment.datetime }}</b><br>
+    <b>Angebot vom {{ lead_comment.datetime }}</b><br>
     {% for attachment in lead_comment.attachments %}
         <a href="{{ attachment.public_link }}" target="_blank">{{ attachment.filename }}</a><br>
     {% endfor %}
+    <br>
+
 {% endfor %}
