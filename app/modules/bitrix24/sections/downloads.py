@@ -52,21 +52,21 @@ def register_routes(api: Blueprint):
             response = post("crm.documentgenerator.document.list", post_data={
                 "filter[entityId]": offer["ID"]
             })
-            if "result" in response and "documents" in response["result"] and len(response["result"]["documents"])>0:
+            if "result" in response and "documents" in response["result"] and len(response["result"]["documents"]) > 0:
                 offer_data["download_link"] = response["result"]["documents"][0]["pdfUrl"]
 
             offers_data.append(offer_data)
 
-        lead_comment = LeadComment.query.filter(LeadComment.lead_id == lead.id).order_by(LeadComment.datetime.desc()).first()
-        if lead_comment is not None:
+        lead_comments = LeadComment.query.filter(LeadComment.lead_id == lead.id).order_by(LeadComment.datetime.desc()).all()
+        for lead_comment in lead_comments:
             for attachment in lead_comment.attachments:
                 s3_file = S3File.query.get(attachment["id"])
                 if s3_file is None:
                     attachment["public_link"] = "#"
                 else:
                     attachment["public_link"] = s3_file.public_link
-        return render_template("downloads/lead_downloads_list.html", offers=offers_data, lead_comment=lead_comment)
+        return render_template("downloads/lead_downloads_list.html", offers=offers_data, lead_comments=lead_comments)
 
-    @api.route("/downloads/install/", methods=[ "POST"])
+    @api.route("/downloads/install/", methods=["POST"])
     def installer():
         return render_template("downloads/install.html")
