@@ -32,7 +32,7 @@ def filter_import_data(item_data):
         "company": company,
         "salutation": "ms" if item_data["HONORIFIC"] == "HNR_DE_1" else "mr",
         "title": "",
-        "firstname": company if item_data["NAME"] == "" else item_data["NAME"],
+        "firstname": item_data["NAME"],
         "lastname": item_data["LAST_NAME"],
         "pending_email": None,
         "email_status": None,
@@ -61,10 +61,13 @@ def filter_import_data(item_data):
 def filter_export_data(customer: Customer):
 
     reseller_link = find_association("Reseller", local_id=customer.reseller_id)
-
+    if customer.firstname is None or customer.firstname == "":
+        customer_name = customer.company
+    else:
+        customer_name = customer.firstname
     data = {
         "fields[HONORIFIC]": "HNR_DE_1" if customer.salutation == "ms" else "HNR_DE_2",
-        "fields[NAME]": customer.firstname,
+        "fields[NAME]": customer_name,
         "fields[LAST_NAME]": customer.lastname,
         "fields[UF_CRM_1572950758]": customer.default_address.street,
         "fields[UF_CRM_1572950777]": customer.default_address.street_nb,
