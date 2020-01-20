@@ -159,7 +159,7 @@ def run_export(remote_id=None, local_id=None):
             if remote_association is None:
                 response = post("crm.contact.add", post_data=post_data)
                 if "result" in response:
-                    associate_item(model="Customer", local_id=customer.id, remote_id=response["result"])
+                    remote_association = associate_item(model="Customer", local_id=customer.id, remote_id=response["result"])
                     if "fields[COMPANY_ID]" in post_data:
                         post_data["id"] = remote_association.remote_id
                         post("crm.contact.company.add", post_data=post_data)
