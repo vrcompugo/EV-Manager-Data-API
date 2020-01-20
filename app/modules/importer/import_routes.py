@@ -25,6 +25,7 @@ class Items(Resource):
     #@token_required("create_file")
     def post(self):
         data = request.json
+        print(data)
         if "remote_id" in data and data["remote_id"] != 0:
             import_by_source_module(source=data["source"], model=data["model"], remote_id=data["remote_id"])
             return {"status": "success"}
