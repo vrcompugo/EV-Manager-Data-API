@@ -160,9 +160,6 @@ def run_export(remote_id=None, local_id=None):
                 response = post("crm.contact.add", post_data=post_data)
                 if "result" in response:
                     remote_association = associate_item(model="Customer", local_id=customer.id, remote_id=response["result"])
-                    if "fields[COMPANY_ID]" in post_data:
-                        post_data["id"] = remote_association.remote_id
-                        post("crm.contact.company.add", post_data=post_data)
             else:
                 post_data["id"] = remote_association.remote_id
                 response = post("crm.contact.get", post_data=post_data)
@@ -185,11 +182,3 @@ def run_export(remote_id=None, local_id=None):
                             if "fields[PHONE][0][VALUE_TYPE]" in post_data:
                                 del post_data["fields[PHONE][0][VALUE_TYPE]"]
                 response = post("crm.contact.update", post_data=post_data)
-                if "fields[COMPANY_ID]" in post_data:
-                    print(
-                        post("crm.contact.company.add", post_data={
-                            "id": remote_association.remote_id,
-                            "fields[COMPANY_ID]": post_data["fields[COMPANY_ID]"],
-                            "fields[IS_PRIMARY ]": 0,
-                            "fields[SORT]": 0,
-                        }))

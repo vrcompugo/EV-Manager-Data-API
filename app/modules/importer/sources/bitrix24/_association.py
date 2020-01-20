@@ -26,3 +26,4 @@ def associate_item(model, remote_id, local_id):
         )
         db.session.add(item)
         db.session.commit()
+    return item
