@@ -33,6 +33,12 @@ def run_import_by_model(model, remote_id=None, local_id=None):
 
 def run_export_by_model(model, remote_id=None, local_id=None):
 
+    if model == "lead_number":
+        from .lead import run_export
+        lead = Lead.query.filter(Lead.number == local_id).first()
+        if lead is not None:
+            run_export(remote_id=remote_id, local_id=lead.id)
+
     if model is None or model == "lead":
         from .lead import run_export
         run_export(remote_id=remote_id, local_id=local_id)
