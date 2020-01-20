@@ -32,7 +32,7 @@ class Items(Resource):
         if "local_id" in data and data["local_id"] != 0:
             import_by_source_module(source=data["source"], model=data["model"], local_id=data["local_id"])
             return {"status": "success"}
-        import_by_source_module(source=data["source"], model=data["model"])
+        #import_by_source_module(source=data["source"], model=data["model"])
         return {"status":"success"}
 
     @api_response

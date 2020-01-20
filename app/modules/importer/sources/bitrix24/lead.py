@@ -276,6 +276,7 @@ def run_status_update_export(remote_id=None, local_id=None):
 
 
 def run_cron_export():
+    from ..data_efi_strom.lead import run_export as run_data_efi_export
     config = get_config_item("importer/bitrix24")
     if config is not None and "data" in config and "last_export" in config["data"]:
         leads = Lead.query.filter(Lead.last_update >= config["data"]["last_export"]).all()
@@ -285,6 +286,7 @@ def run_cron_export():
     if leads is not None:
         for lead in leads:
             run_export(local_id=lead.id)
+            run_data_efi_export(local_id=lead.id)
             time.sleep(1)
 
         config = get_config_item("importer/bitrix24")
