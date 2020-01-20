@@ -59,12 +59,13 @@ def register_routes(api: Blueprint):
 
         lead_comments = LeadComment.query.filter(LeadComment.lead_id == lead.id).order_by(LeadComment.datetime.desc()).all()
         for lead_comment in lead_comments:
-            for attachment in lead_comment.attachments:
-                s3_file = S3File.query.get(attachment["id"])
-                if s3_file is None:
-                    attachment["public_link"] = "#"
-                else:
-                    attachment["public_link"] = s3_file.public_link
+            if lead_comment.attachments is not None:
+                for attachment in lead_comment.attachments:
+                    s3_file = S3File.query.get(attachment["id"])
+                    if s3_file is None:
+                        attachment["public_link"] = "#"
+                    else:
+                        attachment["public_link"] = s3_file.public_link
         return render_template("downloads/lead_downloads_list.html", offers=offers_data, lead_comments=lead_comments)
 
     @api.route("/downloads/install/", methods=["POST"])
