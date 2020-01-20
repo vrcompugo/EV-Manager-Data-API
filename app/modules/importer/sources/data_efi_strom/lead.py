@@ -40,6 +40,7 @@ def run_import(local_id=None, remote_id=None):
 
 
 def run_export(local_id=None, remote_id=None):
+    print("run export", local_id)
     pp = pprint.PrettyPrinter()
     lead = None
     if local_id is not None:

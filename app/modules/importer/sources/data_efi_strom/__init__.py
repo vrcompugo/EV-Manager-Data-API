@@ -30,8 +30,9 @@ def run_import_by_model(model, remote_id=None, local_id=None):
         from .lead_comment import run_import
         run_import(remote_id=remote_id)
 
-    if model == "lead_number":
+    if model is not None and model == "lead_number":
         from .lead import run_export
+        print("lead_number export", local_id)
         lead = Lead.query.filter(Lead.number == local_id).first()
         if lead is not None:
             run_export(remote_id=remote_id, local_id=lead.id)
