@@ -42,14 +42,14 @@ def run_import(local_id=None, remote_id=None):
 def run_export(local_id=None, remote_id=None):
     pp = pprint.PrettyPrinter()
     lead = None
-    if str(local_id).find("lead_number:") == 0:
-        lead_number = str(local_id).replace("lead_number:", "")
-        lead = Lead.query.filter(Lead.number == lead_number).first()
-        if lead is not None:
-            local_id = lead.id
-        else:
-            local_id = None
     if local_id is not None:
+        if str(local_id).find("lead_number:") == 0:
+            lead_number = str(local_id).replace("lead_number:", "")
+            lead = Lead.query.filter(Lead.number == lead_number).first()
+            if lead is not None:
+                local_id = lead.id
+            else:
+                local_id = None
         lead = Lead.query.get(local_id)
     if remote_id is not None:
         remote_association = find_association("Lead", remote_id=remote_id)
