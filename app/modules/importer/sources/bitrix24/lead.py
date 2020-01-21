@@ -290,6 +290,7 @@ def run_cron_export():
             try:
                 run_export(local_id=lead.id)
                 run_data_efi_export(local_id=lead.id)
+                db.session.commit()
                 time.sleep(1)
             except Exception as e:
                 trace_output = traceback.format_exc()
