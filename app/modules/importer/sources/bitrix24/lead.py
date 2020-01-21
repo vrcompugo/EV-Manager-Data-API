@@ -4,6 +4,7 @@ import time
 import random
 from datetime import datetime, timedelta
 from sqlalchemy import and_
+import traceback
 
 from app.models import Lead, Customer
 from app.modules.lead.lead_services import add_item, update_item
@@ -286,9 +287,13 @@ def run_cron_export():
 
     if leads is not None:
         for lead in leads:
-            run_export(local_id=lead.id)
-            run_data_efi_export(local_id=lead.id)
-            time.sleep(1)
+            try:
+                run_export(local_id=lead.id)
+                run_data_efi_export(local_id=lead.id)
+                time.sleep(1)
+            except Exception as e:
+                trace_output = traceback.format_exc()
+                print(traceback)
 
         config = get_config_item("importer/bitrix24")
         if config is not None and "data" in config:
