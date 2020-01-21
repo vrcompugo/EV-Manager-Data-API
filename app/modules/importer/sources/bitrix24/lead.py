@@ -61,7 +61,7 @@ def filter_import_input(item_data):
         reseller_id = reseller_accociation.local_id
 
     inv_map = {v: k for k, v in LEAD_STATUS_CONVERT.items()}
-    status = "new"
+    status = None
     if item_data["STATUS_ID"] in inv_map:
         status = inv_map[item_data["STATUS_ID"]]
 
@@ -98,7 +98,7 @@ def filter_import_input(item_data):
 
 
 def get_remote_lead_status(lead):
-    status = "NEW"
+    status = None
     if lead.status in LEAD_STATUS_CONVERT:
         status = LEAD_STATUS_CONVERT[lead.status]
     return status
@@ -139,12 +139,13 @@ def filter_export_input(lead):
         "fields[UF_CRM_5DD4020239456]": lead.customer.default_address.city,
         "fields[UF_CRM_1578581226149]": lead.number,
         "fields[OPPORTUNITY]": lead.value,
-        "fields[STATUS_ID]": status,
         "fields[OPENED]": "Y",
         "email": lead.customer.email,
         "phone": lead.customer.phone
         # "fields[ASSIGNED_BY_ID]": reseller_link.remote_id
     }
+    if status is not None:
+        data["fields[STATUS_ID]"] = status
     if lead.customer.email and lead.customer.email != "folgt":
         data["fields[EMAIL][0][TYPE_ID]"] = "EMAIL"
         data["fields[EMAIL][0][VALUE]"] = lead.customer.email
