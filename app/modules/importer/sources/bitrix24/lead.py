@@ -109,7 +109,7 @@ def get_remote_lead_status(lead):
 
 def filter_export_input(lead):
     reseller_link = None
-    if lead.reseller_id is None or lead.reseller_id == 0:
+    if lead.reseller_id is not None and lead.reseller_id > 0:
         reseller_link = find_association("Reseller", local_id=lead.reseller_id)
     customer_link = find_association("Customer", local_id=lead.customer_id)
     status = get_remote_lead_status(lead)

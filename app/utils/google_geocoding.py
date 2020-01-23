@@ -16,7 +16,6 @@ def geocode_address(address):
                          'address': address
                      })
     results = r.json()
-    print(results)
     if 'results' in results and len(results['results']) > 0:
         location = results['results'][0]['geometry']['location']
     return location

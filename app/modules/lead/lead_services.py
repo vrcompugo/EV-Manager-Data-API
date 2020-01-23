@@ -175,7 +175,6 @@ def lead_reseller_auto_assignment(lead: Lead):
 
     if lead.reseller_id is not None and lead.reseller_id > 0:
         return lead
-    print(f"{lead.customer.default_address.street}, {lead.customer.default_address.zip}  {lead.customer.default_address.city}")
     location = geocode_address(f"{lead.customer.default_address.street}, {lead.customer.default_address.zip}  {lead.customer.default_address.city}")
     if location is not None:
         reseller_in_range = []
