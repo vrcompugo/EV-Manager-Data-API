@@ -60,6 +60,12 @@ def update_commission_values():
 
 
 @manager.command
+def auto_assign_reseller():
+    from commands.auto_assign_reseller import auto_assign_reseller_cmd
+    auto_assign_reseller_cmd()
+
+
+@manager.command
 def cron():
     from app.modules.events import cron
     cron()

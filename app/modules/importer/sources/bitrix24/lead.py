@@ -110,9 +110,7 @@ def get_remote_lead_status(lead):
 def filter_export_input(lead):
 
     if lead.reseller_id is None or lead.reseller_id == 0:
-        return None
-
-    reseller_link = find_association("Reseller", local_id=lead.reseller_id)
+        reseller_link = find_association("Reseller", local_id=lead.reseller_id)
     customer_link = find_association("Customer", local_id=lead.customer_id)
     status = get_remote_lead_status(lead)
     salutation = "0"
@@ -220,6 +218,8 @@ def run_export(remote_id=None, local_id=None):
     if lead is not None:
         print("Lead Export", lead.id)
         post_data = filter_export_input(lead)
+        if post_data is None:
+            print("post data none")
         if post_data is not None:
             lead_association = find_association("Lead", local_id=lead.id)
             if lead_association is None:
