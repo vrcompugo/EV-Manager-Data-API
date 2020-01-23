@@ -179,6 +179,8 @@ def lead_reseller_auto_assignment(lead: Lead):
     if location is not None:
         reseller_in_range = []
         resellers = db.session.query(Reseller).all()
+        min_distance = None
+        min_distance_reseller = None
         for reseller in resellers:
             if reseller.sales_lat is not None and reseller.sales_lng is not None:
                 distance = calculate_distance(
@@ -190,6 +192,11 @@ def lead_reseller_auto_assignment(lead: Lead):
                 )
                 if distance <= reseller.sales_range and reseller.lead_balance is not None and reseller.lead_balance < 0:
                     reseller_in_range.append(reseller)
+                if min_distance is None or distance < min_distance:
+                    min_distance = distance
+                    min_distance_reseller = reseller
+        if len(reseller_in_range) == 0 and min_distance_reseller is not None:
+            update_item(lead.id, {"reseller_id": min_distance_reseller.id})
         if len(reseller_in_range) == 1:
             update_item(lead.id, {"reseller_id": reseller_in_range[0].id})
         if len(reseller_in_range) > 1:
