@@ -5,8 +5,9 @@ from app.models import Reseller
 
 def get_bitrix_auth_info(request):
     data = {
-        "auth_code": request.form.get("AUTH_ID"),
+        "auth_code": request.form.get("AUTH_ID") if request.form.get("AUTH_ID") else request.args.get("AUTH_ID"),
         "domain": "https://{}".format(request.args.get("DOMAIN")),
+        "domain_raw": request.args.get("DOMAIN"),
         "bitrix_user": None,
         "user": None
     }
@@ -17,6 +18,7 @@ def get_bitrix_auth_info(request):
                               "auth": data["auth_code"]
                           })
         response_data = x.json()
+        print(response_data)
         if "result" in response_data:
             data["bitrix_user"] = {}
             for k,v in response_data["result"].items():

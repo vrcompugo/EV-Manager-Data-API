@@ -124,6 +124,8 @@ spec:
               value: "916afe6444d771"
             - name: EMAIL_USE_TLS
               value: "True"
+            - name: COMMIT
+              value: "init1"
           ports:
             - containerPort: 5000
 ---

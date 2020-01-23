@@ -25,6 +25,9 @@ class Reseller(db.Model):
     sales_lat = db.Column(db.Float)
     sales_lng = db.Column(db.Float)
     lead_balance = db.Column(db.Integer)
+    lead_year_target = db.Column(db.Integer)
+    leads_per_month = db.Column(db.Integer)
+    min_commission = db.Column(db.Numeric(scale=4, precision=12))
 
     @hybrid_property
     def search_query(self):

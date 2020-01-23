@@ -19,6 +19,7 @@ LEAD_STATUS_CONVERT = {
     "new": "NEW",
     "contacted": "IN_PROCESS",
     "tel_not_connected": "5",
+    "returned": "8",
     "survey_created": "4",
     "offer_created": "PROCESSED",
     "offer_presented": "1",
@@ -63,6 +64,7 @@ def filter_import_input(item_data):
 
     inv_map = {v: k for k, v in LEAD_STATUS_CONVERT.items()}
     status = None
+    print(item_data["STATUS_ID"])
     if item_data["STATUS_ID"] in inv_map:
         status = inv_map[item_data["STATUS_ID"]]
 

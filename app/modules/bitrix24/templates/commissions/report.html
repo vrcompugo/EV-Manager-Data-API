@@ -1,0 +1,119 @@
+{% extends "commissions/template.html" %}
+
+
+{% block content %}
+  <div class="layout horizontal">
+    <div class="reseller flex">Verkäufer {{ reseller.name }}</div>
+    <div class="flex">{{ reseller.sales_center }} - {{ reseller.sales_range }}km</div>
+    <div class="timeselect">
+      <select>
+        <option value="current">Aktueller Monat</option>
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <h2>Jahresübersicht</h2>
+    Leads in 2020: {{ provided_leads_year_count }}<br>
+    Verkaufsrate für 2020: {{ ((won_leads_year_count / provided_leads_year_count) * 100) | percentformat("de", 2) }}<br>
+    <div class="row">
+      <div class="progressbar flex">
+        <div class="value left" style="width: {{ 100 - (won_leads_year_count / reseller.lead_year_target) * 100 }}%;">{{ ((won_leads_year_count / reseller.lead_year_target) * 100) | percentformat }} ({{ won_leads_year_count }} Aufträge)</div>
+        <div class="bar-value" style="width: {{ (won_leads_year_count / reseller.lead_year_target) * 100 }}%;"></div>
+      </div>
+      <div class="day_indicator" style="width: {{ (day_of_year / 365) * 100 }}%;"></div>
+    </div>
+    <div style="text-align: right;">
+      {{ reseller.lead_year_target }} Aufträge
+    </div>
+  </div>
+
+  <div>
+    <h2>Ausgewählter Monat</h2>
+    <h3>Leads</h3>
+    <br>
+    <div class="layout horizontal">
+      <div class="flex" style="text-align: center;">
+        <div class="large">
+          {{ ((won_leads_month_count / provided_leads_month_count) * 100) | percentformat("de", 2) }}
+        </div>
+        <small>Verkaufsrate</small>
+      </div>
+      <div class="flex" style="text-align: center;">
+        <div class="large">{{ provided_leads_month_count }} / {{ reseller.leads_per_month }}</div>
+        <small>Leads erhalten</small>
+      </div>
+      <div class="flex" style="text-align: center;">
+        <div class="large">
+          {% if reseller.lead_balance -%}
+            {{ reseller.lead_balance * -1 }}
+          {%- endif %}
+        </div>
+        <small>Kontostand</small>
+      </div>
+    </div>
+    <br>
+    <div class="layout horizontal center">
+      <h3 class="flex">Umsätze</h3>
+      {% if reseller.min_commission -%}
+        <div>Mindestlohn: {{ reseller.min_commission | currencyformat }}</div>
+      {%- endif %}
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Kontakt</th>
+          <th>Art</th>
+          <th class="right">Verkaufspreis (netto)</th>
+          <th class="right">Nachlass</th>
+          <th>Optionen</th>
+          <th class="right">Provision (%)</th>
+          <th class="right">Provision (netto)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in won_leads_month -%}
+          {% if lead.commissions -%}
+            {% for commission in lead.commissions -%}
+              <tr>
+                <td>
+                  {% if loop.index == 1 -%}
+                    {{ lead.customer.company }} {{ lead.customer.firstname }} {{ lead.customer.lastname }}
+                  {%- endif %}
+                </td>
+                <td>{{ commission.type }}</th>
+                <td class="right">Verkaufspreis (netto)</td>
+                <td class="right">Nachlass</td>
+                <td>Optionen</td>
+                <td class="right">Provision (%)</td>
+                <td class="right">Provision (netto)</td>
+              </tr>
+            {%- endfor %}
+          {%- endif %}
+        {%- endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="right" colspan="6">Zwischensumme:</td>
+          <td class="right"></td>
+        </tr>
+        <tr>
+          <td class="right" colspan="6">MwSt:</td>
+          <td class="right"></td>
+        </tr>
+        <tr>
+          <td class="right" colspan="6">Gesamt:</td>
+          <td class="right"></td>
+        </tr>
+      </tfoot>
+    </table>
+    <br>
+    <br>
+    <div style="text-align: center;">
+      {% if not reseller.min_commission -%}
+        <div>Bitte schreiben Sie uns hierzu eine Rechnung mit dem ausgewiesenen Gesamtbetrag.</div>
+      {%- endif %}
+
+    </div>
+  </div>
+{% endblock %}

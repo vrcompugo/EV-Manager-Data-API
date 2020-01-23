@@ -1,0 +1,90 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1">
+  <style>
+    body {
+      font-family: Helvetica, Arial, Helvetica, sans-serif;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+    }
+    th {
+      text-align: left;
+      white-space: nowrap;
+      padding: 0.5em;
+      border-bottom: 1px solid #cccccc;
+    }
+    td {
+      border-bottom: 1px solid #dddddd;
+      padding: 0.3em 0.5em;
+    }
+    td.right,
+    th.right {
+      text-align: right;
+    }
+    .flex {
+      flex: 1;
+    }
+    .layout.horizontal {
+      display: flex;
+      flex-direction: row;
+    }
+    .layout.vertical {
+      display: flex;
+      flex-direction: column;
+    }
+    .layout.center {
+      align-items: center;
+    }
+    .layout.wrap {
+      flex-wrap: wrap;
+    }
+    .progressbar {
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(151,151,151,.4);
+      height: 1.6em;
+      display: flex;
+      align-items: center;
+      background-color: #ffffff;
+    }
+    .progressbar .value {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      right: 0;
+    }
+    .progressbar .value.left {
+      text-align: left;
+      padding-left: 0.3em;
+      box-sizing: border-box;
+    }
+    .progressbar .bar-value {
+      height: 100%;
+      background-color:#5fd3e1;
+    }
+    .row {
+      position: relative;
+      background: #f0fbfe;
+      height: 3em;
+      display: flex;
+      align-items: center;
+    }
+    .day_indicator {
+      border-right: 3px solid #4CAF50;
+      position: absolute;
+      height: 100%;
+    }
+    .day_indicator.red {
+      border-right-color: #F4511E;
+    }
+    .large {
+      font-size: 3em;
+    }
+  </style>
+</head>
+<body>
+  {% block content %}{% endblock %}
+</body>
+</html>

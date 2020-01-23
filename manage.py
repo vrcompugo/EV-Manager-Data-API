@@ -54,6 +54,12 @@ def reassign_customers():
 
 
 @manager.command
+def update_commission_values():
+    from commands.update_commission_values import update_commission_values
+    update_commission_values()
+
+
+@manager.command
 def cron():
     from app.modules.events import cron
     cron()

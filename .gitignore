@@ -1,8 +1,9 @@
-venv
 .idea
 .env
-telepresence.log
-__pycache__
-*.pyc
 .stfolder
 .devspace
+.vscode
+*.pyc
+telepresence.log
+__pycache__
+venv
