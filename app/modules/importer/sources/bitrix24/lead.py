@@ -296,7 +296,7 @@ def run_cron_export():
                 time.sleep(1)
             except Exception as e:
                 trace_output = traceback.format_exc()
-                print(traceback)
+                print(trace_output)
 
         config = get_config_item("importer/bitrix24")
         if config is not None and "data" in config:
