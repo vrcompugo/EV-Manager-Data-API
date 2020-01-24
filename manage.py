@@ -73,8 +73,8 @@ def cron():
     cron()
     from app.modules.lead import cron
     cron()
-    #from app.modules.importer.sources.bitrix24.order import run_cron_import
-    #run_cron_import()
+    from app.modules.importer.sources.bitrix24.order import run_cron_import
+    run_cron_import()
 
 
 @manager.command
