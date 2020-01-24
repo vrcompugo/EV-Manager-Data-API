@@ -102,6 +102,6 @@ def run_cron_import():
             config = get_config_item("importer/bitrix24")
             if config is not None and "data" in config:
                 config["data"]["last_order_import_datetime"] = datetime.now()
-            #update_config_item("importer/bitrix24", config)
+            update_config_item("importer/bitrix24", config)
     except Exception as e:
         error_handler()
