@@ -17,7 +17,10 @@ def datetimeformat(value, format='%d.%m.%Y %H:%M'):
 
 
 def numberformat(value, format='de', digits=2):
-    baseformat = '{:.' + str(digits) + 'f}'
+    if value is None:
+        return ""
+    value = float(value)
+    baseformat = '{:,.' + str(digits) + 'f}'
     if(format == "de"):
         return baseformat.format(float(value)).replace(",", "X").replace(".", ",").replace("X", ".")
     return str(value)
@@ -31,5 +34,4 @@ def currencyformat(value, format='de', digits=2):
 
 
 def percentformat(value, format='de', digits=0):
-    value = float(value)
     return numberformat(value, format, digits=digits) + "%"

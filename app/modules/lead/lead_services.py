@@ -170,6 +170,45 @@ def send_welcome_email(lead):
     return True
 
 
+def load_commission_data(lead: Lead):
+    from app.modules.importer.sources.bitrix24.order import run_import_by_lead
+    lead = run_import_by_lead(lead)
+    lead = lead_commission_calulation(lead)
+    return lead
+
+
+def lead_commission_calulation(lead: Lead):
+    if lead is None:
+        return None
+    is_external = lead.reseller.min_commission is not None and lead.reseller.min_commission > 0
+    if lead.commissions is not None:
+        for commission in lead.commissions:
+            if commission["type"] == "PV":
+                commission["provision_rate"] = 0
+                if commission["discount_range"] == "0%":
+                    commission["provision_rate"] = 10 if is_external else 6
+                if commission["discount_range"] == "bis 5%":
+                    commission["provision_rate"] = 8.5 if is_external else 5
+                if commission["discount_range"] == "bis 8%":
+                    commission["provision_rate"] = 7.5 if is_external else 4.25
+                if commission["discount_range"] == "bis 10%":
+                    commission["provision_rate"] = 6.5 if is_external else 3.75
+                if commission["discount_range"] == "bis 15%":
+                    commission["provision_rate"] = 5 if is_external else 3
+                if commission["discount_range"] == "bis 20%":
+                    commission["provision_rate"] = 3 if is_external else 2
+                if commission["discount_range"] in ["manuell", "Sondervereinbarung"]:
+                    commission["provision_rate"] = 4 if is_external else 2.5
+                commission["provision_net"] = \
+                    round(commission["value_net"] * (commission["provision_rate"] / 100), 2)
+                if "options" in commission and type(commission["options"]) == list:
+                    for option in commission["options"]:
+                        if option["key"] == "Wärmepumpe (ecoStar)":
+                            option["value_net"] = 250 if is_external else 200
+                            commission["provision_net"] = commission["provision_net"] + option["value_net"]
+    return lead
+
+
 def lead_reseller_auto_assignment(lead: Lead):
     from app.utils.google_geocoding import geocode_address
 

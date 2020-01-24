@@ -7,11 +7,12 @@ from sqlalchemy import and_
 import traceback
 
 from app.models import Lead, Customer
-from app.modules.lead.lead_services import add_item, update_item
+from app.modules.lead.lead_services import add_item, update_item, load_commission_data
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 
 from ._connector import post, get
 from ._association import find_association, associate_item
+from ._field_values import convert_field_value_from_remote, convert_field_value_to_remote, convert_field_euro_from_remote
 from .customer import run_export as run_customer_export, run_import as run_customer_import, run_customer_lead_import
 
 
@@ -64,9 +65,12 @@ def filter_import_input(item_data):
 
     inv_map = {v: k for k, v in LEAD_STATUS_CONVERT.items()}
     status = None
-    print(item_data["STATUS_ID"])
     if item_data["STATUS_ID"] in inv_map:
         status = inv_map[item_data["STATUS_ID"]]
+
+    contact_source = convert_field_value_from_remote("SOURCE_ID", item_data)
+    if contact_source == "other":
+        contact_source = item_data["SOURCE_DESCRIPTION"]
 
     data = {
         "datetime": item_data["DATE_CREATE"],
@@ -75,6 +79,7 @@ def filter_import_input(item_data):
         "customer_id": customer_id,
         "value": item_data["OPPORTUNITY"],
         "status": status,
+        "contact_source": contact_source,
         "data": {
             "Vorname": item_data["NAME"],
             "Nachname/Firma": item_data["LAST_NAME"],
@@ -181,7 +186,6 @@ def filter_export_input(lead):
 
 def run_import(remote_id=None, local_id=None):
     from app.modules.importer.sources.data_efi_strom.lead import run_export as run_data_efi_export
-    pp = pprint.PrettyPrinter()
     if local_id is not None:
         lead_association = find_association("Lead", local_id=local_id)
         remote_id = lead_association.remote_id
@@ -194,6 +198,9 @@ def run_import(remote_id=None, local_id=None):
                 lead_link = find_association("Lead", remote_id=remote_id)
                 if lead_link is None:
                     lead = add_item(data)
+                    commissions = load_commission_data(lead).commissions
+                    db.session.refresh(lead)
+                    lead = update_item(lead_link.local_id, {"commissions": commissions})
                     associate_item(model="Lead", local_id=lead.id, remote_id=remote_id)
                     post_data = {
                         "id": remote_id,
@@ -202,6 +209,9 @@ def run_import(remote_id=None, local_id=None):
                     post("crm.lead.update", post_data=post_data)
                 else:
                     lead = update_item(lead_link.local_id, data)
+                    commissions = load_commission_data(lead).commissions
+                    db.session.refresh(lead)
+                    lead = update_item(lead_link.local_id, {"commissions": commissions})
                 if lead is not None:
                     run_data_efi_export(local_id=lead.id)
 

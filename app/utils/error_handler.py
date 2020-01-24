@@ -5,6 +5,7 @@ from app.config import email_config
 
 
 def error_handler():
+    print("error-handling")
     trace_output = traceback.format_exc()
     print(trace_output)
     message = Message(text=trace_output,
@@ -14,5 +15,3 @@ def error_handler():
 
     message.mail_to = "a.hedderich@hbb-werbung.de"
     message.send()
-    trace_output = traceback.format_exc()
-    print(trace_output)

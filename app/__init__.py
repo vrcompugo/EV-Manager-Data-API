@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.plugins import FlaskPlugin
+from sqlalchemy.orm import sessionmaker
 
 from .config import config_by_name
 from .utils.jinja_filters import apply_filters

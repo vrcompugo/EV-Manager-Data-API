@@ -62,7 +62,7 @@
     <table>
       <thead>
         <tr>
-          <th>Kontakt</th>
+          <th width="100%">Kontakt</th>
           <th>Art</th>
           <th class="right">Verkaufspreis (netto)</th>
           <th class="right">Nachlass</th>
@@ -72,6 +72,7 @@
         </tr>
       </thead>
       <tbody>
+        {% set totals = {'subtotal': 0.0} %}
         {% for lead in won_leads_month -%}
           {% if lead.commissions -%}
             {% for commission in lead.commissions -%}
@@ -82,29 +83,54 @@
                   {%- endif %}
                 </td>
                 <td>{{ commission.type }}</th>
-                <td class="right">Verkaufspreis (netto)</td>
-                <td class="right">Nachlass</td>
-                <td>Optionen</td>
-                <td class="right">Provision (%)</td>
-                <td class="right">Provision (netto)</td>
+                <td class="right">{{ commission.value_net | currencyformat }}</td>
+                <td class="right">{{ commission.discount_range }}</td>
+                <td>
+                  <table>
+                    {% for option in commission.options -%}
+                      <tr>
+                        <td style="white-space: nowrap;">{{ option.key }}</td>
+                        <td>{{ option.value_net | currencyformat }}</td>
+                      </tr>
+                    {%- endfor %}
+                  </table>
+                </td>
+                <td class="right">{{ commission.provision_rate | percentformat }}</td>
+                <td class="right">{{ commission.provision_net | currencyformat }}</td>
               </tr>
+              {% if totals.update({"subtotal": totals.subtotal + commission.provision_net}) %} {% endif %}
             {%- endfor %}
           {%- endif %}
         {%- endfor %}
       </tbody>
       <tfoot>
-        <tr>
-          <td class="right" colspan="6">Zwischensumme:</td>
-          <td class="right"></td>
-        </tr>
-        <tr>
-          <td class="right" colspan="6">MwSt:</td>
-          <td class="right"></td>
-        </tr>
-        <tr>
-          <td class="right" colspan="6">Gesamt:</td>
-          <td class="right"></td>
-        </tr>
+        {% if totals.update({"tax": totals.subtotal * 0.19}) %} {% endif %}
+        {% if totals.update({"total": totals.subtotal * 1.19}) %} {% endif %}
+        {% if reseller.min_commission -%}
+          <tr>
+            <td class="right" colspan="6">Summe:</td>
+            <td class="right">
+              {% if totals.subtotal < reseller.min_commission %}
+                {{ reseller.min_commission | currencyformat }}
+              {% else %}
+                {{ totals.subtotal | currencyformat }}
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td class="right" colspan="6">Zwischensumme:</td>
+            <td class="right">{{ totals.subtotal | currencyformat }}</td>
+          </tr>
+          <tr>
+            <td class="right" colspan="6">MwSt:</td>
+            <td class="right">{{ totals.tax | currencyformat }}</td>
+          </tr>
+          <tr>
+            <td class="right" colspan="6">Gesamt:</td>
+            <td class="right">{{ totals.total | currencyformat }}</td>
+          </tr>
+        {%- endif %}
       </tfoot>
     </table>
     <br>
