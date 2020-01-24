@@ -22,6 +22,9 @@ def run_import(local_id=None, remote_id=None):
         })
         if "result" in response:
             deal = response["result"]
+            if deal["LEAD_ID"] is None:
+                print("no local lead: None")
+                continue
             link = find_association("Lead", remote_id=int(deal["LEAD_ID"]))
             if link is not None:
                 lead = db.session.query(Lead).get(link.local_id)
