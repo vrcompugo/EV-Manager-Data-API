@@ -260,12 +260,13 @@ def run_export(remote_id=None, local_id=None):
                                 del post_data["fields[PHONE][0][VALUE]"]
                             if "fields[PHONE][0][VALUE_TYPE]" in post_data:
                                 del post_data["fields[PHONE][0][VALUE_TYPE]"]
-                response = post("crm.lead.update", post_data={
-                    "ID": lead_association.remote_id,
-                    "fields[ASSIGNED_BY_ID]": post_data["fields[ASSIGNED_BY_ID]"]
-                })
-                if "result" not in response:
-                    pp.pprint(response)
+                if "fields[ASSIGNED_BY_ID]" in post_data:
+                    response = post("crm.lead.update", post_data={
+                        "ID": lead_association.remote_id,
+                        "fields[ASSIGNED_BY_ID]": post_data["fields[ASSIGNED_BY_ID]"]
+                    })
+                    if "result" not in response:
+                        pp.pprint(response)
 
 
 def run_status_update_export(remote_id=None, local_id=None):
