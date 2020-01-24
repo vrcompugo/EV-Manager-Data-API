@@ -46,6 +46,8 @@ def run_import(local_id=None, remote_id=None):
                 lead.commissions = [
                     pv_commission
                 ]
+                if lead.won_at is None:
+                    lead.won_at = deal["DATE_CREATE"]
                 print("update commission data lead ", lead.id)
                 db.session.commit()
                 return lead
@@ -101,7 +103,7 @@ def run_cron_import():
 
             config = get_config_item("importer/bitrix24")
             if config is not None and "data" in config:
-                config["data"]["last_order_import_datetime"] = datetime.now()
+                config["data"]["last_order_import_datetime"] = str(datetime.now())
             update_config_item("importer/bitrix24", config)
     except Exception as e:
         error_handler()
