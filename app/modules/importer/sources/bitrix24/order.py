@@ -22,7 +22,7 @@ def run_import(local_id=None, remote_id=None):
         })
         if "result" in response:
             deal = response["result"]
-            link = find_association("Lead", remote_id=deal["LEAD_ID"])
+            link = find_association("Lead", remote_id=int(deal["LEAD_ID"]))
             if link is not None:
                 lead = db.session.query(Lead).get(link.local_id)
                 value_pv = convert_field_euro_from_remote("UF_CRM_5DF8B018B26AF", deal)
@@ -52,7 +52,7 @@ def run_import(local_id=None, remote_id=None):
                 db.session.commit()
                 return lead
             else:
-                print("no local lead")
+                print("no local lead: " + str(deal["LEAD_ID"]))
         else:
             pp.pprint(response)
     return None
