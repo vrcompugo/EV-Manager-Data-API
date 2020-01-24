@@ -27,7 +27,6 @@ def run_import(local_id=None, remote_id=None):
                     response = post("crm.lead.list", {
                         "FILTER[CONTACT_ID]": deal["CONTACT_ID"]
                     })
-                    pp.pprint(response)
                     if "result" in response and len(response["result"]) > 0:
                         deal["LEAD_ID"] = response["result"][0]["ID"]
             if deal["LEAD_ID"] is None:
