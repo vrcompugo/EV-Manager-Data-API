@@ -9,6 +9,7 @@ import traceback
 from app.models import Lead, Customer
 from app.modules.lead.lead_services import add_item, update_item, load_commission_data
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
+from app.utils.error_handler import error_handler
 
 from ._connector import post, get
 from ._association import find_association, associate_item
@@ -295,7 +296,8 @@ def run_cron_export():
     if config is not None and "data" in config and "last_export" in config["data"]:
         leads = Lead.query.filter(Lead.last_update >= config["data"]["last_export"]).all()
     else:
-        leads = None
+        print("No Config")
+        return None
 
     if leads is not None:
         for lead in leads:
@@ -305,8 +307,7 @@ def run_cron_export():
                 db.session.commit()
                 time.sleep(1)
             except Exception as e:
-                trace_output = traceback.format_exc()
-                print(trace_output)
+                error_handler()
 
         config = get_config_item("importer/bitrix24")
         if config is not None and "data" in config:

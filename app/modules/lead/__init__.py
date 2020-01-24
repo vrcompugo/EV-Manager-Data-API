@@ -12,16 +12,6 @@ def cron():
     from .models import Lead, LeadComment
     from .lead_services import send_welcome_email
 
-    rows = db.engine.execute("select * from "
-                             "lead left join ("
-                                "select * from import_id_association where source = 'nocrm.io' and model = 'Lead'"
-                             ") as link on link.local_id = lead.id "
-                             "where lead.id > 12664 and lead.reseller_id > 0 and link.id is null")
-
-    for row in rows:
-        run_export(local_id=row[0])
-        print("export ", row[0])
-
 
     from app.modules.importer.sources.bitrix24.lead import run_cron_export
     run_cron_export()

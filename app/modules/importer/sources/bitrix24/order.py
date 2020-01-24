@@ -23,7 +23,15 @@ def run_import(local_id=None, remote_id=None):
         if "result" in response:
             deal = response["result"]
             if deal["LEAD_ID"] is None:
-                print("no local lead: None " + deal["ID"])
+                if deal["CONTACT_ID"] is not None:
+                    response = post("crm.lead.list", {
+                        "FILTER[CONTACT_ID]": deal["CONTACT_ID"]
+                    })
+                    pp.pprint(response)
+                    if "result" in response and len(response["result"]) > 0:
+                        deal["LEAD_ID"] = response["result"][0]["ID"]
+            if deal["LEAD_ID"] is None:
+                print("lead id is none:" + remote_id)
                 return None
             link = find_association("Lead", remote_id=int(deal["LEAD_ID"]))
             if link is not None:
@@ -50,9 +58,8 @@ def run_import(local_id=None, remote_id=None):
                     pv_commission
                 ]
                 if lead.won_at is None:
-                    lead.won_at = deal["DATE_CREATE"]
+                    update_item(lead.id, {"won_at": deal["DATE_CREATE"], "last_update": lead.last_update})
                 print("update commission data lead ", lead.id)
-                db.session.commit()
                 return lead
             else:
                 print("no local lead: " + str(deal["LEAD_ID"]))
@@ -98,10 +105,10 @@ def run_cron_import():
             for deal in deals["result"]:
                 lead = run_import(remote_id=deal["ID"])
                 if lead is not None:
-                    lead = update_item(lead.id, {"commissions": lead.commissions})
+                    lead = update_item(lead.id, {"commissions": lead.commissions, "last_update": lead.last_update})
                     commissions = lead_commission_calulation(lead).commissions
-                    update_item(lead.id, {"commissions": None})
-                    lead = update_item(lead.id, {"commissions": commissions})
+                    update_item(lead.id, {"commissions": None, "last_update": lead.last_update})
+                    lead = update_item(lead.id, {"commissions": commissions, "last_update": lead.last_update})
                     print(lead.commissions)
 
             config = get_config_item("importer/bitrix24")
