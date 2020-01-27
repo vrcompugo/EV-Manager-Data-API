@@ -42,7 +42,7 @@ def register_routes(api: Blueprint):
                 .filter(Lead.counted_at < datetime.date(base_date.year, base_date.month + 1, 1))\
                 .count()
             won_leads_year_count = db.session.query(Order)\
-                .filter(Lead.reseller_id == reseller.id)\
+                .filter(Order.reseller_id == reseller.id)\
                 .filter(Order.datetime >= datetime.date(base_date.year, 1, 1))\
                 .filter(Order.datetime <= datetime.date(base_date.year, 12, 31))\
                 .count()
