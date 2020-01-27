@@ -3,6 +3,7 @@
 .stfolder
 .devspace
 .vscode
+.deployment.yaml
 *.pyc
 telepresence.log
 __pycache__
