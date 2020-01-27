@@ -14,4 +14,5 @@ from app.modules.file.models import *
 from app.modules.settings.models import *
 from app.modules.email.models import *
 from app.modules.events.models import *
+from app.modules.order.models.order import Order
 

@@ -7,7 +7,6 @@
       <tr>
         <th width="100%">Verkäufer</th>
         <th>Leads</th>
-        <th>Aufträge Vormonat</th>
         <th>Aufträge Aktueller Monat</th>
         <th>Provision Lohn</th>
       </tr>
@@ -16,7 +15,6 @@
       {% for reseller in resellers -%}
       <tr>
         <td><a href="/bitrix24/commissions/{{ reseller.id }}?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">{{ reseller.name }}</a></td>
-        <td></td>
         <td></td>
         <td></td>
         <td></td>

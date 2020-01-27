@@ -15,7 +15,13 @@
   <div>
     <h2>Jahresübersicht</h2>
     Leads in 2020: {{ provided_leads_year_count }}<br>
-    Verkaufsrate für 2020: {{ ((won_leads_year_count / provided_leads_year_count) * 100) | percentformat("de", 2) }}<br>
+
+    Verkaufsrate für 2020:
+    {% if provided_leads_year_count > 0 -%}
+      {{ ((won_leads_year_count / provided_leads_year_count) * 100) | percentformat("de", 2) }}
+    {%- endif %}
+    <br>
+    {% if reseller.lead_year_target -%}
     <div class="row">
       <div class="progressbar flex">
         <div class="value left" style="width: {{ 100 - (won_leads_year_count / reseller.lead_year_target) * 100 }}%;">{{ ((won_leads_year_count / reseller.lead_year_target) * 100) | percentformat }} ({{ won_leads_year_count }} Aufträge)</div>
@@ -23,6 +29,7 @@
       </div>
       <div class="day_indicator" style="width: {{ (day_of_year / 365) * 100 }}%;"></div>
     </div>
+    {%- endif %}
     <div style="text-align: right;">
       {{ reseller.lead_year_target }} Aufträge
     </div>
@@ -35,7 +42,9 @@
     <div class="layout horizontal">
       <div class="flex" style="text-align: center;">
         <div class="large">
-          {{ ((won_leads_month_count / provided_leads_month_count) * 100) | percentformat("de", 2) }}
+          {% if provided_leads_year_count -%}
+            {{ ((won_leads_month_count / provided_leads_month_count) * 100) | percentformat("de", 2) }}
+          {%- endif %}
         </div>
         <small>Verkaufsrate</small>
       </div>

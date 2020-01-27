@@ -43,7 +43,7 @@ def update_role_permissions():
 
 @manager.command
 def bitrix_test_import():
-    from app.modules.importer.sources.bitrix24.lead import run_cron_import
+    from app.modules.importer.sources.bitrix24.order import run_cron_import
     run_cron_import()
 
 

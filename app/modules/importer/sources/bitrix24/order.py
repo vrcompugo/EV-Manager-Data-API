@@ -1,11 +1,12 @@
 import pprint
+import json
 from datetime import datetime, timedelta
 
 from app import db
 from app.models import Lead
 from app.utils.error_handler import error_handler
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
-from app.modules.lead.lead_services import lead_commission_calulation, update_item
+from app.modules.order.order_services import commission_calulation, add_item, update_item
 
 from ._connector import post, get
 from ._association import find_association, associate_item
@@ -15,55 +16,89 @@ from ._field_values import convert_field_value_from_remote, convert_field_value_
 pp = pprint.PrettyPrinter()
 
 
-def run_import(local_id=None, remote_id=None):
-    if remote_id is not None:
-        response = post("crm.deal.get", {
-            "ID": remote_id
+def filter_import_input(item_data):
+    data = {
+        "datetime": item_data["DATE_CREATE"],
+        "customer_id": None,
+        "value_net": convert_field_euro_from_remote("UF_CRM_5DF8B018B26AF", item_data),
+        "last_update": item_data["DATE_MODIFY"],
+        "contact_source": convert_field_value_from_remote("SOURCE_ID", item_data),
+        "status": "won",
+        "commissions": None,
+        "commission_value_net": 0
+    }
+    if item_data["LEAD_ID"] is not None:
+        link = find_association("Lead", remote_id=item_data["LEAD_ID"])
+        if link is not None:
+            data["lead_id"] = link.local_id
+    if item_data["CONTACT_ID"] is not None:
+        link = find_association("Customer", remote_id=item_data["CONTACT_ID"])
+        if link is not None:
+            data["customer_id"] = link.local_id
+    if item_data["ASSIGNED_BY_ID"] is not None:
+        link = find_association("Reseller", remote_id=item_data["ASSIGNED_BY_ID"])
+        if link is not None:
+            data["reseller_id"] = link.local_id
+    value_pv = convert_field_euro_from_remote("UF_CRM_5DF8B018B26AF", item_data)
+    discount_range = convert_field_value_from_remote("UF_CRM_5DF8B0188EF78", item_data)
+    seperate_offer = convert_field_value_from_remote("UF_CRM_5DF8B018DA5E6", item_data)
+    payment_type = convert_field_value_from_remote("UF_CRM_5DF8B018E971A", item_data)
+    pv_commission = {
+        "type": "PV",
+        "value_net": value_pv,
+        "discount_range": discount_range,
+        "options": [],
+        "provision_rate": None,
+        "provision_net": None,
+        "payment_type": payment_type
+    }
+    if seperate_offer == "Wärmepumpe (ecoStar) verkauft":
+        pv_commission["options"].append({
+            "key": "Wärmepumpe (ecoStar)",
+            "value_net": None
         })
-        if "result" in response:
-            deal = response["result"]
-            if deal["LEAD_ID"] is None:
-                if deal["CONTACT_ID"] is not None:
-                    response = post("crm.lead.list", {
-                        "FILTER[CONTACT_ID]": deal["CONTACT_ID"]
-                    })
-                    if "result" in response and len(response["result"]) > 0:
-                        deal["LEAD_ID"] = response["result"][0]["ID"]
-            if deal["LEAD_ID"] is None:
-                print("lead id is none:" + remote_id)
-                return None
-            link = find_association("Lead", remote_id=int(deal["LEAD_ID"]))
-            if link is not None:
-                lead = db.session.query(Lead).get(link.local_id)
-                value_pv = convert_field_euro_from_remote("UF_CRM_5DF8B018B26AF", deal)
-                discount_range = convert_field_value_from_remote("UF_CRM_5DF8B0188EF78", deal)
-                seperate_offer = convert_field_value_from_remote("UF_CRM_5DF8B018DA5E6", deal)
-                payment_type = convert_field_value_from_remote("UF_CRM_5DF8B018E971A", deal)
-                pv_commission = {
-                    "type": "PV",
-                    "value_net": value_pv,
-                    "discount_range": discount_range,
-                    "options": [],
-                    "provision_rate": None,
-                    "provision_net": None,
-                    "payment_type": payment_type
-                }
-                if seperate_offer == "Wärmepumpe (ecoStar) verkauft":
-                    pv_commission["options"].append({
-                        "key": "Wärmepumpe (ecoStar)",
-                        "value_net": None
-                    })
-                lead.commissions = [
-                    pv_commission
-                ]
-                if lead.won_at is None:
-                    update_item(lead.id, {"won_at": deal["DATE_CREATE"], "last_update": lead.last_update})
-                print("update commission data lead ", lead.id)
-                return lead
-            else:
-                print("no local lead: " + str(deal["LEAD_ID"]))
+    data["commissions"] = [
+        pv_commission
+    ]
+    return data
+
+
+def run_import(local_id=None, remote_id=None):
+    if local_id is not None:
+        link = find_association("Order", local_id=local_id)
+        if link is not None:
+            remote_id = link.remote_id
+    if remote_id is None:
+        print("no id given")
+        return None
+    response = post("crm.deal.get", {
+        "ID": remote_id
+    })
+    if "result" in response:
+        deal = response["result"]
+        data = filter_import_input(deal)
+        pp.pprint(deal)
+        pp.pprint(data)
+        link = find_association("Order", remote_id=deal["ID"])
+        if link is None:
+            order = add_item(data)
+            associate_item("Order", local_id=order.id, remote_id=deal["ID"])
         else:
-            pp.pprint(response)
+            order = update_item(link.local_id, data)
+        if order is not None:
+            order = commission_calulation(order)
+            if order is not None:
+                commissions = json.loads(json.dumps(order.commissions))
+                update_item(order.id, {
+                    "commissions": None,
+                    "commission_value_net": order.commission_value_net,
+                })
+                update_item(order.id, {
+                    "commissions": commissions
+                })
+        return
+    else:
+        pp.pprint(response)
     return None
 
 
@@ -77,10 +112,10 @@ def run_import_by_lead(lead: Lead):
             })
             pp.pprint(response)
             if "result" in response and len(response["result"]) > 0:
-                lead_new = run_import(remote_id=response["result"][0]["ID"])
-                if lead_new is not None:
-                    return lead_new
-    return lead
+                order = run_import(remote_id=response["result"][0]["ID"])
+                if order is not None:
+                    return order
+    return None
 
 
 def run_cron_import():
@@ -102,13 +137,7 @@ def run_cron_import():
 
         if "result" in deals:
             for deal in deals["result"]:
-                lead = run_import(remote_id=deal["ID"])
-                if lead is not None:
-                    lead = update_item(lead.id, {"commissions": lead.commissions, "last_update": lead.last_update})
-                    commissions = lead_commission_calulation(lead).commissions
-                    update_item(lead.id, {"commissions": None, "last_update": lead.last_update})
-                    lead = update_item(lead.id, {"commissions": commissions, "last_update": lead.last_update})
-                    print(lead.commissions)
+                order = run_import(remote_id=deal["ID"])
 
             config = get_config_item("importer/bitrix24")
             if config is not None and "data" in config:
