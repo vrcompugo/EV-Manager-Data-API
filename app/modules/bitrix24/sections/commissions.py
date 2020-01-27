@@ -15,7 +15,6 @@ def register_routes(api: Blueprint):
     def commissions():
         auth_info = get_bitrix_auth_info(request)
         if auth_info["user"].id == 1 or auth_info["user"].id == 12:
-            return commission(16)
             resellers = db.session.query(Reseller).order_by(Reseller.name).all()
             return render_template("commissions/list.html", resellers=resellers, auth_info=auth_info)
         else:
