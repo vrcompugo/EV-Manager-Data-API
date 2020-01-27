@@ -4,6 +4,7 @@ import time
 import random
 from datetime import datetime, timedelta
 from sqlalchemy import and_
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
 import traceback
 
 from app.models import Lead, Customer
@@ -241,13 +242,14 @@ def run_cron_import():
             print("import: ", lead_data["ID"])
             try:
                 run_import(remote_id=lead_data["ID"])
+            except IntegrityError as e:
+                print(e.detail)
+            except InvalidRequestError as e:
+                print("already exists")
             except Exception as e:
                 print(str(type(e)))
-                if str(type(e)) == "<class 'sqlalchemy.exc.InvalidRequestError'>":
-                    print("Dublicate")
-                else:
-                    trace_output = traceback.format_exc()
-                    print(trace_output)
+                trace_output = traceback.format_exc()
+                print(trace_output)
                 #error_handler()
                 #time.sleep(5)
             time.sleep(1)
