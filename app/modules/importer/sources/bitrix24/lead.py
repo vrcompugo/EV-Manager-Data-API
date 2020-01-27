@@ -225,12 +225,11 @@ def run_import(remote_id=None, local_id=None):
 
 def run_cron_import():
     config = get_config_item("importer/bitrix24")
+    post_data = {
+        "ORDER[DATE_MODIFY]": "DESC"
+    }
     if config is not None and "data" in config and "last_lead_import" in config["data"]:
-        post_data = {
-            "FILTER[>DATE_MODIFY]": config["data"]["last_lead_import"]
-        }
-    else:
-        post_data = {}
+        post_data["FILTER[>DATE_MODIFY]"] = config["data"]["last_lead_import"]
     response = {"next": 0}
     while "next" in response:
         post_data["start"] = response["next"]
