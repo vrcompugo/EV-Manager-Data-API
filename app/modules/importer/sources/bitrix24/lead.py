@@ -84,7 +84,7 @@ def filter_import_input(item_data):
         "data": {
             "Vorname": item_data["NAME"],
             "Nachname/Firma": item_data["LAST_NAME"],
-            "Stra\u00dfe": item_data["UF_CRM_5DD4020221169"] + " " + item_data["UF_CRM_5DD402022E300"],
+            "Stra\u00dfe": str(item_data["UF_CRM_5DD4020221169"]) + " " + str(item_data["UF_CRM_5DD402022E300"]),
             "PLZ": "" if item_data["UF_CRM_5DD4020242167"] is None else item_data["UF_CRM_5DD4020242167"],
             "Ort": "" if item_data["UF_CRM_5DD4020239456"] is None else item_data["UF_CRM_5DD4020239456"],
             "Quelle": "bitrix24",
@@ -94,7 +94,7 @@ def filter_import_input(item_data):
         },
         "description": "Vorname: {}\n".format(item_data["NAME"])
                        + "Nachname/Firma: {}\n".format(item_data["LAST_NAME"])
-                       + "Stra\u00dfe: {}\n".format(item_data["UF_CRM_5DD4020221169"] + " " + item_data["UF_CRM_5DD402022E300"])
+                       + "Stra\u00dfe: {}\n".format(str(item_data["UF_CRM_5DD4020221169"]) + " " + str(item_data["UF_CRM_5DD402022E300"]))
                        + "PLZ: {}\n".format(item_data["UF_CRM_5DD4020242167"])
                        + "Ort: {}\n".format(item_data["UF_CRM_5DD4020239456"])
                        + "Quelle: {}\n".format("bitrix24")
@@ -192,6 +192,8 @@ def run_import(remote_id=None, local_id=None):
         remote_id = lead_association.remote_id
     if remote_id is not None:
         response = post("crm.lead.get", post_data={"id": remote_id})
+        if "result" not in response:
+            print(response)
         if "result" in response:
             data = filter_import_input(response["result"])
             if data is not None:
@@ -199,22 +201,64 @@ def run_import(remote_id=None, local_id=None):
                 lead_link = find_association("Lead", remote_id=remote_id)
                 if lead_link is None:
                     lead = add_item(data)
-                    commissions = load_commission_data(lead).commissions
-                    db.session.refresh(lead)
-                    lead = update_item(lead_link.local_id, {"commissions": commissions})
                     associate_item(model="Lead", local_id=lead.id, remote_id=remote_id)
+                    lead_commission = load_commission_data(lead)
+                    if lead_commission is not None:
+                        commissions = lead_commission.commissions
+                        db.session.refresh(lead)
+                        lead = update_item(lead.id, {"commissions": commissions, "last_update": lead.last_update})
                     post_data = {
                         "id": remote_id,
                         "fields[UF_CRM_1578581226149]": lead.number
                     }
-                    post("crm.lead.update", post_data=post_data)
+                    #post("crm.lead.update", post_data=post_data)
                 else:
                     lead = update_item(lead_link.local_id, data)
-                    commissions = load_commission_data(lead).commissions
-                    db.session.refresh(lead)
-                    lead = update_item(lead_link.local_id, {"commissions": commissions})
-                if lead is not None:
-                    run_data_efi_export(local_id=lead.id)
+                    lead_commission = load_commission_data(lead)
+                    if lead_commission is not None:
+                        commissions = lead_commission.commissions
+                        db.session.refresh(lead)
+                        lead = update_item(lead_link.local_id, {"commissions": commissions, "last_update": lead.last_update})
+                #if lead is not None:
+                #    run_data_efi_export(local_id=lead.id)
+
+
+def run_cron_import():
+    config = get_config_item("importer/bitrix24")
+    if config is not None and "data" in config and "last_lead_import" in config["data"]:
+        post_data = {
+            "FILTER[>DATE_MODIFY]": config["data"]["last_lead_import"]
+        }
+    else:
+        post_data = {}
+    response = {"next": 0}
+    while "next" in response:
+        post_data["start"] = response["next"]
+        response = post("crm.lead.list", post_data)
+        if "result" not in response:
+            print("list", response)
+            break
+        for lead_data in response["result"]:
+            print("import: ", lead_data["ID"])
+            try:
+                run_import(remote_id=lead_data["ID"])
+            except Exception as e:
+                print(str(type(e)))
+                if str(type(e)) == "<class 'sqlalchemy.exc.InvalidRequestError'>":
+                    print("Dublicate")
+                else:
+                    trace_output = traceback.format_exc()
+                    print(trace_output)
+                #error_handler()
+                #time.sleep(5)
+            time.sleep(1)
+        time.sleep(5)
+    config = get_config_item("importer/bitrix24")
+    if config is not None and "data" in config:
+        config["data"]["last_lead_import"] = str(datetime.now())
+    update_config_item("importer/bitrix24", config)
+    print("end", response)
+
 
 
 def run_export(remote_id=None, local_id=None):
@@ -240,26 +284,6 @@ def run_export(remote_id=None, local_id=None):
                 else:
                     pp.pprint(response)
             else:
-                post_data["id"] = lead_association.remote_id
-                response = post("crm.lead.get", post_data=post_data)
-                if "result" in response and "EMAIL" in response["result"]:
-                    for email in response["result"]["EMAIL"]:
-                        if post_data["email"] is not None and email["VALUE"] == post_data["email"]:
-                            if "fields[EMAIL][0][TYPE_ID]" in post_data:
-                                del post_data["fields[EMAIL][0][TYPE_ID]"]
-                            if "fields[EMAIL][0][VALUE]" in post_data:
-                                del post_data["fields[EMAIL][0][VALUE]"]
-                            if "fields[EMAIL][0][VALUE_TYPE]" in post_data:
-                                del post_data["fields[EMAIL][0][VALUE_TYPE]"]
-                if "result" in response and "PHONE" in response["result"]:
-                    for phone in response["result"]["PHONE"]:
-                        if post_data["phone"] is not None and phone["VALUE"] == post_data["phone"]:
-                            if "fields[PHONE][0][TYPE_ID]" in post_data:
-                                del post_data["fields[PHONE][0][TYPE_ID]"]
-                            if "fields[PHONE][0][VALUE]" in post_data:
-                                del post_data["fields[PHONE][0][VALUE]"]
-                            if "fields[PHONE][0][VALUE_TYPE]" in post_data:
-                                del post_data["fields[PHONE][0][VALUE_TYPE]"]
                 if "fields[ASSIGNED_BY_ID]" in post_data:
                     response = post("crm.lead.update", post_data={
                         "ID": lead_association.remote_id,

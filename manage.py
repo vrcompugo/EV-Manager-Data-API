@@ -42,9 +42,9 @@ def update_role_permissions():
 
 
 @manager.command
-def bitrix_export_all_customer():
-    from commands.bitrix_export_all_customer import bitrix_export_all_customer
-    bitrix_export_all_customer()
+def bitrix_test_import():
+    from app.modules.importer.sources.bitrix24.lead import run_cron_import
+    run_cron_import()
 
 
 @manager.command

@@ -26,7 +26,8 @@ def add_item(data):
         existing = db.session.query(Lead).filter(Lead.number == data["number"]).first()
         if existing is not None:
             data["number"] = None
-    data["last_update"] = datetime.datetime.now()
+    if "last_update" not in data:
+        data["last_update"] = datetime.datetime.now()
     data["last_status_update"] = datetime.datetime.now()
     new_item = set_attr_by_dict(new_item, data, ["id", "activities"])
     settings = get_settings("leads")
@@ -178,7 +179,7 @@ def load_commission_data(lead: Lead):
 
 
 def lead_commission_calulation(lead: Lead):
-    if lead is None:
+    if lead is None or lead.reseller is None:
         return None
     is_external = lead.reseller.min_commission is not None and lead.reseller.min_commission > 0
     if lead.commissions is not None:
