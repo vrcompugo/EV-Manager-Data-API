@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from app.models import Customer, Lead, Reseller
 from app.modules.lead.lead_services import add_item, update_item
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
-from app.modules.events.event_services import add_trigger
 
 from ._connector import post, get, put, remote_user_id
 from ._association import find_association, associate_item
@@ -186,13 +185,5 @@ def run_export(remote_id=None, local_id=None):
                     associate_item(model="Lead", local_id=lead.id, remote_id=response["id"])
                     post_data["id"] = response["id"]
                     put("leads/{}".format(post_data["id"]), post_data=post_data)
-                    add_trigger({
-                        "name": "lead_exported",
-                        "data": {
-                            "lead_id": lead.id,
-                            "operation": "add",
-                            "source": "nocrm.io"
-                        }
-                    })
                 else:
                     print(response)

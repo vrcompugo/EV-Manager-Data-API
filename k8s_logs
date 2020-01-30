@@ -1,3 +1,0 @@
-until kubectl logs -f -n schoen svc/api-svc; do
-    echo "logs crashed. Respawning"
-done

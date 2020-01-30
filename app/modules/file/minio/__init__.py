@@ -8,11 +8,14 @@ from minio.error import ResponseError, BucketAlreadyOwnedByYou, BucketAlreadyExi
 MINIO_HOST = os.getenv('MINIO_HOST', 'minio:9000')
 MINIO_SECURE = os.getenv('MINIO_SECURE', "False") == "True"
 
+
 def connect():
-    return Minio(MINIO_HOST,
-                        access_key=os.environ.get("S3_ACCESS_KEY"),
-                        secret_key=os.environ.get("S3_SECRET_KEY"),
-                        secure=MINIO_SECURE)
+    return Minio(
+        MINIO_HOST,
+        access_key=os.environ.get("S3_ACCESS_KEY"),
+        secret_key=os.environ.get("S3_SECRET_KEY"),
+        secure=MINIO_SECURE)
+
 
 def put_file(bucket, filename, data):
     minioClient = connect()
@@ -34,14 +37,14 @@ def put_file(bucket, filename, data):
 
         length = len(data["file"].read())
         data["file"].seek(0)
-        minioClient.put_object(bucket_name=bucket,
-                               object_name=filename,
-                               content_type=data["content-type"],
-                               data=data["file"],
-                               length=length)
         try:
-            pass
-        except ResponseError as err:
+            minioClient.put_object(
+                bucket_name=bucket,
+                object_name=filename,
+                content_type=data["content-type"],
+                data=data["file"],
+                length=length)
+        except Exception as err:
             print(err)
 
 

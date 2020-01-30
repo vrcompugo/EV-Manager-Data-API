@@ -1,2 +1,0 @@
-kubectl scale --replicas=0 -n schoen deployment/api && \
-kubectl scale --replicas=1 -n schoen deployment/api

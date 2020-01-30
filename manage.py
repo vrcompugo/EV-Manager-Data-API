@@ -67,14 +67,8 @@ def auto_assign_reseller():
 
 @manager.command
 def cron():
-    from app.modules.events import cron
-    cron()
     from app.modules.importer import cron
     cron()
-    from app.modules.lead import cron
-    cron()
-    from app.modules.importer.sources.bitrix24.order import run_cron_import
-    run_cron_import()
 
 
 @manager.command

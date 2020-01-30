@@ -2,7 +2,7 @@ version: v1beta6
 images:
   default:
     image: dev.hbbx.de:4300/ev-manager/ev-manager-data-api
-    tag: dev-${DEVSPACE_GIT_COMMIT}
+    tag: dev-ah
     build:
       docker:
         disableFallback: true

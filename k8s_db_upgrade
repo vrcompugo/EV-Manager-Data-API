@@ -1,2 +1,0 @@
-kubectl exec -it -n schoen svc/api-svc -- python manage.py db upgrade
-

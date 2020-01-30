@@ -7,7 +7,6 @@ from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_mod
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.email.email_services import generate_email, send_email
 from app.modules.settings.settings_services import get_one_item as get_settings
-from app.modules.events.event_services import add_trigger
 from app.models import Reseller
 
 from .models.lead import Lead, LeadSchema
@@ -75,14 +74,6 @@ def update_item(id, data):
             item.customer.lead_number = item.number
             item.customer.reseller_id = item.reseller_id
         db.session.commit()
-        add_trigger({
-            "name": "lead_updated",
-            "data": {
-                "lead_id": item.id,
-                "old_data": old_data,
-                "new_data": schema.dump(item, many=False)
-            }
-        })
         return item
     else:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
@@ -113,8 +104,8 @@ def get_one_item(id, fields=None):
 
 
 def send_welcome_email(lead):
+    return False
     from .lead_comment_services import add_item as add_comment_item
-    from app.modules.importer.sources.nocrm_io._association import find_association as nocrm_link
 
     if lead.id < 12664:
         return False
@@ -126,10 +117,6 @@ def send_welcome_email(lead):
         return False
 
     if lead.status != "new":
-        return False
-
-    link = nocrm_link("Lead", local_id=lead.id)
-    if link is None:
         return False
 
     existing_comment = LeadComment.query\
