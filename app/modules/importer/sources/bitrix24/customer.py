@@ -69,19 +69,24 @@ def filter_export_data(customer: Customer):
         "fields[HONORIFIC]": "HNR_DE_1" if customer.salutation == "ms" else "HNR_DE_2",
         "fields[NAME]": customer_name,
         "fields[LAST_NAME]": customer.lastname,
-        "fields[UF_CRM_1572950758]": customer.default_address.street,
-        "fields[UF_CRM_1572950777]": customer.default_address.street_nb,
-        "fields[UF_CRM_1572963448]": customer.default_address.city,
-        "fields[UF_CRM_1572963458]": customer.default_address.zip,
-        "fields[EMAIL][0][TYPE_ID]": "EMAIL",
-        "fields[EMAIL][0][VALUE]": customer.email,
-        "fields[EMAIL][0][VALUE_TYPE]": "WORK",
         "fields[TYPE_ID]": "CLIENT",
         "email": customer.email,
         "phone": customer.phone
     }
+
+    if customer.default_address is not None:
+        data["fields[UF_CRM_1572950758]"] = customer.default_address.street
+        data["fields[UF_CRM_1572950777]"] = customer.default_address.street_nb
+        data["fields[UF_CRM_1572963448]"] = customer.default_address.city
+        data["fields[UF_CRM_1572963458]"] = customer.default_address.zip
+
     if reseller_link is not None:
         data["fields[ASSIGNED_BY_ID]"] = reseller_link.remote_id
+
+    if customer.email is not None:
+        data["fields[EMAIL][0][TYPE_ID]"] = "EMAIL"
+        data["fields[EMAIL][0][VALUE]"] = customer.email
+        data["fields[EMAIL][0][VALUE_TYPE]"] = "WORK"
 
     if customer.phone is not None and customer.phone != "" and customer.phone != "None":
         data["fields[PHONE][0][TYPE_ID]"] = "PHONE"
