@@ -1,18 +1,16 @@
 from sqlalchemy import and_
 
-from app.models import Customer
+from app import db
+from app.models import Customer, ImportIdAssociation
 from app.modules.importer.sources.bitrix24.customer import run_export, find_association
 
 from ._progress import printProgressBar
 
 
 def bitrix_export_all_customer():
-    customers = Customer.query.filter(
-        and_(
-            Customer.customer_number.isnot(None),
-            Customer.customer_number != ""
-        )
-    ).all()
+    customers = db.session.query(Customer)\
+        .outerjoin(ImportIdAssociation, Customer.id == ImportIdAssociation.local_id)\
+        .all()
     total = len(customers)
     printProgressBar(0, total, prefix='Progress:', suffix='Complete', length=50)
     i = 0

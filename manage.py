@@ -42,9 +42,9 @@ def update_role_permissions():
 
 
 @manager.command
-def bitrix_test_import():
-    from app.modules.importer.sources.bitrix24.order import run_cron_import
-    run_cron_import()
+def bitrix_customer_export():
+    from commands.bitrix_export_all_customer import bitrix_export_all_customer
+    bitrix_export_all_customer()
 
 
 @manager.command
@@ -69,14 +69,6 @@ def auto_assign_reseller():
 def cron():
     from app.modules.importer import cron
     cron()
-
-
-@manager.command
-def bitrix_init():
-    from app.modules.importer.sources.bitrix24.reseller import run_import
-    run_import()
-    from app.modules.importer.sources.bitrix24.lead import run_full_export
-    run_full_export()
 
 
 @manager.option("-m", "--module", dest='module', default=None)
