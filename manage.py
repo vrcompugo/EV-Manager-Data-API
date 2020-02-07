@@ -60,9 +60,9 @@ def update_commission_values():
 
 
 @manager.command
-def auto_assign_reseller():
-    from commands.auto_assign_reseller import auto_assign_reseller_cmd
-    auto_assign_reseller_cmd()
+def reseller_last_lead():
+    from commands.reseller_last_lead import reseller_last_lead
+    reseller_last_lead()
 
 
 @manager.command

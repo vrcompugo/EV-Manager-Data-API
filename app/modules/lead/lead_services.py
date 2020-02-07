@@ -7,6 +7,7 @@ from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_mod
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.email.email_services import generate_email, send_email
 from app.modules.settings.settings_services import get_one_item as get_settings
+from app.modules.reseller.services.reseller_services import update_item as update_reseller
 from app.models import Reseller
 
 from .models.lead import Lead, LeadSchema
@@ -223,18 +224,30 @@ def lead_reseller_auto_assignment(lead: Lead):
                     min_distance = distance
                     min_distance_reseller = reseller
         if len(reseller_in_range) == 0 and min_distance_reseller is not None:
-            update_item(lead.id, {"reseller_id": min_distance_reseller.id})
+            lead_reseller_assignment(lead, min_distance_reseller)
         if len(reseller_in_range) == 1:
-            update_item(lead.id, {"reseller_id": reseller_in_range[0].id})
+            lead_reseller_assignment(lead, reseller_in_range[0])
         if len(reseller_in_range) > 1:
             least_balance_reseller = reseller_in_range[0]
             for reseller in reseller_in_range:
-                if least_balance_reseller.lead_balance < reseller.lead_balance:
+                if least_balance_reseller.last_assigned_lead < reseller.last_assigned_lead:
                     least_balance_reseller = reseller
-            update_item(lead.id, {"reseller_id": least_balance_reseller.id})
+            lead_reseller_assignment(lead, least_balance_reseller)
         db.session.add(lead)
         db.session.commit()
     return lead
+
+
+def lead_reseller_assignment(lead: Lead, reseller: Reseller):
+    update_item(lead.id, {"reseller_id": reseller.id})
+    balance = reseller.lead_balance if reseller.lead_balance is not None else 0
+    update_reseller(
+        reseller.id,
+        {
+            "lead_balance": balance + 1,
+            "last_assigned_lead": datetime.datetime.now()
+        }
+    )
 
 
 def calculate_distance(location1, location2):

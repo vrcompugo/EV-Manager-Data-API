@@ -5,7 +5,8 @@
   <table>
     <thead>
       <tr>
-        <th width="50%">Verkäufer</th>
+        <th width="25%">Verkäufer</th>
+        <th width="25%">E-Mail</th>
         <th >Region</th>
         <th >Lead Konto</th>
         <th >Letzen Lead erhalten</th>
@@ -14,7 +15,16 @@
     <tbody>
       {% for reseller in resellers -%}
       <tr>
-        <td><a href="/bitrix24/resellers/{{ reseller.id }}?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">{{ reseller.name }}</a></td>
+        <td>
+          <a href="/bitrix24/resellers/{{ reseller.id }}?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">
+            {{ reseller.name }}
+          </a>
+        </td>
+        <td>
+          <a href="/bitrix24/resellers/{{ reseller.id }}?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">
+            {{ reseller.email }}
+          </a>
+        </td>
         <td>
           {% if reseller.sales_center -%}
             {{ reseller.sales_center }} ({{ reseller.sales_range }} km)
