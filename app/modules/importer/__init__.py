@@ -2,9 +2,6 @@
 
 def cron():
 
-    from .sources.data_efi_strom.reseller import run_import as run_import_reseller
-    run_import_reseller()
-
     from .sources.bitrix24.reseller import run_import
     run_import()
 
