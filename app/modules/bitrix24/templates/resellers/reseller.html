@@ -1,0 +1,55 @@
+{% extends "commissions/template.html" %}
+
+
+{% block content %}
+  <h2>Verkäufer {{ reseller.name }}</h2>
+  <form method="POST">
+    <input type="hidden" name="AUTH_ID" value="{{ auth_info.auth_code }}" />
+    <input type="hidden" name="DOMAIN" value="{{ auth_info.domain_raw }}" />
+    <b>Verkaufsregion</b><br>
+    <div class="layout horizontal wrap">
+      <p style="margin-right: 1em;">
+        <label for="sales_center">Zentrum</label><br>
+        {% if reseller.lead_balance -%}
+          <input type="text" id="sales_center" name="sales_center" value="{{ reseller.sales_center }}">
+        {%- else -%}
+          <input type="text" id="sales_center" name="sales_center" value="">
+        {%- endif %}
+      </p>
+      <p>
+        <label for="sales_range">Umkreis</label><br>
+        <input type="number" id="sales_range" name="sales_range" value="{{ reseller.sales_range }}">
+      </p>
+    </div>
+    <br>
+    <b>Leads</b><br>
+    <div class="layout horizontal wrap">
+      <p style="margin-right: 1em;">
+        <label for="lead_balance">Aktueller Lead Stand</label><br>
+        {% if reseller.lead_balance -%}
+          <input type="number" id="lead_balance" name="lead_balance" value="{{ reseller.lead_balance * -1 }}">
+        {%- else -%}
+          <input type="number" id="lead_balance" name="lead_balance" value="0">
+        {%- endif %}
+      </p>
+      <p>
+        <label for="leads_per_month">Monatlich gewünschte Leads</label><br>
+        <input type="number" id="leads_per_month" name="leads_per_month" value="{{ reseller.leads_per_month }}">
+      </p>
+    </div>
+    <br>
+    <b>Ziele</b><br>
+    <div class="layout horizontal wrap">
+      <p style="margin-right: 1em;">
+        <label for="min_commission">Mindestgehalt</label><br>
+        <input type="number" step="0.01" id="min_commission" name="min_commission" value="{{ reseller.min_commission }}">
+      </p>
+      <p>
+        <label for="lead_year_target">Jahrenziel Verkäufe pro Jahr</label><br>
+        <input type="number" id="lead_year_target" name="lead_year_target" value="{{ reseller.lead_year_target }}">
+      </p>
+    </div>
+    <button type="submit">Speichern</button>
+  </form>
+
+{% endblock %}

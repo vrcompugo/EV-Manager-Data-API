@@ -9,6 +9,8 @@ def apply_filters(app):
 
 
 def dateformat(value, format='%d.%m.%Y'):
+    if value is None:
+        return ""
     return value.strftime(format)
 
 

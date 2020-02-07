@@ -1,0 +1,33 @@
+{% extends "commissions/template.html" %}
+
+
+{% block content %}
+  <table>
+    <thead>
+      <tr>
+        <th width="50%">Verkäufer</th>
+        <th >Region</th>
+        <th >Lead Konto</th>
+        <th >Letzen Lead erhalten</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reseller in resellers -%}
+      <tr>
+        <td><a href="/bitrix24/resellers/{{ reseller.id }}?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">{{ reseller.name }}</a></td>
+        <td>
+          {% if reseller.sales_center -%}
+            {{ reseller.sales_center }} ({{ reseller.sales_range }} km)
+          {%- endif %}
+        </td>
+        <td>
+          {% if reseller.lead_balance -%}
+            {{ reseller.lead_balance * -1 }}
+          {%- endif %}
+        </td>
+        <td>{{ reseller.last_assigned_lead | dateformat }}</td>
+      </tr>
+      {%- endfor %}
+    </tbody>
+  </table>
+{% endblock %}
