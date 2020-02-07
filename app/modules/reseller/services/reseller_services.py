@@ -22,6 +22,11 @@ def add_item(data):
             "roles": [sales_role.id]
         })
     new_item = Reseller()
+    if "sales_center" in data and data["sales_center"] is not None:
+        location = geocode_address(data["sales_center"])
+        if location is not None:
+            data["sales_lat"] = location["lat"]
+            data["sales_lng"] = location["lng"]
     new_item = set_attr_by_dict(new_item, data, ["id"])
     new_item.user_id = user.id
     db.session.add(new_item)
@@ -32,6 +37,11 @@ def add_item(data):
 def update_item(id, data):
     item = db.session.query(Reseller).get(id)
     if item is not None:
+        if "sales_center" in data and data["sales_center"] is not None and data["sales_center"] != item.sales_center:
+            location = geocode_address(data["sales_center"])
+            if location is not None:
+                data["sales_lat"] = location["lat"]
+                data["sales_lng"] = location["lng"]
         item = set_attr_by_dict(item, data, ["id"])
         db.session.commit()
         return item
@@ -43,6 +53,5 @@ def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(Reseller, ResellerSchema, tree, sort, offset, limit, fields)
 
 
-def get_one_item(id, fields = None):
+def get_one_item(id, fields=None):
     return get_one_item_by_model(Reseller, ResellerSchema, id, fields, [])
-
