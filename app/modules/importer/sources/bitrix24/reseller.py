@@ -73,13 +73,14 @@ def run_import(minutes=None):
             for user in users:
                 user_data = filter_import_data(user)
                 if user_data is not None:
+                    print("bitrix reseller import", user_data["email"])
                     link = find_association("Reseller", user["ID"])
                     if link is not None:
                         reseller = Reseller.query.filter(Reseller.id == link.local_id).first()
                     else:
                         reseller = Reseller.query.filter(Reseller.email == user_data["email"]).first()
                     if reseller is not None:
-                        update_item(reseller.id, user_data)
+                        reseller = update_item(reseller.id, user_data)
                     else:
                         reseller = add_item(user_data)
                     if link is None and reseller is not None:
