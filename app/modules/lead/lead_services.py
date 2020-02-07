@@ -229,9 +229,10 @@ def lead_reseller_auto_assignment(lead: Lead):
             lead_reseller_assignment(lead, reseller_in_range[0])
         if len(reseller_in_range) > 1:
             least_balance_reseller = reseller_in_range[0]
-            for reseller in reseller_in_range:
-                if least_balance_reseller.last_assigned_lead < reseller.last_assigned_lead:
-                    least_balance_reseller = reseller
+            if least_balance_reseller.last_assigned_lead is not None:
+                for reseller in reseller_in_range:
+                    if reseller.last_assigned_lead is not None and least_balance_reseller.last_assigned_lead < reseller.last_assigned_lead:
+                        least_balance_reseller = reseller
             lead_reseller_assignment(lead, least_balance_reseller)
         db.session.add(lead)
         db.session.commit()
