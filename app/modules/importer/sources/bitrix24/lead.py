@@ -76,7 +76,7 @@ def filter_import_input(item_data):
 
     data = {
         "datetime": item_data["DATE_CREATE"],
-        "last_update": item_data["DATE_MODIFY"],
+        "last_update": "no-update",
         "reseller_id": reseller_id,
         "customer_id": customer_id,
         "value": item_data["OPPORTUNITY"],
@@ -212,7 +212,7 @@ def run_import(remote_id=None, local_id=None):
                         "id": remote_id,
                         "fields[UF_CRM_1578581226149]": lead.number
                     }
-                    #post("crm.lead.update", post_data=post_data)
+                    # post("crm.lead.update", post_data=post_data)
                 else:
                     lead = update_item(lead_link.local_id, data)
                     lead_commission = load_commission_data(lead)
@@ -220,7 +220,7 @@ def run_import(remote_id=None, local_id=None):
                         commissions = lead_commission.commissions
                         db.session.refresh(lead)
                         lead = update_item(lead_link.local_id, {"commissions": commissions, "last_update": lead.last_update})
-                #if lead is not None:
+                # if lead is not None:
                 #    run_data_efi_export(local_id=lead.id)
 
 
@@ -250,8 +250,8 @@ def run_cron_import():
                 print(str(type(e)))
                 trace_output = traceback.format_exc()
                 print(trace_output)
-                #error_handler()
-                #time.sleep(5)
+                # error_handler()
+                # time.sleep(5)
             time.sleep(1)
         time.sleep(5)
     config = get_config_item("importer/bitrix24")
@@ -259,7 +259,6 @@ def run_cron_import():
         config["data"]["last_lead_import"] = str(datetime.now())
     update_config_item("importer/bitrix24", config)
     print("end", response)
-
 
 
 def run_export(remote_id=None, local_id=None):
@@ -285,11 +284,13 @@ def run_export(remote_id=None, local_id=None):
                 else:
                     pp.pprint(response)
             else:
+                new_data = {"ID": lead_association.remote_id}
                 if "fields[ASSIGNED_BY_ID]" in post_data:
-                    response = post("crm.lead.update", post_data={
-                        "ID": lead_association.remote_id,
-                        "fields[ASSIGNED_BY_ID]": post_data["fields[ASSIGNED_BY_ID]"]
-                    })
+                    new_data["fields[ASSIGNED_BY_ID]"] = post_data["fields[ASSIGNED_BY_ID]"]
+                if "fields[STATUS_ID]" in post_data and lead.status == "offer_created":
+                    new_data["fields[STATUS_ID]"] = post_data["fields[STATUS_ID]"]
+                if len(new_data) > 1:
+                    response = post("crm.lead.update", post_data=new_data)
                     if "result" not in response:
                         pp.pprint(response)
 

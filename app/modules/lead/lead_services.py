@@ -28,6 +28,8 @@ def add_item(data):
             data["number"] = None
     if "last_update" not in data:
         data["last_update"] = datetime.datetime.now()
+    if data["last_update"] == "no-update":
+        del data["last_update"]
     data["last_status_update"] = datetime.datetime.now()
     new_item = set_attr_by_dict(new_item, data, ["id", "activities"])
     settings = get_settings("leads")
@@ -60,6 +62,8 @@ def update_item(id, data):
         old_data = schema.dump(item, many=False)
         if "last_update" not in data:
             data["last_update"] = datetime.datetime.now()
+        if data["last_update"] == "no-update":
+            del data["last_update"]
         if "status" in data and item.status != data["status"]:
             data["last_status_update"] = datetime.datetime.now()
         item = set_attr_by_dict(item, data, ["id", "activities"])

@@ -41,61 +41,19 @@ def update_role_permissions():
     update_role_permissions()
 
 
-@manager.command
-def bitrix_customer_export():
-    from commands.bitrix_export_all_customer import bitrix_export_all_customer
-    bitrix_export_all_customer()
-
-
-@manager.command
-def reassign_customers():
-    from commands.reassign_customers import reassign_customers
-    reassign_customers()
-
-
-@manager.command
-def update_commission_values():
-    from commands.update_commission_values import update_commission_values
-    update_commission_values()
-
-
-@manager.command
-def reseller_last_lead():
-    from commands.reseller_last_lead import reseller_last_lead
-    reseller_last_lead()
+@manager.option("-l", "--local_id", dest='local_id', default=None)
+def auto_assign_lead(local_id):
+    from app.modules.lead.lead_services import Lead, lead_reseller_auto_assignment
+    if local_id is not None:
+        lead = db.session.query(Lead).get(local_id)
+        if lead is not None:
+            lead_reseller_auto_assignment(lead)
 
 
 @manager.command
 def cron():
     from app.modules.importer import cron
     cron()
-
-
-@manager.option("-m", "--module", dest='module', default=None)
-def deploy_test_data(module):
-    if prompt_bool(
-            "Are you sure you want to import test data"):
-        if module is None or module == "user":
-            from app.modules.user import import_test_data as user_remote_import_data
-            user_remote_import_data()
-        if module is None or module == "customer":
-            from app.modules.customer import import_test_data as customer_remote_import_data
-            customer_remote_import_data()
-        if module is None or module == "reseller":
-            from app.modules.reseller import import_test_data as reseller_remote_import_data
-            reseller_remote_import_data()
-        if module is None or module == "survey":
-            from app.modules.survey import import_test_data as survey_remote_import_data
-            survey_remote_import_data()
-        if module is None or module == "product":
-            from app.modules.product import import_test_data as product_remote_import_data
-            product_remote_import_data()
-        if module is None or module == "offer":
-            from app.modules.offer import import_test_data as offer_remote_import_data
-            offer_remote_import_data()
-        if module is None or module == "contract":
-            from app.modules.contract import import_test_data as contract_remote_import_data
-            contract_remote_import_data()
 
 
 @manager.option("-m", "--module", dest='module', default=None)
