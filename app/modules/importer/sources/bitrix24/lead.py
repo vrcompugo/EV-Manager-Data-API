@@ -254,6 +254,7 @@ def run_cron_import():
                 # error_handler()
                 # time.sleep(5)
             time.sleep(1)
+        db.session.commit()
         time.sleep(5)
     config = get_config_item("importer/bitrix24")
     if config is not None and "data" in config:
@@ -290,10 +291,10 @@ def run_export(remote_id=None, local_id=None):
                     new_data["fields[ASSIGNED_BY_ID]"] = post_data["fields[ASSIGNED_BY_ID]"]
                 if "fields[STATUS_ID]" in post_data and lead.status == "offer_created":
                     new_data["fields[STATUS_ID]"] = post_data["fields[STATUS_ID]"]
+                print(new_data)
                 if len(new_data) > 1:
                     response = post("crm.lead.update", post_data=new_data)
-                    if "result" not in response:
-                        pp.pprint(response)
+                    pp.pprint(response)
 
 
 def run_status_update_export(remote_id=None, local_id=None):
