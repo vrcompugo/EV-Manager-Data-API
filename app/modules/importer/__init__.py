@@ -36,6 +36,6 @@ def cron():
 
     from .sources.bitrix24.lead import run_cron_export
     try:
-        run_cron_import()
+        run_cron_export()
     except Exception as e:
         error_handler()
