@@ -9,6 +9,7 @@ from app.models import Lead, Customer
 from app.modules.lead.lead_services import add_item
 from app.modules.customer.services.customer_services import add_item as customer_add_item
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
+from app.utils.error_handler import error_handler
 
 from ._connector import get
 from ._association import find_association, associate_item
