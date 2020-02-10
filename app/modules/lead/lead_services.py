@@ -224,11 +224,15 @@ def lead_reseller_auto_assignment(lead: Lead):
                 )
                 if distance <= reseller.sales_range and reseller.lead_balance is not None and reseller.lead_balance < 0:
                     reseller_in_range.append(reseller)
-                if min_distance is None or distance < min_distance:
+                if min_distance is None or distance < min_distance and distance < 55:
                     min_distance = distance
                     min_distance_reseller = reseller
-        if len(reseller_in_range) == 0 and min_distance_reseller is not None:
-            lead_reseller_assignment(lead, min_distance_reseller)
+        if len(reseller_in_range) == 0:
+            if min_distance_reseller is not None:
+                lead_reseller_assignment(lead, min_distance_reseller)
+            else:
+                kammandel = db.session.query(Reseller).get(76)
+                lead_reseller_assignment(lead, kammandel)
         if len(reseller_in_range) == 1:
             lead_reseller_assignment(lead, reseller_in_range[0])
         if len(reseller_in_range) > 1:
