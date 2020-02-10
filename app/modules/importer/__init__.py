@@ -1,4 +1,6 @@
 
+from app.utils.error_handler import error_handler
+
 
 def cron():
 
