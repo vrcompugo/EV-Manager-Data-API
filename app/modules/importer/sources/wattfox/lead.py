@@ -88,6 +88,7 @@ def run_customer_import(lead):
 
 
 def run_cron_import():
+    from app.modules.lead.lead_services import lead_reseller_auto_assignment
     config = get_config_item("importer/wattfox")
     print("import leads wattfox")
     if config is None:
