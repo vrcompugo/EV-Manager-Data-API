@@ -245,8 +245,10 @@ def run_cron_import():
                 run_import(remote_id=lead_data["ID"])
             except IntegrityError as e:
                 print(e.detail)
+                db.session.rollback()
             except InvalidRequestError as e:
                 print("already exists")
+                db.session.rollback()
             except Exception as e:
                 error_handler()
             try:
