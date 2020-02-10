@@ -248,13 +248,12 @@ def run_cron_import():
             except InvalidRequestError as e:
                 print("already exists")
             except Exception as e:
-                print(str(type(e)))
-                trace_output = traceback.format_exc()
-                print(trace_output)
-                # error_handler()
-                # time.sleep(5)
+                error_handler()
+            try:
+                db.session.commit()
+            except Exception as e:
+                pass
             time.sleep(1)
-        db.session.commit()
         time.sleep(5)
     config = get_config_item("importer/bitrix24")
     if config is not None and "data" in config:

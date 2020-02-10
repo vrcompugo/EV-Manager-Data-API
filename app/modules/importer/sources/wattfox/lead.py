@@ -113,10 +113,13 @@ def run_cron_import():
             if lead_link is None:
                 existing = Customer.query.filter(Customer.email == lead["email"]).first()
                 if existing is None:
-                    data = filter_import_input(lead)
-                    item = add_item(data)
-                    associate_item("Lead", remote_id=lead["leadid"], local_id=item.id)
-                    lead_reseller_auto_assignment(item)
+                    try:
+                        data = filter_import_input(lead)
+                        item = add_item(data)
+                        associate_item("Lead", remote_id=lead["leadid"], local_id=item.id)
+                        lead_reseller_auto_assignment(item)
+                    except Exception as e:
+                        error_handler()
                 else:
                     print("already known", lead["email"])
 

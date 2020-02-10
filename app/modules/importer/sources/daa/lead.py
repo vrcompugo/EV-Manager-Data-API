@@ -90,39 +90,39 @@ def run_customer_import(lead):
 def run_cron_import():
     from app.modules.lead.lead_services import lead_reseller_auto_assignment
     from app.utils.error_handler import error_handler
-    try:
-        config = get_config_item("importer/daa")
-        print("import leads daa ")
-        if config is None:
-            print("no config for daa import")
-            return None
-        if "data" in config and "last_import_id" in config["data"]:
-            leads = get("/api/v2/leads/bought", parameters={
-                "start_sale_id": config["data"]["last_import_id"]
-            })
-            highest = config["data"]["last_import_id"]
-        else:
-            leads = get("/api/v2/leads/bought")
-            highest = 0
+    config = get_config_item("importer/daa")
+    print("import leads daa ")
+    if config is None:
+        print("no config for daa import")
+        return None
+    if "data" in config and "last_import_id" in config["data"]:
+        leads = get("/api/v2/leads/bought", parameters={
+            "start_sale_id": config["data"]["last_import_id"]
+        })
+        highest = config["data"]["last_import_id"]
+    else:
+        leads = get("/api/v2/leads/bought")
+        highest = 0
 
-        if leads is not None:
-            for lead in leads:
-                lead_link = find_association("Lead", remote_id=lead["sale_id"])
-                if lead_link is None:
-                    existing = Customer.query.filter(Customer.email == lead["email"]).first()
-                    if existing is None:
-                        if highest < lead["sale_id"]:
-                            highest = lead["sale_id"]
+    if leads is not None:
+        for lead in leads:
+            lead_link = find_association("Lead", remote_id=lead["sale_id"])
+            if lead_link is None:
+                existing = Customer.query.filter(Customer.email == lead["email"]).first()
+                if existing is None:
+                    if highest < lead["sale_id"]:
+                        highest = lead["sale_id"]
+                    try:
                         data = filter_import_input(lead)
                         item = add_item(data)
                         associate_item("Lead", remote_id=lead["sale_id"], local_id=item.id)
                         lead_reseller_auto_assignment(item)
-                    else:
-                        print("already known", lead["email"])
+                    except Exception as e:
+                        error_handler()
+                else:
+                    print("already known", lead["email"])
 
-            config = get_config_item("importer/daa")
-            if config is not None and "data" in config:
-                config["data"]["last_import_id"] = highest
-            update_config_item("importer/daa", config)
-    except Exception as e:
-        error_handler()
+        config = get_config_item("importer/daa")
+        if config is not None and "data" in config:
+            config["data"]["last_import_id"] = highest
+        update_config_item("importer/daa", config)

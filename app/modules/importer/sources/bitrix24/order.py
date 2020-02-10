@@ -119,29 +119,29 @@ def run_import_by_lead(lead: Lead):
 
 
 def run_cron_import():
-    try:
-        config = get_config_item("importer/bitrix24")
-        print("import order data bitrix24 ")
-        if config is None:
-            print("no config for bitrix import")
-            return None
-        if "data" in config and "last_order_import_datetime" in config["data"]:
-            deals = post("crm.deal.list", {
-                "FILTER[>DATE_MODIFY]": config["data"]["last_order_import_datetime"],
-                "FILTER[CATEGORY_ID]": 66
-            })
-        else:
-            deals = post("crm.deal.list", {
-                "FILTER[CATEGORY_ID]": 66
-            })
+    config = get_config_item("importer/bitrix24")
+    print("import order data bitrix24 ")
+    if config is None:
+        print("no config for bitrix import")
+        return None
+    if "data" in config and "last_order_import_datetime" in config["data"]:
+        deals = post("crm.deal.list", {
+            "FILTER[>DATE_MODIFY]": config["data"]["last_order_import_datetime"],
+            "FILTER[CATEGORY_ID]": 66
+        })
+    else:
+        deals = post("crm.deal.list", {
+            "FILTER[CATEGORY_ID]": 66
+        })
 
-        if "result" in deals:
-            for deal in deals["result"]:
+    if "result" in deals:
+        for deal in deals["result"]:
+            try:
                 order = run_import(remote_id=deal["ID"])
+            except Exception as e:
+                error_handler()
 
-            config = get_config_item("importer/bitrix24")
-            if config is not None and "data" in config:
-                config["data"]["last_order_import_datetime"] = str(datetime.now())
-            update_config_item("importer/bitrix24", config)
-    except Exception as e:
-        error_handler()
+        config = get_config_item("importer/bitrix24")
+        if config is not None and "data" in config:
+            config["data"]["last_order_import_datetime"] = str(datetime.now())
+        update_config_item("importer/bitrix24", config)
