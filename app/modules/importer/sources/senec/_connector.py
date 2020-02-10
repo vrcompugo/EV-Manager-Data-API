@@ -38,4 +38,4 @@ def get(url, parameters=None):
             return response.json()
         except Exception as e:
             print(response.text)
-    return {}
+    return None

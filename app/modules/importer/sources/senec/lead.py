@@ -98,8 +98,11 @@ def run_cron_import():
             "assignedFrom": config["data"]["last_import_datetime"]
         })
     else:
-        leads = get("/API/assignments/")
-    print(leads)
+        leads = get("/API/assignments/", parameters={
+            "assignedFrom": "2019-01-01",
+            "assignedTo": "2020-02-01"
+        })
+        print(leads)
     if False and leads is not None:
         for lead in leads:
             lead_link = find_association("Lead", remote_id=lead["sale_id"])

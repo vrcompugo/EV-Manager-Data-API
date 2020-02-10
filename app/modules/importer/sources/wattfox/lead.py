@@ -18,7 +18,7 @@ def filter_import_input(item_data):
 
     customer_id = None
     customer = None
-    customer_accociation = find_association("Customer", remote_id=item_data["sale_id"])
+    customer_accociation = find_association("Customer", remote_id=item_data["leadid"])
     if customer_accociation is None:
         customer = run_customer_import(item_data)
         if customer is not None:
@@ -28,10 +28,10 @@ def filter_import_input(item_data):
         customer = Customer.query.get(customer_accociation.local_id)
 
     reseller_id = None
-
+    bought_datetime = datetime.fromtimestamp(item_data["tstamp_sold"])
     data = {
-        "datetime": item_data["sale_date"],
-        "last_update": item_data["sale_date"],
+        "datetime": str(bought_datetime),
+        "last_update": str(bought_datetime),
         "reseller_id": reseller_id,
         "customer_id": customer_id,
         "value": 25000,
@@ -54,22 +54,22 @@ def filter_customer_import_input(item_data):
         "customer_number": None,
         "lead_number": None,
         "company": "",
-        "salutation": "mr" if item_data["title"] == "Herr" else "ms",
+        "salutation": "mr" if item_data["salutation"] == "Herr" else "ms",
         "title": "",
-        "firstname": item_data["first_name"],
-        "lastname": item_data["last_name"],
+        "firstname": item_data["firstname"],
+        "lastname": item_data["lastname"],
         "email": item_data["email"],
         "phone": item_data["phone"],
         "pending_email": None,
         "email_status": None,
         "default_address": {
             "company": "",
-            "salutation": "mr" if item_data["title"] == "Herr" else "ms",
+            "salutation": "mr" if item_data["salutation"] == "Herr" else "ms",
             "title": "",
-            "firstname": item_data["first_name"],
-            "lastname": item_data["last_name"],
+            "firstname": item_data["firstname"],
+            "lastname": item_data["lastname"],
             "street": item_data["street"],
-            "zip": item_data["zipcode"],
+            "zip": item_data["zip"],
             "city": item_data["city"],
             "status": "ok"
         }
@@ -81,7 +81,7 @@ def run_customer_import(lead):
     data = filter_customer_import_input(lead)
     if data is not None:
         customer = customer_add_item(data)
-        associate_item("Customer", remote_id=lead["sale_id"], local_id=customer.id)
+        associate_item("Customer", remote_id=lead["leadid"], local_id=customer.id)
         return customer
     return None
 
@@ -116,8 +116,9 @@ def run_cron_import():
                     data = filter_import_input(lead)
                     item = add_item(data)
                     associate_item("Lead", remote_id=lead["leadid"], local_id=item.id)
+                    lead_reseller_auto_assignment(item)
                 else:
-                    print(lead["email"])
+                    print("already known", lead["email"])
 
         config = get_config_item("importer/wattfox")
         if config is not None and "data" in config:
