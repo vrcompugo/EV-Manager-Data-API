@@ -10,6 +10,7 @@
         <th >Region</th>
         <th >Lead Konto</th>
         <th >Letzen Lead erhalten</th>
+        <th >Aktiv</th>
       </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
           {%- endif %}
         </td>
         <td>{{ reseller.last_assigned_lead | dateformat }}</td>
+        <td>{{ reseller.active | boolformat }}</td>
       </tr>
       {%- endfor %}
     </tbody>

@@ -3,10 +3,11 @@ import json
 from datetime import datetime, timedelta
 
 from app import db
-from app.models import Lead
+from app.models import Lead, Reseller
 from app.utils.error_handler import error_handler
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 from app.modules.order.order_services import commission_calulation, add_item, update_item
+from app.modules.reseller.services import update_item as update_reseller
 
 from ._connector import post, get
 from ._association import find_association, associate_item
@@ -77,13 +78,21 @@ def run_import(local_id=None, remote_id=None):
     if "result" in response:
         deal = response["result"]
         data = filter_import_input(deal)
-        pp.pprint(deal)
-        pp.pprint(data)
         link = find_association("Order", remote_id=deal["ID"])
         if link is None:
+            print("new order", deal["ID"])
             order = add_item(data)
             associate_item("Order", local_id=order.id, remote_id=deal["ID"])
+            if order.reseller_id is not None and order.reseller_id > 0:
+                reseller = db.session.query(Reseller).filter(Reseller.id == order.reseller_id).first()
+                if reseller is not None:
+                    if reseller.lead_balance is None:
+                        lead_balance = 0
+                    else:
+                        lead_balance = reseller.lead_balance
+                    update_reseller(reseller.id, {"lead_balance": lead_balance + 8})
         else:
+            print("update order", deal["ID"])
             order = update_item(link.local_id, data)
         if order is not None:
             order = commission_calulation(order)

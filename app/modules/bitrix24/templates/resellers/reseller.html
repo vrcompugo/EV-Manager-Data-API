@@ -25,7 +25,7 @@
     <b>Leads</b><br>
     <div class="layout horizontal wrap">
       <p style="margin-right: 1em;">
-        <label for="lead_balance">Aktueller Lead Stand</label><br>
+        <label for="lead_balance">Aktueller Lead Kontostand*</label><br>
         {% if reseller.lead_balance -%}
           <input type="number" id="lead_balance" name="lead_balance" value="{{ reseller.lead_balance * -1 }}">
         {%- else -%}
@@ -41,11 +41,11 @@
     <b>Ziele</b><br>
     <div class="layout horizontal wrap">
       <p style="margin-right: 1em;">
-        <label for="min_commission">Mindestgehalt</label><br>
+        <label for="min_commission">Mindestgehalt (netto)</label><br>
         <input type="number" step="0.01" id="min_commission" name="min_commission" value="{{ reseller.min_commission }}">
       </p>
       <p>
-        <label for="lead_year_target">Jahrenziel Verkäufe pro Jahr</label><br>
+        <label for="lead_year_target">Jahresziel Verkäufe pro Jahr</label><br>
         <input type="number" id="lead_year_target" name="lead_year_target" value="{{ reseller.lead_year_target }}">
       </p>
     </div>
@@ -53,5 +53,10 @@
 
     <a href="/bitrix24/resellers/?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">Zur Liste</a>
   </form>
-
+  <br>
+  <br>
+  <small>
+    * Leadkonto: Sollange der Kontostand im Positiven ist bekommt der Verkäufer noch Zuweisungen. Jeder
+    neue Lead verringert das Konto um 1. Verkäufe erhöhen den Kontostand um 8.
+  </small>
 {% endblock %}
