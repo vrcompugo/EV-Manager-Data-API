@@ -261,7 +261,6 @@ def run_cron_import():
     if config is not None and "data" in config:
         config["data"]["last_lead_import"] = str(datetime.now())
     update_config_item("importer/bitrix24", config)
-    print("end", response)
 
 
 def run_export(remote_id=None, local_id=None):
