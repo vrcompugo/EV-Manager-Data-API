@@ -7,7 +7,7 @@ from app.models import Lead, Reseller
 from app.utils.error_handler import error_handler
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 from app.modules.order.order_services import commission_calulation, add_item, update_item
-from app.modules.reseller.services import update_item as update_reseller
+from app.modules.reseller.services.reseller_services import update_item as update_reseller
 
 from ._connector import post, get
 from ._association import find_association, associate_item
