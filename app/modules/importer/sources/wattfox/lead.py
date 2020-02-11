@@ -30,6 +30,7 @@ def filter_import_input(item_data):
 
     reseller_id = None
     bought_datetime = datetime.fromtimestamp(item_data["tstamp_sold"])
+    item_data["Quelle"] = "WattFox"
     data = {
         "datetime": str(bought_datetime),
         "last_update": str(bought_datetime),
@@ -38,6 +39,7 @@ def filter_import_input(item_data):
         "value": 25000,
         "status": "new",
         "data": item_data,
+        "contact_source": "WattFox",
         "description": ""
     }
     data["description_html"] = data["description"].replace("\n", "<br>\n")
