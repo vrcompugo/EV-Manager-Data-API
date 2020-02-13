@@ -1,12 +1,19 @@
 
 
 def apply_filters(app):
+    app.jinja_env.filters['textfilter'] = textfilter
     app.jinja_env.filters['boolformat'] = boolformat
     app.jinja_env.filters['dateformat'] = dateformat
     app.jinja_env.filters['datetimeformat'] = datetimeformat
     app.jinja_env.filters['numberformat'] = numberformat
     app.jinja_env.filters['currencyformat'] = currencyformat
     app.jinja_env.filters['percentformat'] = percentformat
+
+
+def textfilter(value):
+    if value is None:
+        return ""
+    return str(value)
 
 
 def boolformat(value):

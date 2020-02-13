@@ -2,153 +2,274 @@
 
 
 {% block content %}
-  <div class="layout horizontal">
-    <div class="reseller flex">Verkäufer {{ reseller.name }}</div>
-    <div class="flex">{{ reseller.sales_center }} - {{ reseller.sales_range }}km</div>
-    <div class="timeselect">
-      <select>
-        <option value="current">Aktueller Monat</option>
-      </select>
-    </div>
-  </div>
-
-  <div>
-    <h2>Jahresübersicht</h2>
-    Leads in 2020: {{ provided_leads_year_count }}<br>
-
-    Verkaufsrate für 2020:
-    {% if provided_leads_year_count > 0 -%}
-      {{ ((won_leads_year_count / provided_leads_year_count) * 100) | percentformat("de", 2) }}
-    {%- endif %}
-    <br>
-    {% if reseller.lead_year_target -%}
-    <div class="row">
-      <div class="progressbar flex">
-        <div class="value left" style="width: {{ 100 - (won_leads_year_count / reseller.lead_year_target) * 100 }}%;">{{ ((won_leads_year_count / reseller.lead_year_target) * 100) | percentformat }} ({{ won_leads_year_count }} Aufträge)</div>
-        <div class="bar-value" style="width: {{ (won_leads_year_count / reseller.lead_year_target) * 100 }}%;"></div>
-      </div>
-      <div class="day_indicator" style="width: {{ (day_of_year / 365) * 100 }}%;"></div>
-    </div>
-    {%- endif %}
-    <div style="text-align: right;">
-      {{ reseller.lead_year_target }} Aufträge
-    </div>
-  </div>
-
-  <div>
-    <h2>Ausgewählter Monat</h2>
-    <h3>Leads</h3>
-    <br>
+  <div id="content">
     <div class="layout horizontal">
-      <div class="flex" style="text-align: center;">
-        <div class="large">
-          {% if provided_leads_year_count -%}
-            {{ ((won_leads_month_count / provided_leads_month_count) * 100) | percentformat("de", 2) }}
-          {%- endif %}
-        </div>
-        <small>Verkaufsrate</small>
-      </div>
-      <div class="flex" style="text-align: center;">
-        <div class="large">{{ provided_leads_month_count }} / {{ reseller.leads_per_month }}</div>
-        <small>Leads erhalten</small>
-      </div>
-      <div class="flex" style="text-align: center;">
-        <div class="large">
-          {% if reseller.lead_balance -%}
-            {{ reseller.lead_balance * -1 }}
-          {%- endif %}
-        </div>
-        <small>Kontostand</small>
+      <div class="reseller flex">Verkäufer {{ reseller.name }}</div>
+      <div class="flex">{{ reseller.sales_center }} - {{ reseller.sales_range }}km</div>
+      <div class="timeselect">
+        <select id="date_select">
+          <option value="current">Aktueller Monat</option>
+          {% for option in time_select_options -%}
+            <option value="{{ option.value }}" {% if option.selected %}selected{% endif %}>{{ option.label }}</option>
+          {% endfor %}
+        </select>
       </div>
     </div>
-    <br>
-    <div class="layout horizontal center">
-      <h3 class="flex">Umsätze</h3>
-      {% if reseller.min_commission -%}
-        <div>Mindestlohn: {{ reseller.min_commission | currencyformat }}</div>
+
+    <div>
+      <h2>Jahresübersicht</h2>
+      Leads in 2020: {{ provided_leads_year_count }}<br>
+
+      Verkaufsrate für 2020:
+      {% if provided_leads_year_count > 0 -%}
+        {{ ((won_leads_year_count / provided_leads_year_count) * 100) | percentformat("de", 2) }}
       {%- endif %}
+      <br>
+      {% if reseller.lead_year_target -%}
+      <div class="row">
+        <div class="progressbar flex">
+          <div class="value left" style="width: {{ 100 - (won_leads_year_count / reseller.lead_year_target) * 100 }}%;">{{ ((won_leads_year_count / reseller.lead_year_target) * 100) | percentformat }} ({{ won_leads_year_count }} Aufträge)</div>
+          <div class="bar-value" style="width: {{ (won_leads_year_count / reseller.lead_year_target) * 100 }}%;"></div>
+        </div>
+        <div class="day_indicator" style="width: {{ (day_of_year / 365) * 100 }}%;"></div>
+      </div>
+      {%- endif %}
+      <div style="text-align: right;">
+        {{ reseller.lead_year_target }} Aufträge
+      </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th width="100%">Kontakt</th>
-          <th>Art</th>
-          <th class="right">Verkaufspreis (netto)</th>
-          <th class="right">Nachlass</th>
-          <th>Optionen</th>
-          <th class="right">Provision (%)</th>
-          <th class="right">Provision (netto)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% set totals = {'subtotal': 0.0} %}
-        {% for lead in won_leads_month -%}
-          {% if lead.commissions -%}
-            {% for commission in lead.commissions -%}
-              <tr>
-                <td>
-                  {% if loop.index == 1 -%}
-                    {{ lead.customer.company }} {{ lead.customer.firstname }} {{ lead.customer.lastname }}
-                  {%- endif %}
-                </td>
-                <td>{{ commission.type }}</th>
-                <td class="right">{{ commission.value_net | currencyformat }}</td>
-                <td class="right">{{ commission.discount_range }}</td>
-                <td>
-                  <table>
-                    {% for option in commission.options -%}
-                      <tr>
-                        <td style="white-space: nowrap;">{{ option.key }}</td>
-                        <td>{{ option.value_net | currencyformat }}</td>
-                      </tr>
-                    {%- endfor %}
-                  </table>
-                </td>
-                <td class="right">{{ commission.provision_rate | percentformat }}</td>
-                <td class="right">{{ commission.provision_net | currencyformat }}</td>
-              </tr>
-              {% if totals.update({"subtotal": totals.subtotal + commission.provision_net}) %} {% endif %}
-            {%- endfor %}
-          {%- endif %}
-        {%- endfor %}
-      </tbody>
-      <tfoot>
-        {% if totals.update({"tax": totals.subtotal * 0.19}) %} {% endif %}
-        {% if totals.update({"total": totals.subtotal * 1.19}) %} {% endif %}
+
+    <div>
+      <h2>Ausgewählter Monat</h2>
+      <h3>Leads</h3>
+      <br>
+      <div class="layout horizontal">
+        <div class="flex" style="text-align: center;">
+          <div class="large">
+            {% if provided_leads_month_count -%}
+              {{ ((won_leads_month_count / provided_leads_month_count) * 100) | percentformat("de", 2) }}
+            {%- endif %}
+          </div>
+          <small>Verkaufsrate</small>
+        </div>
+        <div class="flex" style="text-align: center;">
+          <div class="large">{{ provided_leads_month_count }} / {{ reseller.leads_per_month }}</div>
+          <small>Leads erhalten</small>
+        </div>
+        <div class="flex" style="text-align: center;">
+          <div class="large">
+            {% if reseller.lead_balance -%}
+              {{ reseller.lead_balance * -1 }}
+            {%- endif %}
+          </div>
+          <small>Kontostand</small>
+        </div>
+      </div>
+      <br>
+      <div class="layout horizontal center">
+        <h3 class="flex">Umsätze</h3>
         {% if reseller.min_commission -%}
+          <div>Mindestlohn: {{ reseller.min_commission | currencyformat }}</div>
+        {%- endif %}
+      </div>
+      <table>
+        <thead>
           <tr>
-            <td class="right" colspan="6">Summe:</td>
-            <td class="right">
-              {% if totals.subtotal < reseller.min_commission %}
-                {{ reseller.min_commission | currencyformat }}
-              {% else %}
-                {{ totals.subtotal | currencyformat }}
-              {% endif %}
+            <th>Datum</th>
+            <th width="50%">Kontakt</th>
+            <th>Status</th>
+            <th>Art</th>
+            <th class="right">Verkaufspreis (netto)</th>
+            <th class="right">Nachlass</th>
+            <th>Optionen</th>
+            <th class="right">Provision (%)</th>
+            <th class="right">Provision (netto)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set totals = {'subtotal': 0.0} %}
+          {% for lead in won_leads_month -%}
+            {% if lead.commissions -%}
+              {% for commission in lead.commissions -%}
+                <tr>
+                  <td style="white-space: nowrap;">
+                    {% if loop.index == 1 -%}
+                      <a href="https://keso.bitrix24.de/crm/deal/details/{{ lead.remote_id }}/" target="_blank">
+                        {{ lead.datetime | dateformat }}
+                      </a>
+                    {%- endif %}
+                  </td>
+                  <td>
+                    {% if loop.index == 1 -%}
+                      <a href="https://keso.bitrix24.de/crm/deal/details/{{ lead.remote_id }}/" target="_blank">
+                        {{ lead.customer.company | textfilter }}
+                        {{ lead.customer.firstname | textfilter }}
+                        {{ lead.customer.lastname | textfilter }}
+                      </a>
+                    {%- endif %}
+                  </td>
+                  <td style="white-space: nowrap;">
+                    {% if loop.index == 1 -%}
+                      {% if lead.is_checked -%}
+                        ist gecheckt
+                        {% if lead.is_paid -%}
+                          und gebucht
+                        {% else %}
+                          <a href="#" data-id="{{ lead.id }}" class="link_booking">als gebucht markieren</a>
+                        {%- endif %}
+                      {% else %}
+                        <a href="#" data-id="{{ lead.id }}" class="link_checking">als gecheckt markieren</a>
+                      {%- endif %}
+                    {%- endif %}
+                  </td>
+                  <td>{{ commission.type }}</td>
+                  <td class="right">{{ commission.value_net | currencyformat }}</td>
+                  <td class="right">{{ commission.discount_range }}</td>
+                  <td>
+                    <table>
+                      {% for option in commission.options -%}
+                        <tr>
+                          <td style="white-space: nowrap;">{{ option.key }}</td>
+                          <td>{{ option.value_net | currencyformat }}</td>
+                        </tr>
+                      {%- endfor %}
+                    </table>
+                  </td>
+                  <td class="right">{{ commission.provision_rate | percentformat }}</td>
+                  <td class="right">{{ commission.provision_net | currencyformat }}</td>
+                </tr>
+                {% if totals.update({"subtotal": totals.subtotal + commission.provision_net}) %} {% endif %}
+              {%- endfor %}
+            {%- endif %}
+          {%- endfor %}
+          <tr>
+            <td colspan="8">
+              {% if can_edit -%}
+                <p class="flex">
+                  <label for="extra_item"></label>
+                  <textarea id="extra_item" style="width: 100%" rows="3">
+                    {%- if commission -%}{{ commission.extra_item | textfilter }}{%- endif -%}
+                  </textarea>
+                </p>
+              {%- else -%}
+                {% if commission -%}{{ commission.extra_item }}{%- endif %}
+              {%- endif %}
+            </td>
+            <td class="right" style="vertical-align: top; white-space: nowrap;">
+              {% if can_edit -%}
+                <input type="number" style="text-align: right; max-width: 8em;" step="0.01" id="extra_value_net" value="{%- if commission -%}{{ commission.extra_value_net }}{%- endif -%}" />  €
+              {%- else -%}
+                {%- if commission -%}{{ commission.extra_value_net }}{%- endif -%} €
+              {%- endif %}
             </td>
           </tr>
-        {% else %}
-          <tr>
-            <td class="right" colspan="6">Zwischensumme:</td>
-            <td class="right">{{ totals.subtotal | currencyformat }}</td>
-          </tr>
-          <tr>
-            <td class="right" colspan="6">MwSt:</td>
-            <td class="right">{{ totals.tax | currencyformat }}</td>
-          </tr>
-          <tr>
-            <td class="right" colspan="6">Gesamt:</td>
-            <td class="right">{{ totals.total | currencyformat }}</td>
-          </tr>
+          {%- if commission -%}
+            {% if totals.update({"subtotal": totals.subtotal + commission.extra_value_net}) %} {% endif %}
+          {%- endif %}
+        </tbody>
+        <tfoot>
+          {% if totals.update({"tax": totals.subtotal * 0.19}) %} {% endif %}
+          {% if totals.update({"total": totals.subtotal * 1.19}) %} {% endif %}
+          {% if reseller.min_commission -%}
+            <tr>
+              <td class="right" colspan="8">Summe:</td>
+              <td class="right">
+                {% if totals.subtotal < reseller.min_commission %}
+                  {{ reseller.min_commission | currencyformat }}
+                {% else %}
+                  {{ totals.subtotal | currencyformat }}
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td class="right" colspan="8">Zwischensumme:</td>
+              <td class="right">{{ totals.subtotal | currencyformat }}</td>
+            </tr>
+            <tr>
+              <td class="right" colspan="8">MwSt:</td>
+              <td class="right">{{ totals.tax | currencyformat }}</td>
+            </tr>
+            <tr>
+              <td class="right" colspan="8">Gesamt:</td>
+              <td class="right">{{ totals.total | currencyformat }}</td>
+            </tr>
+          {%- endif %}
+        </tfoot>
+      </table>
+      <br>
+      {% if can_edit %}
+        <form method="POST" action="">
+          <div class="layout horizontal">
+            <p class="flex">
+              <label for="comment_internal">Interner Kommentar</label><br>
+              <textarea id="comment_internal" style="width: 100%" rows="5">{%- if commission -%}{{ commission.comment_internal }}{%- endif -%}</textarea>
+            </p>
+            <p class="flex">
+              <label for="comment_external">Externer Kommentar</label><br>
+              <textarea id="comment_external" style="width: 100%" rows="5">{%- if commission -%}{{ commission.comment_external }}{%- endif -%}</textarea>
+            </p>
+          </div>
+          <div style="text-align: right;">
+            <button type="button" id="submit_button">Speichern</button>
+          </div>
+        </form>
+      {% else %}
+        Kommentar:<br>
+        {%- if commission -%}{{ commission.comment_external }}{%- endif -%}
+      {% endif %}
+      <br>
+      <div style="text-align: center;">
+        {% if not reseller.min_commission -%}
+          <div>Bitte schreiben Sie uns hierzu eine Rechnung mit dem ausgewiesenen Gesamtbetrag.</div>
         {%- endif %}
-      </tfoot>
-    </table>
-    <br>
-    <br>
-    <div style="text-align: center;">
-      {% if not reseller.min_commission -%}
-        <div>Bitte schreiben Sie uns hierzu eine Rechnung mit dem ausgewiesenen Gesamtbetrag.</div>
-      {%- endif %}
-
+      </div>
     </div>
   </div>
+  <script>
+    const store_url = "/bitrix24/commissions/{{ reseller.id }}/store?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}&";
+
+    const handleSubmit = function(){
+      const xhr = new XMLHttpRequest();
+      date_select = document.getElementById("date_select").value
+
+      xhr.open("POST", store_url + date_select);
+      xhr.addEventListener("load", function(e){
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(this.response, "text/html");
+        document.getElementById("content").innerHTML = doc.getElementById("content").innerHTML;
+        addListeners();
+      });
+      formData = new FormData();
+      formData.append('extra_item', document.getElementById("extra_item").value);
+      formData.append('extra_value_net', document.getElementById("extra_value_net").value);
+      formData.append('comment_internal', document.getElementById("comment_internal").value);
+      formData.append('comment_external', document.getElementById("comment_external").value);
+      xhr.send(formData);
+    }
+
+    const addListeners = function(){
+      document.getElementById("submit_button").addEventListener("click", handleSubmit);
+      document.getElementById("date_select").addEventListener("change", function(){
+        location.href = "/bitrix24/commissions/{{ reseller.id }}?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}&" + this.value;
+      });
+      links = document.querySelectorAll(".link_checking");
+      for(var i=0; i<links.length; i++){
+        links[i].addEventListener("click", function(e){
+          e.preventDefault();
+          location.href = store_url + document.getElementById("date_select").value + "&checked=" + this.dataset.id;
+        });
+      }
+      links = document.querySelectorAll(".link_booking");
+      for(var i=0; i<links.length; i++){
+        links[i].addEventListener("click", function(e){
+          e.preventDefault();
+          location.href = store_url + document.getElementById("date_select").value + "&booked=" + this.dataset.id;
+        });
+      }
+
+    }
+    addListeners();
+
+  </script>
 {% endblock %}

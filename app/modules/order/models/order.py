@@ -23,6 +23,8 @@ class Order(db.Model):
     status = db.Column(db.String(20))
     commissions = db.Column(db.JSON)
     commission_value_net = db.Column(db.Numeric(scale=4, precision=12))
+    is_checked = db.Column(db.Boolean)
+    is_paid = db.Column(db.Boolean)
 
     @hybrid_property
     def search_query(self):

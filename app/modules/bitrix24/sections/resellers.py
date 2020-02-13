@@ -17,11 +17,11 @@ def register_routes(api: Blueprint):
         auth_info = get_bitrix_auth_info(request)
         if auth_info["user"] is None:
             return "not authenticated"
-        if auth_info["user"].id == 1 or auth_info["user"].id == 12:
+        if auth_info["user"].id in [1, 12]:
             resellers = db.session.query(Reseller).filter(Reseller.active.is_(True)).order_by(Reseller.name).all()
             return render_template("resellers/list.html", resellers=resellers, auth_info=auth_info)
         else:
-            return commission(auth_info["user"].id)
+            return reseller(auth_info["user"].id)
         return "not found"
 
     @api.route("/resellers/<id>", methods=["GET", "POST"])
@@ -47,7 +47,8 @@ def register_routes(api: Blueprint):
             return render_template(
                 "resellers/reseller.html",
                 reseller=reseller,
-                auth_info=auth_info
+                auth_info=auth_info,
+                can_edit=can_edit
             )
         return "not found"
 
