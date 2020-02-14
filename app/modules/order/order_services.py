@@ -30,7 +30,7 @@ def update_item(id, data):
 def commission_calulation(order: Order):
     if order is None or order.reseller is None:
         return None
-    is_external = order.reseller.min_commission is None or order.reseller.min_commission <= 0
+    is_external = order.reseller.min_commission is None or float(order.reseller.min_commission) <= 0
     if order.commissions is None:
         return order
     for commission in order.commissions:
