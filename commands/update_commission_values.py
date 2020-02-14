@@ -13,7 +13,8 @@ def update_commission_values():
     printProgressBar(0, total, prefix='Progress:', suffix='Complete', length=50)
     i = 0
     for order in orders:
-        commission_calulation(order)
+        print(order.id)
+        order = commission_calulation(order)
         db.session.commit()
         printProgressBar(i, total, prefix='Progress:', suffix='Complete', length=50)
         i = i + 1
