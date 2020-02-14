@@ -15,9 +15,15 @@ def update_commission_values():
     for order in orders:
         print("id", order.id)
         order = commission_calulation(order)
+        commission_value_net = order.commission_value_net
+        commissions = order.commissions
         update_item(order.id, {
-            "commission_value_net": order.commission_value_net,
-            "commissions": order.commissions
+            "commission_value_net": 0,
+            "commissions": None
+        })
+        update_item(order.id, {
+            "commission_value_net": commission_value_net,
+            "commissions": commissions
         })
         # printProgressBar(i, total, prefix='Progress:', suffix='Complete', length=50)
         i = i + 1
