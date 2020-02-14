@@ -36,6 +36,12 @@ def install():
 
 
 @manager.command
+def update_commission_values():
+    from commands.update_commission_values import update_commission_values
+    update_commission_values()
+
+
+@manager.command
 def update_role_permissions():
     from app.modules.user import update_role_permissions
     update_role_permissions()
