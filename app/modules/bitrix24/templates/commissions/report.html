@@ -2,6 +2,12 @@
 
 
 {% block content %}
+  <div>
+    <a href="/bitrix24/commissions/?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">
+      Zur Liste
+    </a>
+  </div>
+  <br>
   <div id="content">
     <div class="layout horizontal">
       <div class="reseller flex">Verkäufer {{ reseller.name }}</div>
