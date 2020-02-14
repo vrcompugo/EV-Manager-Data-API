@@ -2,7 +2,7 @@ from sqlalchemy import or_
 
 from app import db
 from app.models import Order
-from app.modules.order.order_services import commission_calulation
+from app.modules.order.order_services import commission_calulation, update_item
 
 from ._progress import printProgressBar
 
@@ -15,7 +15,9 @@ def update_commission_values():
     for order in orders:
         print("id", order.id)
         order = commission_calulation(order)
-        db.session.add(order)
-        db.session.commit()
+        update_item(order.id, {
+            "commission_value_net": order.commission_value_net,
+            "commissions": order.commissions
+        })
         # printProgressBar(i, total, prefix='Progress:', suffix='Complete', length=50)
         i = i + 1
