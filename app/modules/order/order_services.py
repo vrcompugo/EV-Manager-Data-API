@@ -33,7 +33,6 @@ def commission_calulation(order: Order):
     if order.commissions is None:
         return order
     is_external = order.reseller.min_commission is None or float(order.reseller.min_commission) <= 0
-    print(is_external)
     for commission in order.commissions:
         if commission["type"] == "PV":
             commission["provision_rate"] = 0
@@ -43,6 +42,7 @@ def commission_calulation(order: Order):
                 commission["provision_rate"] = 8.5 if is_external else 5
             if commission["discount_range"] == "bis 8%":
                 commission["provision_rate"] = 7.5 if is_external else 4.25
+                print("asd", commission["provision_rate"])
             if commission["discount_range"] == "bis 10%":
                 commission["provision_rate"] = 6.5 if is_external else 3.75
             if commission["discount_range"] == "bis 15%":
@@ -60,4 +60,5 @@ def commission_calulation(order: Order):
                         commission["provision_net"] = commission["provision_net"] + option["value_net"]
         if "provision_net" in commission:
             order.commission_value_net = float(order.commission_value_net) + commission["provision_net"]
+    print(is_external)
     return order
