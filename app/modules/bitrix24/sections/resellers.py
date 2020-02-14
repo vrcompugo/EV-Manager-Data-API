@@ -47,8 +47,7 @@ def register_routes(api: Blueprint):
             return render_template(
                 "resellers/reseller.html",
                 reseller=reseller,
-                auth_info=auth_info,
-                can_edit=can_edit
+                auth_info=auth_info
             )
         return "not found"
 
