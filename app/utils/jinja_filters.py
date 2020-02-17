@@ -46,7 +46,7 @@ def currencyformat(value, format='de', digits=2):
     if value is None:
         return ""
     value = round(float(value), 2)
-    return numberformat(value, format, digits=digits) + u"\N{euro sign}"
+    return numberformat(value, format, digits=digits) + u" \N{euro sign}"
 
 
 def percentformat(value, format='de', digits=0):

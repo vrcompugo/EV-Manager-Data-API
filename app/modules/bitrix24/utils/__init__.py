@@ -18,7 +18,6 @@ def get_bitrix_auth_info(request):
                               "auth": data["auth_code"]
                           })
         response_data = x.json()
-        print(response_data)
         if "result" in response_data:
             data["bitrix_user"] = {}
             for k,v in response_data["result"].items():

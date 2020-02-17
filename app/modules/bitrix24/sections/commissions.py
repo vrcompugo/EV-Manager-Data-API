@@ -7,6 +7,7 @@ from flask import Blueprint, render_template, request, make_response, redirect
 from app import db
 from app.models import Reseller, Lead, Order, Commission
 from app.models import ImportIdAssociation
+from app.modules.order.order_services import update_item as update_order
 
 from ..utils import get_bitrix_auth_info
 
@@ -59,18 +60,32 @@ def register_routes(api: Blueprint):
                 commission.comment_internal = request.form.get("comment_internal")
             if request.form.get("comment_external") is not None:
                 commission.comment_external = request.form.get("comment_external")
+            if request.form.get("comment_external") is not None:
+                commission.comment_external = request.form.get("comment_external")
+            if request.form.getlist("provision_checked_net[]") is not None:
+                for provision_checked_net in request.form.getlist("provision_checked_net[]"):
+                    provision_checked_net = json.loads(provision_checked_net)
+                    if provision_checked_net["value"] != "":
+                        order = db.session.query(Order)\
+                            .filter(Order.id == int(provision_checked_net["id"]))\
+                            .first()
+                        order.commissions[int(provision_checked_net["index"])]["provision_checked_net"] = float(provision_checked_net["value"])
+                        tmp = json.dumps(order.commissions)
+                        update_order(order.id, {"commissions": None})
+                        update_order(order.id, {"commissions": json.loads(tmp)})
+                        print(json.loads(tmp))
             if request.args.get("checked") is not None:
                 order = db.session.query(Order)\
                     .filter(Order.id == int(request.args.get("checked")))\
                     .first()
                 if order is not None:
-                    order.is_checked = True
+                    order.is_checked = not order.is_checked
             if request.args.get("booked") is not None:
                 order = db.session.query(Order)\
                     .filter(Order.id == int(request.args.get("booked")))\
                     .first()
                 if order is not None:
-                    order.is_paid = True
+                    order.is_paid = not order.is_paid
             db.session.commit()
 
         return commission_page(id)

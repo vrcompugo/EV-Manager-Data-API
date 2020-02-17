@@ -2,11 +2,13 @@
 
 
 {% block content %}
-  <div>
-    <a href="/bitrix24/commissions/?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">
-      Zur Liste
-    </a>
-  </div>
+  {% if can_edit -%}
+    <div>
+      <a href="/bitrix24/commissions/?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">
+        Zur Liste
+      </a>
+    </div>
+  {% endif %}
   <br>
   <div id="content">
     <div class="layout horizontal">
@@ -90,10 +92,11 @@
             <th>Optionen</th>
             <th class="right">Provision (%)</th>
             <th class="right">Provision (netto)</th>
+            <th class="right">Provision (geprüft)</th>
           </tr>
         </thead>
         <tbody>
-          {% set totals = {'subtotal': 0.0} %}
+          {% set totals = {'subtotal': 0.0, 'subtotal_checked': 0.0} %}
           {% for lead in won_leads_month -%}
             {% if lead.commissions -%}
               {% for commission in lead.commissions -%}
@@ -117,9 +120,12 @@
                   <td style="white-space: nowrap;">
                     {% if loop.index == 1 -%}
                       {% if lead.is_checked -%}
-                        ist gecheckt
+                        <a href="#" data-id="{{ lead.id }}" class="link_checking">
+                          ist gecheckt
+                        </a>
+                        und
                         {% if lead.is_paid -%}
-                          und gebucht
+                          <a href="#" data-id="{{ lead.id }}" class="link_booking">gebucht</a>
                         {% else %}
                           <a href="#" data-id="{{ lead.id }}" class="link_booking">als gebucht markieren</a>
                         {%- endif %}
@@ -143,13 +149,32 @@
                   </td>
                   <td class="right">{{ commission.provision_rate | percentformat }}</td>
                   <td class="right">{{ commission.provision_net | currencyformat }}</td>
+                  <td class="right" style="white-space: nowrap;">
+                    {% if can_edit and not lead.is_checked -%}
+                      <input
+                        data-id="{{ lead.id }}"
+                        data-index="{{ loop.index - 1 }}"
+                        class="provision_checked_net"
+                        type="number"
+                        step="0.01"
+                        style="max-width: 7em"
+                        value="{{ commission.provision_checked_net }}" /> &euro;
+                    {%- else -%}
+                      {% if commission.provision_checked_net -%}
+                        {{ commission.provision_checked_net | currencyformat }}
+                      {%- else -%}
+                        0,00 &euro;
+                      {%- endif %}
+                    {%- endif %}
+                  </td>
                 </tr>
                 {% if totals.update({"subtotal": totals.subtotal + commission.provision_net}) %} {% endif %}
+                {% if commission.provision_checked_net and totals.update({"subtotal_checked": totals.subtotal_checked + commission.provision_checked_net}) %} {% endif %}
               {%- endfor %}
             {%- endif %}
           {%- endfor %}
           <tr>
-            <td colspan="8">
+            <td colspan="9">
               {% if can_edit -%}
                 <p class="flex">
                   <label for="extra_item"></label>
@@ -171,11 +196,14 @@
           </tr>
           {%- if commission -%}
             {% if totals.update({"subtotal": totals.subtotal + commission.extra_value_net}) %} {% endif %}
+            {% if totals.update({"subtotal_checked": totals.subtotal_checked + commission.extra_value_net}) %} {% endif %}
           {%- endif %}
         </tbody>
         <tfoot>
           {% if totals.update({"tax": totals.subtotal * 0.19}) %} {% endif %}
+          {% if totals.update({"tax_checked": totals.subtotal_checked * 0.19}) %} {% endif %}
           {% if totals.update({"total": totals.subtotal * 1.19}) %} {% endif %}
+          {% if totals.update({"total_checked": totals.subtotal_checked * 1.19}) %} {% endif %}
           {% if reseller.min_commission -%}
             <tr>
               <td class="right" colspan="8">Summe:</td>
@@ -186,19 +214,29 @@
                   {{ totals.subtotal | currencyformat }}
                 {% endif %}
               </td>
+              <td class="right">
+                {% if totals.subtotal_checked < reseller.min_commission %}
+                  {{ reseller.min_commission | currencyformat }}
+                {% else %}
+                  {{ totals.subtotal_checked | currencyformat }}
+                {% endif %}
+              </td>
             </tr>
           {% else %}
             <tr>
               <td class="right" colspan="8">Zwischensumme:</td>
               <td class="right">{{ totals.subtotal | currencyformat }}</td>
+              <td class="right">{{ totals.subtotal_checked | currencyformat }}</td>
             </tr>
             <tr>
               <td class="right" colspan="8">MwSt:</td>
               <td class="right">{{ totals.tax | currencyformat }}</td>
+              <td class="right">{{ totals.tax_checked | currencyformat }}</td>
             </tr>
             <tr>
               <td class="right" colspan="8">Gesamt:</td>
               <td class="right">{{ totals.total | currencyformat }}</td>
+              <td class="right">{{ totals.total_checked | currencyformat }}</td>
             </tr>
           {%- endif %}
         </tfoot>
@@ -208,11 +246,11 @@
         <form method="POST" action="">
           <div class="layout horizontal">
             <p class="flex">
-              <label for="comment_internal">Interner Kommentar</label><br>
+              <label for="comment_internal">Interner Kommentar für Buchhaltung</label><br>
               <textarea id="comment_internal" style="width: 100%" rows="5">{%- if commission -%}{{ commission.comment_internal }}{%- endif -%}</textarea>
             </p>
             <p class="flex">
-              <label for="comment_external">Externer Kommentar</label><br>
+              <label for="comment_external">Externer Kommentar für Verkäufer</label><br>
               <textarea id="comment_external" style="width: 100%" rows="5">{%- if commission -%}{{ commission.comment_external }}{%- endif -%}</textarea>
             </p>
           </div>
@@ -251,6 +289,13 @@
       formData.append('extra_value_net', document.getElementById("extra_value_net").value);
       formData.append('comment_internal', document.getElementById("comment_internal").value);
       formData.append('comment_external', document.getElementById("comment_external").value);
+      inputs = document.querySelectorAll(".provision_checked_net");
+      for(var i=0; i < inputs.length; i++){
+        formData.append(
+          'provision_checked_net[]',
+          JSON.stringify({"id": inputs[i].dataset.id, "index": inputs[i].dataset.index, "value": inputs[i].value})
+        );
+      }
       xhr.send(formData);
     }
 
