@@ -110,7 +110,7 @@ def register_routes(api: Blueprint):
     @api.route("/commissions/<id>", methods=["GET", "POST"])
     def commission_page(id):
         auth_info = get_bitrix_auth_info(request)
-        if auth_info["user"].id in [1, 12, id]:
+        if auth_info["user"].id in [1, 12, id] or auth_info["user"].group_id == 8:
             can_edit = False
             if auth_info["user"].id in [1, 12] or auth_info["user"].group_id == 8:
                 can_edit = True
