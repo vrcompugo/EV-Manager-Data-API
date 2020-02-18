@@ -157,7 +157,7 @@
                         class="provision_checked_net"
                         step="0.01"
                         style="max-width: 8em"
-                        value="{{ commission.provision_checked_net | numberformat }}" /> &euro;
+                        value="{% if commission.provision_checked_net -%}{{ commission.provision_checked_net | numberformat }}{%- endif %}" /> &euro;
                     {%- else -%}
                       {% if commission.provision_checked_net -%}
                         {{ commission.provision_checked_net | currencyformat }}
