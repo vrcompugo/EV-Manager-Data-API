@@ -6,18 +6,16 @@
     <thead>
       <tr>
         <th width="100%">Verkäufer</th>
-        <th>Leads</th>
-        <th>Aufträge Aktueller Monat</th>
-        <th>Provision Lohn</th>
+        <th>Leads diesen Monat</th>
+        <th>Aufträge diesen Monat</th>
       </tr>
     </thead>
     <tbody>
       {% for reseller in resellers -%}
       <tr>
         <td><a href="/bitrix24/commissions/{{ reseller.id }}?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">{{ reseller.name }}</a></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>{{ reseller.provided_leads_month_count }}</td>
+        <td>{{ reseller.won_leads_month }}</td>
       </tr>
       {%- endfor %}
     </tbody>

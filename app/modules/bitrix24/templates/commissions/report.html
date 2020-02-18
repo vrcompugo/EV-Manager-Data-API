@@ -155,10 +155,9 @@
                         data-id="{{ lead.id }}"
                         data-index="{{ loop.index - 1 }}"
                         class="provision_checked_net"
-                        type="number"
                         step="0.01"
                         style="max-width: 8em"
-                        value="{{ commission.provision_checked_net }}" /> &euro;
+                        value="{{ commission.provision_checked_net | numberformat }}" /> &euro;
                     {%- else -%}
                       {% if commission.provision_checked_net -%}
                         {{ commission.provision_checked_net | currencyformat }}
@@ -188,7 +187,7 @@
             </td>
             <td class="right" style="vertical-align: top; white-space: nowrap;">
               {% if can_edit -%}
-                <input type="number" style="text-align: right; max-width: 8em;" step="0.01" id="extra_value_net" value="{%- if commission -%}{{ commission.extra_value_net }}{%- endif -%}" />  €
+                <input style="text-align: right; max-width: 8em;" step="0.01" id="extra_value_net" value="{%- if commission -%}{{ commission.extra_value_net | numberformat }}{%- endif -%}" />  €
               {%- else -%}
                 {%- if commission -%}{{ commission.extra_value_net }}{%- endif -%} €
               {%- endif %}

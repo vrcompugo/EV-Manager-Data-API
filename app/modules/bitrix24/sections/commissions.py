@@ -18,7 +18,20 @@ def register_routes(api: Blueprint):
     def commissions():
         auth_info = get_bitrix_auth_info(request)
         if auth_info["user"].id in [1, 12] or auth_info["user"].group_id == 8:
+            now = datetime.datetime.now()
             resellers = db.session.query(Reseller).order_by(Reseller.name).filter(Reseller.active.is_(True)).all()
+            for reseller in resellers:
+                reseller.provided_leads_month_count = db.session.query(Lead)\
+                    .filter(Lead.reseller_id == reseller.id)\
+                    .filter(Lead.returned_at.is_(None))\
+                    .filter(Lead.datetime >= datetime.date(now.year, now.month, 1))\
+                    .filter(Lead.datetime < datetime.date(now.year, now.month + 1, 1))\
+                    .count()
+                reseller.won_leads_month = db.session.query(Order)\
+                    .filter(Order.reseller_id == reseller.id)\
+                    .filter(Order.datetime >= datetime.date(now.year, now.month, 1))\
+                    .filter(Order.datetime < datetime.date(now.year, now.month + 1, 1))\
+                    .count()
             return render_template("commissions/list.html", resellers=resellers, auth_info=auth_info)
         else:
             return commission_page(auth_info["user"].id)
@@ -55,7 +68,7 @@ def register_routes(api: Blueprint):
             if request.form.get("extra_item") is not None:
                 commission.extra_item = request.form.get("extra_item")
             if request.form.get("extra_value_net") is not None:
-                commission.extra_value_net = float(request.form.get("extra_value_net"))
+                commission.extra_value_net = float(request.form.get("extra_value_net").replace(".", "").replace(",", "."))
             if request.form.get("comment_internal") is not None:
                 commission.comment_internal = request.form.get("comment_internal")
             if request.form.get("comment_external") is not None:
@@ -123,14 +136,14 @@ def register_routes(api: Blueprint):
             provided_leads_year_count = db.session.query(Lead)\
                 .filter(Lead.reseller_id == reseller.id)\
                 .filter(Lead.returned_at.is_(None))\
-                .filter(Lead.counted_at >= datetime.date(base_date.year, 1, 1))\
-                .filter(Lead.counted_at <= datetime.date(base_date.year, 12, 31))\
+                .filter(Lead.datetime >= datetime.date(base_date.year, 1, 1))\
+                .filter(Lead.datetime <= datetime.date(base_date.year, 12, 31))\
                 .count()
             provided_leads_month_count = db.session.query(Lead)\
                 .filter(Lead.reseller_id == reseller.id)\
                 .filter(Lead.returned_at.is_(None))\
-                .filter(Lead.counted_at >= datetime.date(base_date.year, base_date.month, 1))\
-                .filter(Lead.counted_at < datetime.date(base_date.year, base_date.month + 1, 1))\
+                .filter(Lead.datetime >= datetime.date(base_date.year, base_date.month, 1))\
+                .filter(Lead.datetime < datetime.date(base_date.year, base_date.month + 1, 1))\
                 .count()
             won_leads_year_count = db.session.query(Order)\
                 .filter(Order.reseller_id == reseller.id)\
