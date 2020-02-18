@@ -17,7 +17,7 @@
         <td><a href="/bitrix24/commissions/{{ reseller.id }}?AUTH_ID={{ auth_info.auth_code }}&DOMAIN={{ auth_info.domain_raw }}">{{ reseller.name }}</a></td>
         <td>
           {% if reseller.provided_leads_month_count > 0 -%}
-            {{ (reseller.won_leads_month / reseller.provided_leads_month_count) * 100 | percentformat }}
+            {{ (reseller.won_leads_month / reseller.provided_leads_month_count) * 100.0 | percentformat }}
           {% else %}
             {{ 0 | percentformat }}
           {% endif %}
