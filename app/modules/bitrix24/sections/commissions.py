@@ -32,7 +32,10 @@ def register_routes(api: Blueprint):
                     .filter(Order.datetime >= datetime.date(now.year, now.month, 1))\
                     .filter(Order.datetime < datetime.date(now.year, now.month + 1, 1))\
                     .count()
-                reseller.win_rate = (float(reseller.won_leads_month) / float(reseller.provided_leads_month_count)) * 100.0
+                if reseller.provided_leads_month_count > 0:
+                    reseller.win_rate = (float(reseller.won_leads_month) / float(reseller.provided_leads_month_count)) * 100.0
+                else:
+                    reseller.win_rate = 0
             return render_template("commissions/list.html", resellers=resellers, auth_info=auth_info)
         else:
             return commission_page(auth_info["user"].id)
