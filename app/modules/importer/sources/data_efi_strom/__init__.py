@@ -39,6 +39,19 @@ def run_import_by_model(model, remote_id=None, local_id=None):
         if lead is not None:
             run_export(local_id=lead.id)
 
+    if model is not None and model == "customer_number":
+        from .lead import run_export
+        from app.models import Customer, Lead
+        print("customer_number export", local_id)
+        customer = Customer.query.filter(Customer.customer_number == str(local_id)).first()
+        if customer is None:
+            print("no customer found")
+            return
+        lead = Lead.query.filter(Lead.customer_id == customer.id).first()
+        print("found lead", lead)
+        if lead is not None:
+            run_export(local_id=lead.id)
+
 
 def run_export_by_model(model, remote_id=None, local_id=None):
 
