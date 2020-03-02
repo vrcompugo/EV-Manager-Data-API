@@ -82,7 +82,7 @@ def convert_field_euro_from_remote(field, data):
     if data[field] is None or data[field] == "":
         return 0
     value = str(data[field])
-    if value.index("|") <= 0:
+    if value.find("|") < 0:
         print("wrong format error: ", value)
         return 0
-    return float(value[:value.index("|")])
+    return float(value[:value.find("|")])
