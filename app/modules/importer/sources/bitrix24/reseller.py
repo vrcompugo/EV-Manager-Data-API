@@ -49,7 +49,7 @@ def filter_import_data(item_data):
         "group_id": group_id,
         "bitrix_department": ", ".join(bitrix_department),
         "email": item_data["EMAIL"],
-        "name": item_data["NAME"] + " " + item_data["LAST_NAME"],
+        "name": str(item_data["NAME"]) + " " + str(item_data["LAST_NAME"]),
         "phone": item_data["WORK_PHONE"],
         "active": item_data["ACTIVE"]
     }
