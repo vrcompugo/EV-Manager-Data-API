@@ -19,7 +19,7 @@ def filter_export_input(lead):
         del customer_address["customer_id"]
     data = {
         "kez_id": None,
-        "customer_number": None,
+        "customer_number": lead.customer.customer_number,
         "lead_number": lead.number,
         "salutation": lead.customer.salutation,
         "title": lead.customer.title,
