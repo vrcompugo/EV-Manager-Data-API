@@ -20,7 +20,7 @@ def post(url, post_data=None, files=None):
         response = requests.post(base_url + url, data=post_data)
         try:
             data = response.json()
-            if "error" in response and response["error"] == "QUERY_LIMIT_EXCEEDED":
+            if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
                 time.sleep(10)
                 return post(url, post_data, files)
             return data
