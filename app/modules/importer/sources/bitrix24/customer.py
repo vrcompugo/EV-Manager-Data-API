@@ -73,7 +73,8 @@ def filter_export_data(customer: Customer):
         "email": customer.email,
         "phone": customer.phone
     }
-
+    if customer.customer_number is not None and customer.customer_number != "":
+        data["fields[UF_CRM_1572949928]"] = customer.customer_number
     if customer.default_address is not None:
         data["fields[UF_CRM_1572950758]"] = customer.default_address.street
         data["fields[UF_CRM_1572950777]"] = customer.default_address.street_nb
