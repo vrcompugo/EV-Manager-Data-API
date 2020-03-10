@@ -10,15 +10,22 @@ from ._progress import printProgressBar
 def bitrix_export_all_customer():
     customers = db.session.query(Customer).all()
     total = len(customers)
-    printProgressBar(0, total, prefix='Progress:', suffix='Complete', length=50)
+    # printProgressBar(0, total, prefix='Progress:', suffix='Complete', length=50)
     i = 0
     for customer in customers:
         link = find_association("Customer", local_id=customer.id)
         if link is not None:
             if customer.customer_number is not None and customer.customer_number != "":
-                response = post("crm.contact.update", post_data={
+                response = post("crm.contact.get", post_data={
                     "id": link.remote_id,
                     "fields[UF_CRM_1572949928]": customer.customer_number
                 })
+                if "result" in response:
+                    if response["result"]["UF_CRM_1572949928"] != customer.customer_number:
+                        print("customer: ", customer.id)
+                        print(customer.customer_number, "!=", response["result"]["UF_CRM_1572949928"])
+                else:
+                    print("customer: ", customer.id)
+                    print(customer.customer_number, "!=", "nothing")
         i = i + 1
-        printProgressBar(i, total, prefix='Progress:', suffix='Complete', length=50)
+        # printProgressBar(i, total, prefix='Progress:', suffix='Complete', length=50)
