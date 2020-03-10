@@ -26,6 +26,10 @@ def bitrix_export_all_customer():
                     if response["result"]["UF_CRM_1572949928"] != customer.customer_number:
                         print("customer: ", customer.id)
                         print(customer.customer_number, "!=", response["result"]["UF_CRM_1572949928"])
+                        response = post("crm.contact.update", post_data={
+                            "id": link.remote_id,
+                            "fields[UF_CRM_1572949928]": customer.customer_number
+                        })
                 else:
                     print("customer: ", customer.id)
                     print(response)
