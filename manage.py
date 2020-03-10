@@ -42,6 +42,12 @@ def update_commission_values():
 
 
 @manager.command
+def bitrix_export_all_customer_number():
+    from commands.bitrix_export_all_customer import bitrix_export_all_customer
+    bitrix_export_all_customer()
+
+
+@manager.command
 def update_role_permissions():
     from app.modules.user import update_role_permissions
     update_role_permissions()
