@@ -1,3 +1,4 @@
+import time
 from sqlalchemy import and_
 
 from app import db
@@ -20,12 +21,14 @@ def bitrix_export_all_customer():
                     "id": link.remote_id,
                     "fields[UF_CRM_1572949928]": customer.customer_number
                 })
+                time.sleep(0.5)
                 if "result" in response:
                     if response["result"]["UF_CRM_1572949928"] != customer.customer_number:
                         print("customer: ", customer.id)
                         print(customer.customer_number, "!=", response["result"]["UF_CRM_1572949928"])
                 else:
                     print("customer: ", customer.id)
+                    print(response)
                     print(customer.customer_number, "!=", "nothing")
         i = i + 1
         # printProgressBar(i, total, prefix='Progress:', suffix='Complete', length=50)
