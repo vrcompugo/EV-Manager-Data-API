@@ -34,10 +34,13 @@ def get(url, parameters=None):
     base_url = authenticate()
 
     if base_url is not None:
-        response = requests.get(base_url + url,
-                            )
+        response = requests.get(base_url + url, params=parameters)
         try:
-            return response.json()
-        except:
+            data = response.json()
+            if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
+                time.sleep(10)
+                return get(url, parameters)
+            return data
+        except Exception as e:
             print(response.text)
     return {}

@@ -44,15 +44,15 @@ def customer_data(id, data):
 def filter_import_data(item_data):
     if "responsibleId" not in item_data:
         print("no user")
-        return {}
+        return None
     user_link = find_association("User", remote_id=item_data["responsibleId"])
     if user_link is None:
         print("no user")
-        return {}
+        return None
     user = User.query.filter(User.id == user_link.local_id).first()
     if user is None:
         print("no user")
-        return {}
+        return None
 
     members = [user]
     if "accomplices" in item_data:
