@@ -39,6 +39,10 @@ def filter_import_data(item_data):
         role_id = 14
     if "Elektrik Abteilung" in bitrix_department:
         role_id = 14
+    if "Leiter Einkauf" in bitrix_department:
+        role_id = 11
+    if "Wärme & Wasser (KEZ)" in bitrix_department:
+        role_id = 10
 
     if role_id is None:
         return None
