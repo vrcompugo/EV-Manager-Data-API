@@ -1,24 +1,19 @@
-from sqlalchemy.ext.hybrid import hybrid_property
+from app import db
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
-
-from app import db
-
-association_table = db.Table(
-    'task_member_association',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('task_id', db.Integer, db.ForeignKey('task.id'))
-)
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
-class Task(db.Model):
-    __tablename__ = "task"
+class CalendarEvent(db.Model):
+    __versioned__ = {}
+    __tablename__ = "calendar_event"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     customer_id = db.Column(db.Integer(), db.ForeignKey('customer.id'))
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
     reseller_id = db.Column(db.Integer(), db.ForeignKey('reseller.id'))
     order_id = db.Column(db.Integer(), db.ForeignKey('order.id'))
+    task_id = db.Column(db.Integer(), db.ForeignKey('task.id'))
     salutation = db.Column(db.String(30))
     title = db.Column(db.String(30))
     firstname = db.Column(db.String(100))
@@ -39,7 +34,6 @@ class Task(db.Model):
     end = db.Column(db.DateTime())
     comment = db.Column(db.Text())
     status = db.Column(db.String(30))
-    members = db.relationship("User", secondary=association_table)
 
     @hybrid_property
     def location(self):
@@ -54,45 +48,10 @@ class Task(db.Model):
             data.append(self.city)
         return " ".join(data)
 
-    @hybrid_property
-    def search_query(self):
-        return db.session.query(Task)
 
-    @hybrid_property
-    def lead_number(self):
-        if self.customer is not None:
-            return self.customer.lead_number
-        return None
+class CalendarEventSchema(ModelSchema):
 
-    @hybrid_property
-    def customer_number(self):
-        if self.customer is not None:
-            return self.customer.customer_number
-        return None
-
-    @hybrid_property
-    def project_number(self):
-        if self.project is not None:
-            return self.project.number
-        return None
-
-    @hybrid_property
-    def contract_number(self):
-        if self.contract is not None:
-            return self.contract.number
-        return None
-
-
-class TaskSchema(ModelSchema):
-
-    lead_number = fields.String()
-    customer_number = fields.String()
-    project_number = fields.String()
-    contract_number = fields.String()
-    customer = fields.Nested("CustomerSchema")
-    role = fields.Nested("UserRoleShortSchema")
-    survey = fields.Nested("SurveySchema")
     versions = fields.Constant([])
 
     class Meta:
-        model = Task
+        model = CalendarEvent

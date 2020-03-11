@@ -42,9 +42,9 @@ def update_commission_values():
 
 
 @manager.command
-def bitrix_export_all_customer_number():
-    from commands.bitrix_export_all_customer import bitrix_export_all_customer
-    bitrix_export_all_customer()
+def cron_import_tasks():
+    from commands.cron_import_tasks import cron_import_tasks
+    cron_import_tasks()
 
 
 @manager.command

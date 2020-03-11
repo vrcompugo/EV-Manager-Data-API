@@ -31,9 +31,10 @@ def add_item(data):
 def update_item(id, data):
     user = db.session.query(User).get(id)
     if user is not None:
-        user.email=data['email']
-        user.username=data['username']
-        user.password=data['password']
+        user.email = data['email']
+        user.username = data['username']
+        if "password" in data:
+            user.password = data['password']
         roles = []
         for role_id in data["roles"]:
             role = db.session.query(UserRole).get(role_id)
@@ -49,7 +50,7 @@ def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(User, UserSchema, tree, sort, offset, limit, fields)
 
 
-def get_one_item(id, fields = None):
+def get_one_item(id, fields=None):
     data = get_one_item_by_model(User, UserSchema, id, fields, [db.subqueryload("roles")])
     del data["password_hash"]
     return data

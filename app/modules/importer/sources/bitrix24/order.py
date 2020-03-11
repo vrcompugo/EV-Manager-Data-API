@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta
 
 from app import db
-from app.models import Lead, Reseller
+from app.models import Lead, Reseller, Customer
 from app.utils.error_handler import error_handler
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 from app.modules.order.order_services import commission_calulation, add_item, update_item
@@ -16,8 +16,34 @@ from ._field_values import convert_field_value_from_remote, convert_field_value_
 
 pp = pprint.PrettyPrinter()
 
+CATEGORY_TYPES = {
+    "FastUmsatzdarstellung": "salesstats",
+    "Verbau Photovoltaik": "pv_construction",
+    "Verbau Heizung": "heating_construction",
+    "Verbau BWWP": "pv_construction",
+    "Verbau Dachsanierung": "roof_construction",
+    "Verbau Dach/PV": "pv_roof_construction",
+    "Verbau Elektrik": "electric_construction"
+}
+
 
 def filter_import_input(item_data):
+    response = post("crm.dealcategory.get", {"ID": item_data["CATEGORY_ID"]})
+    category = ""
+    if "result" in response and "NAME" in response["result"]:
+        category = response["result"]["NAME"]
+    order_type = ""
+    if category in CATEGORY_TYPES:
+        order_type = CATEGORY_TYPES[category]
+
+    street = item_data["UF_CRM_1572962429"] if "UF_CRM_1572962429" in item_data else None
+    street = street if street != "siehe Kundenanschrift" else None
+    street_nb = item_data["UF_CRM_1572962442"] if "UF_CRM_1572962442" in item_data else None
+    street_nb = street_nb if street_nb != "siehe Kundenanschrift" else None
+    zip_code = item_data["UF_CRM_1572962458"] if "UF_CRM_1572962458" in item_data else None
+    zip_code = zip_code if zip_code != "siehe Kundenanschrift" else None
+    city = item_data["UF_CRM_1572962413"] if "UF_CRM_1572962413" in item_data else None
+    city = city if city != "siehe Kundenanschrift" else None
     data = {
         "datetime": item_data["DATE_CREATE"],
         "customer_id": None,
@@ -25,17 +51,33 @@ def filter_import_input(item_data):
         "last_update": item_data["DATE_MODIFY"],
         "contact_source": convert_field_value_from_remote("SOURCE_ID", item_data),
         "status": "won",
+        "type": order_type,
+        "category": category,
+        "street": street,
+        "street_nb": street_nb,
+        "zip": zip_code,
+        "city": city,
         "commissions": None,
         "commission_value_net": 0
     }
+
     if item_data["LEAD_ID"] is not None:
         link = find_association("Lead", remote_id=item_data["LEAD_ID"])
         if link is not None:
             data["lead_id"] = link.local_id
     if item_data["CONTACT_ID"] is not None:
+        print(item_data["CONTACT_ID"])
         link = find_association("Customer", remote_id=item_data["CONTACT_ID"])
         if link is not None:
             data["customer_id"] = link.local_id
+            customer = Customer.query.filter(Customer.id == link.local_id).first()
+            if customer is not None and customer.default_address is not None:
+                if data["street"] is None:
+                    data["street"] = customer.default_address.street
+                    data["street_nb"] = customer.default_address.street_nb
+                if data["zip"] is None:
+                    data["zip"] = customer.default_address.zip
+                    data["city"] = customer.default_address.city
     if item_data["ASSIGNED_BY_ID"] is not None:
         link = find_association("Reseller", remote_id=item_data["ASSIGNED_BY_ID"])
         if link is not None:
@@ -44,27 +86,29 @@ def filter_import_input(item_data):
     discount_range = convert_field_value_from_remote("UF_CRM_5DF8B0188EF78", item_data)
     seperate_offer = convert_field_value_from_remote("UF_CRM_5DF8B018DA5E6", item_data)
     payment_type = convert_field_value_from_remote("UF_CRM_5DF8B018E971A", item_data)
-    pv_commission = {
-        "type": "PV",
-        "value_net": value_pv,
-        "discount_range": discount_range,
-        "options": [],
-        "provision_rate": None,
-        "provision_net": None,
-        "payment_type": payment_type
-    }
-    if seperate_offer == "Wärmepumpe (ecoStar) verkauft":
-        pv_commission["options"].append({
-            "key": "Wärmepumpe (ecoStar)",
-            "value_net": None
-        })
-    data["commissions"] = [
-        pv_commission
-    ]
+    if data["type"] == "salesstats":
+        pv_commission = {
+            "type": "PV",
+            "value_net": value_pv,
+            "discount_range": discount_range,
+            "options": [],
+            "provision_rate": None,
+            "provision_net": None,
+            "payment_type": payment_type
+        }
+        if seperate_offer == "Wärmepumpe (ecoStar) verkauft":
+            pv_commission["options"].append({
+                "key": "Wärmepumpe (ecoStar)",
+                "value_net": None
+            })
+        data["commissions"] = [
+            pv_commission
+        ]
     return data
 
 
 def run_import(local_id=None, remote_id=None):
+    print("order ", remote_id)
     if local_id is not None:
         link = find_association("Order", local_id=local_id)
         if link is not None:
@@ -83,7 +127,7 @@ def run_import(local_id=None, remote_id=None):
             print("new order", deal["ID"])
             order = add_item(data)
             associate_item("Order", local_id=order.id, remote_id=deal["ID"])
-            if order.reseller_id is not None and order.reseller_id > 0:
+            if order.type == "salesstats" and order.reseller_id is not None and order.reseller_id > 0:
                 reseller = db.session.query(Reseller).filter(Reseller.id == order.reseller_id).first()
                 if reseller is not None:
                     if reseller.lead_balance is None:
@@ -94,7 +138,7 @@ def run_import(local_id=None, remote_id=None):
         else:
             print("update order", deal["ID"])
             order = update_item(link.local_id, data)
-        if order is not None:
+        if order is not None and order.type == "salesstats":
             order = commission_calulation(order)
             if order is not None:
                 commissions = json.loads(json.dumps(order.commissions))
@@ -105,7 +149,8 @@ def run_import(local_id=None, remote_id=None):
                 update_item(order.id, {
                     "commissions": commissions
                 })
-        return
+                return order
+        return None
     else:
         pp.pprint(response)
     return None

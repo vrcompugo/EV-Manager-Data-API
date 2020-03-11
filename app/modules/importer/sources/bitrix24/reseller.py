@@ -79,6 +79,7 @@ def run_import():
                 if user_data is not None:
                     print("bitrix reseller import", user_data["email"])
                     link = find_association("Reseller", user["ID"])
+                    link2 = find_association("User", user["ID"])
                     if link is not None:
                         reseller = Reseller.query.filter(Reseller.id == link.local_id).first()
                     else:
@@ -87,8 +88,11 @@ def run_import():
                         reseller = update_item(reseller.id, user_data)
                     else:
                         reseller = add_item(user_data)
-                    if link is None and reseller is not None:
-                        associate_item("Reseller", remote_id=user["ID"], local_id=reseller.id)
+                    if reseller is not None:
+                        if link is None:
+                            associate_item("Reseller", remote_id=user["ID"], local_id=reseller.id)
+                        if link2 is None:
+                            associate_item("User", remote_id=user["ID"], local_id=reseller.user_id)
 
 
 def run_export(remote_id=None, local_id=None):

@@ -8,10 +8,11 @@ from app.modules.lead.models import *
 from app.modules.offer.models import *
 from app.modules.contract.models import *
 from app.modules.pv_system.models import *
-from app.modules.task.models import *
+from app.modules.task.models import Task
 from app.modules.importer.models import *
 from app.modules.file.models import *
 from app.modules.settings.models import *
 from app.modules.email.models import *
 from app.modules.order.models.order import Order, OrderSchema
 from app.modules.commission.models.commission import Commission, CommissionSchema
+from app.modules.calendar.models.calendar_event import CalendarEvent, CalendarEventSchema

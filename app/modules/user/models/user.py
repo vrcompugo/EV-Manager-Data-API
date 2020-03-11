@@ -5,7 +5,8 @@ from marshmallow import Schema, fields
 from .user_role import UserRoleSchema
 
 
-association_table = db.Table('user_role_association',
+association_table = db.Table(
+    'user_role_association',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('user_role_id', db.Integer, db.ForeignKey('user_role.id'))
 )
@@ -17,9 +18,12 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
+    name = db.Column(db.String(150))
     registered_on = db.Column(db.DateTime, nullable=False)
     username = db.Column(db.String(50), unique=True)
     password_hash = db.Column(db.String(100))
+    bitrix_department = db.Column(db.String(100))
+    active = db.Column(db.Boolean)
     roles = db.relationship("UserRole", secondary=association_table, backref="users")
 
     @property
@@ -35,9 +39,6 @@ class User(db.Model):
 
     def __repr__(self):
         return "<User '{}'>".format(self.username)
-
-
-
 
 
 class UserSchema(ModelSchema):
