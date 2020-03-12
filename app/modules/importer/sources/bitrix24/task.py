@@ -19,7 +19,7 @@ def convert_datetime(raw):
     if raw.find("+") > 0:
         raw = raw[:raw.find("+")] + raw[raw.find("+"):].replace(":", "")
     if raw.find(":") > 0:
-        return str(datetime.datetime.strptime(raw, "%Y-%m-%d %H:%M:%S%z"))
+        return datetime.datetime.strptime(raw, "%Y-%m-%d %H:%M:%S%z")
     return datetime.datetime.strptime(raw, "%Y-%m-%d")
 
 
