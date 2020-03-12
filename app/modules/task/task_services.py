@@ -20,10 +20,10 @@ def add_item(data):
         if location is not None and "lat" in location:
             new_item.lat = location["lat"]
             new_item.lng = location["lng"]
-        route = route_to_address(item.location)
+        route = route_to_address(new_item.location)
         if route is not None:
-            item.distance_km = route["distance"]
-            item.travel_time_minutes = route["duration"]
+            new_item.distance_km = route["distance"]
+            new_item.travel_time_minutes = route["duration"]
     db.session.add(new_item)
     db.session.commit()
     update_calender_events(new_item)
