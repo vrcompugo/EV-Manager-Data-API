@@ -80,6 +80,8 @@ def filter_import_data(item_data):
     }
     if data["begin"] == data["end"] and data["end"] is not None:
         data["end"] = datetime.datetime(data["end"].year, data["end"].month, data["end"].day, 23, 59, 59)
+    if data["begin"] is not None and data["end"] is None:
+        data["end"] = data["begin"] + datetime.timedelta(minutes=15)
 
     reseller = Reseller.query.filter(Reseller.user_id == user.id).first()
     if reseller is not None:
