@@ -34,6 +34,7 @@ def route_to_address(address):
             'destination': address
         })
     results = r.json()
+    print(results)
     if 'routes' in results and len(results["routes"]) > 0:
         route = {"distance": 0, "duration": 0}
         for leg in results["routes"][0]["legs"]:
