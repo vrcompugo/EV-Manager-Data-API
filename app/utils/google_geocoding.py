@@ -11,7 +11,7 @@ def geocode_address(address):
     location = None
 
     r = requests.get(
-        f'https://maps.googleapis.com/maps/api/geocode/json?key=' + config["data"]["key"],
+        'https://maps.googleapis.com/maps/api/geocode/json?key=' + config["data"]["key"],
         params={
             'sensor': 'false',
             'address': address
@@ -28,13 +28,12 @@ def route_to_address(address):
     route = None
 
     r = requests.get(
-        f'https://maps.googleapis.com/maps/api/directions/json?key=' + config["data"]["key"],
+        'https://maps.googleapis.com/maps/api/directions/json?key=' + config["data"]["key"],
         params={
             'origin': config["data"]["home_address"],
             'destination': address
         })
     results = r.json()
-    print(results)
     if 'routes' in results and len(results["routes"]) > 0:
         route = {"distance": 0, "duration": 0}
         for leg in results["routes"][0]["legs"]:

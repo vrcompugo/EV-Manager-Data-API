@@ -11,7 +11,7 @@ from .models.task import Task, TaskSchema
 
 
 def add_item(data):
-    from app.utils.google_geocoding import geocode_address
+    from app.utils.google_geocoding import geocode_address, route_to_address
 
     new_item = Task()
     new_item = set_attr_by_dict(new_item, data, ["id"])
@@ -20,6 +20,10 @@ def add_item(data):
         if location is not None and "lat" in location:
             new_item.lat = location["lat"]
             new_item.lng = location["lng"]
+        route = route_to_address(item.location)
+        if route is not None:
+            item.distance_km = route["distance"]
+            item.travel_time_minutes = route["duration"]
     db.session.add(new_item)
     db.session.commit()
     update_calender_events(new_item)
@@ -38,6 +42,7 @@ def update_item(id, data):
             if location is not None and "lat" in location:
                 item.lat = location["lat"]
                 item.lng = location["lng"]
+        if item.distance_km is None and item.location is not None and item.location != "":
             route = route_to_address(item.location)
             if route is not None:
                 item.distance_km = route["distance"]
