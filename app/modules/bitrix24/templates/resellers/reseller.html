@@ -10,7 +10,7 @@
     <div class="layout horizontal wrap">
       <p style="margin-right: 1em;">
         <label for="sales_center">Zentrum</label><br>
-        {% if reseller.lead_balance -%}
+        {% if reseller.sales_center -%}
           <input type="text" id="sales_center" name="sales_center" value="{{ reseller.sales_center }}">
         {%- else -%}
           <input type="text" id="sales_center" name="sales_center" value="">
