@@ -17,9 +17,9 @@ def convert_datetime(raw):
         return None
     raw = raw.replace("T", " ")
     if raw.find("+") > 0:
-        raw = raw[:raw.find("+")] + raw[raw.find("+"):].replace(":", "")
+        raw = raw[:raw.find("+")]
     if raw.find(":") > 0:
-        return datetime.datetime.strptime(raw, "%Y-%m-%d %H:%M:%S%z")
+        return datetime.datetime.strptime(raw, "%Y-%m-%d %H:%M:%S")
     return datetime.datetime.strptime(raw, "%Y-%m-%d")
 
 
@@ -99,6 +99,7 @@ def filter_import_data(item_data):
                     data["order_id"] = order_link.local_id
                     order = Order.query.filter(Order.id == order_link.local_id).first()
                     if order is not None:
+                        data["type"] = order.type
                         data = customer_data(order.customer_id, data)
                         data["street"] = order.street
                         data["street_nb"] = order.street_nb
@@ -150,7 +151,7 @@ def run_cron_import():
         "ORDER[CHANGED_DATE]": "ASC"
     }
     if config is not None and "data" in config and "last_task_import" in config["data"]:
-        post_data["FILTER[>CHANGED_DATE]"] = config["data"]["last_task_import"]
+        post_data["filter[>CHANGED_DATE]"] = config["data"]["last_task_import"]
 
     response = {"next": 0}
     while "next" in response:
@@ -163,7 +164,7 @@ def run_cron_import():
                 except Exception as e:
                     error_handler()
 
-        config = get_config_item("importer/bitrix24")
-        if config is not None and "data" in config:
-            config["data"]["last_task_import"] = str(datetime.datetime.now())
-        update_config_item("importer/bitrix24", config)
+    config = get_config_item("importer/bitrix24")
+    if config is not None and "data" in config:
+        config["data"]["last_task_import"] = str(datetime.datetime.now())
+    update_config_item("importer/bitrix24", config)

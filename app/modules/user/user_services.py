@@ -33,6 +33,7 @@ def update_item(id, data):
     if user is not None:
         user.email = data['email']
         user.username = data['username']
+        user = set_attr_by_dict(user, data, ["id", "registered_on", "password", "roles"])
         if "password" in data:
             user.password = data['password']
         roles = []

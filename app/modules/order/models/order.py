@@ -55,6 +55,8 @@ class Order(db.Model):
 class OrderSchema(ModelSchema):
 
     versions = fields.Constant([])
+    value_net = fields.Float()
+    commission_value_net = fields.Float()
 
     class Meta:
         model = Order

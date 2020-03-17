@@ -4,6 +4,7 @@ from flask import Blueprint, Response, url_for
 from flask_httpauth import HTTPBasicAuth
 
 from app.modules.auth.auth_routes import api as auth_ns
+from app.modules.calendar.calendar_routes import api as calendar_ns
 from app.modules.contract.contract_routes import api as contract_ns
 from app.modules.customer.routes import api as customer_ns
 from app.modules.file.file_routes import api as file_ns
@@ -75,6 +76,7 @@ def version_number():
 
 api.add_namespace(user_ns, path='/users')
 api.add_namespace(user_role_ns, path='/user_roles')
+api.add_namespace(calendar_ns, path='/calendar')
 api.add_namespace(customer_ns, path='/customers')
 api.add_namespace(reseller_ns, path='/resellers')
 api.add_namespace(reseller_group_ns, path='/reseller_groups')

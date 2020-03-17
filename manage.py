@@ -42,6 +42,12 @@ def update_commission_values():
 
 
 @manager.command
+def reimport_orders():
+    from commands.reimport_orders import reimport_orders
+    reimport_orders()
+
+
+@manager.command
 def cron_import_tasks():
     from commands.cron_import_tasks import cron_import_tasks
     cron_import_tasks()

@@ -18,7 +18,7 @@ def filter_import_data(item_data):
         time.sleep(0.3)
         if "result" in department and len(department["result"]) > 0:
             bitrix_department.append(department["result"][0]["NAME"])
-    role_id = None
+    role_id = 3
     if "Innendienst" in bitrix_department:
         role_id = 5
     if "Front Sales" in bitrix_department:
@@ -28,6 +28,8 @@ def filter_import_data(item_data):
     if "Montage" in bitrix_department:
         role_id = 10
     if "Montage II (Dach&PV)" in bitrix_department:
+        role_id = 10
+    if "Montage III (PV)" in bitrix_department:
         role_id = 10
     if "Montage Team III" in bitrix_department:
         role_id = 10
@@ -44,18 +46,18 @@ def filter_import_data(item_data):
     if "Wärme & Wasser (KEZ)" in bitrix_department:
         role_id = 10
 
-    if role_id is None:
-        return None
     if item_data["EMAIL"] is None or item_data["EMAIL"].strip() == "":
         return None
     data = {
-        "roles": [role_id],
+        "roles": [],
         "bitrix_department": ", ".join(bitrix_department),
         "email": item_data["EMAIL"],
         "username": item_data["EMAIL"],
         "name": str(item_data["NAME"]) + " " + str(item_data["LAST_NAME"]),
         "active": item_data["ACTIVE"]
     }
+    if role_id is not None:
+        data["roles"] = [role_id]
     return data
 
 

@@ -1,7 +1,14 @@
 from app import db
 from marshmallow_sqlalchemy import ModelSchema
+from marshmallow_sqlalchemy.fields import Nested
 from marshmallow import fields
 from sqlalchemy.ext.hybrid import hybrid_property
+
+from app.modules.task.models.task import TaskSchema
+from app.modules.reseller.models.reseller import ResellerSchema
+from app.modules.user.models.user import UserSchema
+from app.modules.order.models.order import OrderSchema
+from app.modules.customer.models.customer import CustomerSchema
 
 
 class CalendarEvent(db.Model):
@@ -10,10 +17,16 @@ class CalendarEvent(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     customer_id = db.Column(db.Integer(), db.ForeignKey('customer.id'))
+    customer = db.relationship("Customer")
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    user = db.relationship("User")
     reseller_id = db.Column(db.Integer(), db.ForeignKey('reseller.id'))
+    reseller = db.relationship("Reseller")
     order_id = db.Column(db.Integer(), db.ForeignKey('order.id'))
+    order = db.relationship("Order")
     task_id = db.Column(db.Integer(), db.ForeignKey('task.id'))
+    task = db.relationship("Task")
+    label = db.Column(db.String(250))
     salutation = db.Column(db.String(30))
     title = db.Column(db.String(30))
     firstname = db.Column(db.String(100))
@@ -30,6 +43,7 @@ class CalendarEvent(db.Model):
     distance_km = db.Column(db.Integer())
     travel_time_minutes = db.Column(db.Integer())
     type = db.Column(db.String(40))
+    deadline = db.Column(db.DateTime())
     begin = db.Column(db.DateTime())
     end = db.Column(db.DateTime())
     comment = db.Column(db.Text())
@@ -52,6 +66,15 @@ class CalendarEvent(db.Model):
 class CalendarEventSchema(ModelSchema):
 
     versions = fields.Constant([])
+    customer_id = fields.Integer()
+    user_id = fields.Integer()
+    reseller_id = fields.Integer()
+    task_id = fields.Integer()
+    order_id = fields.Integer()
+    customer = Nested(CustomerSchema, many=False)
+    task = Nested(TaskSchema, many=False)
+    reseller = Nested(ResellerSchema, many=False)
+    order = Nested(OrderSchema, many=False)
 
     class Meta:
         model = CalendarEvent
