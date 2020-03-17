@@ -42,9 +42,11 @@ def update_item(id, data):
         if "sales_center" in data and data["sales_center"] is not None and data["sales_center"] != item.sales_center:
             location = geocode_address(data["sales_center"])
             if location is not None:
+                print("loc", location)
                 data["sales_lat"] = location["lat"]
                 data["sales_lng"] = location["lng"]
         item = set_attr_by_dict(item, data, ["id"])
+        print(item.sales_center, item.__dict__)
         db.session.commit()
         return item
     else:
