@@ -7,12 +7,12 @@ from app.modules.user.user_services import add_item as add_user_item
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
-from app.utils.google_geocoding import geocode_address
 
 from ..models.reseller import Reseller, ResellerSchema
 
 
 def add_item(data):
+    from app.utils.google_geocoding import geocode_address
     sales_role = db.session.query(UserRole).filter(UserRole.code == "sales").one()
     user = User.query.filter(or_(User.username == data["email"], User.email == data["email"])).first()
     if user is None:
@@ -36,6 +36,7 @@ def add_item(data):
 
 
 def update_item(id, data):
+    from app.utils.google_geocoding import geocode_address
     item = db.session.query(Reseller).get(id)
     if item is not None:
         if "sales_center" in data and data["sales_center"] is not None and data["sales_center"] != item.sales_center:
