@@ -42,9 +42,10 @@ def register_routes(api: Blueprint):
                 data["min_commission"] = float(request.form.get("min_commission"))
             if "lead_year_target" in request.form:
                 data["lead_year_target"] = int(request.form.get("lead_year_target"))
-            print(data)
+            print(reseller.__dict__)
             if len(data) > 0:
-                update_item(reseller.id, data)
+                reseller = update_item(reseller.id, data)
+            print(reseller.__dict__)
             return render_template(
                 "resellers/reseller.html",
                 reseller=reseller,
