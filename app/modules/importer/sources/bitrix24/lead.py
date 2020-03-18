@@ -14,7 +14,7 @@ from app.utils.error_handler import error_handler
 
 from ._connector import post, get
 from ._association import find_association, associate_item
-from ._field_values import convert_field_value_from_remote, convert_field_value_to_remote, convert_field_euro_from_remote
+from ._field_values import convert_field_value_from_remote, convert_field_value_to_remote, convert_field_euro_from_remote, t_lead_zip_codes
 from .customer import run_export as run_customer_export, run_import as run_customer_import, run_customer_lead_import
 
 
@@ -27,6 +27,7 @@ LEAD_STATUS_CONVERT = {
     "offer_created": "PROCESSED",
     "offer_presented": "1",
     "offer_negotiation": "1",
+    "never_use": "10",
     "lost": "JUNK",
     "won": "CONVERTED",
 }
@@ -73,6 +74,9 @@ def filter_import_input(item_data):
     contact_source = convert_field_value_from_remote("SOURCE_ID", item_data)
     if contact_source == "other":
         contact_source = item_data["SOURCE_DESCRIPTION"]
+
+    if contact_source == "T-Leads" and item_data["UF_CRM_5DD4020242167"] not in t_lead_zip_codes:
+        status = "never_use"
 
     data = {
         "datetime": item_data["DATE_CREATE"],
@@ -188,6 +192,8 @@ def filter_export_input(lead):
 
 def run_import(remote_id=None, local_id=None):
     from app.modules.importer.sources.data_efi_strom.lead import run_export as run_data_efi_export
+    from app.modules.lead.lead_services import lead_reseller_auto_assignment
+
     if local_id is not None:
         lead_association = find_association("Lead", local_id=local_id)
         remote_id = lead_association.remote_id
@@ -220,7 +226,9 @@ def run_import(remote_id=None, local_id=None):
                         commissions = lead_commission.commissions
                         db.session.refresh(lead)
                         lead = update_item(lead_link.local_id, {"commissions": commissions, "last_update": lead.last_update})
-                # if lead is not None:
+                if lead is not None:
+                    if lead.contact_source == "T-Leads" and lead.reseller_id == 76:
+                        lead = lead_reseller_auto_assignment(lead)
                 #    run_data_efi_export(local_id=lead.id)
 
 
@@ -291,7 +299,6 @@ def run_export(remote_id=None, local_id=None):
                     new_data["fields[ASSIGNED_BY_ID]"] = post_data["fields[ASSIGNED_BY_ID]"]
                 if "fields[STATUS_ID]" in post_data and lead.status == "offer_created":
                     new_data["fields[STATUS_ID]"] = post_data["fields[STATUS_ID]"]
-                print(new_data)
                 if len(new_data) > 1:
                     response = post("crm.lead.update", post_data=new_data)
                     pp.pprint(response)
