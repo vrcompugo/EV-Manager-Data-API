@@ -227,7 +227,7 @@ def run_import(remote_id=None, local_id=None):
                         db.session.refresh(lead)
                         lead = update_item(lead_link.local_id, {"commissions": commissions, "last_update": lead.last_update})
                 if lead is not None:
-                    if lead.contact_source == "T-Leads" and lead.reseller_id == 76:
+                    if lead.contact_source == "T-Leads" and lead.reseller_id == 76 and lead.status == "new":
                         lead = lead_reseller_auto_assignment(lead)
                 #    run_data_efi_export(local_id=lead.id)
 
