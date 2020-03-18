@@ -96,5 +96,9 @@ def run_import():
                         associate_item("User", remote_id=user["ID"], local_id=user_model.id)
 
 
+def run_cron_import():
+    return run_import()
+
+
 def run_export(remote_id=None, local_id=None):
     pass

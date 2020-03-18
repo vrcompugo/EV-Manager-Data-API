@@ -39,3 +39,21 @@ def cron():
         run_cron_export()
     except Exception as e:
         error_handler()
+
+    from .sources.bitrix24.user import run_import
+    try:
+        run_import()
+    except Exception as e:
+        error_handler()
+
+    from .sources.bitrix24.user import run_cron_import
+    try:
+        run_cron_import()
+    except Exception as e:
+        error_handler()
+
+    from .sources.bitrix24.task import run_cron_import
+    try:
+        run_cron_import()
+    except Exception as e:
+        error_handler()
