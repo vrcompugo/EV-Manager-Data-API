@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from app import db
 from app.decorators import token_required, api_response
 from app.models import User, UserSchema
+from app.modules.importer.sources.bitrix24._association import find_association
 
 from .models.calendar_event import CalendarEvent, CalendarEventSchema
 
@@ -82,6 +83,15 @@ class Items(Resource):
             user = next((user for user in users if user["id"] == event.user_id), None)
             if user is not None:
                 event_data = event_schema.dump(event, many=False)
+                if event.customer_id is not None:
+                    link = find_association("Customer", local_id=event.customer_id)
+                    if link is not None:
+                        event_data["bitrix_contact_id"] = link.remote_id
+                if event.order_id is not None:
+                    link = find_association("Order", local_id=event.order_id)
+                    if link is not None:
+                        event_data["bitrix_order_id"] = link.remote_id
+
                 if "events" in user:
                     user["events"].append(event_data)
                 else:

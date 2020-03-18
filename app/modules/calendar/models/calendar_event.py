@@ -71,6 +71,7 @@ class CalendarEventSchema(ModelSchema):
     reseller_id = fields.Integer()
     task_id = fields.Integer()
     order_id = fields.Integer()
+    location = fields.String()
     customer = Nested(CustomerSchema, many=False)
     task = Nested(TaskSchema, many=False)
     reseller = Nested(ResellerSchema, many=False)

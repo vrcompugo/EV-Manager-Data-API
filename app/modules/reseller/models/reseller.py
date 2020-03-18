@@ -40,6 +40,7 @@ class Reseller(db.Model):
 class ResellerSchema(ModelSchema):
 
     versions = fields.Constant([])
+    min_commission = fields.Float()
 
     class Meta:
         model = Reseller
