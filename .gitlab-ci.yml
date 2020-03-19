@@ -17,7 +17,6 @@ build1:
 deploy1:
   stage: deploy
   script:
-    - curl https://web3.hbbx.de/deployment/schoen/ev-manager-data-api/pITaR3m6FoWfE9VYeyw9QuaJfDwI9DmC
     - curl https://web3.hbbx.de/deployment/schoen/api.korbacher-energiezentrum.de/pITaR3m6FoWfE9VYeyw9QuaJfDwI9DmC
     - rm -r ./*
     - rm -r .e*
