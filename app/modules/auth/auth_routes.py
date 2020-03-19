@@ -26,11 +26,18 @@ class UserLogin(Resource):
         return {"status": "success", "data": user}, 200
 
 
-@api.route('/refresh')
+@api.route('/refresh', methods=["GET", "POST"])
 class UserLogin(Resource):
     @api_response
     @token_required()
     def get(self):
+        """ User Login Resource """
+        user = revalidate_user()
+        return {"status": "success", "data": user}, 200
+
+    @api_response
+    @token_required()
+    def post(self):
         """ User Login Resource """
         user = revalidate_user()
         return {"status": "success", "data": user}, 200

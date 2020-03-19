@@ -9,6 +9,7 @@ from app import db
 from app.decorators import token_required, api_response
 from app.models import User, UserSchema
 from app.modules.importer.sources.bitrix24._association import find_association
+from app.modules.auth.auth_services import get_logged_in_user
 
 from .models.calendar_event import CalendarEvent, CalendarEventSchema
 
@@ -26,9 +27,22 @@ class Items(Resource):
     })
     # @token_required("list_lead")
     def get(self):
+        user = get_logged_in_user(request)
+        if user is None or "roles" not in user:
+            return {"status": "error", "message": "auth failed"}
+        if len(set(user["roles"]).intersection([
+            "bookkeeping",
+            "construction",
+            "construction_lead"])) > 0:
+            filter_group = "construction"
+        else:
+            filter_group = request.args.get("filter_group") or "own"
+            print(user["id"])
+            if filter_group != "own" and user["id"] not in [1, 2, 13, 18, 77, 107]:
+                filter_group = "own"
         cal_type = request.args.get("type") or "day"
         cal_date = request.args.get("date") or str(datetime.date.today())
-        filter_group = request.args.get("filter_group") or "all"
+
 
         if cal_type == "day":
             begin_date = datetime.datetime.strptime(cal_date, "%Y-%m-%d")
@@ -42,6 +56,9 @@ class Items(Resource):
             begin_date = datetime.datetime(year=cal_date.year, month=cal_date.month, day=1)
             end_date = begin_date + relativedelta(months=+1)
         users = User.query.filter(User.active.is_(True))
+
+        if filter_group == "own":
+            users = users.filter(User.id == user["id"])
         if filter_group == "reseller":
             users = users.filter(User.bitrix_department.in_(["Mittendrin statt nur dabei", "Südkurve", "Mittendrin statt nur dabei (HV)"]))
         if filter_group == "eeg":

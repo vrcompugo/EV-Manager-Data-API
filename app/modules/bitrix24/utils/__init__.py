@@ -1,6 +1,6 @@
 import requests
 
-from app.models import Reseller
+from app.models import Reseller, User
 
 
 def get_bitrix_auth_info(request):
@@ -20,9 +20,12 @@ def get_bitrix_auth_info(request):
         response_data = x.json()
         if "result" in response_data:
             data["bitrix_user"] = {}
-            for k,v in response_data["result"].items():
+            for k, v in response_data["result"].items():
                 data["bitrix_user"][k.lower()] = v
         if data["bitrix_user"] is not None and "email" in data["bitrix_user"]:
+            user = User.query.filter(User.email == data["bitrix_user"]["email"]).first()
+            if user is not None:
+                data["user2"] = user
             reseller = Reseller.query.filter(Reseller.email == data["bitrix_user"]["email"]).first()
             if reseller is not None:
                 data["user"] = reseller

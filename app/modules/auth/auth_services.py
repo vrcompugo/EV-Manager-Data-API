@@ -65,6 +65,7 @@ def get_logged_in_user(new_request):
     # get the auth token
     auth_token = new_request.headers.get('Authorization')
     if auth_token:
+        auth_token = auth_token.replace("Bearer ", "")
         resp = decode_auth_token(auth_token)
         user = User.query.filter_by(id=resp.get("sub")).first()
         roles = []
@@ -75,11 +76,12 @@ def get_logged_in_user(new_request):
             role_ids.append(role.id)
             permissions += role.permissions
         return {
-                'user_id': user.id,
-                'email': user.email,
-                'roles': roles,
-                'role_ids': role_ids,
-                'permissions': permissions,
-                'registered_on': str(user.registered_on)
-            }
+            'id': user.id,
+            'user_id': user.id,
+            'email': user.email,
+            'roles': roles,
+            'role_ids': role_ids,
+            'permissions': permissions,
+            'registered_on': str(user.registered_on)
+        }
     raise ApiException("invalid_token", "Invalid Token. Please log in again.", 401)

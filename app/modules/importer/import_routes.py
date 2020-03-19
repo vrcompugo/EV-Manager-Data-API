@@ -20,9 +20,9 @@ _item_input = api.model("ImportRequest_", model={
 @api.route('/')
 class Items(Resource):
 
-    #@api_response
+    # @api_response
     @api.expect(_item_input, validate=True)
-    #@token_required("create_file")
+    # @token_required("create_file")
     def post(self):
         data = request.json
         print(data)
@@ -32,16 +32,16 @@ class Items(Resource):
         if "local_id" in data and data["local_id"] != 0:
             import_by_source_module(source=data["source"], model=data["model"], local_id=data["local_id"])
             return {"status": "success"}
-        #import_by_source_module(source=data["source"], model=data["model"])
-        return {"status":"success"}
+        # import_by_source_module(source=data["source"], model=data["model"])
+        return {"status": "success"}
 
     @api_response
     @api.doc(params={
-        'offset': {"type":'integer', "default": 0},
-        "limit":{"type":'integer', "default": 10},
-        "sort": {"type":"string", "default": ""},
-        "fields": {"type":"string", "default": "_default_"},
-        "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
+        'offset': {"type": 'integer', "default": 0},
+        "limit": {"type": 'integer', "default": 10},
+        "sort": {"type": "string", "default": ""},
+        "fields": {"type": "string", "default": "_default_"},
+        "q": {"type": "string", "default": "", "description": "Lucene syntax search query"}
     })
     @token_required("list_lead")
     def get(self):
@@ -64,7 +64,7 @@ class Items(Resource):
         if query is not None:
             tree = parser.parse(query)
         data, total_count = get_items(tree, sort, offset, limit, fields)
-        return {"status":"success",
+        return {"status": "success",
                 "fields": fields,
                 "sort": sort,
                 "offset": offset,
@@ -72,3 +72,18 @@ class Items(Resource):
                 "query": query,
                 "total_count": total_count,
                 "data": data}
+
+
+@api.route('/bitrix24/webhook/')
+class Items(Resource):
+
+    def get(self):
+        print("bitrix webhook get")
+
+    def post(self):
+        from .sources.bitrix24.task import run_import
+
+        if request.form.get("event") == "ONTASKUPDATE":
+            run_import(remote_id=request.form.get("data[FIELDS_AFTER][ID]"))
+            print(request.form)
+            print("bitrix webhook post")
