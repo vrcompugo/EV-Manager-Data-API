@@ -105,6 +105,8 @@ def filter_import_input(item_data):
                        + "Quelle: {}\n".format("bitrix24")
                        + "Angelegt am: {}\n".format(item_data["DATE_CREATE"])
     }
+    if status == "never_use":
+        del data["last_update"]
     data["description_html"] = data["description"].replace("\n", "<br>\n")
     if customer is not None and customer.default_address is not None:
         data["address_id"] = customer.default_address.id
