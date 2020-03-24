@@ -1,7 +1,7 @@
 from flask import request
 from flask_restplus import Resource
 from flask_restplus import Namespace, fields
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, func
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -23,6 +23,7 @@ class Items(Resource):
     @api_response
     @api.doc(params={
         'type': {"type": 'string', "default": "day"},
+        'search_phrase': {"type": 'string', "default": ""},
         'date': {"type": 'string', "default": None}
     })
     # @token_required("list_lead")
@@ -30,10 +31,11 @@ class Items(Resource):
         user = get_logged_in_user(request)
         if user is None or "roles" not in user:
             return {"status": "error", "message": "auth failed"}
-        if len(set(user["roles"]).intersection([
-            "bookkeeping",
-            "construction",
-            "construction_lead"])) > 0:
+        if len(
+            set(user["roles"]).intersection([
+                "bookkeeping",
+                "construction",
+                "construction_lead"])) > 0:
             filter_group = "construction"
         else:
             filter_group = request.args.get("filter_group") or "own"
@@ -42,7 +44,7 @@ class Items(Resource):
                 filter_group = "own"
         cal_type = request.args.get("type") or "day"
         cal_date = request.args.get("date") or str(datetime.date.today())
-
+        search_phrase = request.args.get("search_phrase") or ""
 
         if cal_type == "day":
             begin_date = datetime.datetime.strptime(cal_date, "%Y-%m-%d")
@@ -91,8 +93,15 @@ class Items(Resource):
                     CalendarEvent.begin < end_date
                 )
             )
-        ).order_by(CalendarEvent.begin.asc()).all()
-
+        )
+        if search_phrase != "":
+            events = events.filter(func.concat(
+                CalendarEvent.company, " ",
+                CalendarEvent.firstname, " ",
+                CalendarEvent.lastname, " ",
+                CalendarEvent.label
+            ).ilike('%' + search_phrase + '%'))
+        events = events.order_by(CalendarEvent.begin.asc()).all()
         user_schema = UserSchema()
         users = user_schema.dump(users, many=True)
         event_schema = CalendarEventSchema()
@@ -117,6 +126,8 @@ class Items(Resource):
         for user in users:
             if "roles" in user:
                 del user["roles"]
+            if search_phrase != "" and "events" not in user:
+                continue
             if "events" in user:
                 user["max_rows"] = 1
                 rows = [datetime.datetime(year=1970, month=1, day=1)]
@@ -139,6 +150,7 @@ class Items(Resource):
             departments = user["bitrix_department"].split(",")
             main_department = departments[len(departments) - 1].strip()
             group = next((group for group in data if group["label"] == main_department), None)
+
             if group is None:
                 group = {
                     "label": main_department,
