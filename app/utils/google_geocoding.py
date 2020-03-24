@@ -9,7 +9,7 @@ def geocode_address(address):
     if config is None or "data" not in config or "key" not in config["data"]:
         return None
     location = None
-
+    print("ylkcxn")
     r = requests.get(
         'https://maps.googleapis.com/maps/api/geocode/json?key=' + config["data"]["key"],
         params={
