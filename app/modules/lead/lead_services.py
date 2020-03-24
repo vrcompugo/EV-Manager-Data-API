@@ -204,7 +204,7 @@ def lead_commission_calulation(lead: Lead):
 
 def lead_reseller_auto_assignment(lead: Lead):
     from app.utils.google_geocoding import geocode_address
-
+    print("loc1", lead.reseller_id)
     if lead.reseller_id is not None and lead.reseller_id > 0:
         return lead
     location = geocode_address(f"{lead.customer.default_address.street}, {lead.customer.default_address.zip}  {lead.customer.default_address.city}")

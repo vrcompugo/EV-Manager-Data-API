@@ -230,6 +230,7 @@ def run_import(remote_id=None, local_id=None):
                 if lead is not None:
                     print("ass2", lead.contact_source, lead.reseller_id, lead.status)
                     if lead.contact_source == "T-Leads" and lead.reseller_id == 76 and lead.status == "new":
+                        print("ass3", lead.contact_source, lead.reseller_id, lead.status)
                         lead = lead_reseller_auto_assignment(lead)
                 #    run_data_efi_export(local_id=lead.id)
 
