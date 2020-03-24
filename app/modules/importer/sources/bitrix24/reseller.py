@@ -24,6 +24,8 @@ def filter_import_data(item_data):
         group_id = 1
     if "Front Sales" in bitrix_department:
         group_id = 1
+    if "After Sales" in bitrix_department:
+        group_id = 1
     if "Vertrieb" in bitrix_department:
         group_id = 1
     if "Mittendrin statt nur dabei" in bitrix_department:
