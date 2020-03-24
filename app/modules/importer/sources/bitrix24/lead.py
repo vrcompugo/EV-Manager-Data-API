@@ -299,7 +299,7 @@ def run_export(remote_id=None, local_id=None):
                 new_data = {"ID": lead_association.remote_id}
                 if "fields[ASSIGNED_BY_ID]" in post_data:
                     new_data["fields[ASSIGNED_BY_ID]"] = post_data["fields[ASSIGNED_BY_ID]"]
-                if "fields[STATUS_ID]" in post_data and lead.status == "offer_created":
+                if "fields[STATUS_ID]" in post_data and lead.status in ["offer_created", "never_use"]:
                     new_data["fields[STATUS_ID]"] = post_data["fields[STATUS_ID]"]
                 if len(new_data) > 1:
                     response = post("crm.lead.update", post_data=new_data)
