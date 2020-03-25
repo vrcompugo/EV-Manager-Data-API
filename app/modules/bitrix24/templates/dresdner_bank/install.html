@@ -12,23 +12,24 @@
           "HANDLER": "https://api.korbacher-energiezentrum.de/bitrix24/dresdner/",
         },
         function(result) {
-          BX24.callMethod(
-            "placement.bind",
-            {
-              "PLACEMENT": "CRM_LEAD_DETAIL_TAB",
-              "TITLE": "Dresdner Bank",
-              "HANDLER": "https://api.korbacher-energiezentrum.de/bitrix24/dresdner/",
-            },
-            function(result) {
-              if (result.error()){
-                console.error(result.error());
-              }else{
-                console.dir(result.data());
-                BX24.installFinish();
-              }
-              console.log(BX24.placement.info());
-            }
-          );
+
+        }
+      );
+      BX24.callMethod(
+        "placement.bind",
+        {
+          "PLACEMENT": "CRM_LEAD_DETAIL_TAB",
+          "TITLE": "Dresdner Bank",
+          "HANDLER": "https://api.korbacher-energiezentrum.de/bitrix24/dresdner/",
+        },
+        function(result) {
+          if (result.error()){
+            console.error(result.error());
+          }else{
+            console.dir(result.data());
+            BX24.installFinish();
+          }
+          console.log(BX24.placement.info());
         }
       );
 
