@@ -12,6 +12,7 @@ from app.modules.reseller.services.reseller_services import update_item as updat
 from ._connector import post, get
 from ._association import find_association, associate_item
 from ._field_values import convert_field_value_from_remote, convert_field_value_to_remote, convert_field_euro_from_remote
+from .customer import run_import as customer_import
 
 
 pp = pprint.PrettyPrinter()
@@ -60,14 +61,15 @@ def filter_import_input(item_data):
         "commissions": None,
         "commission_value_net": 0
     }
-
     if item_data["LEAD_ID"] is not None:
         link = find_association("Lead", remote_id=item_data["LEAD_ID"])
         if link is not None:
             data["lead_id"] = link.local_id
     if item_data["CONTACT_ID"] is not None:
-        print(item_data["CONTACT_ID"])
         link = find_association("Customer", remote_id=item_data["CONTACT_ID"])
+        if link is None:
+            customer_import(remote_id=item_data["CONTACT_ID"])
+            link = find_association("Customer", remote_id=item_data["CONTACT_ID"])
         if link is not None:
             data["customer_id"] = link.local_id
             customer = Customer.query.filter(Customer.id == link.local_id).first()
