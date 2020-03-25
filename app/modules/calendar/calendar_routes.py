@@ -69,9 +69,12 @@ class Items(Resource):
             users = users.filter(User.bitrix_department.in_([
                 "Elektrik Abteilung",
                 "Montage",
+                "Montage ",
                 "Montage II (Dach&PV)",
                 "Montage III (PV)",
-                "Montage Team III"]))
+                "Montage Team III",
+                "Team Hybrid EnPal",
+                "Wärme & Wasser (KEZ)"]))
         if filter_group == "service":
             users = users.filter(User.bitrix_department.in_([
                 "Service & Wartung",
