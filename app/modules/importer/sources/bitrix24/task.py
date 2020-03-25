@@ -76,7 +76,7 @@ def filter_import_data(item_data):
         "deadline": convert_datetime(item_data["deadline"]),
         "label": item_data["title"],
         "comment": item_data["description"],
-        "status": None
+        "status": "done" if item_data["status"] == "5" else "open"
     }
     if data["begin"] == data["end"] and data["end"] is not None:
         data["end"] = datetime.datetime(data["end"].year, data["end"].month, data["end"].day, 23, 59, 59)
