@@ -39,8 +39,7 @@ class Items(Resource):
             filter_group = "construction"
         else:
             filter_group = request.args.get("filter_group") or "own"
-            print(user["id"])
-            if filter_group != "own" and user["id"] not in [1, 2, 13, 18, 77, 107]:
+            if filter_group != "own" and user["id"] not in [1, 2, 13, 18, 77, 107, 104]:
                 filter_group = "own"
         cal_type = request.args.get("type") or "day"
         cal_date = request.args.get("date") or str(datetime.date.today())
@@ -74,10 +73,10 @@ class Items(Resource):
                 "Montage III (PV)",
                 "Montage Team III",
                 "Team Hybrid EnPal",
-                "Wärme & Wasser (KEZ)"]))
+                "Wärme & Wasser (KEZ)",
+                "Service & Wartung"]))
         if filter_group == "service":
             users = users.filter(User.bitrix_department.in_([
-                "Service & Wartung",
                 "Technik & Service"]))
         users = users.order_by(User.bitrix_department.asc(), User.name.asc()).all()
         events = CalendarEvent.query.options(
