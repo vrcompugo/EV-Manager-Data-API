@@ -35,6 +35,9 @@ def filter_input(data):
     if data["offer_status"] == "missing_documents":
         data["offer_status"] = "missing_data"
 
+    if "data" in data and "lead_id" in data["data"]:
+        data["lead_id"] = data["data"]["lead_id"]
+
     return data
 
 

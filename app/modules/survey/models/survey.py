@@ -30,6 +30,8 @@ class Survey(db.Model):
     address_id = db.Column(db.Integer, db.ForeignKey("customer_address.id"))
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
     reseller = db.relationship("Reseller")
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"))
+    lead = db.relationship("Lead")
     datetime = db.Column(db.DateTime)
     data_status = db.Column(db.String(30))
     offer_status = db.Column(db.String(30))
