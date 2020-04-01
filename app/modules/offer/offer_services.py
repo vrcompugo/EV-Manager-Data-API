@@ -46,6 +46,7 @@ def add_item_v2(data):
     new_item.last_updated = datetime.datetime.now()
     db.session.add(new_item)
     db.session.commit()
+    # loading relations for pdf creation
     customer = new_item.customer
     items = new_item.items
     address = new_item.address
