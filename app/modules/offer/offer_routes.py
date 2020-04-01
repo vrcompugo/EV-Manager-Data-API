@@ -5,7 +5,7 @@ from luqum.parser import parser
 
 from app.decorators import token_required, api_response
 
-from .offer_services import add_item, update_item, get_items, get_one_item
+from .offer_services import add_item, update_item, get_items, get_one_item, generate_offer_pdf
 
 
 api = Namespace('Offer')
@@ -27,11 +27,11 @@ _item_input = api.model("Offer_", model={
 class Items(Resource):
     @api_response
     @api.doc(params={
-        'offset': {"type":'integer', "default": 0},
-        "limit":{"type":'integer', "default": 10},
-        "sort": {"type":"string", "default": ""},
-        "fields": {"type":"string", "default": "_default_"},
-        "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
+        'offset': {"type": 'integer', "default": 0},
+        "limit": {"type": 'integer', "default": 10},
+        "sort": {"type": "string", "default": ""},
+        "fields": {"type": "string", "default": "_default_"},
+        "q": {"type": "string", "default": "", "description": "Lucene syntax search query"}
     })
     @token_required("list_offer")
     def get(self):
@@ -54,7 +54,7 @@ class Items(Resource):
         if query is not None:
             tree = parser.parse(query)
         data, total_count = get_items(tree, sort, offset, limit, fields)
-        return {"status":"success",
+        return {"status": "success",
                 "fields": fields,
                 "sort": sort,
                 "offset": offset,
@@ -71,7 +71,7 @@ class Items(Resource):
         data = request.json
         item = add_item(data=data)
         item_dict = get_one_item(item.id)
-        return {"status":"success",
+        return {"status": "success",
                 "data": item_dict}
 
 
@@ -79,7 +79,7 @@ class Items(Resource):
 class User(Resource):
     @api_response
     @api.doc(params={
-        "fields": {"type":"string", "default": "_default_"},
+        "fields": {"type": "string", "default": "_default_"},
     })
     @token_required("show_offer")
     def get(self, id):
@@ -89,8 +89,10 @@ class User(Resource):
         if not item_dict:
             api.abort(404)
         else:
-            return {"status":"success",
-                "data": item_dict}
+            return {
+                "status": "success",
+                "data": item_dict
+            }
 
     @api.response(201, 'User successfully updated.')
     @api.doc('update offer')
@@ -100,3 +102,9 @@ class User(Resource):
         """Update User """
         data = request.json
         return update_item(id, data=data)
+
+
+@api.route('/<id>/PDF')
+class OfferPDF(Resource):
+    def get(self, id):
+        return generate_offer_pdf(id)

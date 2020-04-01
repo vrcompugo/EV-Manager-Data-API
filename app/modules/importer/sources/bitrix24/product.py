@@ -1,5 +1,6 @@
 from app import db
 import pprint
+import json
 from datetime import datetime, timedelta
 
 from app.models import Reseller, Product
@@ -12,22 +13,28 @@ from .customer import run_export as run_customer_export
 
 def filter_import_data(item_data):
     product_group = ""
-    if item_data["CATALOG_ID"] == "22":
-        product_group = "Dach"
-    if item_data["CATALOG_ID"] == "24":
-        product_group = "Cloud PV Pakete Optionen"
-    if item_data["CATALOG_ID"] == "26":
-        product_group = "Cloud PV Pakete"
+    pack_unit = ""
+    catalog_data = post("crm.productsection.get", {"id": item_data["SECTION_ID"]})
+    if catalog_data is not None and "result" in catalog_data:
+        product_group = catalog_data["result"]["NAME"]
+        while catalog_data["result"]["SECTION_ID"] is not None:
+            catalog_data = post("crm.productsection.get", {"id": catalog_data["result"]["SECTION_ID"]})
+            if catalog_data is not None and "result" in catalog_data:
+                product_group = catalog_data["result"]["NAME"] + " - " + product_group
+    unit_data = post("crm.measure.get", {"id": item_data["MEASURE"]})
+    if unit_data is not None and "result" in unit_data:
+        pack_unit = unit_data["result"]["MEASURE_TITLE"]
     data = {
         "product_group": product_group,
         "name": item_data["NAME"],
+        "description": item_data["DESCRIPTION"],
         "weight": 0,
         "width": 0,
         "length": 0,
         "height": 0,
         "purchase_unit": 1,
         "reference_unit": 1,
-        "pack_unit": 1,
+        "pack_unit": pack_unit,
         "shipping_time": "",
         "tax_rate": 19,
         "min_purchase": 1,

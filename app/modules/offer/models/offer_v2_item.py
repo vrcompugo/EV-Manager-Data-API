@@ -26,6 +26,7 @@ class OfferV2Item(db.Model):
     weight_single = db.Column(db.Numeric(scale=4, precision=12))
     weight_total = db.Column(db.Numeric(scale=4, precision=12))
     quantity = db.Column(db.Numeric(scale=4, precision=12))
+    quantity_unit = db.Column(db.String(50))
     cost = db.Column(db.Numeric(scale=4, precision=12))
     tax_rate = db.Column(db.Integer)
     single_price = db.Column(db.Numeric(scale=4, precision=12))

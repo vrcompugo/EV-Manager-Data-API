@@ -1,10 +1,14 @@
 import datetime
 
 from app import db
+from sqlalchemy import or_
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
+from app.utils.gotenberg import generate_pdf
 from app.models import Lead, Product
+from flask import render_template, request, make_response
+
 
 from .models.offer import Offer, OfferSchema
 from .models.offer_v2 import OfferV2
@@ -49,7 +53,7 @@ def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(Offer, OfferSchema, tree, sort, offset, limit, fields)
 
 
-def get_one_item(id, fields = None):
+def get_one_item(id, fields=None):
     return get_one_item_by_model(Offer, OfferSchema, id, fields, [])
 
 
@@ -135,7 +139,10 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
 
 
 def add_item_to_offer(offer_data, product_name, quantity):
-    product = Product.query.filter(Product.name == product_name).first()
+    product = Product.query\
+        .filter(Product.name == product_name)\
+        .filter(Product.product_group.like("%Erneuerbare Energie - %"))\
+        .first()
     if product is None:
         raise Exception("Product not found: {}".format(product_name))
     tax_rate = 19
@@ -147,7 +154,8 @@ def add_item_to_offer(offer_data, product_name, quantity):
         "sort": 0,
         "number": product.number,
         "label": product.name,
-        "description": "",
+        "description": product.description,
+        "quantity_unit": product.pack_unit,
         "weight_single": 0,
         "weight_total": 0,
         "quantity": quantity,
@@ -171,3 +179,21 @@ def add_item_to_offer(offer_data, product_name, quantity):
     offer_data["total"] = offer_data["total"] + item_data["total_price"]
     offer_data["items"].append(item_data)
     return offer_data
+
+
+def generate_offer_pdf(id):
+    offer = OfferV2.query.options(
+        db.subqueryload("items"),
+        db.subqueryload("customer"),
+        db.subqueryload("address")
+    ).get(id)
+    content = render_template("offer/index.html", offer=offer)
+    content_footer = render_template("offer/footer.html", offer=offer)
+    pdf = generate_pdf(content, content_footer=content_footer)
+    if pdf is not None:
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        return response
+    response = make_response(content)
+    response.headers['Content-Type'] = 'text/html'
+    return response
