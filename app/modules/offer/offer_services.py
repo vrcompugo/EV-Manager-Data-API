@@ -194,8 +194,9 @@ def generate_offer_pdf(offer: OfferV2):
         file_data = {
             "model": "OfferV2",
             "model_id": offer.id,
+            "content-type": 'application/pdf',
             "file_content": pdf,
-            "filename": f"Angebot PV-{offer.id}"
+            "filename": f"Angebot PV-{offer.id}.pdf"
         }
         if pdf_file is not None:
             update_file(pdf_file.id, file_data)

@@ -114,4 +114,13 @@ class OfferPDF(Resource):
             db.subqueryload("customer"),
             db.subqueryload("address")
         ).get(id)
-        return generate_offer_pdf(offer)
+        pdf = offer.pdf
+        if pdf is None:
+            generate_offer_pdf(offer)
+            pdf = offer.pdf
+        if pdf is not None:
+            return {
+                "public_link": offer.pdf.public_link,
+                "filename": offer.pdf.filename
+            }
+        return {"error": "no pdf"}

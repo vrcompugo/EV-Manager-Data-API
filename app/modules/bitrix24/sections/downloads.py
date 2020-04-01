@@ -40,22 +40,7 @@ def register_routes(api: Blueprint):
             "filter[LEAD_ID]": lead_link.remote_id,
             "order[id]": "desc"
         })
-        offers_data = []
-        for offer in response["result"]:
-            date_time_obj = datetime.datetime.strptime(offer["DATE_CREATE"], '%Y-%m-%dT%H:%M:%S%z')
-            offer_data = {
-                "id": offer["ID"],
-                "datetime": date_time_obj.strftime("%d.%m.%Y"),
-                "number": offer["QUOTE_NUMBER"],
-                "download_link": "#"
-            }
-            response = post("crm.documentgenerator.document.list", post_data={
-                "filter[entityId]": offer["ID"]
-            })
-            if "result" in response and "documents" in response["result"] and len(response["result"]["documents"]) > 0:
-                offer_data["download_link"] = response["result"]["documents"][0]["pdfUrl"]
-
-            offers_data.append(offer_data)
+        offers = OfferV2.query.filter(OfferV2.lead_id == lead.id).order_by(OfferV2.datetime.desc()).all()
 
         lead_comments = LeadComment.query.filter(LeadComment.lead_id == lead.id).order_by(LeadComment.datetime.desc()).all()
         for lead_comment in lead_comments:
@@ -66,7 +51,7 @@ def register_routes(api: Blueprint):
                         attachment["public_link"] = "#"
                     else:
                         attachment["public_link"] = s3_file.public_link
-        return render_template("downloads/lead_downloads_list.html", offers=offers_data, lead_comments=lead_comments)
+        return render_template("downloads/lead_downloads_list.html", offers=offers, lead_comments=lead_comments)
 
     @api.route("/downloads/install/", methods=["POST"])
     def installer():

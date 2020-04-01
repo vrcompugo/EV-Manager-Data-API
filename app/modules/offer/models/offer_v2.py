@@ -44,6 +44,18 @@ class OfferV2(db.Model):
     def search_query(self):
         return db.session.query(OfferV2)
 
+    @hybrid_property
+    def pdf(self):
+        from app.models import S3File
+
+        s3_file = S3File.query\
+            .filter(S3File.model == "OfferV2")\
+            .filter(S3File.model_id == self.id)\
+            .first()
+        if s3_file is None:
+            return None
+        return s3_file
+
 
 class OfferV2Schema(ModelSchema):
 

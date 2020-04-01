@@ -1,6 +1,13 @@
 
 <h3>Angebote &amp; Zusatz</h3>
 
+{% for offer in offers %}
+  {% if offer.public_pdf_link %}
+    <a href="{{ offer.pdf.public_link }}" target="_blank">{{ offer.pdf.filename }}</a><br>
+  {% endif %}
+{% endfor %}
+<br>
+
 {% for lead_comment in lead_comments %}
     {% if lead_comment.attachments %}
         <b>Angebot vom {{ lead_comment.datetime }}</b><br>
