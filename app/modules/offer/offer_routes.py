@@ -3,7 +3,9 @@ from flask_restplus import Resource
 from flask_restplus import Namespace, fields
 from luqum.parser import parser
 
+from app import db
 from app.decorators import token_required, api_response
+from app.models import OfferV2
 
 from .offer_services import add_item, update_item, get_items, get_one_item, generate_offer_pdf
 
@@ -107,4 +109,9 @@ class User(Resource):
 @api.route('/<id>/PDF')
 class OfferPDF(Resource):
     def get(self, id):
-        return generate_offer_pdf(id)
+        offer = OfferV2.query.options(
+            db.subqueryload("items"),
+            db.subqueryload("customer"),
+            db.subqueryload("address")
+        ).get(id)
+        return generate_offer_pdf(offer)

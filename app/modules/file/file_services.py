@@ -45,10 +45,10 @@ def sync_item(data):
     else:
         return update_item(item.id, data)
 
+
 def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(S3File, S3FileSchema, tree, sort, offset, limit, fields)
 
 
-def get_one_item(id, fields = None):
+def get_one_item(id, fields=None):
     return get_one_item_by_model(S3File, S3FileSchema, id, fields)
-

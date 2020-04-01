@@ -1,14 +1,14 @@
 import datetime
+from sqlalchemy import or_
+from flask import render_template, request, make_response
 
 from app import db
-from sqlalchemy import or_
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.utils.gotenberg import generate_pdf
-from app.models import Lead, Product
-from flask import render_template, request, make_response
-
+from app.models import Lead, Product, S3File
+from app.modules.file.file_services import add_item as add_file, update_item as update_file
 
 from .models.offer import Offer, OfferSchema
 from .models.offer_v2 import OfferV2
@@ -44,6 +44,7 @@ def add_item_v2(data):
             item_object = set_attr_by_dict(item_object, item_data, ["id"])
             new_item.items.append(item_object)
     new_item.last_updated = datetime.datetime.now()
+    generate_offer_pdf(new_item)
     db.session.add(new_item)
     db.session.commit()
     return new_item
@@ -181,16 +182,25 @@ def add_item_to_offer(offer_data, product_name, quantity):
     return offer_data
 
 
-def generate_offer_pdf(id):
-    offer = OfferV2.query.options(
-        db.subqueryload("items"),
-        db.subqueryload("customer"),
-        db.subqueryload("address")
-    ).get(id)
+def generate_offer_pdf(offer: OfferV2):
     content = render_template("offer/index.html", offer=offer)
     content_footer = render_template("offer/footer.html", offer=offer)
     pdf = generate_pdf(content, content_footer=content_footer)
     if pdf is not None:
+        pdf_file = S3File.query\
+            .filter(S3File.model == "OfferV2")\
+            .filter(S3File.model_id == offer.id)\
+            .first()
+        file_data = {
+            "model": "OfferV2",
+            "model_id": offer.id,
+            "file_content": pdf,
+            "filename": f"Angebot PV-{offer.id}"
+        }
+        if pdf_file is not None:
+            update_file(pdf_file.id, file_data)
+        else:
+            add_file(file_data)
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
         return response
