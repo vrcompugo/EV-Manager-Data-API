@@ -44,9 +44,12 @@ def add_item_v2(data):
             item_object = set_attr_by_dict(item_object, item_data, ["id"])
             new_item.items.append(item_object)
     new_item.last_updated = datetime.datetime.now()
-    generate_offer_pdf(new_item)
     db.session.add(new_item)
     db.session.commit()
+    customer = new_item.customer
+    items = new_item.items
+    address = new_item.address
+    generate_offer_pdf(new_item)
     return new_item
 
 
