@@ -7,7 +7,7 @@ from app import db
 from app.decorators import token_required, api_response
 from app.models import OfferV2
 
-from .offer_services import add_item, update_item, get_items, get_one_item, generate_offer_pdf
+from .offer_services import add_item, update_item, get_items, get_one_item, generate_feasibility_study_pdf
 
 
 api = Namespace('Offer')
@@ -114,9 +114,10 @@ class OfferPDF(Resource):
             db.subqueryload("customer"),
             db.subqueryload("address")
         ).get(id)
+        return generate_feasibility_study_pdf(offer)
         pdf = offer.pdf
         if pdf is None:
-            generate_offer_pdf(offer)
+            generate_feasibility_study_pdf(offer)
             pdf = offer.pdf
         if pdf is not None:
             return {

@@ -1,6 +1,9 @@
 import datetime
 from sqlalchemy import or_
 from flask import render_template, request, make_response
+from PyPDF2 import PdfFileWriter, PdfFileReader
+from io import StringIO, BytesIO
+import pdfkit
 
 from app import db
 from app.exceptions import ApiException
@@ -207,6 +210,47 @@ def generate_offer_pdf(offer: OfferV2):
         else:
             add_file(file_data)
         response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        return response
+    response = make_response(content)
+    response.headers['Content-Type'] = 'text/html'
+    return response
+
+
+def generate_feasibility_study_pdf(offer: OfferV2):
+    content = render_template("feasibility_study/overlay.html", offer=offer)
+    config = pdfkit.configuration(wkhtmltopdf="./wkhtmltopdf")
+    overlay_binary = pdfkit.from_string(content, configuration=config, output_path=False, options={
+        'disable-smart-shrinking': ''
+    })
+    if overlay_binary is not None:
+        pdf = BytesIO()
+        output = PdfFileWriter()
+        base_study_pdf = PdfFileReader(open("app/modules/offer/static/feasibility_study.pdf", 'rb'))
+        overlay_pdf = PdfFileReader(BytesIO(overlay_binary))
+        for i in range(base_study_pdf.getNumPages()):
+            page = base_study_pdf.getPage(i)
+            if i < overlay_pdf.getNumPages():
+                page.mergePage(overlay_pdf.getPage(i))
+            output.addPage(page)
+        output.write(pdf)
+        pdf.seek(0)
+        '''pdf_file = S3File.query\
+            .filter(S3File.model == "OfferV2FeasibilityStudy")\
+            .filter(S3File.model_id == offer.id)\
+            .first()
+        file_data = {
+            "model": "OfferV2FeasibilityStudy",
+            "model_id": offer.id,
+            "content-type": 'application/pdf',
+            "file_content": pdf,
+            "filename": f"Wirtschaftlichkeitsrechnung PV-{offer.id}.pdf"
+        }
+        if pdf_file is not None:
+            update_file(pdf_file.id, file_data)
+        else:
+            add_file(file_data)'''
+        response = make_response(pdf.read())
         response.headers['Content-Type'] = 'application/pdf'
         return response
     response = make_response(content)
