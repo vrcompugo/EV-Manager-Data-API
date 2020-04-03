@@ -210,7 +210,7 @@ def lead_reseller_auto_assignment(lead: Lead):
     print("loc", location)
     if location is not None:
         reseller_in_range = []
-        resellers = db.session.query(Reseller).filter(Reseller.active.is_(True)).all()
+        resellers = db.session.query(Reseller).filter(Reseller.lead_balance < 0).filter(Reseller.active.is_(True)).all()
         min_distance = None
         min_distance_reseller = None
         for reseller in resellers:
