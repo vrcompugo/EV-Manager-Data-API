@@ -158,6 +158,8 @@ def filter_export_input(lead):
         "phone": lead.customer.phone
         # "fields[ASSIGNED_BY_ID]": reseller_link.remote_id
     }
+    if "subject" in lead.data:
+        data["fields[UF_CRM_1586180962328]"] = lead.data["subject"]
     if status is not None:
         data["fields[STATUS_ID]"] = status
     if lead.customer.email and lead.customer.email != "folgt":
@@ -293,6 +295,25 @@ def run_export(remote_id=None, local_id=None):
                 response = post("crm.lead.add", post_data=post_data)
                 if "result" in response:
                     associate_item(model="Lead", local_id=lead.id, remote_id=response["result"])
+                    if lead.comment is not None and lead.comment != "":
+                        response2 = post("crm.timeline.comment.add", post_data={
+                            "ENTITY_ID": response["result"],
+                            "ENTITY_TYPE": "lead",
+                            "COMMENT": lead.comment
+                        })
+                        if "result" not in response2:
+                            pp.pprint(response2)
+                    if lead.data is not None:
+                        comment = ""
+                        for key, value in lead.data.items():
+                            comment = comment + f"{key}: {value}\n"
+                        response2 = post("crm.timeline.comment.add", post_data={
+                            "ENTITY_ID": response["result"],
+                            "ENTITY_TYPE": "lead",
+                            "COMMENT": comment
+                        })
+                        if "result" not in response2:
+                            pp.pprint(response2)
                 else:
                     pp.pprint(response)
             else:
@@ -301,6 +322,8 @@ def run_export(remote_id=None, local_id=None):
                     new_data["fields[ASSIGNED_BY_ID]"] = post_data["fields[ASSIGNED_BY_ID]"]
                 if "fields[STATUS_ID]" in post_data and lead.status in ["offer_created", "never_use"]:
                     new_data["fields[STATUS_ID]"] = post_data["fields[STATUS_ID]"]
+                if "fields[UF_CRM_1586180962328]" in post_data:
+                    new_data["fields[UF_CRM_1586180962328]"] = post_data["fields[UF_CRM_1586180962328]"]
                 if len(new_data) > 1:
                     response = post("crm.lead.update", post_data=new_data)
                     pp.pprint(response)

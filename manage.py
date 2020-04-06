@@ -42,9 +42,9 @@ def update_commission_values():
 
 
 @manager.command
-def reimport_orders():
-    from commands.reimport_orders import reimport_orders
-    reimport_orders()
+def lead_comment_test():
+    from commands.lead_comment_test import lead_comment_test
+    lead_comment_test()
 
 
 @manager.command
