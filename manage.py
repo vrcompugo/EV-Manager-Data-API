@@ -54,6 +54,12 @@ def cron_import_tasks():
 
 
 @manager.command
+def customer_export_missing():
+    from commands.customer_export_missing import customer_export_missing
+    customer_export_missing()
+
+
+@manager.command
 def update_role_permissions():
     from app.modules.user import update_role_permissions
     update_role_permissions()
