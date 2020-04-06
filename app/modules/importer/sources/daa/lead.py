@@ -50,7 +50,9 @@ def filter_import_input(item_data):
 def filter_customer_import_input(item_data):
 
     reseller_id = None
-
+    infos = item_data["infos"]
+    infos["subject"] = item_data["subject"]
+    infos["service"] = item_data["service"]
     data = {
         "reseller_id": reseller_id,
         "customer_number": None,
@@ -64,7 +66,7 @@ def filter_customer_import_input(item_data):
         "phone": item_data["phone"],
         "pending_email": None,
         "email_status": None,
-        "data": item_data["infos"],
+        "data": infos,
         "description": item_data["comment"],
         "default_address": {
             "company": "",
