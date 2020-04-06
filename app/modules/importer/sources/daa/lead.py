@@ -64,6 +64,8 @@ def filter_customer_import_input(item_data):
         "phone": item_data["phone"],
         "pending_email": None,
         "email_status": None,
+        "data": item_data["infos"],
+        "description": item_data["comment"],
         "default_address": {
             "company": "",
             "salutation": "mr" if item_data["title"] == "Herr" else "ms",
