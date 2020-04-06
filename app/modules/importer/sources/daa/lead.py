@@ -39,7 +39,7 @@ def filter_import_input(item_data):
         "status": "new",
         "data": item_data,
         "contact_source": "DAA",
-        "description": ""
+        "description": item_data["comment"]
     }
     data["description_html"] = data["description"].replace("\n", "<br>\n")
     if customer is not None and customer.default_address is not None:
@@ -50,9 +50,6 @@ def filter_import_input(item_data):
 def filter_customer_import_input(item_data):
 
     reseller_id = None
-    infos = item_data["infos"]
-    infos["subject"] = item_data["subject"]
-    infos["service"] = item_data["service"]
     data = {
         "reseller_id": reseller_id,
         "customer_number": None,
@@ -66,8 +63,6 @@ def filter_customer_import_input(item_data):
         "phone": item_data["phone"],
         "pending_email": None,
         "email_status": None,
-        "data": infos,
-        "description": item_data["comment"],
         "default_address": {
             "company": "",
             "salutation": "mr" if item_data["title"] == "Herr" else "ms",

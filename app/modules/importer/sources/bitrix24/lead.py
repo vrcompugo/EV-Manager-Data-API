@@ -224,6 +224,12 @@ def run_import(remote_id=None, local_id=None):
                     }
                     # post("crm.lead.update", post_data=post_data)
                 else:
+                    if "data" in data:
+                        del data["data"]
+                    if "description" in data:
+                        del data["description"]
+                    if "description_html" in data:
+                        del data["description_html"]
                     lead = update_item(lead_link.local_id, data)
                     lead_commission = load_commission_data(lead)
                     if lead_commission is not None:
