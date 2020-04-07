@@ -314,9 +314,11 @@ def run_export(remote_id=None, local_id=None):
                         for key, value in lead.data.items():
                             if key in ["price", "subscription_group", "images"]:
                                 continue
+                            key = key.capitalize()
                             if type(value) is dict:
                                 comment = comment + f"{key}:\n"
                                 for key2, value2 in value.items():
+                                    key2 = key2.capitalize()
                                     comment = comment + f"  {key2}: {value2}\n"
                             else:
                                 comment = comment + f"{key}: {value}\n"
