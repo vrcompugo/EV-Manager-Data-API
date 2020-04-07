@@ -15,4 +15,4 @@ def customer_export_missing():
             print(customer.id)
             run_export(local_id=customer.id)
             link = find_association("Customer", local_id=customer.id)
-            print(link.__dict__)
+            print(link)
