@@ -1,4 +1,5 @@
 import pprint
+from verify_email import verify_email
 
 from app.models import Customer
 from app.modules.customer.services.customer_services import add_item, update_item
@@ -70,9 +71,14 @@ def filter_export_data(customer: Customer):
         "fields[NAME]": customer_name,
         "fields[LAST_NAME]": customer.lastname,
         "fields[TYPE_ID]": "CLIENT",
-        "email": customer.email,
+        "email": None,
         "phone": customer.phone
     }
+    if customer.email is not None:
+        if verify_email(customer.email):
+            data["email"] = customer.email
+        else:
+            data["fields[UF_CRM_1573021516]"] = customer.email
     if customer.customer_number is not None and customer.customer_number != "":
         data["fields[UF_CRM_1572949928]"] = customer.customer_number
     if customer.default_address is not None:
