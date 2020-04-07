@@ -116,9 +116,9 @@ def run_cron_import():
                         data = filter_import_input(lead)
                         item = add_item(data)
                         associate_item("Lead", remote_id=lead["sale_id"], local_id=item.id)
-                        if "subject" in lead["data"]:
-                            if lead.data["subject"] in ["heat_pump", "gas_heating", "oil_heating"]:
-                                lead.reseller_id = 10
+                        if item.data is not None and "subject" in item.data:
+                            if item.data["subject"] in ["heat_pump", "gas_heating", "oil_heating"]:
+                                item.reseller_id = 10
                         lead_reseller_auto_assignment(item)
                     except Exception as e:
                         error_handler()
