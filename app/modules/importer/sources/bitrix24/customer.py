@@ -166,6 +166,9 @@ def run_export(remote_id=None, local_id=None):
                 response = post("crm.contact.add", post_data=post_data)
                 if "result" in response:
                     remote_association = associate_item(model="Customer", local_id=customer.id, remote_id=response["result"])
+                else:
+                    pp = pprint.PrettyPrinter(indent=2)
+                    pp.pprint(response)
             else:
                 post_data["id"] = remote_association.remote_id
                 response = post("crm.contact.get", post_data=post_data)
