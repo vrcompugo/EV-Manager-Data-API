@@ -90,7 +90,7 @@ def filter_export_data(customer: Customer):
     if reseller_link is not None:
         data["fields[ASSIGNED_BY_ID]"] = reseller_link.remote_id
 
-    if customer.email is not None:
+    if data["email"] is not None:
         data["fields[EMAIL][0][TYPE_ID]"] = "EMAIL"
         data["fields[EMAIL][0][VALUE]"] = customer.email
         data["fields[EMAIL][0][VALUE_TYPE]"] = "WORK"
