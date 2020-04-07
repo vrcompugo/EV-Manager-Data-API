@@ -160,6 +160,12 @@ def filter_export_input(lead):
     }
     if "subject" in lead.data:
         data["fields[UF_CRM_1586180962328]"] = lead.data["subject"]
+        if lead.data["subject"] == "heat_pump":
+            data["fields[TITLE]"] = "WP: " + data["fields[TITLE]"]
+        if lead.data["subject"] == "gas_heating":
+            data["fields[TITLE]"] = "Gas: " + data["fields[TITLE]"]
+        if lead.data["subject"] == "oil_heating":
+            data["fields[TITLE]"] = "Öl: " + data["fields[TITLE]"]
     if status is not None:
         data["fields[STATUS_ID]"] = status
     if lead.customer.email and lead.customer.email != "folgt":
