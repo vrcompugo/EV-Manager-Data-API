@@ -22,16 +22,21 @@
   * für 10 Jahre garantiert
 </div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 66.8mm; background-color: #e3e3e3; text-align: center;">
-  1.500 kWh pro Jahr
+  {{ data.usage | numberformat('de', 0) }} kWh pro Jahr
 </div>
 <div class="box" style="left: 23mm; width: 30mm; top: 72.8mm; background-color: #ffffff;">
   Größe der PV-Anlage
 </div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 72.8mm; background-color: #ffffff; text-align: center;">
-  Paket 50
+  Paket {{ data.paket }}
 </div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 78.7mm; background-color: #e3e3e3; text-align: center;">
-  900 kWh je kWp pro Jahr
+  {% if data.orientation == "south" %}
+    900
+  {% else %}
+    830
+  {% endif %}
+  kWh je kWp pro Jahr
 </div>
 <div class="box" style="left: 23mm; width: 77mm; top: 84.7mm; background-color: #ffffff;">
   &nbsp;
@@ -40,42 +45,42 @@
   Senec LI laut Paket
 </div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 105.1mm; background-color: #e3e3e3; text-align: center;">
-  Nord1
+  {{ data.orientation_label }}
 </div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 122.8mm; background-color: #ffffff; text-align: center;">
-  Nord2
+  {{ data.in_use_date | dateformat }}
 </div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 128.5mm; background-color: #e3e3e3; text-align: center;">
-  Nord3
+  {{ data.in_use_date | dateformat }}
 </div>
 <div class="box" style="left: 158.6mm; width: 30mm; top: 61mm; background-color: #ffffff; text-align: center;">
-  120,00 &euro; pro Jahr
+  {{ data.conventional_base_cost_per_year | currencyformat }} pro Jahr
 </div>
 <div class="box" style="left: 158.6mm; width: 30mm; top: 67mm; background-color: #e3e3e3; text-align: center;">
-  27,80 cent pro kWh
+  {{ (100 * data.conventional_base_cost_per_kwh) | numberformat('de', 2) }} cent pro kWh
 </div>
 <div class="box" style="left: 158.6mm; width: 30mm; top: 72.8mm; background-color: #ffffff; text-align: center;">
-  6,75 % pro Jahr
+  {{ data.cost_increase_rate | percentformat(2) }} pro Jahr
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 84.5mm; background-color: #ffffff; text-align: center;">
-  1
+  {{ data.consumer_count }}
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 90.7mm; background-color: #E3E3E3; text-align: center;">
-  19,99 € pro Monat*
+  {{ data.cloud_monthly_cost | currencyformat }} pro Monat*
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 108.2mm; background-color: #ffffff; text-align: center;">
-  10,18 cent pro kWh
+  {{ (100 * data.eeg_refund_per_kwh) | numberformat('de', 2) }} cent pro kWh
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 119.8mm; background-color: #ffffff; text-align: center;">
-  3,00 cent pro kWh
+  {{ (100 * data.refund_per_kwh) | numberformat('de', 2) }} cent pro kWh
 </div>
 <div class="box" style="left: 246.0mm; width: 30mm; top: 87.1mm; background-color: #ffffff; text-align: center;">
-  15.975 €
+  {{ data.pv_offer_total | currencyformat }}
 </div>
 <div class="box" style="left: 246.0mm; width: 30mm; top: 99.1mm; background-color: #ffffff; text-align: center;">
-  2,00 % pro Jahr
+  {{ data.loan_interest_rate | percentformat }} pro Jahr
 </div>
 <div class="box" style="left: 246.0mm; width: 30mm; top: 105.1mm; background-color: #E3E3E3; text-align: center;">
-  19.412 €
+  {{ data.loan_total | currencyformat }}
 </div>
 <div class="foot-date">{{ offer.datetime | dateformat }}</div>

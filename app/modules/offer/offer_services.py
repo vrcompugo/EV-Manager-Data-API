@@ -1,4 +1,5 @@
 import datetime
+import dateutil.relativedelta
 from sqlalchemy import or_
 from flask import render_template, request, make_response
 from PyPDF2 import PdfFileWriter, PdfFileReader
@@ -218,7 +219,61 @@ def generate_offer_pdf(offer: OfferV2):
 
 
 def generate_feasibility_study_pdf(offer: OfferV2):
-    content = render_template("feasibility_study/overlay.html", offer=offer)
+    in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
+    data = {
+        "runtime": 30,
+        "usage": float(offer.survey.data["pv_usage"]),
+        "paket": int(offer.survey.data["packet_number"]),
+        "orientation": offer.survey.data["roof_datas"][0]["direction"],
+        "orientation_label": "Süd" if offer.survey.data["roof_datas"][0]["direction"] == "south" else "West/Ost",
+        "in_use_date": in_use_date,
+        "conventional_base_cost_per_year": 120,
+        "conventional_base_cost_per_kwh": 0.2780,
+        "cost_increase_rate": 6.75,
+        "conventional_total_cost": None,
+        "consumer_count": 1,
+        "cloud_monthly_cost": 19.99,
+        "eeg_refund_per_kwh": 0.1018,
+        "refund_per_kwh": 0.04,
+        "pv_offer_total": offer.total,
+        "loan_interest_rate": 2,
+        "loan_total": None,
+        "cloud_total": None,
+        "cost_total": None,
+        "cost_benefit": None
+    }
+    data["loan_total"] = float(offer.total) * ((1 + data["loan_interest_rate"] / 100) ** 20)
+    data["conventional_usage_cost"] = data["conventional_base_cost_per_kwh"] * float(data["usage"])
+
+    data["conventional_total_usage_cost"] = data["conventional_usage_cost"]
+    for n in range(data["runtime"]):
+        data["conventional_total_usage_cost"] = data["conventional_total_usage_cost"] + data["conventional_total_usage_cost"] * ((1 + data["cost_increase_rate"] / 100) ** data["runtime"])
+
+    data["conventional_total_base_cost"] = data["conventional_base_cost_per_year"]
+    for n in range(data["runtime"]):
+        data["conventional_total_base_cost"] = data["conventional_total_base_cost"] + data["conventional_total_base_cost"] * ((1 + data["cost_increase_rate"] / 100) ** data["runtime"])
+
+    data["conventional_total_cost"] = 0
+    base = data["conventional_usage_cost"] + data["conventional_base_cost_per_year"]
+    for n in range(data["runtime"]):
+        print(base, data["conventional_total_cost"])
+        data["conventional_total_cost"] = data["conventional_total_cost"] + base
+        base = base * (1 + data["cost_increase_rate"] / 100)
+
+    data["cloud_total"] = data["cloud_monthly_cost"] * 12 * 10 \
+        + (data["cloud_monthly_cost"] * 12) * ((1 + data["cost_increase_rate"] / 100) ** (data["runtime"] - 10))
+    if data["runtime"] == 20:
+        data["cloud_total"] = data["cloud_total"] + 1500
+    if data["runtime"] >= 30:
+        data["cloud_total"] = data["cloud_total"] + 2500
+    data["cost_total"] = data["cloud_total"] + data["loan_total"]
+    data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
+    max_cost = data["conventional_total_cost"]
+    if data["cost_total"] > max_cost:
+        max_cost = data["cost_total"]
+    data["cost_conventional_rate"] = data["conventional_total_cost"] / max_cost
+    data["cost_cloud_rate"] = data["cost_total"] / max_cost
+    content = render_template("feasibility_study/overlay.html", offer=offer, data=data)
     config = pdfkit.configuration(wkhtmltopdf="./wkhtmltopdf")
     overlay_binary = pdfkit.from_string(content, configuration=config, output_path=False, options={
         'disable-smart-shrinking': ''

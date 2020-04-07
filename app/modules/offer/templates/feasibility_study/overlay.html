@@ -95,66 +95,7 @@
 
 
   <div class="page page7">
-    <style>
-      .page7 .secure_cloud {
-        position: absolute;
-        left: 180.1mm;
-        top: 20mm;
-        font-size: 14pt;
-        letter-spacing: 0;
-      }
-      .page7 .cloud {
-        position: absolute;
-        left: 218.1mm;
-        top: 96.1mm;
-        font-size: 7pt;
-        width: 50mm;
-        background-color: #F5F9FA;
-      }
-      .page7 .cloud2 {
-        position: absolute;
-        left: 155.1mm;
-        top: 129.9mm;
-        font-size: 8pt;
-        width: 50mm;
-        background-color: #E3E3E3;
-      }
-      .page7 .no_change {
-        position: absolute;
-        left: 155.2mm;
-        top: 137mm;
-        font-size: 8pt;
-        line-height: 1.6em;
-        letter-spacing: -0.06em;
-      }
-      .page7 .smallprint {
-        position: absolute;
-        left: 55.6mm;
-        top: 193.8mm;
-        font-size: 6pt;
-        letter-spacing: -0.05em;
-      }
-    </style>
-
-    <div class=secure_cloud">
-      Deutschlands sicherste Cloud
-    </div>
-
-    <div class="cloud">C.Cloud</div>
-
-    <div class="page4_cloud2">C.Cloud</div>
-
-    <div class="no_change">
-      Ändert sich Ihr Verbrauchsverhalten, ändert sich der Cloudpreis bei uns
-      <span style="text-decoration: underline">nicht</span>.<br>
-      19,99€ garantiert für 10 Jahre.*
-    </div>
-
-    <div class="smallprint">
-      * gilt für den vereinbarten Gesamtverbrauch
-    </div>
-
-    <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    {% include("feasibility_study/pages/page7.html") %}
   </div>
 
 

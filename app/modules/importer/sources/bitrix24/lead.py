@@ -312,7 +312,14 @@ def run_export(remote_id=None, local_id=None):
                     if lead.data is not None:
                         comment = ""
                         for key, value in lead.data.items():
-                            comment = comment + f"{key}: {value}\n"
+                            if key in ["price", "subscription_group", "images"]:
+                                continue
+                            if type(value) is dict:
+                                comment = comment + f"{key}:\n"
+                                for key2, value2 in value.items():
+                                    comment = comment + f"  {key2}: {value2}\n"
+                            else:
+                                comment = comment + f"{key}: {value}\n"
                         response2 = post("crm.timeline.comment.add", post_data={
                             "fields[ENTITY_ID]": response["result"],
                             "fields[ENTITY_TYPE]": "lead",

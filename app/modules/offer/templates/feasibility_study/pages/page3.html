@@ -9,12 +9,15 @@
 
   }
 </style>
+<div class="box" style="left: 20mm; width: 277mm; top: 35.1mm; font-size: 12pt; background-color: #f4f8fb;">
+  Das geben Sie in den nächsten {{ data.runtime }} Jahren für Strom aus:
+</div>
 <div class="box" style="left: 10mm; width: 277mm; top: 75.1mm; font-size: 122pt; color: #ff9900; background-color: #f4f8fb; text-align: center;">
-  52.954 €
+  {{ data.conventional_total_cost | currencyformat("de", 0) }}
 </div>
 <div class="box" style="left: 20.8mm; width: 237mm; top: 151.1mm; background-color: #f4f8fb; padding-bottom: 10mm;">
   Die oben genannten Stromkosten ergeben sich aus den von Ihnen zu zahlenden Grundgebühren und Strompreisen pro kWh für Ihren Stromverbrauch unter der Berücksichtigung einer
-  Strompreissteigerung von 6,75 Prozent innerhalb der kommenden 30 Jahre.
+  Strompreissteigerung von {{ data.cost_increase_rate | numberformat("de", 2) }} Prozent innerhalb der kommenden 30 Jahre.
 </div>
 <div class="notes2">
   1) In dem Betrag sind die Finanzierungskosten enthalten.<br>

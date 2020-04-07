@@ -10,6 +10,6 @@
   }
 </style>
 <div class="box" style="left: 25.7mm; top: 74.1mm; font-size: 14pt; background-color: #cfdef1;">
-  <b>19.871 € Vorteil</b> über 30 Jahre
+  <b>{{ data.cost_benefit | currencyformat("de", 0) }} Vorteil</b> über {{ data.runtime }} Jahre
 </div>
 <div class="address">{{ offer.address | addressblock | nltobr }}</div>

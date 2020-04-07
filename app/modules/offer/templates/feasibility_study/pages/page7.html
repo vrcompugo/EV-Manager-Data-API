@@ -1,0 +1,60 @@
+<div class="box" style="left: 180mm; top: 11mm; font-size: 14pt;">
+  Deutschlands sicherste Cloud
+</div>
+
+<div class="box" style="left: 218.1mm; top: 96.6mm; width: 50mm; background-color: #F5F9FA;">
+  C.Cloud
+</div>
+
+<div class="box" style="left: 104.2mm; top: 105.8mm; font-size: 8pt; width: 40mm; background-color: #e3e3e3; text-align: right;">
+  Paket {{ data.paket }}
+</div>
+
+<div class="box" style="left: 104.2mm; top: 111.8mm; font-size: 8pt; width: 40mm; background-color: #ffffff; text-align: right;">
+  {% if data.orientation == "south" %}
+    900
+  {% else %}
+    830
+  {% endif %}
+  kWh je kWp pro Jahr
+</div>
+
+<div class="box" style="left: 22.2mm; top: 117.8mm; font-size: 8pt; width: 122mm; background-color: #e3e3e3; text-align: right;">
+  &nbsp;
+</div>
+
+<div class="box" style="left: 236.2mm; top: 105.8mm; font-size: 8pt; width: 40mm; background-color: #e3e3e3; text-align: right;">
+  {{ data.usage | numberformat("de", 2) }} kWh
+</div>
+
+<div class="box" style="left: 236.2mm; top: 111.8mm; font-size: 8pt; width: 40mm; background-color: #ffffff; text-align: right;">
+  {{ data.usage | numberformat("de", 2) }} kWh
+</div>
+
+<div class="box" style="left: 236.2mm; top: 117.8mm; font-size: 8pt; width: 40mm; background-color: #e3e3e3; text-align: right;">
+  {{ data.cost_increase_rate | percentformat("de", 2) }} pro Jahr
+</div>
+
+<div class="box" style="left: 236.2mm; top: 124.2mm; font-size: 8pt; width: 40mm; background-color: #ffffff; text-align: right;">
+  {{ (data.usage * 0.75) | numberformat("de", 2) }} kWh
+</div>
+
+<div class="box" style="left: 155.1mm; top: 130.4mm; font-size: 8pt; width: 50mm; background-color: #E3E3E3;">
+  C.Cloud
+</div>
+
+<div class="box" style="left: 236.2mm; top: 130.4mm; font-size: 8pt; width: 40mm; background-color: #e3e3e3; text-align: right;">
+  {{ (data.usage * 0.25) | numberformat("de", 2) }} kWh
+</div>
+
+<div class="box" style="left: 155.2mm; top: 137mm; font-size: 8pt; line-height: 1.6em; letter-spacing: -0.06em;">
+  Ändert sich Ihr Verbrauchsverhalten, ändert sich der Cloudpreis bei uns
+  <span style="text-decoration: underline">nicht</span>.<br>
+  {{ data.cloud_monthly_cost | currencyformat }} garantiert für 10 Jahre.*
+</div>
+
+<div class="box" style="left: 55.6mm; top: 193.8mm; font-size: 6pt; letter-spacing: -0.05em;">
+  * gilt für den vereinbarten Gesamtverbrauch
+</div>
+
+<div class="foot-date">{{ offer.datetime | dateformat }}</div>
