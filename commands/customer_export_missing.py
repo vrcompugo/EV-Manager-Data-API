@@ -14,3 +14,5 @@ def customer_export_missing():
         if link is None:
             print(customer.id)
             run_export(local_id=customer.id)
+            link = find_association("Customer", local_id=customer.id)
+            print(link.__dict__)
