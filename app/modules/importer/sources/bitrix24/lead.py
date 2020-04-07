@@ -303,9 +303,9 @@ def run_export(remote_id=None, local_id=None):
                     associate_item(model="Lead", local_id=lead.id, remote_id=response["result"])
                     if lead.description is not None and lead.description != "":
                         response2 = post("crm.timeline.comment.add", post_data={
-                            "ENTITY_ID": response["result"],
-                            "ENTITY_TYPE": "lead",
-                            "COMMENT": lead.description
+                            "fields[ENTITY_ID]]": response["result"],
+                            "fields[ENTITY_TYPE]": "lead",
+                            "fields[COMMENT]": lead.description
                         })
                         if "result" not in response2:
                             pp.pprint(response2)
@@ -314,9 +314,9 @@ def run_export(remote_id=None, local_id=None):
                         for key, value in lead.data.items():
                             comment = comment + f"{key}: {value}\n"
                         response2 = post("crm.timeline.comment.add", post_data={
-                            "ENTITY_ID": response["result"],
-                            "ENTITY_TYPE": "lead",
-                            "COMMENT": comment
+                            "fields[ENTITY_ID]": response["result"],
+                            "fields[ENTITY_TYPE]": "lead",
+                            "fields[COMMENT]": comment
                         })
                         if "result" not in response2:
                             pp.pprint(response2)
