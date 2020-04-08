@@ -56,6 +56,18 @@ class OfferV2(db.Model):
             return None
         return s3_file
 
+    @hybrid_property
+    def feasibility_study_pdf(self):
+        from app.models import S3File
+
+        s3_file = S3File.query\
+            .filter(S3File.model == "OfferV2FeasibilityStudy")\
+            .filter(S3File.model_id == self.id)\
+            .first()
+        if s3_file is None:
+            return None
+        return s3_file
+
 
 class OfferV2Schema(ModelSchema):
 

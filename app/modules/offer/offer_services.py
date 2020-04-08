@@ -55,6 +55,7 @@ def add_item_v2(data):
     items = new_item.items
     address = new_item.address
     generate_offer_pdf(new_item)
+    generate_feasibility_study_pdf(new_item)
     return new_item
 
 
@@ -229,7 +230,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         "in_use_date": in_use_date,
         "conventional_base_cost_per_year": 120,
         "conventional_base_cost_per_kwh": 0.2780,
-        "cost_increase_rate": 6.75,
+        "cost_increase_rate": 6.0,
         "conventional_total_cost": None,
         "consumer_count": 1,
         "cloud_monthly_cost": 19.99,
@@ -242,7 +243,14 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         "cost_total": None,
         "cost_benefit": None
     }
-    data["loan_total"] = float(offer.total) * ((1 + data["loan_interest_rate"] / 100) ** 20)
+    yearly_loan_payment = (float(offer.total) * data["loan_interest_rate"] / 100) / (1 - (1 + data["loan_interest_rate"] / 100) ** -20)
+    data["loan_total_interest"] = 0
+    rest_loan = float(offer.total)
+    for n in range(20):
+        interest = rest_loan * (data["loan_interest_rate"] / 100)
+        data["loan_total_interest"] = data["loan_total_interest"] + interest
+        rest_loan = rest_loan + interest - yearly_loan_payment
+    data["loan_total"] = data["loan_total_interest"] + float(offer.total)
     data["conventional_usage_cost"] = data["conventional_base_cost_per_kwh"] * float(data["usage"])
 
     data["conventional_total_usage_cost"] = data["conventional_usage_cost"]
@@ -254,11 +262,18 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         data["conventional_total_base_cost"] = data["conventional_total_base_cost"] + data["conventional_total_base_cost"] * ((1 + data["cost_increase_rate"] / 100) ** data["runtime"])
 
     data["conventional_total_cost"] = 0
+    data["conventional_total_cost_base"] = 0
+    data["conventional_total_cost_usage"] = 0
     base = data["conventional_usage_cost"] + data["conventional_base_cost_per_year"]
+    base_base = data["conventional_base_cost_per_year"]
+    base_usage = data["conventional_usage_cost"]
     for n in range(data["runtime"]):
-        print(base, data["conventional_total_cost"])
         data["conventional_total_cost"] = data["conventional_total_cost"] + base
+        data["conventional_total_cost_base"] = data["conventional_total_cost_base"] + base_base
+        data["conventional_total_cost_usage"] = data["conventional_total_cost_usage"] + base_usage
         base = base * (1 + data["cost_increase_rate"] / 100)
+        base_base = base_base * (1 + data["cost_increase_rate"] / 100)
+        base_usage = base_usage * (1 + data["cost_increase_rate"] / 100)
 
     data["cloud_total"] = data["cloud_monthly_cost"] * 12 * 10 \
         + (data["cloud_monthly_cost"] * 12) * ((1 + data["cost_increase_rate"] / 100) ** (data["runtime"] - 10))
@@ -290,7 +305,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
             output.addPage(page)
         output.write(pdf)
         pdf.seek(0)
-        '''pdf_file = S3File.query\
+        pdf_file = S3File.query\
             .filter(S3File.model == "OfferV2FeasibilityStudy")\
             .filter(S3File.model_id == offer.id)\
             .first()
@@ -304,7 +319,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         if pdf_file is not None:
             update_file(pdf_file.id, file_data)
         else:
-            add_file(file_data)'''
+            add_file(file_data)
         response = make_response(pdf.read())
         response.headers['Content-Type'] = 'application/pdf'
         return response
