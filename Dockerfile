@@ -14,6 +14,7 @@ COPY . .
 RUN chmod 644 manage.py
 RUN mkdir /usr/src/app/tmp
 RUN chmod 777 /usr/src/app/tmp
+RUN chmod 777 /usr/src/app/wkhtmltopdf
 RUN chown -R appuser.appuser /usr/src/app
 
 USER appuser
