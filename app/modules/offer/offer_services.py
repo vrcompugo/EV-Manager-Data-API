@@ -313,13 +313,14 @@ def generate_feasibility_study_pdf(offer: OfferV2):
             "model": "OfferV2FeasibilityStudy",
             "model_id": offer.id,
             "content-type": 'application/pdf',
-            "file_content": pdf,
+            "file": pdf,
             "filename": f"Wirtschaftlichkeitsrechnung PV-{offer.id}.pdf"
         }
         if pdf_file is not None:
             update_file(pdf_file.id, file_data)
         else:
             add_file(file_data)
+        pdf.seek(0)
         response = make_response(pdf.read())
         response.headers['Content-Type'] = 'application/pdf'
         return response
