@@ -26,12 +26,14 @@ def post(url, post_data=None):
     token = authenticate()
 
     if token is not None:
-        response = requests.post(API_URL + "/v1/{}".format(url),
-                                     headers={'Authorization': "Basic {}".format(token)},
-                                     json=post_data)
+        response = requests.post(
+            API_URL + "/v1/{}".format(url),
+            headers={'Authorization': "Basic {}".format(token)},
+            json=post_data
+        )
         try:
             return response.json()
-        except:
+        except Exception as e:
             print(response.text)
     return {}
 
@@ -41,12 +43,15 @@ def put(url, post_data=None):
     token = authenticate()
 
     if token is not None:
-        response = requests.put(API_URL + "/v1/{}".format(url),
-                                     headers={'Authorization': "Basic {}".format(token)},
-                                     json=post_data)
+        response = requests.put(
+            API_URL + "/v1/{}".format(url),
+            headers={'Authorization': "Basic {}".format(token)},
+            json=post_data,
+            timeout=320
+        )
         try:
             return response.json()
-        except:
+        except Exception as e:
             print(response.text)
     return {}
 
@@ -56,13 +61,16 @@ def get(url, parameters=None, raw=False):
     token = authenticate()
 
     if token is not None:
-        response = requests.get(API_URL + "/v1/{}".format(url),
-                                     headers={'Authorization': "Basic {}".format(token)},
-                                     params=parameters)
+        response = requests.get(
+            API_URL + "/v1/{}".format(url),
+            headers={'Authorization': "Basic {}".format(token)},
+            params=parameters,
+            timeout=320
+        )
         try:
             if raw:
                 return response
             return response.json()
-        except:
+        except Exception as e:
             print(response.text)
     return {}
