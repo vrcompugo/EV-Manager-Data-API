@@ -103,7 +103,7 @@
   Inflationsrate
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 125.8mm; text-align: center;">
-  {{ (100 * 0.02) | percentformat(2) }}
+  {{ data.inflation_rate | percentformat(2) }}
 </div>
 <div class="box" style="left: 246.0mm; width: 30mm; top: 87.1mm; background-color: #ffffff; text-align: center;">
   {{ data.pv_offer_total | currencyformat }}
