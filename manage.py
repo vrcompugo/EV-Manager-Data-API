@@ -53,15 +53,20 @@ def cron_import_tasks():
     cron_import_tasks()
 
 
-@manager.command
-def generate_offer_by_survey():
-    from app.models import Survey
-    from app.modules.offer.offer_services import automatic_offer_creation_by_survey
+@manager.option("-l", "--local_id", dest='local_id', default=None)
+def generate_pdfs_for_offer(local_id):
+    from app.models import OfferV2
+    from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
+    from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
+    from app.modules.offer.services.pdf_generation.pv_offer import generate_pv_offer_pdf
 
-    survey = Survey.query.get(1022)
-    automatic_offer_creation_by_survey(survey)
-    survey = Survey.query.get(1023)
-    automatic_offer_creation_by_survey(survey)
+    offer = OfferV2.query.get(int(local_id))
+    if offer is not None:
+        generate_feasibility_study_pdf(offer)
+        generate_cloud_pdf(offer)
+        generate_pv_offer_pdf(offer)
+    else:
+        print("Offer not found")
 
 
 @manager.command

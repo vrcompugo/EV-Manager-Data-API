@@ -22,8 +22,13 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     for item in items:
         cloud_total = cloud_total + float(item["total_price"])
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
+    consumer = 1
+    if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+        for drain in offer.survey.data["extra_drains"]:
+            if "usage" in drain and int(drain["usage"]) > 0:
+                consumer = consumer + 1
     data = {
-        "runtime": 30,
+        "runtime": int(offer.survey.data["run_time"]),
         "usage": float(offer.survey.data["pv_usage"]),
         "paket": int(offer.survey.data["packet_number"]),
         "orientation": offer.survey.data["roof_datas"][0]["direction"],
@@ -31,14 +36,15 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         "in_use_date": in_use_date,
         "conventional_base_cost_per_year": settings["data"]["wi_settings"]["conventional_base_cost_per_year"],
         "conventional_base_cost_per_kwh": settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"],
-        "cost_increase_rate": settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"],
+        "cost_increase_rate": float(offer.survey.data["price_increase"]),
+        "inflation_rate": float(offer.survey.data["inflation_rate"]),
         "conventional_total_cost": None,
-        "consumer_count": 1,
+        "consumer_count": consumer,
         "cloud_monthly_cost": cloud_total,
-        "eeg_refund_per_kwh": 0.1018,
-        "refund_per_kwh": 0.04,
+        "eeg_refund_per_kwh": settings["data"]["wi_settings"]["eeg_refund_per_kwh"],
+        "refund_per_kwh": settings["data"]["wi_settings"]["refund_per_kwh"],
         "pv_offer_total": offer.total,
-        "loan_interest_rate": 2,
+        "loan_interest_rate": settings["data"]["wi_settings"]["loan_interest_rate"],
         "loan_total": None,
         "cloud_total": None,
         "cost_total": None,

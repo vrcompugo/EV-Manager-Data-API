@@ -56,14 +56,6 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
                 "Erneuerbare Energie - Cloud PV Pakete Optionen",
                 quantity)
 
-        if int(survey.data["packet_number"]) >= 60:
-            offer_data = add_item_to_offer(
-                survey,
-                offer_data,
-                "zus. digitaler Zähler",
-                "Erneuerbare Energie - Cloud PV Pakete Optionen",
-                1)
-
         integrated_options = ["Schwarze Module"]
         for optional_product in survey.data["pv_options"]:
             if optional_product["label"] not in integrated_options:

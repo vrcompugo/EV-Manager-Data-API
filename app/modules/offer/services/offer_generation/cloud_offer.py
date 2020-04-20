@@ -1,9 +1,14 @@
 from app.models import OfferV2
+from app.modules.settings.settings_services import get_one_item as get_settings
 
 from ._utils import base_offer_data, add_item_to_offer, add_optional_item_to_offer
 
 
 def cloud_offer_items_by_pv_offer(offer: OfferV2):
+    settings = get_settings("pv-settings")
+    if settings is None:
+        return None
+
     items = [
         {
             "label": "cCloud-Zero",
@@ -36,9 +41,9 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         "label": "",
         "description": (
             "<b>PV Erzeugung</b><br>\n"
-            + "Zählernummer:<br>\n"
+            + f"Zählernummer: {offer.survey.data['current_counter_number']}<br>\n"
             + f"PV-Anlage laut Angebot: PV-{offer.id}<br>\n"
-            + "Musterstraße 1 Musterstadt<br>\n"
+            + f"{offer.survey.data['street']} {offer.survey.data['zip']} {offer.survey.data['city']}<br>\n"
             + f"Abnahme: {offer.survey.data['pv_usage']} kWh<br>\n"
             + "Mehrverbrauch: 0 kWh\n"
         ),
@@ -59,29 +64,32 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         "total_price_net": 0,
         "total_tax_amount": 0
     })
-    items.append({
-        "label": "",
-        "description": (
-            "<b>Abnahmestelle</b><br>\n"
-            + "Zählernummer:<br>\n"
-            + "Musterstraße 1 Musterstadt<br>\n"
-            + f"Abnahme: {offer.survey.data['pv_usage']} kWh<br>\n"
-        ),
-        "quantity": 1,
-        "quantity_unit": "mtl.",
-        "tax_rate": 19,
-        "single_price": 0,
-        "single_price_net": 0,
-        "single_tax_amount": 0,
-        "discount_rate": 0,
-        "discount_single_amount": 0,
-        "discount_single_price": 0,
-        "discount_single_price_net": 0,
-        "discount_single_price_net_overwrite": None,
-        "discount_single_tax_amount": 0,
-        "discount_total_amount": 0,
-        "total_price": 12,
-        "total_price_net": 0,
-        "total_tax_amount": 0
-    })
+
+    if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+        for drain in offer.survey.data["extra_drains"]:
+            if "usage" in drain and int(drain["usage"]) > 0:
+                items.append({
+                    "label": "",
+                    "description": (
+                        "<b>Extra Abnahmestelle</b><br>\n"
+                        + f"{drain['street']} {drain['city']}<br>\n"
+                        + f"Abnahme: {drain['usage']} kWh<br>\n"
+                    ),
+                    "quantity": 1,
+                    "quantity_unit": "mtl.",
+                    "tax_rate": 19,
+                    "single_price": 0,
+                    "single_price_net": 0,
+                    "single_tax_amount": 0,
+                    "discount_rate": 0,
+                    "discount_single_amount": 0,
+                    "discount_single_price": 0,
+                    "discount_single_price_net": 0,
+                    "discount_single_price_net_overwrite": None,
+                    "discount_single_tax_amount": 0,
+                    "discount_total_amount": 0,
+                    "total_price": 12,
+                    "total_price_net": 0,
+                    "total_tax_amount": 0
+                })
     return items
