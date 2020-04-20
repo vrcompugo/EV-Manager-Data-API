@@ -1,0 +1,22 @@
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: minio-ingress
+  namespace: schoen
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 200m
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - minio.api.korbacher-energiezentrum.de.ah.hbbx.de
+      secretName: minio.api.korbacher-energiezentrum.de.ah.hbbx.de-tls
+  rules:
+    - host: minio.api.korbacher-energiezentrum.de.ah.hbbx.de
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: minio-svc
+              servicePort: 9000

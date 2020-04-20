@@ -211,6 +211,7 @@ metadata:
   name: minio-ingress
   namespace: schoen
   annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 200m
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   tls:

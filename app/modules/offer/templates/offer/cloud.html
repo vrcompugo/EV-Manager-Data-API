@@ -68,99 +68,46 @@
     </style>
   </head>
   <body>
+    {% set heading = "C.Cloud Konfiguration" %}
     {% include "offer/head.html" %}
-    <small>
-      Das Leistungsverzeichnis beinhaltet die Lieferung und Montage der Stromerzeugungsanlage.<br>
-      (Zusatzkosten sind unten aufgeführt/beschrieben)<br>
-      <br>
-      Die Anfrage zur Anschlussgenehmigung Ihrer Stromerzeugungsanlage an den Netzbetreiber übernehmen wir gerne für Sie und diese
-      Leistung ist im Preis enthalten. Nach Anschluss Ihrer Anlage an das Betreibernetz und der Inbetriebnahme durch den Netzbetreiber erfolgt
-      die Anmeldung an die Bundesnetzagentur durch Sie. Sie haben von der Auftragsannahme bis zur funktionsfertigen Übergabe Ihrer Anlage
-      nur einen Ansprechpartner. <br>
-    </small>
     <br>
     <table cellspacing="0" class="table table-condensed" style="width: 100%;">
       <thead>
         <tr>
-          <th class="table--th">Pos.</th>
-          <th class="table--th">Anzahl</th>
-          <th class="table--th">Einheit</th>
+          <th class="table--th" width="1%">Pos.</th>
           <th class="table--th">Bezeichnung</th>
-          <th class="table--th">Einzelpreis</th>
-          <th class="table--th">Gesamtpreis</th>
+          <th class="table--th right">mtl. Beitrag</th>
         </tr>
       </thead>
       <tbody>
-        {% set index = {'index': 1, 'unused': 0} %}
-        {% for item in offer.items %}
-          {% if item.quantity > 0 or item.position == "top" %}
+        {% set index = {'index': 1} %}
+        {% for item in items %}
+          {% if item.quantity > 0 %}
             <tr>
               <td class="border-right">{{ index.index }}</td>
-              <td class="border-right right">{{ item.quantity | numberformat("de", 0) }}</td>
-              <td class="border-right">{{ item.quantity_unit }}</td>
               <td class="border-right">
-                <small>{{ item.label }}</small><br>
+                <small style="display: block;">{{ item.label }}</small>
                 {{ item.description | safe }}
               </td>
-              <td class="right border-right" style="white-space: nowrap;">{{ item.single_price_net | currencyformat }}</td>
-              <td class="right" style="white-space: nowrap;">{{ item.total_price_net | currencyformat }}</td>
+              <td class="right">
+                {%- if item.total_price > 0 -%}
+                  {{ item.total_price | currencyformat }}
+                {%- endif -%}
+              </td>
             </tr>
             {% if index.update({"index": index.index + 1 }) %} {% endif %}
-          {% else %}
-            {% if index.update({"unused": index.unused + 1 }) %} {% endif %}
           {% endif %}
         {% endfor %}
-        <tr>
-          <td class="border-right" colspan="5">Summe:</td>
-          <td class="right" style="white-space: nowrap;">{{ offer.subtotal_net | currencyformat }}</td>
-        </tr>
-        <tr>
-          <td class="border-right" colspan="5">Mehrwertsteuer {{ offer.tax_rate | percentformat }} auf {{ offer.subtotal_net | currencyformat }} netto</td>
-          <td class="right" style="white-space: nowrap;">{{ offer.total_tax | currencyformat }}</td>
-        </tr>
         <tr class="foot-line">
-          <td class="border-right" colspan="5">Zu zahlender Betrag</td>
-          <td class="right" style="white-space: nowrap;">{{ offer.total | currencyformat }}</td>
+          <td class="border-right right" colspan="2">Monatlicher Beitrag für (a) - ZERO:</td>
+          <td class="right">{{ 19.99 | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td class="border-right right" colspan="2">Monatliche Gesamtkosten:</td>
+          <td class="right">{{ 19.99 | currencyformat }}</td>
         </tr>
       </tbody>
     </table>
-    {% if index.unused > 0 %}
-      <div style="page-break-after: always;"></div>
-
-      <h2>Interessantes Zubehör</h2>
-
-      <table cellspacing="0" class="table table-condensed" style="width: 100%;">
-        <thead>
-          <tr>
-            <th class="table--th">Pos.</th>
-            <th class="table--th">Anzahl</th>
-            <th class="table--th">Einheit</th>
-            <th class="table--th">Bezeichnung</th>
-            <th class="table--th">Einzelpreis</th>
-            <th class="table--th">Gesamtpreis</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% set index = {'index': 1} %}
-          {% for item in offer.items %}
-            {% if item.quantity == 0 and item.position == "bottom" %}
-              <tr>
-                <td class="border-right">{{ index.index }}</td>
-                <td class="border-right right">{{ item.quantity | numberformat("de", 0) }}</td>
-                <td class="border-right">{{ item.quantity_unit }}</td>
-                <td class="border-right">
-                  <small>{{ item.label }}</small><br>
-                  {{ item.description | safe }}
-                </td>
-                <td class="right border-right" style="white-space: nowrap;">{{ item.single_price_net | currencyformat }}</td>
-                <td class="right" style="white-space: nowrap;">{{ 0 | currencyformat }}</td>
-              </tr>
-              {% if index.update({"index": index.index + 1 }) %} {% endif %}
-            {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
-    {% endif %}
 
     <div style="page-break-after: always;"></div>
 
@@ -170,7 +117,7 @@
     <p>Als Zahlungsbedingungen werden vereinbart (bitte ankreuzen):</p>
     <p>(&nbsp; &nbsp;) 7 Tage nach betriebsbereiter PV-Anlage inkl. Speicher oder spätestens 30 Tage nach DC Montage (Bonität vorausgesetzt)</p>
     <p>(&nbsp; &nbsp;) 30% bei Auftragserteilung, 65% 5 Tage vor Lieferung, 5% bei betriebsbereiter PV-Anlage inkl. Speicher</p>
-    <p></p>
+    <p>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bankverbindung: _________________________________________________</p>
     <p>Bemerkungen</p>
     <p>____________________________________________________________________</p>
     <p>____________________________________________________________________</p>

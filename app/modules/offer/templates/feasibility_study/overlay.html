@@ -28,6 +28,12 @@
       font-size: 7pt;
       background-color: white;
     }
+    .foot-pages {
+      position: absolute;
+      right: 10.5mm;
+      top: 12.6mm;
+      font-size: 7pt;
+    }
     .box {
       position: absolute;
       left: 10mm;
@@ -38,21 +44,26 @@
 <body>
   <div class="page page1">
     {% include("feasibility_study/pages/page1.html") %}
+    <div class="foot-pages">Seite 2 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page2">
     {% include("feasibility_study/pages/page2.html") %}
+    <div class="foot-pages">Seite 3 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page3">
     {% include("feasibility_study/pages/page3.html") %}
+    <div class="foot-pages">Seite 4 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page4">
+    {% include("feasibility_study/pages/page4.html") %}
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 5 von {{ data.total_pages }}</div>
   </div>
 
 
@@ -86,16 +97,19 @@
       So funktioniert der SENEC-Batteriespeicher und die Cloud:
     </div>
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 6 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page6">
     {% include("feasibility_study/pages/page6.html") %}
+    <div class="foot-pages">Seite 7 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page7">
     {% include("feasibility_study/pages/page7.html") %}
+    <div class="foot-pages">Seite 8 von {{ data.total_pages }}</div>
   </div>
 
 
@@ -124,16 +138,19 @@
     </div>
 
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 9 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page9">
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 10 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page10">
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 11 von {{ data.total_pages }}</div>
   </div>
 
 
@@ -161,6 +178,7 @@
       </ul>
     </div>
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 12 von {{ data.total_pages }}</div>
   </div>
 
 
@@ -181,26 +199,32 @@
       <img src="data:image/png;base64,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" alt="" />
     </div>
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 13 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page13">
+    {% include("feasibility_study/pages/page13.html") %}
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 14 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page14">
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
+    <div class="foot-pages">Seite 15 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page15">
     {% include("feasibility_study/pages/page15.html") %}
+    <div class="foot-pages">Seite 16 von {{ data.total_pages }}</div>
   </div>
 
 
   <div class="page page16">
     {% include("feasibility_study/pages/page16.html") %}
+    <div class="foot-pages">Seite 17 von {{ data.total_pages }}</div>
   </div>
 
 

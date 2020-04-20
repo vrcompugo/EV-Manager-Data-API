@@ -1,0 +1,21 @@
+from .pv_offer import pv_offer_by_survey
+
+
+def automatic_offer_creation_by_survey(survey, old_data=None):
+
+    from app.modules.offer.services.offer_generation import automatic_offer_creation_by_survey
+
+    from app.modules.importer.sources.bitrix24.offer import run_export
+    from app.modules.importer.sources.bitrix24.lead import run_status_update_export
+
+    if ("offer_comment" not in survey.data or survey.data["offer_comment"] == ""):
+        offer = None
+        if "create_offer_pv" in survey.data and survey.data["create_offer_pv"]:
+            offer = pv_offer_by_survey(survey, old_data)
+
+        if survey.lead is not None and offer is not None:
+            survey.lead.value = offer.total
+            survey.lead.status = "offer_created"
+            db.session.add(lead)
+            db.session.commit()
+            run_status_update_export(local_id=lead.id)

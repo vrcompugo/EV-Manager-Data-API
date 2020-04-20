@@ -38,7 +38,7 @@ class OfferV2(db.Model):
     total = db.Column(db.Numeric(scale=4, precision=12))
     status = db.Column(db.String(20))
     last_updated = db.Column(db.DateTime)
-    items = db.relationship("OfferV2Item")
+    items = db.relationship("OfferV2Item", order_by="OfferV2Item.id")
 
     @hybrid_property
     def search_query(self):
@@ -47,24 +47,63 @@ class OfferV2(db.Model):
     @hybrid_property
     def pdf(self):
         from app.models import S3File
+        from ..services.pdf_generation.pv_offer import generate_pv_offer_pdf
 
         s3_file = S3File.query\
             .filter(S3File.model == "OfferV2")\
             .filter(S3File.model_id == self.id)\
             .first()
         if s3_file is None:
+            if self.offer_group == "pv-offer":
+                generate_pv_offer_pdf(self)
+                s3_file = S3File.query\
+                    .filter(S3File.model == "OfferV2")\
+                    .filter(S3File.model_id == self.id)\
+                    .first()
+                if s3_file is not None:
+                    return s3_file
+            return None
+        return s3_file
+
+    @hybrid_property
+    def cloud_pdf(self):
+        from app.models import S3File
+        from ..services.pdf_generation.cloud_offer import generate_cloud_pdf
+
+        s3_file = S3File.query\
+            .filter(S3File.model == "OfferV2Cloud")\
+            .filter(S3File.model_id == self.id)\
+            .first()
+        if s3_file is None:
+            if self.offer_group == "pv-offer":
+                generate_cloud_pdf(self)
+                s3_file = S3File.query\
+                    .filter(S3File.model == "OfferV2Cloud")\
+                    .filter(S3File.model_id == self.id)\
+                    .first()
+                if s3_file is not None:
+                    return s3_file
             return None
         return s3_file
 
     @hybrid_property
     def feasibility_study_pdf(self):
         from app.models import S3File
+        from ..services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
 
         s3_file = S3File.query\
             .filter(S3File.model == "OfferV2FeasibilityStudy")\
             .filter(S3File.model_id == self.id)\
             .first()
         if s3_file is None:
+            if self.offer_group == "pv-offer":
+                generate_feasibility_study_pdf(self)
+                s3_file = S3File.query\
+                    .filter(S3File.model == "OfferV2FeasibilityStudy")\
+                    .filter(S3File.model_id == self.id)\
+                    .first()
+                if s3_file is not None:
+                    return s3_file
             return None
         return s3_file
 

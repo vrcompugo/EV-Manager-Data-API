@@ -48,8 +48,8 @@ def run_import(remote_id=None, local_id=None):
                     item_data["data"]["pv_offer"]["files"][i]["id"] = local_file.id
                     item_data["data"]["pv_offer"]["files"][i]["uuid"] = str(local_file.uuid)
             if "cloud_offer" in item_data["calculation"] and "id" in item_data["calculation"]["cloud_offer"]:
-                    local_file = run_file_import("OfferPDF", model_id=None, id=item_data["calculation"]["cloud_offer"]["id"])
-                    item_data["calculation"]["cloud_offer"]["pdf_id"] = local_file.id
+                local_file = run_file_import("OfferPDF", model_id=None, id=item_data["calculation"]["cloud_offer"]["id"])
+                item_data["calculation"]["cloud_offer"]["pdf_id"] = local_file.id
 
             return import_item(item_data)
         return

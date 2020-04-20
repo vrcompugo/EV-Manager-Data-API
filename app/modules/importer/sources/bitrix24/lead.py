@@ -1,5 +1,6 @@
 from app import db
 import pprint
+import json
 import time
 import random
 from datetime import datetime, timedelta
@@ -372,7 +373,7 @@ def run_status_update_export(remote_id=None, local_id=None):
         post_data["fields[COMPANY_ID]"] = company_link.remote_id
     response = post("crm.lead.update", post_data=post_data)
     if "result" not in response:
-        pp.pprint(response)
+        print(json.dumps(response, indent=2))
 
 
 def run_cron_export():

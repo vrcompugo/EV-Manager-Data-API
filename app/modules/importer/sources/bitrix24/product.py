@@ -1,6 +1,7 @@
 from app import db
 import pprint
 import json
+import re
 from datetime import datetime, timedelta
 
 from app.models import Reseller, Product
@@ -24,6 +25,21 @@ def filter_import_data(item_data):
     unit_data = post("crm.measure.get", {"id": item_data["MEASURE"]})
     if unit_data is not None and "result" in unit_data:
         pack_unit = unit_data["result"]["MEASURE_TITLE"]
+    item_data["NAME"] = item_data["NAME"].strip()
+    packet_range_start = None
+    packet_range_end = None
+    if item_data["NAME"].find("PV Paket") == -1:
+        if re.match(r"(.*) \([0-9\-]+\)$", item_data["NAME"]):
+            if re.match(r"(.*) \([0-9]+\)$", item_data["NAME"]):
+                search = re.search(r"(.*) \(([0-9]+)\)$", item_data["NAME"])
+                packet_range_start = search.group(2)
+                packet_range_end = search.group(2)
+            else:
+                search = re.search(r"(.*) \(([0-9]+)\-([0-9]+)\)$", item_data["NAME"])
+                packet_range_start = search.group(2)
+                packet_range_end = search.group(3)
+                item_data["NAME"] = search.group(1)
+    print(item_data["NAME"])
     data = {
         "product_group": product_group,
         "name": item_data["NAME"],
@@ -35,6 +51,8 @@ def filter_import_data(item_data):
         "purchase_unit": 1,
         "reference_unit": 1,
         "pack_unit": pack_unit,
+        "packet_range_start": packet_range_start,
+        "packet_range_end": packet_range_end,
         "shipping_time": "",
         "tax_rate": 19,
         "min_purchase": 1,

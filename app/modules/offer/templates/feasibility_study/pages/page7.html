@@ -23,6 +23,10 @@
   &nbsp;
 </div>
 
+<div class="box" style="left: 104.2mm; top: 124.2mm; font-size: 8pt; width: 40mm; background-color: #ffffff; text-align: right;">
+  70 %
+</div>
+
 <div class="box" style="left: 236.2mm; top: 105.8mm; font-size: 8pt; width: 40mm; background-color: #e3e3e3; text-align: right;">
   {{ data.usage | numberformat("de", 2) }} kWh
 </div>
@@ -36,7 +40,7 @@
 </div>
 
 <div class="box" style="left: 236.2mm; top: 124.2mm; font-size: 8pt; width: 40mm; background-color: #ffffff; text-align: right;">
-  {{ (data.usage * 0.75) | numberformat("de", 2) }} kWh
+  70 %
 </div>
 
 <div class="box" style="left: 155.1mm; top: 130.4mm; font-size: 8pt; width: 50mm; background-color: #E3E3E3;">
@@ -44,7 +48,7 @@
 </div>
 
 <div class="box" style="left: 236.2mm; top: 130.4mm; font-size: 8pt; width: 40mm; background-color: #e3e3e3; text-align: right;">
-  {{ (data.usage * 0.25) | numberformat("de", 2) }} kWh
+  30 %
 </div>
 
 <div class="box" style="left: 155.2mm; top: 137mm; font-size: 8pt; line-height: 1.6em; letter-spacing: -0.06em;">
@@ -54,7 +58,7 @@
 </div>
 
 <div class="box" style="left: 55.6mm; top: 193.8mm; font-size: 6pt; letter-spacing: -0.05em;">
-  * gilt für den vereinbarten Gesamtverbrauch
+  * gilt für den vereinbarten Gesamtverbrauch abgedeckt durch PV und Speicher sowie Netzbezug.
 </div>
 
 <div class="foot-date">{{ offer.datetime | dateformat }}</div>

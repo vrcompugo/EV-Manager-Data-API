@@ -54,6 +54,17 @@ def cron_import_tasks():
 
 
 @manager.command
+def generate_offer_by_survey():
+    from app.models import Survey
+    from app.modules.offer.offer_services import automatic_offer_creation_by_survey
+
+    survey = Survey.query.get(1022)
+    automatic_offer_creation_by_survey(survey)
+    survey = Survey.query.get(1023)
+    automatic_offer_creation_by_survey(survey)
+
+
+@manager.command
 def customer_export_missing():
     from commands.customer_export_missing import customer_export_missing
     customer_export_missing()

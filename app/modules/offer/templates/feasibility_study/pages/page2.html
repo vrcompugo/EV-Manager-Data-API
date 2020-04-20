@@ -7,19 +7,28 @@
     width: 50mm;
     background-color: #E3E3E3;
   }
-  .page2 .smallprint {
-    position: absolute;
-    left: 55.6mm;
-    top: 193.8mm;
-    font-size: 6pt;
-    letter-spacing: -0.05em;
-  }
 </style>
 <div class="cloud">
   Cloud Beitrag
 </div>
-<div class="smallprint">
-  * für 10 Jahre garantiert
+<div class="box" style="left: 55.6mm; top: 191.2mm; font-size: 6pt; letter-spacing: -0.05em; line-height: 1.5em;">
+  * für 10 Jahre garantiert<br>
+  ** Derzeitig gültige EEG-Vergütungszätze Stand: 02.2020
+</div>
+
+<div class="box" style="left: 66.5mm; width: 35mm; top: 55.1mm; background-color: #e3e3e3; text-align: center;">
+  {% if data.paket >= 150 %}
+    Gewerbe
+  {% else %}
+    Ein- bis Zweifamilienhaus
+  {% endif %}
+</div>
+<div class="box" style="left: 66.5mm; width: 35mm; top: 61.1mm; background-color: #ffffff; text-align: center;">
+  {% if data.paket >= 150 %}
+    Gewerblich
+  {% else %}
+    H0D - Privathaushalt
+  {% endif %}
 </div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 66.8mm; background-color: #e3e3e3; text-align: center;">
   {{ data.usage | numberformat('de', 0) }} kWh pro Jahr
@@ -47,6 +56,12 @@
 <div class="box" style="left: 71.5mm; width: 30mm; top: 105.1mm; background-color: #e3e3e3; text-align: center;">
   {{ data.orientation_label }}
 </div>
+<div class="box" style="left: 71.5mm; width: 30mm; top: 111.1mm; background-color: #ffffff; text-align: center;">
+  ca. 70%
+</div>
+<div class="box" style="left: 71.5mm; width: 30mm; top: 117.1mm; background-color: #e3e3e3; text-align: center;">
+  70%
+</div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 122.8mm; background-color: #ffffff; text-align: center;">
   {{ data.in_use_date | dateformat }}
 </div>
@@ -69,16 +84,35 @@
   {{ data.cloud_monthly_cost | currencyformat }} pro Monat*
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 108.2mm; background-color: #ffffff; text-align: center;">
-  {{ (100 * data.eeg_refund_per_kwh) | numberformat('de', 2) }} cent pro kWh
+  {{ (100 * data.eeg_refund_per_kwh) | numberformat('de', 2) }} cent pro kWh**
+</div>
+<div class="box" style="left: 158.0mm; width: 30mm; top: 114mm; background-color: #e3e3e3; text-align: center;">
+  {% if data.paket >= 55 %}
+    Ja
+  {% else %}
+    Nein
+  {% endif %}
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 119.8mm; background-color: #ffffff; text-align: center;">
   {{ (100 * data.refund_per_kwh) | numberformat('de', 2) }} cent pro kWh
+</div>
+<div class="box" style="left: 107.65mm; width: 81mm; top: 124.0mm; height: 6mm; background-color: #e3e3e3;">
+  &nbsp;
+</div>
+<div class="box" style="left: 110.0mm; width: 30mm; top: 125.8mm; text-align: left;">
+  Inflationsrate
+</div>
+<div class="box" style="left: 158.0mm; width: 30mm; top: 125.8mm; text-align: center;">
+  {{ (100 * 0.02) | percentformat(2) }}
 </div>
 <div class="box" style="left: 246.0mm; width: 30mm; top: 87.1mm; background-color: #ffffff; text-align: center;">
   {{ data.pv_offer_total | currencyformat }}
 </div>
 <div class="box" style="left: 246.0mm; width: 30mm; top: 99.1mm; background-color: #ffffff; text-align: center;">
   {{ data.loan_interest_rate | percentformat }} pro Jahr
+</div>
+<div class="box" style="left: 197.0mm; width: 30mm; top: 99.1mm; background-color: #ffffff; text-align: center;">
+  Soll-Zinssatz (Beispiel)
 </div>
 <div class="box" style="left: 246.0mm; width: 30mm; top: 105.1mm; background-color: #E3E3E3; text-align: center;">
   {{ data.loan_total | currencyformat }}

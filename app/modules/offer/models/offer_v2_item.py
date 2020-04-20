@@ -20,6 +20,7 @@ class OfferV2Item(db.Model):
     number = db.Column(db.String(50))
     label = db.Column(db.String(200))
     description = db.Column(db.Text)
+    position = db.Column(db.String(10))
     data = db.Column(db.JSON)
     calculation = db.Column(db.JSON)
     price_definition = db.Column(db.JSON)

@@ -1,0 +1,38 @@
+import pdfkit
+from flask import render_template, request, make_response
+from PyPDF2 import PdfFileWriter, PdfFileReader
+from io import StringIO, BytesIO
+
+from app.models import OfferV2, S3File
+from app.modules.file.file_services import add_item as add_file, update_item as update_file
+from app.utils.gotenberg import generate_pdf
+
+from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
+
+
+def generate_pv_offer_pdf(offer: OfferV2):
+    content = render_template("offer/index.html", offer=offer, offer_number_prefix="PV-")
+    content_footer = render_template("offer/footer.html", offer=offer, offer_number_prefix="PV-")
+    pdf = generate_pdf(content, content_footer=content_footer)
+    if pdf is not None:
+        pdf_file = S3File.query\
+            .filter(S3File.model == "OfferV2")\
+            .filter(S3File.model_id == offer.id)\
+            .first()
+        file_data = {
+            "model": "OfferV2",
+            "model_id": offer.id,
+            "content-type": 'application/pdf',
+            "file_content": pdf,
+            "filename": f"Angebot PV-{offer.id}.pdf"
+        }
+        if pdf_file is not None:
+            update_file(pdf_file.id, file_data)
+        else:
+            add_file(file_data)
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        return response
+    response = make_response(content)
+    response.headers['Content-Type'] = 'text/html'
+    return response

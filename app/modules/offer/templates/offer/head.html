@@ -19,7 +19,7 @@
       <div>Datum:</div>
       <div>{{ offer.datetime | dateformat }}</div>
       <div>Angebots-Nr.:</div>
-      <div>{{ offer.id }}</div>
+      <div>{{ offer_number_prefix }}{{ offer.id }}</div>
       <div>Kunden-Nr.:</div>
       <div>{{ offer.customer.customer_number }}</div>
     </div>
@@ -47,4 +47,10 @@
 {{ offer.address | addressblock | nltobr }}
 
 <div style="clear: both;"></div>
-<h2>Angebot/Leistungsverzeichnis</h2>
+<h2>
+  {%- if heading -%}
+    {{ heading }}
+  {%- else -%}
+    Angebot/Leistungsverzeichnis
+  {%- endif -%}
+</h2>

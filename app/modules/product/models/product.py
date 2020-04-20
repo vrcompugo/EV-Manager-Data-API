@@ -21,6 +21,8 @@ class Product(db.Model):
     width = db.Column(db.Numeric(scale=4, precision=12))
     length = db.Column(db.Numeric(scale=4, precision=12))
     height = db.Column(db.Numeric(scale=4, precision=12))
+    packet_range_start = db.Column(db.Integer)
+    packet_range_end = db.Column(db.Integer)
     ean = db.Column(db.String(120))
     purchase_unit = db.Column(db.Numeric(scale=4, precision=12))
     reference_unit = db.Column(db.Numeric(scale=4, precision=12))
