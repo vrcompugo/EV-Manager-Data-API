@@ -2,7 +2,7 @@
 <h3>Angebote &amp; Zusatz</h3>
 
 {% for offer in offers %}
-  <b>{ offer.datetime | dateformat }</b><br>
+  <b>{{ offer.datetime | dateformat }}</b><br>
   {% if offer.pdf %}
     <a href="{{ offer.pdf.public_link }}" target="_blank">{{ offer.pdf.filename }}</a><br>
   {% endif %}
