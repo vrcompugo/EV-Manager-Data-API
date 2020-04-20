@@ -25,7 +25,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     consumer = 1
     if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
         for drain in offer.survey.data["extra_drains"]:
-            if "usage" in drain and int(drain["usage"]) > 0:
+            if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                 consumer = consumer + 1
     data = {
         "runtime": int(offer.survey.data["run_time"]),
@@ -38,6 +38,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         "conventional_base_cost_per_kwh": settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"],
         "cost_increase_rate": float(offer.survey.data["price_increase"]),
         "inflation_rate": float(offer.survey.data["inflation_rate"]),
+        "full_cost_increase_rate": float(offer.survey.data["price_increase"]) + float(offer.survey.data["inflation_rate"]),
         "conventional_total_cost": None,
         "consumer_count": consumer,
         "cloud_monthly_cost": cloud_total,
@@ -62,11 +63,11 @@ def generate_feasibility_study_pdf(offer: OfferV2):
 
     data["conventional_total_usage_cost"] = data["conventional_usage_cost"]
     for n in range(data["runtime"]):
-        data["conventional_total_usage_cost"] = data["conventional_total_usage_cost"] + data["conventional_total_usage_cost"] * ((1 + data["cost_increase_rate"] / 100) ** data["runtime"])
+        data["conventional_total_usage_cost"] = data["conventional_total_usage_cost"] + data["conventional_total_usage_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
 
     data["conventional_total_base_cost"] = data["conventional_base_cost_per_year"]
     for n in range(data["runtime"]):
-        data["conventional_total_base_cost"] = data["conventional_total_base_cost"] + data["conventional_total_base_cost"] * ((1 + data["cost_increase_rate"] / 100) ** data["runtime"])
+        data["conventional_total_base_cost"] = data["conventional_total_base_cost"] + data["conventional_total_base_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
 
     data["conventional_total_cost"] = 0
     data["conventional_total_cost_base"] = 0
@@ -78,12 +79,12 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         data["conventional_total_cost"] = data["conventional_total_cost"] + base
         data["conventional_total_cost_base"] = data["conventional_total_cost_base"] + base_base
         data["conventional_total_cost_usage"] = data["conventional_total_cost_usage"] + base_usage
-        base = base * (1 + data["cost_increase_rate"] / 100)
-        base_base = base_base * (1 + data["cost_increase_rate"] / 100)
-        base_usage = base_usage * (1 + data["cost_increase_rate"] / 100)
+        base = base * (1 + data["full_cost_increase_rate"] / 100)
+        base_base = base_base * (1 + data["full_cost_increase_rate"] / 100)
+        base_usage = base_usage * (1 + data["full_cost_increase_rate"] / 100)
 
     data["cloud_total"] = data["cloud_monthly_cost"] * 12 * 10 \
-        + (data["cloud_monthly_cost"] * 12) * ((1 + data["cost_increase_rate"] / 100) ** (data["runtime"] - 10))
+        + (data["cloud_monthly_cost"] * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - 10))
     if data["runtime"] == 20:
         data["cloud_total"] = data["cloud_total"] + 1500
     if data["runtime"] >= 30:

@@ -81,6 +81,7 @@
       </thead>
       <tbody>
         {% set index = {'index': 1} %}
+        {% set total = {'total': 0} %}
         {% for item in items %}
           {% if item.quantity > 0 %}
             <tr>
@@ -90,21 +91,22 @@
                 {{ item.description | safe }}
               </td>
               <td class="right">
-                {%- if item.total_price > 0 -%}
+                {%- if item.total_price != 0 -%}
                   {{ item.total_price | currencyformat }}
                 {%- endif -%}
               </td>
             </tr>
+            {% if total.update({"total": total.total + item.total_price }) %} {% endif %}
             {% if index.update({"index": index.index + 1 }) %} {% endif %}
           {% endif %}
         {% endfor %}
         <tr class="foot-line">
           <td class="border-right right" colspan="2">Monatlicher Beitrag für (a) - ZERO:</td>
-          <td class="right">{{ 19.99 | currencyformat }}</td>
+          <td class="right">{{ total.total | currencyformat }}</td>
         </tr>
         <tr>
           <td class="border-right right" colspan="2">Monatliche Gesamtkosten:</td>
-          <td class="right">{{ 19.99 | currencyformat }}</td>
+          <td class="right">{{ total.total | currencyformat }}</td>
         </tr>
       </tbody>
     </table>

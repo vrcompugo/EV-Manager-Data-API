@@ -11,6 +11,7 @@ from app.utils.gotenberg import generate_pdf
 def generate_cloud_pdf(offer: OfferV2):
     from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
     items = cloud_offer_items_by_pv_offer(offer)
+    print(items)
 
     content = render_template("offer/cloud.html", offer=offer, items=items, offer_number_prefix="C-")
     content_footer = render_template("offer/footer.html", offer=offer, offer_number_prefix="C-")

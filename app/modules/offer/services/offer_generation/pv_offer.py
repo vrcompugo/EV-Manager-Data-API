@@ -58,7 +58,7 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
 
         integrated_options = ["Schwarze Module"]
         for optional_product in survey.data["pv_options"]:
-            if optional_product["label"] not in integrated_options:
+            if optional_product["label"] not in integrated_options and "is_selected" in optional_product and optional_product["is_selected"]:
                 integrated_options.append(optional_product["label"])
                 offer_data = add_optional_item_to_offer(
                     survey,
