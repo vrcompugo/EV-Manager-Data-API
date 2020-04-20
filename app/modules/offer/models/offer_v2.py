@@ -57,13 +57,14 @@ class OfferV2(db.Model):
             .first()
         if s3_file is None:
             if self.offer_group == "pv-offer":
-                generate_pv_offer_pdf(self)
-                s3_file = S3File.query\
-                    .filter(S3File.model == "OfferV2")\
-                    .filter(S3File.model_id == self.id)\
-                    .first()
-                if s3_file is not None:
-                    return s3_file
+                if "pv_options" in self.survey.data:
+                    generate_pv_offer_pdf(self)
+                    s3_file = S3File.query\
+                        .filter(S3File.model == "OfferV2")\
+                        .filter(S3File.model_id == self.id)\
+                        .first()
+                    if s3_file is not None:
+                        return s3_file
             return None
         return s3_file
 
@@ -71,21 +72,21 @@ class OfferV2(db.Model):
     def cloud_pdf(self):
         from app.models import S3File
         from ..services.pdf_generation.cloud_offer import generate_cloud_pdf
-        if self.id < 1497:
-            return None
+
         s3_file = S3File.query\
             .filter(S3File.model == "OfferV2Cloud")\
             .filter(S3File.model_id == self.id)\
             .first()
         if s3_file is None:
             if self.offer_group == "pv-offer":
-                generate_cloud_pdf(self)
-                s3_file = S3File.query\
-                    .filter(S3File.model == "OfferV2Cloud")\
-                    .filter(S3File.model_id == self.id)\
-                    .first()
-                if s3_file is not None:
-                    return s3_file
+                if "pv_options" in self.survey.data:
+                    generate_cloud_pdf(self)
+                    s3_file = S3File.query\
+                        .filter(S3File.model == "OfferV2Cloud")\
+                        .filter(S3File.model_id == self.id)\
+                        .first()
+                    if s3_file is not None:
+                        return s3_file
             return None
         return s3_file
 
@@ -94,21 +95,20 @@ class OfferV2(db.Model):
         from app.models import S3File
         from ..services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
 
-        if self.id < 1497:
-            return None
         s3_file = S3File.query\
             .filter(S3File.model == "OfferV2FeasibilityStudy")\
             .filter(S3File.model_id == self.id)\
             .first()
         if s3_file is None:
             if self.offer_group == "pv-offer":
-                generate_feasibility_study_pdf(self)
-                s3_file = S3File.query\
-                    .filter(S3File.model == "OfferV2FeasibilityStudy")\
-                    .filter(S3File.model_id == self.id)\
-                    .first()
-                if s3_file is not None:
-                    return s3_file
+                if "pv_options" in self.survey.data:
+                    generate_feasibility_study_pdf(self)
+                    s3_file = S3File.query\
+                        .filter(S3File.model == "OfferV2FeasibilityStudy")\
+                        .filter(S3File.model_id == self.id)\
+                        .first()
+                    if s3_file is not None:
+                        return s3_file
             return None
         return s3_file
 
