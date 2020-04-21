@@ -27,10 +27,20 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         for drain in offer.survey.data["extra_drains"]:
             if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                 consumer = consumer + 1
+    orientation_label = "West/Ost"
+    pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
+    if offer.survey.data["roof_datas"][0]["direction"] == "south":
+        orientation_label = "Süd"
+        pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["south"]
+    if offer.survey.data["roof_datas"][0]["direction"] == "north":
+        orientation_label = "Nord"
+        pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["north"]
+
     data = {
         "runtime": int(offer.survey.data["run_time"]),
         "usage": float(offer.survey.data["pv_usage"]),
         "paket": int(offer.survey.data["packet_number"]),
+        "pv_efficiancy": pv_efficiancy,
         "orientation": offer.survey.data["roof_datas"][0]["direction"],
         "orientation_label": "Süd" if offer.survey.data["roof_datas"][0]["direction"] == "south" else "West/Ost",
         "in_use_date": in_use_date,
@@ -97,7 +107,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     data["cost_conventional_rate"] = data["conventional_total_cost"] / max_cost
     data["cost_cloud_rate"] = data["cost_total"] / max_cost
     data["total_pages"] = 17
-    content = render_template("feasibility_study/overlay.html", offer=offer, data=data)
+    content = render_template("feasibility_study/overlay.html", offer=offer, data=data, settings=settings)
     config = pdfkit.configuration(wkhtmltopdf="./wkhtmltopdf")
     overlay_binary = pdfkit.from_string(content, configuration=config, output_path=False, options={
         'disable-smart-shrinking': ''

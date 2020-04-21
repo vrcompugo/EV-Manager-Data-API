@@ -40,12 +40,7 @@
   Paket {{ data.paket }}
 </div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 78.7mm; background-color: #e3e3e3; text-align: center;">
-  {% if data.orientation == "south" %}
-    900
-  {% else %}
-    830
-  {% endif %}
-  kWh je kWp pro Jahr
+  {{ data.pv_efficiancy }} kWh je kWp pro Jahr
 </div>
 <div class="box" style="left: 23mm; width: 77mm; top: 84.7mm; background-color: #ffffff;">
   &nbsp;

@@ -2,16 +2,7 @@
   &nbsp;
 </div>
 <div class="box" style="left: 20.8mm; top: 35.5mm; width: 245mm; font-size: 6pt; background-color: #f1f6f9;">
-  <b>Haftungsausschluss</b>
-  <p>
-    Bei den hier dargestellten Ergebnissen handelt es sich um eine Prognoseberechnung unter Zugrundlegung von Durchschnittsangaben aufgrund historischer Werte. Dabei werden u.U. in der Realität komplexere Sachverhalte bewusst teilweise vereinfachend oder abstrahierend dargestellt und berechnet, um dem Nutzer die Eingabe zu erleichtern und ihm eine schnelle Informationsgewinnung in Form eines Überblicks zu ermöglichen. Die Ergebnisse dieser Auswertung können daher von einer genauen Berechnung im Einzelfall und in der Praxis teilweise nicht unerheblich abweichen, in diesem Sinne objektiv unrichtig sein und können die individuelle Beratung grundsätzlich nicht ersetzen. Durch den Gebrauch dieses Berechnungsprogramms und die Kenntnisnahme seiner Informationen wird ein Vertrags- oder vertragsähnliches Verhältnis zwischen SENEC GmbH und dem Nutzer dieses Berechnungsprogramms weder ausdrücklich, noch konkludent begründet. Entsprechend haftet die SENEC GmbH nicht für Schäden, gleich aus welchem Rechtsgrund, die infolge mangelnder Geeignetheit der Informationen zu einem bestimmten Zweck, Unvollständigkeit, zeitliche oder inhaltliche Überholung oder andere Umstände eintreten. Jede Verwertung erfolgt auf alleinige Gefahr des Nutzers dieses Berechnungsprogrammes.
-  </p>
-  <p>
-    Die SENEC GmbH sowie Korbmacher-energiezentrum GmbH & Co KG  übernimmt für eventuelle Nachteile oder Schäden, die aus den aufgeführten Informationen, Empfehlungen oder Hinweisen resultieren, keine Haftung. Diese Auswertung ist ausschließlich zu Informationszwecken bestimmt. Die Informationen stellen in keiner Weise einen Ersatz für professionelle Beratung durch Fachleute dar. Für Schäden oder Unannehmlichkeiten, die durch den Gebrauch oder Missbrauch dieser Informationen entstehen, kann die SENEC GmbH nicht – weder direkt noch indirekt – zur Verantwortung gezogen werden. Die SENEC GmbH übernimmt keine Gewähr für die Aktualität, Richtigkeit und Vollständigkeit der bereitgestellten Informationen sowie Berechnungsformeln und Berechnungs-Logiken. Die Haftung für die Inhalte und Nutzung der Homepage beschränkt sich auf Vorsatz und grob fahrlässiges Verhalten. Die SENEC GmbH haftet auch nicht für unbefugte Veränderungen durch Dritte (z.B. Hackangriffe etc.). Eine kommerzielle Nutzung des Online Rechners ist ohne ausdrückliche Zustimmung der SENEC GmbH nicht gestattet. Sofern Teile oder einzelne Formulierungen dieses Textes der geltenden Rechtslage nicht, nicht mehr oder nicht vollständig entsprechen sollten, bleiben die übrigen Teile des Dokumentes in ihrem Inhalt und ihrer Gültigkeit davon unberührt.
-  </p>
-  <p>
-    SENEC GmbH, Wittenberger Str. 15, 04129 Leipzig, www.senec.com SENEC ist ein Unternehmen der EnBW Energie Baden-Württemberg AG
-  </p>
+  {{ settings.data.wi_settings.important_notices | safe }}
 </div>
 
 <div class="foot-date">{{ offer.datetime | dateformat }}</div>

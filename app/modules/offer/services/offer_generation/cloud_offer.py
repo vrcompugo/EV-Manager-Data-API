@@ -8,6 +8,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
+    offer_data = base_offer_data("cloud-offer", offer.survey)
     total_drain = int(offer.survey.data['pv_usage'])
     if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
         for drain in offer.survey.data["extra_drains"]:
@@ -18,7 +19,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
     for price in settings["data"]["cloud_settings"]["cloud_prices"]:
         if int(price["paket_range_start"]) <= int(offer.survey.data["packet_number"]) <= int(price["paket_range_end"]):
             cloud_price = float(price["price"])
-    items = [
+    offer_data["items"] = [
         {
             "label": "cCloud-Zero",
             "description": "Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Stromverbrauchen, wann immer Sie ihn brauchen.",
@@ -40,13 +41,14 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
             "total_tax_amount": cloud_price * (tax_rate / 100),
         }
     ]
-    items[0]["description"] = items[0]["description"] + "<br>\n<br>\n"\
+    offer_data["items"][0]["description"] = offer_data["items"][0]["description"] + "<br>\n<br>\n"\
         + "Tarif: cCloud-Zero<br>\n" \
-        + "Kündigungsfrist: 6 Monate<br>\n" \
-        + "Vertragslaufzeit: 24 Monate<br>\n" \
-        + "garantierte Zero-Laufzeit für (a): 10 Jahre<br>\n" \
-        + f"Erwarteter Jahresverbrauch (a): {total_drain} kWh<br>\n"
-    items.append({
+        + f"Kündigungsfrist: {settings['data']['cloud_settings']['notice_period']}<br>\n" \
+        + f"Vertragslaufzeit: {settings['data']['cloud_settings']['contract_run_time']}<br>\n" \
+        + f"garantierte Zero-Laufzeit für (a): {settings['data']['cloud_settings']['guaranteed_run_time']}<br>\n" \
+        + f"Erwarteter Jahresverbrauch (a): {total_drain} kWh<br>\n" \
+        + "<small>durch PV und Speicher sowie Netzbezug</small>"
+    offer_data["items"].append({
         "label": "",
         "description": (
             "<b>PV Erzeugung</b><br>\n"
@@ -54,7 +56,8 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
             + f"PV-Anlage laut Angebot: PV-{offer.id}<br>\n"
             + f"{offer.survey.data['street']} {offer.survey.data['zip']} {offer.survey.data['city']}<br>\n"
             + f"Abnahme: {offer.survey.data['pv_usage']} kWh<br>\n"
-            + "Mehrverbrauch: 0 kWh\n"
+            + "Mehrverbrauch: 0 kWh<br>\n"
+            + "<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung</small>"
         ),
         "quantity": 1,
         "quantity_unit": "mtl.",
@@ -77,8 +80,8 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
     if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
         for drain in offer.survey.data["extra_drains"]:
             if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
-                items.append({
-                    "label": "",
+                offer_data["items"].append({
+                    "label": "Zählergrundgebühr",
                     "description": (
                         "<b>Extra Abnahmestelle</b><br>\n"
                         + f"{drain['street']} {drain['city']}<br>\n"
@@ -101,9 +104,14 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
                     "total_price_net": 0,
                     "total_tax_amount": 0
                 })
+
+    for product in settings["data"]["cloud_settings"]["extra_products"]:
+        if product["include_always"] == "top-one":
+            offer_data = add_item_to_offer(offer.survey, offer_data, product["product_link"], product["product_folder"], 1)
+
     for optional_product in offer.survey.data["pv_options"]:
         if optional_product["label"] == "ZERO-Paket" and "is_selected" in optional_product and optional_product["is_selected"]:
-            items.append({
+            offer_data["items"].append({
                 "label": "",
                 "description": (
                     "<b>ZERO-Paket</b>"
@@ -125,4 +133,8 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
                 "total_price_net": 0,
                 "total_tax_amount": 0
             })
-    return items
+    for product in settings["data"]["cloud_settings"]["extra_products"]:
+        if product["include_always"] == "top":
+            offer_data = add_item_to_offer(offer.survey, offer_data, product["product_link"], product["product_folder"], 0)
+
+    return offer_data["items"]

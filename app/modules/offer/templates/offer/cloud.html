@@ -75,7 +75,9 @@
       <thead>
         <tr>
           <th class="table--th" width="1%">Pos.</th>
+          <th class="table--th" width="1%">Otional</th>
           <th class="table--th">Bezeichnung</th>
+          <th class="table--th right">Opt. mtl. Preis</th>
           <th class="table--th right">mtl. Beitrag</th>
         </tr>
       </thead>
@@ -83,29 +85,41 @@
         {% set index = {'index': 1} %}
         {% set total = {'total': 0} %}
         {% for item in items %}
-          {% if item.quantity > 0 %}
-            <tr>
-              <td class="border-right">{{ index.index }}</td>
-              <td class="border-right">
-                <small style="display: block;">{{ item.label }}</small>
-                {{ item.description | safe }}
+          <tr>
+            <td class="border-right">{{ index.index }}</td>
+            <td class="border-right">
+              (
+              {% if item.quantity > 0 %}
+              x
+              {% else %}
+              &nbsp;&nbsp;
+              {% endif %}
+              )
               </td>
-              <td class="right">
-                {%- if item.total_price != 0 -%}
-                  {{ item.total_price | currencyformat }}
-                {%- endif -%}
-              </td>
-            </tr>
-            {% if total.update({"total": total.total + item.total_price }) %} {% endif %}
-            {% if index.update({"index": index.index + 1 }) %} {% endif %}
-          {% endif %}
+            <td class="border-right">
+              <small style="display: block;">{{ item.label }}</small>
+              {{ item.description | safe }}
+            </td>
+            <td class="border-right right">
+              {%- if item.quantity == 0 -%}
+                {{ item.single_price | currencyformat }}
+              {%- endif -%}
+            </td>
+            <td class="right">
+              {%- if item.total_price != 0 -%}
+                {{ item.total_price | currencyformat }}
+              {%- endif -%}
+            </td>
+          </tr>
+          {% if total.update({"total": total.total + item.total_price }) %} {% endif %}
+          {% if index.update({"index": index.index + 1 }) %} {% endif %}
         {% endfor %}
         <tr class="foot-line">
-          <td class="border-right right" colspan="2">Monatlicher Beitrag für (a) - ZERO:</td>
+          <td class="border-right right" colspan="4">Monatlicher Beitrag für (a) - ZERO:</td>
           <td class="right">{{ total.total | currencyformat }}</td>
         </tr>
         <tr>
-          <td class="border-right right" colspan="2">Monatliche Gesamtkosten:</td>
+          <td class="border-right right" colspan="4">Monatliche Gesamtkosten:</td>
           <td class="right">{{ total.total | currencyformat }}</td>
         </tr>
       </tbody>
@@ -116,15 +130,9 @@
     <h2>Verbindliche Bestellung</h2>
     <p>Diese Ausarbeitung ist geistiges Eigentum des Unternehmens. Die Unterlagen d&uuml;rfen gem&auml;&szlig; &sect;&sect; 1,2 und 11 des UrhG und &sect; 823 BGB ohne Genehmigung des Unternehmens weder zur Ausschreibung benutzt, noch Dritten zur Einsicht &uuml;berlassen oder in sonstiger Weise inhaltlich mitgeteilt werden. Es gelten unsere allgemeinen Gesch&Atilde;&curren;ftsbedingungen. Gerichtsstand ist Korbach.</p>
     <p>Das Angebot ist ab Erstellung 2 Wochen g&uuml;ltig. Ein verbindlicher Vertrag kommt erst zu Stande, nachdem das unterschriebene Leistungsverzeichnis/Angebot von der Korbacher Energiezentrum GmbH &amp; Co. KG per Auftragsbest&auml;tigung angenommen wurde. Etwaige Nebenabreden (schriftlich und/oder m&uuml;ndlich) sind unwirksam, sofern sie nicht ausdr&uuml;cklich schriftlich durch den Gesch&auml;ftsf&uuml;hrer best&auml;tigt worden sind.</p>
-    <p>Als Zahlungsbedingungen werden vereinbart (bitte ankreuzen):</p>
-    <p>(&nbsp; &nbsp;) 7 Tage nach betriebsbereiter PV-Anlage inkl. Speicher oder spätestens 30 Tage nach DC Montage (Bonität vorausgesetzt)</p>
-    <p>(&nbsp; &nbsp;) 30% bei Auftragserteilung, 65% 5 Tage vor Lieferung, 5% bei betriebsbereiter PV-Anlage inkl. Speicher</p>
-    <p>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bankverbindung: _________________________________________________</p>
-    <p>Bemerkungen</p>
-    <p>____________________________________________________________________</p>
-    <p>____________________________________________________________________</p>
-    <p>____________________________________________________________________</p>
-    <p>____________________________________________________________________</p>
+    <p>Als Zahlungsbedingungen werden vereinbart:</p>
+    <p>monatliche Zahlungsweise ab Eintritt in die Cloud</p>
+    <br>
     <p>Hiermit bestellen ich / wir die oben beschriebene netzgekoppelte Photovoltaikanlage. <br />Die Bestellung erfolgt vorbehaltlich der Finanzierungszusage einer Bank. Kommt eine Finanzierung nicht zustande, entsteht keine Abnahmepflicht der Anlage f&uuml;r den Kunden. Hierzu gen&uuml;gt die schriftliche Absage der Bank.</p>
     <ul>
     <li>Stromz&auml;hler wird/werden vom jeweiligen Netzbetreiber gestellt. Keine Haftung von korbacher-energieZENTRUM f&uuml;r Verz&ouml;gerungen bei der Terminvergabe f&uuml;r die Z&auml;hlermontage durch den Netzbetreiber</li>
