@@ -46,8 +46,8 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         + f"Kündigungsfrist: {settings['data']['cloud_settings']['notice_period']}<br>\n" \
         + f"Vertragslaufzeit: {settings['data']['cloud_settings']['contract_run_time']}<br>\n" \
         + f"garantierte Zero-Laufzeit für (a): {settings['data']['cloud_settings']['guaranteed_run_time']}<br>\n" \
-        + f"Erwarteter Jahresverbrauch (a): {total_drain} kWh<br>\n" \
-        + "<small>durch PV und Speicher sowie Netzbezug</small>"
+        + f"Durch die Cloud abgedeckter Jahresverbrauch: {total_drain} kWh<br>\n" \
+        + "<small>PV, Speicher & Netzbezug</small>"
     offer_data["items"].append({
         "label": "",
         "description": (
@@ -57,7 +57,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
             + f"{offer.survey.data['street']} {offer.survey.data['zip']} {offer.survey.data['city']}<br>\n"
             + f"Abnahme: {offer.survey.data['pv_usage']} kWh<br>\n"
             + "Mehrverbrauch: 0 kWh<br>\n"
-            + "<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung</small>"
+            + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {settings['data']['cloud_settings']['extra_kwh_cost']} cent / kWh</small>"
         ),
         "quantity": 1,
         "quantity_unit": "mtl.",

@@ -36,9 +36,14 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         orientation_label = "Nord"
         pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["north"]
 
+    usage = float(offer.survey.data["pv_usage"])
+    if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+        for drain in offer.survey.data["extra_drains"]:
+            if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
+                usage = usage + float(drain["usage"])
     data = {
         "runtime": int(offer.survey.data["run_time"]),
-        "usage": float(offer.survey.data["pv_usage"]),
+        "usage": usage,
         "paket": int(offer.survey.data["packet_number"]),
         "pv_efficiancy": pv_efficiancy,
         "orientation": offer.survey.data["roof_datas"][0]["direction"],

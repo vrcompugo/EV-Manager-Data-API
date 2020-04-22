@@ -99,7 +99,7 @@
               <td class="border-right right">{{ item.quantity | numberformat("de", 0) }}</td>
               <td class="border-right">{{ item.quantity_unit }}</td>
               <td class="border-right">
-                <small>{{ item.label }}</small><br>
+                <b>{{ item.label }}</b><br>
                 {{ item.description | safe }}
               </td>
               <td class="right border-right" style="white-space: nowrap;">{{ item.single_price_net | currencyformat }}</td>
@@ -149,7 +149,7 @@
                 <td class="border-right right">{{ item.quantity | numberformat("de", 0) }}</td>
                 <td class="border-right">{{ item.quantity_unit }}</td>
                 <td class="border-right">
-                  <small>{{ item.label }}</small><br>
+                  <b>{{ item.label }}</b><br>
                   {{ item.description | safe }}
                 </td>
                 <td class="right border-right" style="white-space: nowrap;">{{ item.single_price_net | currencyformat }}</td>

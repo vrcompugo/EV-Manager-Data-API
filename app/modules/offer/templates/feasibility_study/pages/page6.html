@@ -61,10 +61,13 @@
 <div class="box" style="left: 244.4mm; width: 30mm; top: 135.6mm; background-color: #ffffff; text-align: right;">
   {{ data.cloud_total | currencyformat("de", 0) }}
 </div>
-<div class="box" style="left: 244.4mm; width: 30mm; top: 142.3mm; background-color: #ff9902; text-align: right;">
+<div class="box" style="left: 244.4mm; width: 30mm; top: 142.3mm; background-color: #ff9902; color: #ffffff; text-align: right;">
   {{ data.cost_total | currencyformat("de", 0) }}
 </div>
-<div class="box" style="left: 244.4mm; width: 30mm; top: 148.8mm; background-color: #8aaddc; text-align: right;">
+<div class="box" style="left: 158.8mm; width: 30mm; top: 148.8mm; background-color: #8aaddc; color: #ffffff;">
+  Vorteil über {{ data.runtime }} Jahre
+</div>
+<div class="box" style="left: 244.4mm; width: 30mm; top: 148.8mm; background-color: #8aaddc; color: #ffffff; text-align: right;">
   {{ data.cost_benefit | currencyformat("de", 0) }}
 </div>
 <div class="box" style="left: 244.4mm; width: 30mm; top: 155.6mm; background-color: #ffffff; text-align: right;">
