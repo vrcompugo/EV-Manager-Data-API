@@ -111,12 +111,14 @@ class OfferPDF(Resource):
     def get(self, id):
         from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
         from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
+        from app.modules.offer.services.pdf_generation.pv_offer import generate_pv_offer_pdf
         offer = OfferV2.query.options(
             db.subqueryload("items"),
             db.subqueryload("customer"),
             db.subqueryload("address")
         ).get(id)
         data = {}
+        generate_pv_offer_pdf(offer)
         generate_feasibility_study_pdf(offer)
         generate_cloud_pdf(offer)
         if offer.pdf is not None:

@@ -1,3 +1,5 @@
+import json
+
 from app.models import OfferV2, Survey, Settings, Lead
 
 from ..add_update_item import add_item_v2
@@ -58,18 +60,16 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
 
         integrated_options = ["Schwarze Module"]
         for optional_product in survey.data["pv_options"]:
-            if optional_product["label"] not in integrated_options and "is_selected" in optional_product and optional_product["is_selected"]:
-                integrated_options.append(optional_product["label"])
-                offer_data = add_optional_item_to_offer(
-                    survey,
-                    offer_data,
-                    optional_product
-                )
+            if (optional_product["label"] not in integrated_options
+                and (
+                    (
+                        "is_selected" in optional_product
+                        and optional_product["is_selected"])
+                    or (
+                        "include_always" in optional_product
+                        and optional_product["include_always"] in ["top", "bottom"]))):
 
-        optional_products = Settings.query.filter(Settings.section == 'pv-settings').first()
-        optional_products = optional_products.data["pv_settings"]["optional_products"]
-        for optional_product in optional_products:
-            if optional_product["label"] not in integrated_options and "include_always" in optional_product and optional_product["include_always"] in ["top", "bottom"]:
+                integrated_options.append(optional_product["label"])
                 offer_data = add_optional_item_to_offer(
                     survey,
                     offer_data,

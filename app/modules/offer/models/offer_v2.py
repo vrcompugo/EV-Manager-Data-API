@@ -49,8 +49,6 @@ class OfferV2(db.Model):
         from app.models import S3File
         from ..services.pdf_generation.pv_offer import generate_pv_offer_pdf
 
-        if self.id < 1497:
-            return None
         s3_file = S3File.query\
             .filter(S3File.model == "OfferV2")\
             .filter(S3File.model_id == self.id)\

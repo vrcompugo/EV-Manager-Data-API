@@ -52,7 +52,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         "conventional_total_cost": None,
         "consumer_count": consumer,
         "cloud_monthly_cost": cloud_total,
-        "eeg_refund_per_kwh": settings["data"]["wi_settings"]["eeg_refund_per_kwh"],
+        "eeg_refund_per_kwh": float(settings["data"]["wi_settings"]["eeg_refund_per_kwh"]),
         "refund_per_kwh": settings["data"]["wi_settings"]["refund_per_kwh"],
         "pv_offer_total": offer.total - offer.total_tax,
         "loan_interest_rate": settings["data"]["wi_settings"]["loan_interest_rate"],
