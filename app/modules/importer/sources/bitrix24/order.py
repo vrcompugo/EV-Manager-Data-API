@@ -181,6 +181,7 @@ def run_import_by_lead(lead: Lead):
 
 
 def run_cron_import():
+    from app.modules.offer.services.offer_generation import generate_offer_by_order
     config = get_config_item("importer/bitrix24")
     print("import order data bitrix24 ")
     if config is None:
