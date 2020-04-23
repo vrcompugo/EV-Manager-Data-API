@@ -158,6 +158,7 @@ def run_import(local_id=None, remote_id=None):
                     "commissions": commissions
                 })
                 return order
+            return order
         return None
     else:
         pp.pprint(response)
