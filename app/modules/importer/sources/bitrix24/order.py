@@ -185,10 +185,19 @@ def run_cron_import():
             "FILTER[>DATE_MODIFY]": config["data"]["last_order_import_datetime"],
             "FILTER[CATEGORY_ID]": 66
         })
+        deals2 = post("crm.deal.list", {
+            "FILTER[>DATE_MODIFY]": config["data"]["last_order_import_datetime"],
+            "FILTER[CATEGORY_ID]": 124
+        })
     else:
         deals = post("crm.deal.list", {
             "FILTER[CATEGORY_ID]": 66
         })
+        deals2 = post("crm.deal.list", {
+            "FILTER[CATEGORY_ID]": 124
+        })
+
+    last_import = str(datetime.now())
 
     if "result" in deals:
         for deal in deals["result"]:
@@ -197,7 +206,14 @@ def run_cron_import():
             except Exception as e:
                 error_handler()
 
-        config = get_config_item("importer/bitrix24")
-        if config is not None and "data" in config:
-            config["data"]["last_order_import_datetime"] = str(datetime.now())
-        update_config_item("importer/bitrix24", config)
+    if "result" in deals2:
+        for deal in deals2["result"]:
+            try:
+                order = run_import(remote_id=deal["ID"])
+            except Exception as e:
+                error_handler()
+
+    config = get_config_item("importer/bitrix24")
+    if config is not None and "data" in config:
+        config["data"]["last_order_import_datetime"] = last_import
+    update_config_item("importer/bitrix24", config)
