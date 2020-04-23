@@ -218,6 +218,7 @@ def run_cron_import():
         for deal in deals2["result"]:
             try:
                 order = run_import(remote_id=deal["ID"])
+                generate_offer_by_order(order)
             except Exception as e:
                 error_handler()
 
