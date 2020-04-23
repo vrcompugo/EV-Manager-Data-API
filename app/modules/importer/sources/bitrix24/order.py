@@ -210,7 +210,7 @@ def run_cron_import():
         for deal in deals["result"]:
             try:
                 order = run_import(remote_id=deal["ID"])
-                if order.category == "Enpal Angebote":
+                if order is not None and order.category == "Enpal Angebote":
                     enpal_offer_by_order(order)
             except Exception as e:
                 error_handler()
