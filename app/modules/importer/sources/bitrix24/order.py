@@ -146,18 +146,19 @@ def run_import(local_id=None, remote_id=None):
         else:
             print("update order", deal["ID"])
             order = update_item(link.local_id, data)
-        if order is not None and order.type == "salesstats":
-            order = commission_calulation(order)
-            if order is not None:
-                commissions = json.loads(json.dumps(order.commissions))
-                update_item(order.id, {
-                    "commissions": None,
-                    "commission_value_net": order.commission_value_net,
-                })
-                update_item(order.id, {
-                    "commissions": commissions
-                })
-                return order
+        if order is not None:
+            if order.type == "salesstats":
+                order = commission_calulation(order)
+                if order is not None:
+                    commissions = json.loads(json.dumps(order.commissions))
+                    update_item(order.id, {
+                        "commissions": None,
+                        "commission_value_net": order.commission_value_net,
+                    })
+                    update_item(order.id, {
+                        "commissions": commissions
+                    })
+                    return order
             return order
         return None
     else:
@@ -220,6 +221,7 @@ def run_cron_import():
                 order = run_import(remote_id=deal["ID"])
                 if order is not None and order.category == "Enpal Angebote":
                     generate_offer_by_order(order)
+
             except Exception as e:
                 error_handler()
 

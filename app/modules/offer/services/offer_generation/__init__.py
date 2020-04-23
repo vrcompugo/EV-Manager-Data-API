@@ -31,3 +31,5 @@ def generate_offer_by_order(order: Order):
         if offer.pdf is not None:
             public_link = offer.pdf.make_public()
             run_offer_pdf_export(local_id=order.id, public_link=public_link)
+    else:
+        print("order not found")

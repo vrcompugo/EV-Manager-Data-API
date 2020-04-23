@@ -993,9 +993,6 @@ t_lead_zip_codes = [
 
 
 def convert_field_value_from_remote(field, data):
-    if field == "UF_CRM_1587030744":
-        response = post("crm.enum.fields")
-        print(json.dumps(response, indent=2))
     if field in fields and data[field] in fields[field]:
         return fields[field][data[field]]
     return None
