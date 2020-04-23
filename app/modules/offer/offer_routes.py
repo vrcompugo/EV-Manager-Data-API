@@ -7,7 +7,7 @@ from app import db
 from app.decorators import token_required, api_response
 from app.models import OfferV2
 
-from .offer_services import add_item, update_item, get_items, get_one_item, generate_cloud_pdf, generate_feasibility_study_pdf, generate_pv_offer_pdf
+from .offer_services import add_item, update_item, get_items, get_one_item, generate_cloud_pdf, generate_feasibility_study_pdf, generate_offer_pdf
 
 
 api = Namespace('Offer')
@@ -111,16 +111,14 @@ class OfferPDF(Resource):
     def get(self, id):
         from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
         from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
-        from app.modules.offer.services.pdf_generation.pv_offer import generate_pv_offer_pdf
+        from app.modules.offer.services.pdf_generation.offer import generate_offer_pdf
         offer = OfferV2.query.options(
             db.subqueryload("items"),
             db.subqueryload("customer"),
             db.subqueryload("address")
         ).get(id)
         data = {}
-        generate_pv_offer_pdf(offer)
-        generate_feasibility_study_pdf(offer)
-        generate_cloud_pdf(offer)
+        return generate_offer_pdf(offer)
         if offer.pdf is not None:
             data["pdf"] = {
                 "public_link": offer.pdf.public_link,

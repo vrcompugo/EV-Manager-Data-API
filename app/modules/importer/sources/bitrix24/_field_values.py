@@ -1,3 +1,7 @@
+import json
+
+from ._connector import post, get
+
 
 fields = {
     "SOURCE_ID": {
@@ -61,7 +65,22 @@ fields = {
         "1566": "Barzahler",
         "1568": "Dresdner Bank",
         "1844": "keine Auswahl"
+    },
+    "UF_CRM_1587030744": {
+        "": "nicht ausgewählt",
+        "2208": "bis 3900 kWh",
+        "2210": "bis 6000 kWh",
+        "2212": "bis 8000 kWh",
+        "2214": "über 8000 kWh",
+    },
+    "UF_CRM_1587030804": {
+        "": "nicht ausgewählt",
+        "2216": "bis 4 kWp",
+        "2218": "bis 7 kWp",
+        "2220": "bis 10 kWp",
+        "2222": "über 10 kWp",
     }
+
 }
 
 t_lead_zip_codes = [
@@ -974,6 +993,9 @@ t_lead_zip_codes = [
 
 
 def convert_field_value_from_remote(field, data):
+    if field == "UF_CRM_1587030744":
+        response = post("crm.enum.fields")
+        print(json.dumps(response, indent=2))
     if field in fields and data[field] in fields[field]:
         return fields[field][data[field]]
     return None

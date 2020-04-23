@@ -21,7 +21,7 @@ from .services.offer_generation import automatic_offer_creation_by_survey
 from .services.add_update_item import add_item, add_item_v2, update_item
 from .services.pdf_generation.cloud_offer import generate_cloud_pdf
 from .services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
-from .services.pdf_generation.pv_offer import generate_pv_offer_pdf
+from .services.pdf_generation.offer import generate_offer_pdf
 
 
 def get_items(tree, sort, offset, limit, fields):

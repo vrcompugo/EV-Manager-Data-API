@@ -1,5 +1,6 @@
 import os
 import tempfile
+import json
 from datetime import timedelta
 
 from minio import Minio
@@ -56,3 +57,20 @@ def get_file(bucket, filename):
 def get_file_public(bucket, filename, minutes):
     minioClient = connect()
     return minioClient.presigned_get_object(bucket, filename, expires=timedelta(minutes=minutes))
+
+
+def make_public(bucket, filename):
+    minioClient = connect()
+    policy_read_only = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "",
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Action": "s3:GetObject",
+                "Resource": f"arn:aws:s3:::{bucket}/{filename}"
+            }
+        ]}
+    minioClient.set_bucket_policy(bucket, json.dumps(policy_read_only))
+    return "https://" + MINIO_HOST + "/" + bucket + "/" + filename

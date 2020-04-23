@@ -1,3 +1,4 @@
+from app.models import Order
 from .pv_offer import pv_offer_by_survey
 
 
@@ -19,3 +20,15 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
             db.session.add(lead)
             db.session.commit()
             run_status_update_export(local_id=lead.id)
+
+
+def generate_offer_by_order(order: Order):
+    from .enpal_offer import enpal_offer_by_order
+    from app.modules.importer.sources.bitrix24.order import run_offer_pdf_export
+
+    if order.category == "Enpal Angebote":
+        print(f"generate offer for {order.id}")
+        offer = enpal_offer_by_order(order)
+        if offer.pdf is not None:
+            public_link = offer.pdf.make_public()
+            run_offer_pdf_export(local_id=order.id, public_link=public_link)

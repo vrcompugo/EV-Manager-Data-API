@@ -56,3 +56,7 @@ def run_export_by_model(model, remote_id=None, local_id=None):
     if model is None or model == "survey":
         from .survey import run_export
         run_export(local_id=local_id)
+
+    if model is None or model == "product":
+        from .product import run_export
+        run_export(remote_id=remote_id, local_id=local_id)

@@ -47,16 +47,16 @@ class OfferV2(db.Model):
     @hybrid_property
     def pdf(self):
         from app.models import S3File
-        from ..services.pdf_generation.pv_offer import generate_pv_offer_pdf
+        from ..services.pdf_generation.offer import generate_offer_pdf
 
         s3_file = S3File.query\
             .filter(S3File.model == "OfferV2")\
             .filter(S3File.model_id == self.id)\
             .first()
         if s3_file is None:
-            if self.offer_group == "pv-offer":
-                if "pv_options" in self.survey.data:
-                    generate_pv_offer_pdf(self)
+            if self.offer_group in ["pv-offer", "enpal-offer"]:
+                if self.offer_group != "pv-offer" or "pv_options" in self.survey.data:
+                    generate_offer_pdf(self)
                     s3_file = S3File.query\
                         .filter(S3File.model == "OfferV2")\
                         .filter(S3File.model_id == self.id)\

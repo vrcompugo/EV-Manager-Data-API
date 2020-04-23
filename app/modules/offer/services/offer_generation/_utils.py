@@ -4,13 +4,8 @@ import json
 from app.models import Survey, Product
 
 
-def base_offer_data(offer_group, survey: Survey):
-    return {
-        "customer_id": survey.customer_id,
-        "address_id": survey.customer.default_address_id,
-        "payment_account_id": survey.customer.default_payment_account_id,
-        "reseller_id": survey.reseller_id,
-        "survey_id": survey.id,
+def base_offer_data(offer_group, survey=None, order=None):
+    data = {
         "offer_group": offer_group,
         "datetime": datetime.datetime.now(),
         "currency": "eur",
@@ -25,15 +20,29 @@ def base_offer_data(offer_group, survey: Survey):
         "status": "created",
         "items": []
     }
+    if survey is not None:
+        data["customer_id"] = survey.customer_id
+        data["address_id"] = survey.customer.default_address_id
+        data["payment_account_id"] = survey.customer.default_payment_account_id
+        data["reseller_id"] = survey.reseller_id
+        data["survey_id"] = survey.id
+    if order is not None:
+        data["customer_id"] = order.customer_id
+        data["address_id"] = order.customer.default_address_id
+        data["payment_account_id"] = order.customer.default_payment_account_id
+        data["reseller_id"] = order.reseller_id
+    return data
 
 
-def add_item_to_offer(survey: Survey, offer_data, product_name, product_folder, quantity, position="top"):
-    product = Product.query\
-        .filter(Product.name == product_name)\
-        .filter(Product.product_group == product_folder)\
-        .filter(Product.packet_range_start <= int(survey.data["packet_number"]))\
-        .filter(Product.packet_range_end >= int(survey.data["packet_number"]))\
-        .first()
+def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_folder=None, quantity=None, position="top"):
+    product = None
+    if survey is not None:
+        product = Product.query\
+            .filter(Product.name == product_name)\
+            .filter(Product.product_group == product_folder)\
+            .filter(Product.packet_range_start <= int(survey.data["packet_number"]))\
+            .filter(Product.packet_range_end >= int(survey.data["packet_number"]))\
+            .first()
     if product is None:
         product = Product.query\
             .filter(Product.name == product_name)\

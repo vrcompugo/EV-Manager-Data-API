@@ -54,6 +54,18 @@ def cron_import_tasks():
 
 
 @manager.option("-l", "--local_id", dest='local_id', default=None)
+def generate_offer_by_order(local_id):
+    from app.models import Order
+    from app.modules.offer.services.offer_generation import generate_offer_by_order
+
+    order = Order.query.get(int(local_id))
+    if order is not None:
+        generate_offer_by_order(order)
+    else:
+        print("Order not found")
+
+
+@manager.option("-l", "--local_id", dest='local_id', default=None)
 def generate_pdfs_for_offer(local_id):
     from app.models import OfferV2
     from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf

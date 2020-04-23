@@ -25,6 +25,7 @@ class Order(db.Model):
     city = db.Column(db.String(60))
     lat = db.Column(db.Float())
     lng = db.Column(db.Float())
+    data = db.Column(db.JSON)
     value_net = db.Column(db.Numeric(scale=4, precision=12))
     last_update = db.Column(db.DateTime)
     contact_source = db.Column(db.String(80))

@@ -8,6 +8,7 @@ from app.utils.error_handler import error_handler
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 from app.modules.order.order_services import commission_calulation, add_item, update_item
 from app.modules.reseller.services.reseller_services import update_item as update_reseller
+from app.modules.offer.services.offer_generation.enpal_offer import enpal_offer_by_order
 
 from ._connector import post, get
 from ._association import find_association, associate_item
@@ -59,8 +60,13 @@ def filter_import_input(item_data):
         "zip": zip_code,
         "city": city,
         "commissions": None,
-        "commission_value_net": 0
+        "commission_value_net": 0,
+        "data": {}
     }
+    if "UF_CRM_1587030744" in item_data:
+        data["data"]["usage_without_pv"] = convert_field_value_from_remote("UF_CRM_1587030744", item_data)
+    if "UF_CRM_1587030804" in item_data:
+        data["data"]["pv_size"] = convert_field_value_from_remote("UF_CRM_1587030804", item_data)
     if item_data["LEAD_ID"] is not None:
         link = find_association("Lead", remote_id=item_data["LEAD_ID"])
         if link is not None:
@@ -203,6 +209,8 @@ def run_cron_import():
         for deal in deals["result"]:
             try:
                 order = run_import(remote_id=deal["ID"])
+                if order.category == "Enpal Angebote":
+                    enpal_offer_by_order(order)
             except Exception as e:
                 error_handler()
 
@@ -217,3 +225,16 @@ def run_cron_import():
     if config is not None and "data" in config:
         config["data"]["last_order_import_datetime"] = last_import
     update_config_item("importer/bitrix24", config)
+
+
+def run_offer_pdf_export(local_id=None, remote_id=None, public_link=None):
+    if local_id is not None:
+        link = find_association("Order", local_id=local_id)
+    if remote_id is not None:
+        link = find_association("Order", remote_id=remote_id)
+    if link is not None:
+        response = post("crm.deal.update", {
+            "id": link.remote_id,
+            "fields[UF_CRM_1587121259]": public_link
+        })
+        print(response)

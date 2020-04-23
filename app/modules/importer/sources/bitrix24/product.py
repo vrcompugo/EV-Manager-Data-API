@@ -92,4 +92,15 @@ def run_import(minutes=None):
 
 
 def run_export(remote_id=None, local_id=None):
-    pass
+    if local_id is not None:
+        link = find_association("Product", local_id=local_id)
+        product = Product.query.get(link.local_id)
+    if remote_id is not None:
+        link = find_association("Product", remote_id=remote_id)
+        product = Product.query.get(link.local_id)
+
+    response = post("crm.product.update", {
+        "id": link.remote_id,
+        "fields[DESCRIPTION]": product.description
+    })
+    print(response)

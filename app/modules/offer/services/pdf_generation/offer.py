@@ -10,9 +10,13 @@ from app.utils.gotenberg import generate_pdf
 from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
 
 
-def generate_pv_offer_pdf(offer: OfferV2):
-    content = render_template("offer/index.html", offer=offer, offer_number_prefix="PV-")
-    content_footer = render_template("offer/footer.html", offer=offer, offer_number_prefix="PV-")
+def generate_offer_pdf(offer: OfferV2):
+    offer_number_prefix = "PV-"
+    if offer.offer_group == "enpal-offer":
+        offer_number_prefix = "EN-"
+    content = render_template("offer/index.html", offer=offer, offer_number_prefix=offer_number_prefix)
+    content_footer = render_template("offer/footer.html", offer=offer, offer_number_prefix=offer_number_prefix)
+
     pdf = generate_pdf(content, content_footer=content_footer)
     if pdf is not None:
         pdf_file = S3File.query\
@@ -24,7 +28,7 @@ def generate_pv_offer_pdf(offer: OfferV2):
             "model_id": offer.id,
             "content-type": 'application/pdf',
             "file_content": pdf,
-            "filename": f"Angebot PV-{offer.id}.pdf"
+            "filename": f"Angebot {offer_number_prefix}{offer.id}.pdf"
         }
         if pdf_file is not None:
             update_file(pdf_file.id, file_data)
