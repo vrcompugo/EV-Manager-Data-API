@@ -118,7 +118,7 @@ class OfferPDF(Resource):
             db.subqueryload("address")
         ).get(id)
         data = {}
-        return generate_offer_pdf(offer)
+        return generate_cloud_pdf(offer)
         if offer.pdf is not None:
             data["pdf"] = {
                 "public_link": offer.pdf.public_link,
