@@ -29,12 +29,15 @@ def generate_feasibility_study_pdf(offer: OfferV2):
                 consumer = consumer + 1
     orientation_label = "West/Ost"
     pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
-    if offer.survey.data["roof_datas"][0]["direction"] == "south":
-        orientation_label = "Süd"
-        pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["south"]
-    if offer.survey.data["roof_datas"][0]["direction"] == "north":
-        orientation_label = "Nord"
-        pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["north"]
+    if "direction" in offer.survey.data["roof_datas"][0]:
+        if offer.survey.data["roof_datas"][0]["direction"] == "south":
+            orientation_label = "Süd"
+            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["south"]
+        if offer.survey.data["roof_datas"][0]["direction"] == "north":
+            orientation_label = "Nord"
+            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["north"]
+    else:
+        offer.survey.data["roof_datas"][0]["direction"] = "west"
 
     usage = float(offer.survey.data["pv_usage"])
     if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
