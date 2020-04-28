@@ -25,7 +25,7 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
 def generate_offer_by_order(order: Order):
     from .enpal_offer import enpal_offer_by_order
     from app.modules.importer.sources.bitrix24.order import run_offer_pdf_export
-    if order is not None and order.category == "Enpal Angebote":
+    if order is not None and order.category == "online Speichernachrüstung":
         print(f"generate offer for {order.id}")
         offer = enpal_offer_by_order(order)
         if offer.pdf is not None:
