@@ -74,7 +74,7 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
                 "Erneuerbare Energie - Cloud PV Pakete Optionen",
                 quantity)
 
-        integrated_options = ["Schwarze Module"]
+        integrated_options = []
         for optional_product in survey.data["pv_options"]:
             if (optional_product["label"] not in integrated_options
                 and (
