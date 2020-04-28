@@ -67,6 +67,9 @@ def filter_import_input(item_data):
         data["data"]["usage_without_pv"] = convert_field_value_from_remote("UF_CRM_1587030744", item_data)
     if "UF_CRM_1587030804" in item_data:
         data["data"]["pv_size"] = convert_field_value_from_remote("UF_CRM_1587030804", item_data)
+    if "UF_CRM_1587121259" in item_data:
+        data["data"]["pdf_link"] = item_data["UF_CRM_1587121259"]
+
     if item_data["LEAD_ID"] is not None:
         link = find_association("Lead", remote_id=item_data["LEAD_ID"])
         if link is not None:
@@ -219,7 +222,7 @@ def run_cron_import():
         for deal in deals2["result"]:
             try:
                 order = run_import(remote_id=deal["ID"])
-                if order is not None and order.category == "Enpal Angebote":
+                if order is not None and order.category == "Enpal Angebote" and ("pdf_link" not in order.data or order.data["pdf_link"] == ""):
                     generate_offer_by_order(order)
 
             except Exception as e:
@@ -241,4 +244,4 @@ def run_offer_pdf_export(local_id=None, remote_id=None, public_link=None):
             "id": link.remote_id,
             "fields[UF_CRM_1587121259]": public_link
         })
-        print(response)
+        print("offer pdf link resp:", response)
