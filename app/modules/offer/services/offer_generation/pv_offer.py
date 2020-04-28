@@ -1,4 +1,5 @@
 import json
+import math
 
 from app.models import OfferV2, Survey, Settings, Lead
 
@@ -16,16 +17,14 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
             or survey.data["pv_usage"] != old_data["data"]["pv_usage"]):
 
         offer_data = base_offer_data("pv-offer", survey)
-
-        product_name = "PV Paket {}".format(survey.data["packet_number"])
-        for optional_product in survey.data["pv_options"]:
-            if optional_product["label"] == "Schwarze Module":
-                product_name = "PV Paket {}".format(survey.data["packet_number"])
-                break
+        packet_number = survey.data["packet_number"]
+        if int(survey.data["packet_number"]) > 300:
+            packet_number = 300
+        product_name = "PV Paket {}".format(packet_number)
         if survey.data["pv_module_type"] == "390":
-            product_name = "PV Paket {} (390)".format(survey.data["packet_number"])
+            product_name = "PV Paket {} (390)".format(packet_number)
         if survey.data["pv_module_type"] == "400":
-            product_name = "PV Paket {} (400)".format(survey.data["packet_number"])
+            product_name = "PV Paket {} (400)".format(packet_number)
 
         offer_data = add_item_to_offer(
             survey,
@@ -51,6 +50,23 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
                 quantity = 7
             if 230 <= int(survey.data["packet_number"]) <= 300:
                 quantity = 9
+            if int(survey.data["packet_number"]) > 300:
+                total_usage = int(survey.data["pv_usage"])
+                if "extra_drains" in survey.data:
+                    for drain in survey.data["extra_drains"]:
+                        if drain["usage"] != "":
+                            total_usage = total_usage + int(drain["usage"])
+                quantity = 9 + math.ceil((total_usage - 30000) / 5000)
+                extra_modules = math.ceil((total_usage - 30000) / 500) * 5
+                if survey.data["pv_module_type"] == "400":
+                    extra_modules = math.ceil((total_usage - 30000) / 500) * 3
+                if extra_modules > 0:
+                    offer_data = add_item_to_offer(
+                        survey,
+                        offer_data,
+                        f"zusätzliches {survey.data['pv_module_type']}Watt Modul",
+                        "Erneuerbare Energie - Cloud PV Pakete Optionen",
+                        extra_modules)
             offer_data = add_item_to_offer(
                 survey,
                 offer_data,
