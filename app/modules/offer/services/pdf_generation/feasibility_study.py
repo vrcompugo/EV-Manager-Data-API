@@ -44,8 +44,11 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         for drain in offer.survey.data["extra_drains"]:
             if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                 usage = usage + float(drain["usage"])
+    run_time = 30
+    if "run_time" in offer.survey.data:
+        run_time = int(offer.survey.data["run_time"])
     data = {
-        "runtime": int(offer.survey.data["run_time"]),
+        "runtime": run_time,
         "usage": usage,
         "paket": int(offer.survey.data["packet_number"]),
         "pv_efficiancy": pv_efficiancy,
