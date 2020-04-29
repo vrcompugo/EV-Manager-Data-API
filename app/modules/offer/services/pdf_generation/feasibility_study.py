@@ -47,6 +47,12 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     run_time = 30
     if "run_time" in offer.survey.data:
         run_time = int(offer.survey.data["run_time"])
+    price_increase = 5.75
+    if "price_increase" in offer.survey.data:
+        price_increase = float(offer.survey.data["price_increase"])
+    inflation_rate = 2.5
+    if "inflation_rate" in offer.survey.data:
+        inflation_rate = float(offer.survey.data["inflation_rate"])
     data = {
         "runtime": run_time,
         "usage": usage,
@@ -57,9 +63,9 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         "in_use_date": in_use_date,
         "conventional_base_cost_per_year": settings["data"]["wi_settings"]["conventional_base_cost_per_year"],
         "conventional_base_cost_per_kwh": settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"],
-        "cost_increase_rate": float(offer.survey.data["price_increase"]),
-        "inflation_rate": float(offer.survey.data["inflation_rate"]),
-        "full_cost_increase_rate": float(offer.survey.data["price_increase"]) + float(offer.survey.data["inflation_rate"]),
+        "cost_increase_rate": price_increase,
+        "inflation_rate": inflation_rate,
+        "full_cost_increase_rate": price_increase + inflation_rate,
         "conventional_total_cost": None,
         "consumer_count": consumer,
         "cloud_monthly_cost": cloud_total,
