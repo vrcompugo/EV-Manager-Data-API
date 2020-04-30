@@ -1,5 +1,8 @@
 from app.models import Order
 from .pv_offer import pv_offer_by_survey
+from .roof_offer import roof_offer_by_survey
+from .heater_offer import heater_offer_by_survey
+from .storage_offer import storage_offer_by_survey
 
 
 def automatic_offer_creation_by_survey(survey, old_data=None):
@@ -13,6 +16,12 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
         offer = None
         if "create_offer_pv" in survey.data and survey.data["create_offer_pv"]:
             offer = pv_offer_by_survey(survey, old_data)
+        if "create_offer_roof" in survey.data and survey.data["create_offer_roof"]:
+            offer = roof_offer_by_survey(survey, old_data)
+        if "create_offer_heater" in survey.data and survey.data["create_offer_heater"]:
+            offer = heater_offer_by_survey(survey, old_data)
+        if "create_offer_storage" in survey.data and survey.data["create_offer_storage"]:
+            offer = storage_offer_by_survey(survey, old_data)
 
         if survey.lead is not None and offer is not None:
             survey.lead.value = offer.total

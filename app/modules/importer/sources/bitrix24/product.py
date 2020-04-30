@@ -34,6 +34,7 @@ def filter_import_data(item_data):
                 search = re.search(r"(.*) \(([0-9]+)\)$", item_data["NAME"])
                 packet_range_start = search.group(2)
                 packet_range_end = search.group(2)
+                item_data["NAME"] = search.group(1)
             else:
                 search = re.search(r"(.*) \(([0-9]+)\-([0-9]+)\)$", item_data["NAME"])
                 packet_range_start = search.group(2)

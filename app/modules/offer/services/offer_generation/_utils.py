@@ -34,14 +34,16 @@ def base_offer_data(offer_group, survey=None, order=None):
     return data
 
 
-def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_folder=None, quantity=None, position="top"):
+def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_folder=None, quantity=None, position="top", packet_number=None):
+    if packet_number is None:
+        packet_number = int(survey.data["packet_number"])
     product = None
     if survey is not None:
         product = Product.query\
             .filter(Product.name == product_name)\
             .filter(Product.product_group == product_folder)\
-            .filter(Product.packet_range_start <= int(survey.data["packet_number"]))\
-            .filter(Product.packet_range_end >= int(survey.data["packet_number"]))\
+            .filter(Product.packet_range_start <= packet_number)\
+            .filter(Product.packet_range_end >= packet_number)\
             .first()
     if product is None:
         product = Product.query\

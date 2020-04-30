@@ -54,6 +54,18 @@ def cron_import_tasks():
 
 
 @manager.option("-l", "--local_id", dest='local_id', default=None)
+def generate_offer_by_survey(local_id):
+    from app.models import Survey
+    from app.modules.survey.survey_services import automatic_offer_creation_by_survey
+
+    survey = Survey.query.get(int(local_id))
+    if survey is not None:
+        automatic_offer_creation_by_survey(survey)
+    else:
+        print("Survey not found")
+
+
+@manager.option("-l", "--local_id", dest='local_id', default=None)
 def generate_offer_by_order(local_id):
     from app.models import Order
     from app.modules.offer.services.offer_generation import generate_offer_by_order

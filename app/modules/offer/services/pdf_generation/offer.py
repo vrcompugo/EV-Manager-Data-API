@@ -14,6 +14,10 @@ def generate_offer_pdf(offer: OfferV2):
     offer_number_prefix = "PV-"
     if offer.offer_group == "enpal-offer":
         offer_number_prefix = "EN-"
+    if offer.offer_group == "heater-offer":
+        offer_number_prefix = "HZ-"
+    if offer.offer_group == "roof-offer":
+        offer_number_prefix = "DA-"
     content = render_template("offer/index.html", offer=offer, offer_number_prefix=offer_number_prefix)
     content_footer = render_template("offer/footer.html", offer=offer, offer_number_prefix=offer_number_prefix)
 
