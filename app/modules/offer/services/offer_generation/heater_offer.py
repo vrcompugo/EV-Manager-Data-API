@@ -129,7 +129,7 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
                 offer_data,
                 "WP Befestigung",
                 "Heizung - WP",
-                0
+                1
             )
 
         offer_data = add_item_to_offer(
