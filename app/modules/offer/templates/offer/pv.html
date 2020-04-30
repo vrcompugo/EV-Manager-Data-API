@@ -84,14 +84,16 @@
           {% if item.quantity > 0 or item.position == "top" %}
             <tr>
               <td class="border-right">{{ index.index }}</td>
-              <td class="border-right right">{{ item.quantity | numberformat("de", 0) }}</td>
-              <td class="border-right">{{ item.quantity_unit }}</td>
-              <td class="border-right">
-                <b>{{ item.label }}</b><br>
-                {{ item.description | safe }}
+              <td class="border-right right empty-on-split">{{ item.quantity | numberformat("de", 0) }}</td>
+              <td class="border-right empty-on-split">{{ item.quantity_unit }}</td>
+              <td class="border-right description">
+                <div>
+                  <b>{{ item.label }}</b><br>
+                  {{ item.description | safe }}
+                </div>
               </td>
-              <td class="right border-right" style="white-space: nowrap;">{{ item.single_price_net | currencyformat }}</td>
-              <td class="right" style="white-space: nowrap;">{{ item.total_price_net | currencyformat }}</td>
+              <td class="right border-right empty-on-split" style="white-space: nowrap;">{{ item.single_price_net | currencyformat }}</td>
+              <td class="right empty-on-split" style="white-space: nowrap;">{{ item.total_price_net | currencyformat }}</td>
             </tr>
             {% if index.update({"index": index.index + 1 }) %} {% endif %}
           {% else %}

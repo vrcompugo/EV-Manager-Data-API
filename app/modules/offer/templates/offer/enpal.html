@@ -143,14 +143,16 @@
             {% if item.quantity == 0 and item.position == "bottom" %}
               <tr>
                 <td class="border-right">{{ index.index }}</td>
-                <td class="border-right right">{{ item.quantity | numberformat("de", 0) }}</td>
-                <td class="border-right">{{ item.quantity_unit }}</td>
-                <td class="border-right">
-                  <b>{{ item.label }}</b><br>
-                  {{ item.description | safe }}
+                <td class="border-right right empty-on-split">{{ item.quantity | numberformat("de", 0) }}</td>
+                <td class="border-right empty-on-split">{{ item.quantity_unit }}</td>
+                <td class="border-right description">
+                  <div>
+                    <b>{{ item.label }}</b><br>
+                    {{ item.description | safe }}
+                  </div>
                 </td>
-                <td class="right border-right" style="white-space: nowrap;">{{ item.single_price_net | currencyformat }}</td>
-                <td class="right" style="white-space: nowrap;">{{ 0 | currencyformat }}</td>
+                <td class="right border-right empty-on-split" style="white-space: nowrap;">{{ item.single_price_net | currencyformat }}</td>
+                <td class="right empty-on-split" style="white-space: nowrap;">{{ 0 | currencyformat }}</td>
               </tr>
               {% if index.update({"index": index.index + 1 }) %} {% endif %}
             {% endif %}
@@ -184,6 +186,26 @@
     <p>Der Auftraggeber best&auml;tigt mit seiner Unterschrift ein Exemplar des Vertrages erhalten zu haben.</p>
     <p>&nbsp;</p>
     <p>______________________________________________________________<br />Ort, Datum Unterschrift Kunde</p>
+
+    <script>
+      let trs = document.querySelectorAll("table tr");
+      let i = 1;
+      if(trs[i].offsetHeight > 500){
+        new_tr = trs[i].cloneNode(true)
+        let description_div = trs[i].querySelector(".description > div");
+        description_div.style.overflow = "hidden";
+        description_div.style.height = "500px";
+        trs[i].insertAdjacentElement("afterend", new_tr);
+        let description2 = new_tr.querySelector(".description");
+        description2.style.overflow = "hidden";
+        let description2_div = new_tr.querySelector(".description > div");
+        description2_div.style.marginTop = "-540px";
+        let empties = new_tr.querySelectorAll(".empty-on-split");
+        for(let j=0;j < empties.length;j++){
+          empties[j].innerHTML = "";
+        }
+      }
+    </script>
   </body>
 </html>
 
