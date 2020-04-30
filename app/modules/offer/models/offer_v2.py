@@ -54,7 +54,7 @@ class OfferV2(db.Model):
             .filter(S3File.model_id == self.id)\
             .first()
         if s3_file is None:
-            if self.offer_group in ["pv-offer", "enpal-offer"]:
+            if self.offer_group in ["pv-offer", "enpal-offer", 'heater-offer', 'root-offer']:
                 if self.offer_group != "pv-offer" or "pv_options" in self.survey.data:
                     generate_offer_pdf(self)
                     s3_file = S3File.query\

@@ -1,3 +1,4 @@
+from app import db
 from app.models import Order
 from .pv_offer import pv_offer_by_survey
 from .roof_offer import roof_offer_by_survey
