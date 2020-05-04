@@ -57,6 +57,12 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
     single_price = round(float(product.price_net) * (1 + tax_rate / 100), 4)
     single_price_net = float(product.price_net)
     single_tax_amount = single_price - single_price_net
+    quantity_unit = product.pack_unit
+    if "heater_create_as_contracting" in survey.data and survey.data["heater_create_as_contracting"]:
+        single_price = single_price / 1000 * 7.9
+        single_price_net = single_price_net / 1000 * 7.9
+        single_tax_amount = single_tax_amount / 1000 * 7.9
+        quantity_unit = "mtl."
     item_data = {
         "product_id": product.id,
         "sort": 0,
@@ -64,7 +70,7 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
         "label": product.name,
         "description": product.description,
         "position": position,
-        "quantity_unit": product.pack_unit,
+        "quantity_unit": quantity_unit,
         "weight_single": 0,
         "weight_total": 0,
         "quantity": quantity,

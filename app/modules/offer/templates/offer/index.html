@@ -7,6 +7,9 @@
 {% if offer.offer_group == "heater-offer" %}
     {% include "offer/heater.html" %}
 {% endif %}
+{% if offer.offer_group == "heater-offer-con" %}
+    {% include "offer/heater-contracting.html" %}
+{% endif %}
 {% if offer.offer_group == "roof-offer" %}
     {% include "offer/roof.html" %}
 {% endif %}

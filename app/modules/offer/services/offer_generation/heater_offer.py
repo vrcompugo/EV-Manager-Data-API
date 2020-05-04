@@ -16,6 +16,8 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
     ):
 
         offer_data = base_offer_data("heater-offer", survey)
+        if "heater_create_as_contracting" in survey.data and survey.data["heater_create_as_contracting"]:
+            offer_data = base_offer_data("heater-offer-con", survey)
         heater_sqm = int(survey.data["heating_sqm"])
         if "house_construction_year" in survey.data and survey.data["house_construction_year"] == "1940-1969":
             heater_sqm = heater_sqm * 2
@@ -25,6 +27,22 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
             heater_sqm = heater_sqm * 1.5
         if "house_construction_year" in survey.data and survey.data["house_construction_year"] == "2000-2015":
             heater_sqm = heater_sqm * 1.25
+
+        if survey.data["heater_type"] == "oil":
+            label_type = "Öl"
+        if survey.data["heater_type"] == "gas":
+            label_type = "Gas"
+        if survey.data["heater_type"] == "wp":
+            label_type = "WP"
+
+        if "heater_create_as_contracting" in survey.data and survey.data["heater_create_as_contracting"]:
+            offer_data = add_item_to_offer(
+                survey,
+                offer_data,
+                f"AIO Paket {label_type}",
+                f"Heizung - {label_type}",
+                1
+            )
 
         if survey.data["heater_type"] == "oil":
             offer_data = add_item_to_offer(
@@ -98,16 +116,6 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
                 1,
                 packet_number=int(survey.data["solarthermie_sqm"])
             )
-
-
-        if survey.data["heater_type"] == "oil":
-            label_type = "Öl"
-            products = [["Systemtrenner Auslaufventil Öl", 1], ["Hydraulischer Abgleich Öl", 1], ["Hydraulischer Abgleich Öl II", 1]]
-            product_folder = "Heizung - Öl"
-        if survey.data["heater_type"] == "gas":
-            label_type = "Gas"
-        if survey.data["heater_type"] == "wp":
-            label_type = "WP"
 
         if "Heizungstyp" == "Fussbodenheizung und Heizkörper":
             offer_data = add_item_to_offer(

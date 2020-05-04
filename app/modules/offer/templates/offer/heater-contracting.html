@@ -71,11 +71,10 @@
       <thead>
         <tr>
           <th class="table--th">Pos.</th>
-          <th class="table--th">Anzahl</th>
-          <th class="table--th">Einheit</th>
+          <th class="table--th" width="1%">Gewählt</th>
           <th class="table--th">Bezeichnung</th>
-          <th class="table--th">Einzelpreis</th>
-          <th class="table--th">Gesamtpreis</th>
+          <th class="table--th" style="white-space: nowrap;">Opt. mtl. Preis</th>
+          <th class="table--th" style="white-space: nowrap;">mtl. Beitrag</th>
         </tr>
       </thead>
       <tbody>
@@ -84,8 +83,15 @@
           {% if item.quantity > 0 or item.position == "top" %}
             <tr>
               <td class="border-right">{{ index.index }}</td>
-              <td class="border-right right empty-on-split">{{ item.quantity | numberformat("de", 0) }}</td>
-              <td class="border-right empty-on-split">{{ item.quantity_unit }}</td>
+              <td class="border-right empty-on-split">
+                (
+                {% if item.quantity > 0 %}
+                x
+                {% else %}
+                &nbsp;&nbsp;
+                {% endif %}
+                )
+              </td>
               <td class="border-right description">
                 <div>
                   <b>{{ item.label }}</b><br>
@@ -101,17 +107,15 @@
           {% endif %}
         {% endfor %}
         <tr>
-          <td class="border-right" colspan="5">Summe:</td>
+          <td class="border-right" colspan="4">Summe:</td>
           <td class="right" style="white-space: nowrap;">{{ offer.subtotal_net | currencyformat }}</td>
         </tr>
         <tr>
-          <td class="border-right" colspan="5">Mehrwertsteuer {{ offer.tax_rate | percentformat }} auf {{ offer.subtotal_net | currencyformat }} netto</td>
+          <td class="border-right" colspan="4">Mehrwertsteuer {{ offer.tax_rate | percentformat }} auf {{ offer.subtotal_net | currencyformat }} netto</td>
           <td class="right" style="white-space: nowrap;">{{ offer.total_tax | currencyformat }}</td>
         </tr>
         <tr class="foot-line">
-          <td class="border-right" colspan="5">
-            Zu zahlender Betrag
-          </td>
+          <td class="border-right" colspan="4">Monatlicher Gesamtbetrag</td>
           <td class="right" style="white-space: nowrap;">{{ offer.total | currencyformat }}</td>
         </tr>
       </tbody>
@@ -178,15 +182,21 @@
     <p>____________________________________________________________________</p>
     <p>____________________________________________________________________</p>
     <p>____________________________________________________________________</p>
-    <p>____________________________________________________________________</p>
     <p>Hiermit bestellen ich / wir die oben beschriebene Ware/Heizung. <br />Die Bestellung erfolgt vorbehaltlich der Finanzierungszusage einer Bank. Kommt eine Finanzierung nicht zustande, entsteht keine Abnahmepflicht der Anlage f&uuml;r den Kunden. Hierzu gen&uuml;gt die schriftliche Absage der Bank.</p>
     <ul>
-    <li>Eine etwaige Wirtschaftlichkeitsberechnung, angenommmene / errechnete PV-Ertr&auml;ge und ein Autarkiegrad etc. sind lediglich theoretisch errechnete Werte und k&ouml;nnen von den tats&auml;chlich erreichten Werten abweichen. Hierf&uuml;r &uuml;bernimmt korbacher-energieZENTRUM keine Haftung. Diese werden nicht Gesch&auml;ftsgrundlage sowie nicht Vertragsbestandteil dieses Angebots.</li>
-    <li>Alle Garantien gem&auml;&szlig; Angebot sind reine Herstellergarantien. korbacher-energieZENTRUM ist nicht Garantiegeber. Ein etwaiger eintretender Verzug bei der Lieferung sowie Ausf&uuml;hrung der vereinbarten Leistungen inkl. der sich aus aus dem Verzug ergebenden Rechtsfolgen setzt in jeden Fall eigenes Verschulden der korbacher-energieZENTRUM GmbH &amp; Co KG voraus.</li>
-    <li>Der Vertrag gem&auml;&szlig; Angebot ist erf&uuml;llt mit vollst&auml;ndiger Lieferung und Montage der Anlage gem&auml;&szlig; Angebot sowie der schriftlichen Fertigstellung-Anzeige oder Inbetriebnahme des EVU</li>
-    <li>Aufrechnung sowie Zur&uuml;ckbehaltungsrecht gegen&uuml;ber Forderungen von korbacher-energieZENTRUM sind dem Kunden nicht gestattet, es sei denn, es handelt sich um unbestrittene oder rechtskr&auml;ftig festgestellte Forderungen.</li>
+      <li>Eine etwaige Wirtschaftlichkeitsberechnung, angenommmene / errechnete PV-Ertr&auml;ge und ein Autarkiegrad etc. sind lediglich theoretisch errechnete Werte und k&ouml;nnen von den tats&auml;chlich erreichten Werten abweichen. Hierf&uuml;r &uuml;bernimmt korbacher-energieZENTRUM keine Haftung. Diese werden nicht Gesch&auml;ftsgrundlage sowie nicht Vertragsbestandteil dieses Angebots.</li>
+      <li>Alle Garantien gem&auml;&szlig; Angebot sind reine Herstellergarantien. korbacher-energieZENTRUM ist nicht Garantiegeber. Ein etwaiger eintretender Verzug bei der Lieferung sowie Ausf&uuml;hrung der vereinbarten Leistungen inkl. der sich aus aus dem Verzug ergebenden Rechtsfolgen setzt in jeden Fall eigenes Verschulden der korbacher-energieZENTRUM GmbH &amp; Co KG voraus.</li>
+      <li>Der Vertrag gem&auml;&szlig; Angebot ist erf&uuml;llt mit vollst&auml;ndiger Lieferung und Montage der Anlage gem&auml;&szlig; Angebot sowie der schriftlichen Fertigstellung-Anzeige oder Inbetriebnahme des EVU</li>
+      <li>Aufrechnung sowie Zur&uuml;ckbehaltungsrecht gegen&uuml;ber Forderungen von korbacher-energieZENTRUM sind dem Kunden nicht gestattet, es sei denn, es handelt sich um unbestrittene oder rechtskr&auml;ftig festgestellte Forderungen.</li>
     </ul>
-    <br>
+    <p>
+      Die im Angebot Nr. {{ offer_number_prefix }}{{ offer.id }} beschriebenen Preise sind monatliche Euro Beträge. Das Angebot ist 3 Wochen gültig ab dem Erstellungsdatum. Ein verbindlicher Vertrag kommt erst zusatande, nachdem dieses Angebot sowohl vom Auftraggeber/Käufer als auch von dem Geschäftsführer der Auftragnehmerin unterzeichnet wurde. Etwaige Nebenabreden (schriftlich oder mündlich) sind unwirksam, sofern sie nicht ausdrücklich schriftlich durch den Geschäftsführer bestätigt wurden.
+      Der Gesamtbetrag beläuft sich auf {{ offer.total_15years  | currencyformat }} über eines Laufzeit von 180 Monaten. Des weiteren muss die Finanzierende Bank (Dresdner Sparkasse) der monatlichen Zahlungsweise – also dem Kreditvertrag zustimmen bzw. diesen genehmigen.<br>
+      Der Kunde zahlt an unsere Partner-Bank, die Sparkasse Dresden den im Angebot beschriebenen monatlichen Betrag zu den vereinbarten Konditionen.</p>
+
+    <p>Hiermit erteile ich/wir Ihnen den Auftrag zur Ausführung vorgenannter Leistungen. Grundlage des Auftrags sind die Allgemeinen Geschäftsbedingungen der korbacher-energiezentrum GmbH und Co KG.</p>
+
+    <p>Die Zahlung beginnt erst nach Lieferung der Komponenten und der Montage an das vorhandene Heizungsrohrnetz.</p>
     <p>Der Auftraggeber best&auml;tigt mit seiner Unterschrift ein Exemplar des Vertrages erhalten zu haben.</p>
     <p>&nbsp;</p>
     <p>______________________________________________________________<br />Ort, Datum Unterschrift Kunde</p>
