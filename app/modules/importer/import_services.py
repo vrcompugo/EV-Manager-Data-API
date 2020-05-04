@@ -20,6 +20,10 @@ def import_by_source_module(source, model, remote_id=None, local_id=None):
         from .sources.daa import run_import_by_model
         run_import_by_model(model=model, remote_id=remote_id, local_id=local_id)
 
+    if source == "hausfrage":
+        from .sources.hausfrage import run_import_by_model
+        run_import_by_model(model=model, remote_id=remote_id, local_id=local_id)
+
     if source == "senec":
         from .sources.senec import run_import_by_model
         run_import_by_model(model=model, remote_id=remote_id, local_id=local_id)
