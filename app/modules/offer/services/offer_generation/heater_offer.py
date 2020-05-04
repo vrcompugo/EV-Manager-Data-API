@@ -16,7 +16,15 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
     ):
 
         offer_data = base_offer_data("heater-offer", survey)
-        heater_kw = int(int(survey.data["heating_sqm"]) * int(survey.data["house_damping"]) / 1000)
+        heater_sqm = int(survey.data["heating_sqm"])
+        if "house_construction_year" in survey.data and survey.data["house_construction_year"] == "1940-1969":
+            heater_sqm = heater_sqm * 2
+        if "house_construction_year" in survey.data and survey.data["house_construction_year"] == "1970-1979":
+            heater_sqm = heater_sqm * 1.75
+        if "house_construction_year" in survey.data and survey.data["house_construction_year"] == "1980-1999":
+            heater_sqm = heater_sqm * 1.5
+        if "house_construction_year" in survey.data and survey.data["house_construction_year"] == "2000-2015":
+            heater_sqm = heater_sqm * 1.25
 
         if survey.data["heater_type"] == "oil":
             offer_data = add_item_to_offer(
@@ -25,7 +33,7 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
                 "Öl Heizung",
                 "Heizung - Öl",
                 1,
-                packet_number=heater_kw
+                packet_number=heater_sqm
             )
         if survey.data["heater_type"] == "gas":
             product_name = "HANSA Gas Pega"
@@ -37,7 +45,7 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
                 product_name,
                 "Heizung - Gas",
                 1,
-                packet_number=heater_kw
+                packet_number=heater_sqm
             )
         if survey.data["heater_type"] == "wp":
             product_name = "Luft-Wasser Wärmepumpe Bestand"
@@ -49,7 +57,7 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
                 product_name,
                 "Heizung - WP",
                 1,
-                packet_number=heater_kw
+                packet_number=heater_sqm
             )
 
         if survey.data["heater_type"] in ["oil", "gas"]:
@@ -91,6 +99,7 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
                 packet_number=int(survey.data["solarthermie_sqm"])
             )
 
+
         if survey.data["heater_type"] == "oil":
             label_type = "Öl"
             products = [["Systemtrenner Auslaufventil Öl", 1], ["Hydraulischer Abgleich Öl", 1], ["Hydraulischer Abgleich Öl II", 1]]
@@ -100,6 +109,14 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
         if survey.data["heater_type"] == "wp":
             label_type = "WP"
 
+        if "Heizungstyp" == "Fussbodenheizung und Heizkörper":
+            offer_data = add_item_to_offer(
+                survey,
+                offer_data,
+                f"2ter Heizkreis {label_type}",
+                f"Heizung - {label_type}",
+                1
+            )
         offer_data = add_item_to_offer(
             survey,
             offer_data,
