@@ -27,9 +27,9 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
         if survey.lead is not None and offer is not None:
             survey.lead.value = offer.total
             survey.lead.status = "offer_created"
-            db.session.add(lead)
+            db.session.add(survey.lead)
             db.session.commit()
-            run_status_update_export(local_id=lead.id)
+            run_status_update_export(local_id=survey.lead.id)
 
 
 def generate_offer_by_order(order: Order):
