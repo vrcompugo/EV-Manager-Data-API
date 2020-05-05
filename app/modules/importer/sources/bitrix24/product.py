@@ -40,7 +40,7 @@ def filter_import_data(item_data):
                 packet_range_start = search.group(2)
                 packet_range_end = search.group(3)
                 item_data["NAME"] = search.group(1)
-    print(item_data["NAME"])
+    item_data["NAME"] = item_data["NAME"].strip()
     data = {
         "product_group": product_group,
         "name": item_data["NAME"],
