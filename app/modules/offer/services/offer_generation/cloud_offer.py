@@ -14,10 +14,13 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         for drain in offer.survey.data["extra_drains"]:
             if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                 total_drain = total_drain + int(drain["usage"])
+    extra_usage = 0
+    if total_drain > int(offer.survey.data['offered_usage']):
+        extra_usage = total_drain - int(offer.survey.data['offered_usage'])
     tax_rate = 19
     cloud_price = 99
     for price in settings["data"]["cloud_settings"]["cloud_prices"]:
-        if int(price["paket_range_start"]) <= int(offer.survey.data["packet_number"]) <= int(price["paket_range_end"]):
+        if int(price["paket_range_start"]) <= int(offer.survey.data["offered_packet_number"]) <= int(price["paket_range_end"]):
             cloud_price = float(price["price"])
     offer_data["items"] = [
         {
@@ -46,8 +49,9 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         + f"Kündigungsfrist: {settings['data']['cloud_settings']['notice_period']}<br>\n" \
         + f"Vertragslaufzeit: {settings['data']['cloud_settings']['contract_run_time']}<br>\n" \
         + f"garantierte Zero-Laufzeit für (a): {settings['data']['cloud_settings']['guaranteed_run_time']}<br>\n" \
-        + f"Durch die Cloud abgedeckter Jahresverbrauch: {total_drain} kWh<br>\n" \
-        + "<small>PV, Speicher & Netzbezug</small>"
+        + f"Durch die Cloud abgedeckter Jahresverbrauch: {offer.survey.data['offered_usage']} kWh<br>\n" \
+        + "<small>PV, Speicher & Netzbezug</small><br>\n" \
+        + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {settings['data']['cloud_settings']['extra_kwh_cost']} cent / kWh</small>"
     offer_data["items"].append({
         "label": "",
         "description": (
@@ -56,8 +60,6 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
             + f"PV-Anlage laut Angebot: PV-{offer.id}<br>\n"
             + f"{offer.survey.data['street']} {offer.survey.data['zip']} {offer.survey.data['city']}<br>\n"
             + f"Abnahme: {offer.survey.data['pv_usage']} kWh<br>\n"
-            + "Mehrverbrauch: 0 kWh<br>\n"
-            + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {settings['data']['cloud_settings']['extra_kwh_cost']} cent / kWh</small>"
         ),
         "quantity": 1,
         "quantity_unit": "mtl.",
@@ -104,6 +106,31 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
                     "total_price_net": 0,
                     "total_tax_amount": 0
                 })
+
+    extra_usage_cost = (float(settings['data']['cloud_settings']['extra_kwh_cost']) / 100 * extra_usage) / 12
+    offer_data["items"].append({
+        "label": "",
+        "description": (
+            "<b>Mehrverbrauch</b><br>\n"
+            + f"Geplanter Mehrverbrauch: {extra_usage} kWh<br>\n"
+        ),
+        "quantity": 1,
+        "quantity_unit": "mtl.",
+        "tax_rate": 19,
+        "single_price": extra_usage_cost,
+        "single_price_net": 0,
+        "single_tax_amount": 0,
+        "discount_rate": 0,
+        "discount_single_amount": 0,
+        "discount_single_price": 0,
+        "discount_single_price_net": 0,
+        "discount_single_price_net_overwrite": None,
+        "discount_single_tax_amount": 0,
+        "discount_total_amount": 0,
+        "total_price": extra_usage_cost,
+        "total_price_net": 0,
+        "total_tax_amount": 0
+    })
 
     for product in settings["data"]["cloud_settings"]["extra_products"]:
         if product["include_always"] == "top-one":

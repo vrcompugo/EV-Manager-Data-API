@@ -17,8 +17,8 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
             or survey.data["pv_usage"] != old_data["data"]["pv_usage"]):
 
         offer_data = base_offer_data("pv-offer", survey)
-        packet_number = survey.data["packet_number"]
-        if int(survey.data["packet_number"]) > 300:
+        packet_number = survey.data["offered_packet_number"]
+        if int(survey.data["offered_packet_number"]) > 300:
             packet_number = 300
         product_name = "PV Paket {}".format(packet_number)
         if survey.data["pv_module_type"] == "390":
