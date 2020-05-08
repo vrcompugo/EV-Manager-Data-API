@@ -12,6 +12,7 @@ from app.modules.importer.sources.bitrix24._association import find_association
 from app.modules.auth.auth_services import get_logged_in_user
 
 from .models.calendar_event import CalendarEvent, CalendarEventSchema
+from .calendar_services import update_item
 
 
 api = Namespace('Calendar')
@@ -168,3 +169,19 @@ class Items(Resource):
                     "end": str(end_date),
                 },
                 "data": data}
+
+
+@api.route('/<id>')
+class Item(Resource):
+
+    @api_response
+    # @token_required("list_lead")
+    def post(self, id):
+        item_data = request.json
+        data = {
+            "begin": item_data["begin"],
+            "end": item_data["end"],
+            "user_id": item_data["user_id"]
+        }
+        item = update_item(id, data=data)
+        return {"status": "success"}
