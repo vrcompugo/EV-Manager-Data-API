@@ -226,6 +226,7 @@ def run_import(remote_id=None, local_id=None):
                     if lead_commission is not None:
                         commissions = lead_commission.commissions
                         db.session.refresh(lead)
+                        lead.reseller.lead_balance = lead.reseller.lead_balance + 8
                         lead = update_item(lead.id, {"commissions": commissions, "last_update": lead.last_update})
                     post_data = {
                         "id": remote_id,
