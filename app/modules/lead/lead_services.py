@@ -208,7 +208,7 @@ def lead_reseller_auto_assignment(lead: Lead):
 
     reseller = find_reseller(lead)
     if reseller is not None:
-        lead_reseller_assignment(lead, least_balance_reseller)
+        lead_reseller_assignment(lead, reseller)
         db.session.add(lead)
         db.session.commit()
     return lead
