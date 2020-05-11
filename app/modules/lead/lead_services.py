@@ -206,45 +206,10 @@ def lead_reseller_auto_assignment(lead: Lead):
     from app.utils.google_geocoding import geocode_address
     if lead.reseller_id is not None and lead.reseller_id > 0 and lead.reseller_id != 76:
         return lead
-    location = geocode_address(f"{lead.customer.default_address.street}, {lead.customer.default_address.zip}  {lead.customer.default_address.city}")
-    print("loc", location)
-    if location is not None:
-        reseller_in_range = []
-        resellers = db.session.query(Reseller).filter(Reseller.lead_balance < 0).filter(Reseller.active.is_(True)).all()
-        min_distance = None
-        min_distance_reseller = None
-        for reseller in resellers:
-            if reseller.sales_lat is not None and reseller.sales_lng is not None:
-                distance = calculate_distance(
-                    {
-                        "lat": reseller.sales_lat,
-                        "lng": reseller.sales_lng
-                    },
-                    location
-                )
-                if distance <= reseller.sales_range and reseller.lead_balance is not None and reseller.lead_balance < 0:
-                    reseller_in_range.append(reseller)
-                if min_distance is None or distance < min_distance and distance < 55:
-                    min_distance = distance
-                    min_distance_reseller = reseller
-        if len(reseller_in_range) == 0:
-            if min_distance_reseller is not None:
-                lead_reseller_assignment(lead, min_distance_reseller)
-            else:
-                kammandel = db.session.query(Reseller).get(76)
-                lead_reseller_assignment(lead, kammandel)
-        if len(reseller_in_range) == 1:
-            lead_reseller_assignment(lead, reseller_in_range[0])
-        if len(reseller_in_range) > 1:
-            least_balance_reseller = reseller_in_range[0]
-            if least_balance_reseller.last_assigned_lead is not None:
-                for reseller in reseller_in_range:
-                    if reseller.last_assigned_lead is None:
-                        least_balance_reseller = reseller
-                        break
-                    if reseller.last_assigned_lead < least_balance_reseller.last_assigned_lead:
-                        least_balance_reseller = reseller
-            lead_reseller_assignment(lead, least_balance_reseller)
+
+    reseller = find_reseller(lead)
+    if reseller is not None:
+        lead_reseller_assignment(lead, least_balance_reseller)
         db.session.add(lead)
         db.session.commit()
     return lead
@@ -260,6 +225,58 @@ def lead_reseller_assignment(lead: Lead, reseller: Reseller):
             "last_assigned_lead": datetime.datetime.now()
         }
     )
+
+
+def find_reseller(lead):
+    location = geocode_address(f"{lead.customer.default_address.street}, {lead.customer.default_address.zip}  {lead.customer.default_address.city}")
+    print("reseller auto assign:", lead.id)
+    if location is None:
+        return None
+
+    reseller_in_range = []
+    resellers = db.session.query(Reseller).filter(Reseller.lead_balance < 0).filter(Reseller.active.is_(True)).all()
+
+    min_distance = None
+    min_distance_reseller = None
+    for reseller in resellers:
+        if reseller.sales_lat is not None and reseller.sales_lng is not None:
+            distance = calculate_distance(
+                {
+                    "lat": reseller.sales_lat,
+                    "lng": reseller.sales_lng
+                },
+                location
+            )
+            if reseller.sales_range > 0 and distance <= reseller.sales_range:
+                reseller_in_range.append(reseller)
+            if (min_distance is None or distance < min_distance) and distance < 60:
+                min_distance = distance
+                min_distance_reseller = reseller
+
+    if len(reseller_in_range) == 0:
+        if min_distance_reseller is not None:
+            print("min-distance", min_distance_reseller.id)
+            return min_distance_reseller
+        else:
+            kammandel = db.session.query(Reseller).get(76)
+            print("kammandel", kammandel.id)
+            return kammandel
+
+    if len(reseller_in_range) == 1:
+        print("only one found", reseller_in_range[0].id)
+        return reseller_in_range[0]
+
+    if len(reseller_in_range) > 1:
+        least_balance_reseller = reseller_in_range[0]
+        if least_balance_reseller.last_assigned_lead is not None:
+            for reseller in reseller_in_range:
+                if reseller.last_assigned_lead is None:
+                    least_balance_reseller = reseller
+                    break
+                if reseller.last_assigned_lead < least_balance_reseller.last_assigned_lead:
+                    least_balance_reseller = reseller
+        print("multiple found", least_balance_reseller.id)
+        return least_balance_reseller
 
 
 def calculate_distance(location1, location2):
