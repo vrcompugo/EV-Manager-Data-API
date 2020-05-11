@@ -57,6 +57,8 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
                         if drain["usage"] != "":
                             total_usage = total_usage + int(drain["usage"])
                 quantity = 9 + math.ceil((total_usage - 30000) / 5000)
+                if quantity > 27:
+                    quantity = 27
                 extra_modules = math.ceil((total_usage - 30000) / 500) * 5
                 if survey.data["pv_module_type"] == "400":
                     extra_modules = math.ceil((total_usage - 30000) / 500) * 3
