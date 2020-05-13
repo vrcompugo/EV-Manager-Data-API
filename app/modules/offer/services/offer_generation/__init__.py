@@ -16,12 +16,16 @@ def automatic_offer_creation_by_survey(survey, old_data=None):
     if ("offer_comment" not in survey.data or survey.data["offer_comment"] == ""):
         offer = None
         if "create_offer_pv" in survey.data and survey.data["create_offer_pv"]:
+            print("offer creation pv")
             offer = pv_offer_by_survey(survey, old_data)
         if "create_offer_roof" in survey.data and survey.data["create_offer_roof"]:
+            print("offer creation roof")
             offer = roof_offer_by_survey(survey, old_data)
         if "create_offer_heater" in survey.data and survey.data["create_offer_heater"]:
+            print("offer creation heater")
             offer = heater_offer_by_survey(survey, old_data)
         if "create_offer_storage" in survey.data and survey.data["create_offer_storage"]:
+            print("offer creation storage")
             offer = storage_offer_by_survey(survey, old_data)
 
         if survey.lead is not None and offer is not None:

@@ -18,6 +18,7 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
 
         offer_data = base_offer_data("pv-offer", survey)
         packet_number = survey.data["offered_packet_number"]
+        print("packet number:", packet_number)
         if int(survey.data["offered_packet_number"]) > 300:
             packet_number = 300
         product_name = "PV Paket {}".format(packet_number)
@@ -98,5 +99,7 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
         if lead is not None:
             offer_data["lead_id"] = lead.id
         offer = add_item_v2(offer_data)
+    else:
+        print("usage missing")
 
     return offer
