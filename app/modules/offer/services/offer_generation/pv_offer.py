@@ -9,12 +9,10 @@ from ._utils import base_offer_data, add_item_to_offer, add_optional_item_to_off
 
 def pv_offer_by_survey(survey: Survey, old_data=None):
     offer = None
-    if survey.data["pv_usage"] is not None and \
-        survey.data["pv_usage"] != "" and \
-        int(survey.data["pv_usage"]) > 0 and \
-        (
-            old_data is None
-            or survey.data["pv_usage"] != old_data["data"]["pv_usage"]):
+    if (
+        survey.data["pv_usage"] is not None
+        and survey.data["pv_usage"] != ""
+        and int(survey.data["pv_usage"]) > 0):
 
         offer_data = base_offer_data("pv-offer", survey)
         packet_number = survey.data["offered_packet_number"]
