@@ -35,6 +35,8 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
 
         if int(survey.data["packet_number"]) >= 35:
             quantity = 1
+            if int(survey.data["packet_number"]) == 35 and survey.data["pv_module_type"] == "280":
+                quantity = 0
             if 65 <= int(survey.data["packet_number"]) <= 70:
                 quantity = 2
             if 75 <= int(survey.data["packet_number"]) <= 85:
@@ -68,12 +70,13 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
                         f"zusätzliches {survey.data['pv_module_type']}Watt Modul",
                         "Erneuerbare Energie - Cloud PV Pakete Optionen",
                         extra_modules)
-            offer_data = add_item_to_offer(
-                survey,
-                offer_data,
-                "Akku Stag 2,5 kW",
-                "Erneuerbare Energie - Cloud PV Pakete Optionen",
-                quantity)
+            if quantity > 0:
+                offer_data = add_item_to_offer(
+                    survey,
+                    offer_data,
+                    "Akku Stag 2,5 kW",
+                    "Erneuerbare Energie - Cloud PV Pakete Optionen",
+                    quantity)
 
         integrated_options = []
         for optional_product in survey.data["pv_options"]:
