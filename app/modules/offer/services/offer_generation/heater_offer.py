@@ -35,7 +35,7 @@ def heater_offer_by_survey(survey: Survey, old_data=None):
         if survey.data["heater_type"] == "wp":
             label_type = "WP"
 
-        if "heater_create_as_contracting" in survey.data and survey.data["heater_create_as_contracting"]:
+        if offer_data["offer_group"] == "heater-offer-con":
             offer_data = add_item_to_offer(
                 survey,
                 offer_data,
