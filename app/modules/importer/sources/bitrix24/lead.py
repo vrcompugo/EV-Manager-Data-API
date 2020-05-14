@@ -363,12 +363,17 @@ def run_status_update_export(remote_id=None, local_id=None):
         print("lead link not found", local_id, remote_id)
         return
     lead = Lead.query.get(lead_association.local_id)
+    if lead.status not in ["new", "contacted", "tel_not_connected", "returned", "survey_created"]:
+        return
     status = get_remote_lead_status(lead)
     post_data = {}
     post_data["id"] = lead_association.remote_id
     post_data["fields[STATUS_ID]"] = status
     post_data["fields[OPPORTUNITY]"] = float(lead.value)
     customer_link = find_association("Customer", local_id=lead.customer_id)
+    if customer_link is None:
+        run_customer_export(local_id=lead.customer_id)
+        customer_link = find_association("Customer", local_id=lead.customer_id)
     if customer_link is not None:
         post_data["fields[CONTACT_ID]"] = customer_link.remote_id
     company_link = find_association("CustomerCompany", local_id=lead.customer_id)
