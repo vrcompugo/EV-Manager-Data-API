@@ -10,6 +10,7 @@ from app.decorators import token_required, api_response
 from app.models import User, UserSchema
 from app.modules.importer.sources.bitrix24._association import find_association
 from app.modules.auth.auth_services import get_logged_in_user
+from app.modules.task.task_services import add_item as add_task, update_item as update_task
 
 from .models.calendar_event import CalendarEvent, CalendarEventSchema
 from .calendar_services import add_item, update_item
@@ -124,6 +125,18 @@ class Items(Resource):
                     "name": user["name"],
                     "id": user["id"]
                 }
+                event_data["task"] = {"members": []}
+                if event.task is not None:
+                    event_data["task"] = {
+                        "id": event.task.id,
+                        "label": event.task.label,
+                        "members": []
+                    }
+                    for member in event.task.members:
+                        event_data["task"]["members"].append({
+                            "id": member.id,
+                            "name": member.name,
+                        })
                 if event.customer is not None:
                     event_data["customer"] = {
                         "company": event.customer.company,
@@ -165,19 +178,15 @@ class Items(Resource):
     @api_response
     # @token_required("list_lead")
     def post(self):
-        item_data = request.json
-        data = {
-            "label": item_data["label"],
-            "comment": item_data["comment"],
-            "begin": item_data["begin"],
-            "end": item_data["end"],
-            "user_id": item_data["user"]["id"],
-            "status": "open"
-        }
-        item = add_item(data=data)
-        if "as_task" in item_data and item_data["as_task"]:
-            # add task
-            pass
+        raw_data = request.json
+        item_data = get_item_data(request.json)
+        item_data["status"] = "open"
+        if "as_task" in raw_data and raw_data["as_task"]:
+            item_data["members"] = raw_data["task"]["members"]
+            task = add_task(item_data)
+            if task is not None:
+                item_data["task_id"] = task.id
+        item = add_item(data=item_data)
         return {"status": "success"}
 
 
@@ -187,20 +196,40 @@ class Item(Resource):
     @api_response
     # @token_required("list_lead")
     def put(self, id):
-        item_data = request.json
-        data = {
-            "label": item_data["label"],
-            "comment": item_data["comment"],
-            "begin": item_data["begin"],
-            "end": item_data["end"],
-            "user_id": item_data["user"]["id"],
-        }
-        if "order" in item_data and "id" in item_data["order"]:
-            data["order_id"] = item_data["order"]["id"]
-            if "customer" in item_data["order"]:
-                if type(item_data["order"]["customer"]) is int:
-                    data["customer_id"] = item_data["order"]["customer"]
-                if type(item_data["order"]["customer"]) is dict:
-                    data["customer_id"] = item_data["order"]["customer"]["id"]
-        item = update_item(id, data=data)
+        raw_data = request.json
+        item_data = get_item_data(raw_data)
+        if "task" in raw_data and raw_data["task"] is not None and "id" in raw_data["task"]:
+            item_data["members"] = raw_data["task"]["members"]
+            update_task(raw_data["task"]["id"], item_data)
+        else:
+            if "as_task" in raw_data and raw_data["as_task"]:
+                item_data["members"] = raw_data["task"]["members"]
+                task = add_task(item_data)
+                if task is not None:
+                    item_data["task_id"] = task.id
+        item = update_item(id, data=item_data)
         return {"status": "success"}
+
+
+def get_item_data(item_data):
+    data = {
+        "label": item_data["label"],
+        "comment": item_data["comment"],
+        "begin": item_data["begin"],
+        "end": item_data["end"],
+        "user_id": item_data["user"]["id"]
+    }
+    if "order" in item_data and item_data["order"] is not None and "id" in item_data["order"]:
+        data["order_id"] = item_data["order"]["id"]
+        if "customer" in item_data["order"]:
+            if type(item_data["order"]["customer"]) is int:
+                data["customer_id"] = item_data["order"]["customer"]
+            if type(item_data["order"]["customer"]) is dict:
+                data["customer_id"] = item_data["order"]["customer"]["id"]
+    else:
+        if "customer" in item_data and item_data["customer"] is not None:
+            if type(item_data["customer"]) is int:
+                data["customer_id"] = item_data["customer"]
+            if type(item_data["customer"]) is dict and "id" in item_data["customer"]:
+                data["customer_id"] = item_data["customer"]["id"]
+    return data

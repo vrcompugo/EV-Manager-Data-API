@@ -4,7 +4,7 @@ from app import db
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
-from app.models import CalendarEvent
+from app.models import CalendarEvent, User
 from app.modules.calendar.calendar_services import add_item as event_add, update_item as event_update
 
 from .models.task import Task, TaskSchema
@@ -14,6 +14,9 @@ def add_item(data):
     from app.utils.google_geocoding import geocode_address, route_to_address
 
     new_item = Task()
+    if "members" in data:
+        data["members"] = convert_members(data["members"])
+        print(data["members"])
     new_item = set_attr_by_dict(new_item, data, ["id"])
     if new_item.location is not None and new_item.location != "":
         location = geocode_address(new_item.location)
@@ -34,6 +37,8 @@ def update_item(id, data):
     from app.utils.google_geocoding import geocode_address, route_to_address
 
     item = db.session.query(Task).get(id)
+    if "members" in data:
+        data["members"] = convert_members(data["members"])
     if item is not None:
         old_location = item.location
         item = set_attr_by_dict(item, data, ["id"])
@@ -121,3 +126,17 @@ def event_data_by_task(task: Task):
     if "id" in data:
         del data["id"]
     return data
+
+
+def convert_members(members):
+    if members is None:
+        return []
+    user_list = []
+    for member in members:
+        if type(member) == dict and "id" in member:
+            user = User.query.filter(User.id == member["id"]).first()
+            if user is not None:
+                user_list.append(user)
+        if type(member) == User:
+            user_list.append(member)
+    return user_list
