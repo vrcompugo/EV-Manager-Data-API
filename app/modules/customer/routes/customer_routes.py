@@ -48,8 +48,8 @@ class Index(Resource):
                 - "column1,column2" -> {column1: "", column2: ""}
 
         """
-        offset = int(request.args.get("offset")) or 0
-        limit = int(request.args.get("limit")) or 10
+        offset = int(request.args.get("offset") or 0)
+        limit = int(request.args.get("limit") or 10)
         sort = request.args.get("sort") or ""
         fields = request.args.get("fields") or "_default_"
         query = request.args.get("q") or None

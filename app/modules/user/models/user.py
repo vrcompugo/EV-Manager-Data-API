@@ -1,6 +1,7 @@
 from app import db, flask_bcrypt
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import Schema, fields
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from .user_role import UserRoleSchema
 
@@ -36,6 +37,14 @@ class User(db.Model):
 
     def check_password(self, password):
         return flask_bcrypt.check_password_hash(self.password_hash, password)
+
+    @hybrid_property
+    def search_query(self):
+        return db.session.query(User)
+
+    @hybrid_property
+    def fulltext(self):
+        return User.name
 
     def __repr__(self):
         return "<User '{}'>".format(self.username)

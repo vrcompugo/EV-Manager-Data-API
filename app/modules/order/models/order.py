@@ -13,6 +13,7 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     datetime = db.Column(db.DateTime())
     lead_number = db.Column(db.String(20))
+    label = db.Column(db.String(200))
     customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"))
     customer = db.relationship("Customer")
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))

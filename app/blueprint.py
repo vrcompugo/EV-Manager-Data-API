@@ -11,6 +11,7 @@ from app.modules.file.file_routes import api as file_ns
 from app.modules.importer.import_routes import api as import_ns
 from app.modules.lead.lead_routes import api as lead_ns
 from app.modules.offer.offer_routes import api as offer_ns
+from app.modules.order.order_routes import api as order_ns
 from app.modules.product.product_routes import api as product_ns
 from app.modules.project.project_routes import api as project_ns
 from app.modules.pv_system.pv_system_routes import api as pv_system_ns
@@ -34,6 +35,7 @@ authorizations = {
 }
 full_permission_list = [x for x in full_permission_list if x is not None]
 
+
 class MyApi(Api):
     @property
     def specs_url(self):
@@ -43,16 +45,17 @@ class MyApi(Api):
         return url_for(self.endpoint('specs'), _external=True, _scheme=scheme)
 
 
-api = MyApi(blueprint,
-          doc=None,
-          title='EV-Manager Data API',
-          contact="hb&b Werbeagentur und Unternehmensberatung-GmbH",
-          contact_url="https://www.hbb-werbung.de",
-          contact_email="info@hbb-werbung.de",
-          version='1.0.0',
-          security=["jwt"],
-          authorizations=authorizations
-          )
+api = MyApi(
+    blueprint,
+    doc=None,
+    title='EV-Manager Data API',
+    contact="hb&b Werbeagentur und Unternehmensberatung-GmbH",
+    contact_url="https://www.hbb-werbung.de",
+    contact_email="info@hbb-werbung.de",
+    version='1.0.0',
+    security=["jwt"],
+    authorizations=authorizations
+)
 
 
 @auth.get_password
@@ -86,6 +89,7 @@ api.add_namespace(file_ns, path='/files')
 api.add_namespace(import_ns, path='/imports')
 api.add_namespace(lead_ns, path='/leads')
 api.add_namespace(offer_ns, path='/offers')
+api.add_namespace(order_ns, path='/orders')
 api.add_namespace(contract_ns, path='/contracts')
 api.add_namespace(product_ns, path='/product')
 api.add_namespace(pv_system_ns, path='/pv_system')

@@ -48,6 +48,7 @@ def filter_import_input(item_data):
     city = city if city != "siehe Kundenanschrift" else None
     data = {
         "datetime": item_data["DATE_CREATE"],
+        "label": item_data["TITLE"],
         "customer_id": None,
         "value_net": convert_field_euro_from_remote("UF_CRM_5DF8B018B26AF", item_data),
         "last_update": item_data["DATE_MODIFY"],

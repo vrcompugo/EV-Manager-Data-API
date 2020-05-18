@@ -12,7 +12,7 @@ from app.modules.importer.sources.bitrix24._association import find_association
 from app.modules.auth.auth_services import get_logged_in_user
 
 from .models.calendar_event import CalendarEvent, CalendarEventSchema
-from .calendar_services import update_item
+from .calendar_services import add_item, update_item
 
 
 api = Namespace('Calendar')
@@ -120,7 +120,17 @@ class Items(Resource):
                     link = find_association("Order", local_id=event.order_id)
                     if link is not None:
                         event_data["bitrix_order_id"] = link.remote_id
-
+                event_data["user"] = {
+                    "name": user["name"],
+                    "id": user["id"]
+                }
+                if event.customer is not None:
+                    event_data["customer"] = {
+                        "company": event.customer.company,
+                        "firstname": event.customer.company,
+                        "lastname": event.customer.company,
+                        "id": event.customer.id
+                    }
                 if "events" in user:
                     user["events"].append(event_data)
                 else:
@@ -131,24 +141,6 @@ class Items(Resource):
                 del user["roles"]
             if search_phrase != "" and "events" not in user:
                 continue
-            if "events" in user:
-                user["max_rows"] = 1
-                rows = [datetime.datetime(year=1970, month=1, day=1)]
-                for event in user["events"]:
-                    event_begin = datetime.datetime.strptime(event["begin"], "%Y-%m-%dT%H:%M:%S")
-                    event_end = datetime.datetime.strptime(event["end"], "%Y-%m-%dT%H:%M:%S")
-                    row_index = 0
-                    found = False
-                    for row_end in rows:
-                        if row_end <= event_begin and row_end <= end_date:
-                            rows[row_index] = event_end
-                            found = True
-                            break
-                        row_index = row_index + 1
-                    if not found:
-                        rows.append(event_end)
-                    event["row_index"] = row_index + 1
-                user["max_rows"] = len(rows)
 
             departments = user["bitrix_department"].split(",")
             main_department = departments[len(departments) - 1].strip()
@@ -170,18 +162,45 @@ class Items(Resource):
                 },
                 "data": data}
 
+    @api_response
+    # @token_required("list_lead")
+    def post(self):
+        item_data = request.json
+        data = {
+            "label": item_data["label"],
+            "comment": item_data["comment"],
+            "begin": item_data["begin"],
+            "end": item_data["end"],
+            "user_id": item_data["user"]["id"],
+            "status": "open"
+        }
+        item = add_item(data=data)
+        if "as_task" in item_data and item_data["as_task"]:
+            # add task
+            pass
+        return {"status": "success"}
+
 
 @api.route('/<id>')
 class Item(Resource):
 
     @api_response
     # @token_required("list_lead")
-    def post(self, id):
+    def put(self, id):
         item_data = request.json
         data = {
+            "label": item_data["label"],
+            "comment": item_data["comment"],
             "begin": item_data["begin"],
             "end": item_data["end"],
-            "user_id": item_data["user_id"]
+            "user_id": item_data["user"]["id"],
         }
+        if "order" in item_data and "id" in item_data["order"]:
+            data["order_id"] = item_data["order"]["id"]
+            if "customer" in item_data["order"]:
+                if type(item_data["order"]["customer"]) is int:
+                    data["customer_id"] = item_data["order"]["customer"]
+                if type(item_data["order"]["customer"]) is dict:
+                    data["customer_id"] = item_data["order"]["customer"]["id"]
         item = update_item(id, data=data)
         return {"status": "success"}

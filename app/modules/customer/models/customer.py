@@ -31,6 +31,16 @@ class Customer(db.Model):
     def search_query(self):
         return db.session.query(Customer)
 
+    @hybrid_property
+    def fulltext(self):
+        return (
+            Customer.customer_number + " "
+            + Customer.lead_number + " "
+            + Customer.company + " "
+            + Customer.firstname + " "
+            + Customer.lastname
+        )
+
 
 class CustomerSchema(ModelSchema):
 

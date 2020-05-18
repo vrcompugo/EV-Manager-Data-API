@@ -62,3 +62,7 @@ def commission_calulation(order: Order):
             order.commission_value_net = float(order.commission_value_net) + commission["provision_net"]
     print(is_external)
     return order
+
+
+def get_items(tree, sort, offset, limit, fields):
+    return get_items_by_model(Order, OrderSchema, tree, sort, offset, limit, fields)
