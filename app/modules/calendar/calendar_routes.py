@@ -125,13 +125,20 @@ class Items(Resource):
                     "name": user["name"],
                     "id": user["id"]
                 }
-                event_data["task"] = {"members": []}
+                event_data["task"] = {"user": None, "members": []}
                 if event.task is not None:
                     event_data["task"] = {
                         "id": event.task.id,
                         "label": event.task.label,
+                        "user": None,
                         "members": []
                     }
+                    task_user = User.query.filter(User.id == event.task.user_id).first()
+                    if task_user is not None:
+                        event_data["task"]["user"] = {
+                            "id": task_user.id,
+                            "name": task_user.name
+                        }
                     for member in event.task.members:
                         event_data["task"]["members"].append({
                             "id": member.id,
@@ -186,7 +193,8 @@ class Items(Resource):
             task = add_task(item_data)
             if task is not None:
                 item_data["task_id"] = task.id
-        item = add_item(data=item_data)
+        else:
+            item = add_item(data=item_data)
         return {"status": "success"}
 
 
@@ -207,7 +215,8 @@ class Item(Resource):
                 task = add_task(item_data)
                 if task is not None:
                     item_data["task_id"] = task.id
-        item = update_item(id, data=item_data)
+            else:
+                item = update_item(id, data=item_data)
         return {"status": "success"}
 
 
@@ -219,6 +228,9 @@ def get_item_data(item_data):
         "end": item_data["end"],
         "user_id": item_data["user"]["id"]
     }
+    if "task" in item_data and item_data["task"] is not None:
+        if "user" in item_data["task"] and "id" in item_data["task"]["user"]:
+            data["user_id"] = item_data["task"]["user"]["id"]
     if "order" in item_data and item_data["order"] is not None and "id" in item_data["order"]:
         data["order_id"] = item_data["order"]["id"]
         if "customer" in item_data["order"]:

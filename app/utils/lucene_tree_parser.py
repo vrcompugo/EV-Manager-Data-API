@@ -22,17 +22,19 @@ def parse_tree(model, query, tree):
         if isinstance(tree.children[0], Range):
             return and_(getattr(model, tree.name) >= int(str(tree.children[0].low)), getattr(model, tree.name) <= int(str(tree.children[0].high)))
         if str(tree.children[0].value).strip('"') == "ISNULL":
-            return getattr(model, tree.name) == None
+            return getattr(model, tree.name) is None
         if tree.name == "fulltext":
             searchquery = "%" + \
                 str(tree.children[0].value) \
-                    .strip('"') \
-                    .replace("-","%") \
-                    .replace(" ","%") \
-                    .replace("*","%") \
+                .strip() \
+                .strip('"') \
+                .replace("-", "%") \
+                .replace(" ", "%") \
+                .replace("*", "%") \
                 + "%"
+            print(searchquery)
             return getattr(model, tree.name).ilike(searchquery)
-        searchquery = str(tree.children[0].value).strip('"').replace("*","%")
+        searchquery = str(tree.children[0].value).strip('"').replace("*", "%")
         if searchquery.find("%") >= 0:
             return getattr(model, tree.name).ilike(searchquery)
         else:

@@ -12,11 +12,11 @@ from .models.task import Task, TaskSchema
 
 def add_item(data):
     from app.utils.google_geocoding import geocode_address, route_to_address
+    from app.modules.importer.sources.bitrix24.task import run_export as export_task
 
     new_item = Task()
     if "members" in data:
         data["members"] = convert_members(data["members"])
-        print(data["members"])
     new_item = set_attr_by_dict(new_item, data, ["id"])
     if new_item.location is not None and new_item.location != "":
         location = geocode_address(new_item.location)
@@ -29,12 +29,14 @@ def add_item(data):
             new_item.travel_time_minutes = route["duration"]
     db.session.add(new_item)
     db.session.commit()
+    export_task(local_id=new_item.id)
     update_calender_events(new_item)
     return new_item
 
 
 def update_item(id, data):
     from app.utils.google_geocoding import geocode_address, route_to_address
+    from app.modules.importer.sources.bitrix24.task import run_export as export_task
 
     item = db.session.query(Task).get(id)
     if "members" in data:
@@ -53,6 +55,7 @@ def update_item(id, data):
                 item.distance_km = route["distance"]
                 item.travel_time_minutes = route["duration"]
         db.session.commit()
+        export_task(local_id=item.id)
         update_calender_events(item)
         return item
     else:

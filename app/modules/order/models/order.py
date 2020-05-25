@@ -53,6 +53,13 @@ class Order(db.Model):
     def search_query(self):
         return db.session.query(Order)
 
+    @hybrid_property
+    def fulltext(self):
+        return (
+            Order.category + " "
+            + Order.label
+        )
+
 
 class OrderSchema(ModelSchema):
 

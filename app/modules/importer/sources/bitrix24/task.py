@@ -2,7 +2,7 @@ import json
 import pprint
 import datetime
 
-from app.models import User, Reseller, Customer, Order
+from app.models import User, Reseller, Customer, Order, Task
 from app.modules.task.task_services import add_item, update_item
 from app.utils.error_handler import error_handler
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
@@ -38,6 +38,29 @@ def customer_data(id, data):
         if "zip" not in data:
             data["zip"] = customer.default_address.zip
             data["city"] = customer.default_address.city
+    return data
+
+
+def filter_export_data(task: Task):
+    user_link = find_association("User", local_id=task.user_id)
+    data = {
+        "fields[START_DATE_PLAN]": str(task.begin),
+        "fields[END_DATE_PLAN]": str(task.end),
+        "fields[TITLE]": task.label,
+        "fields[DESCRIPTION]": task.comment
+    }
+    if user_link is not None:
+        data["fields[RESPONSIBLE_ID]"] = user_link.remote_id
+    if len(task.members) > 0:
+        index = 0
+        for member in task.members:
+            if member.id == task.user_id:
+                continue
+            user_link = find_association("User", local_id=member.id)
+            if user_link is not None:
+                data[f"fields[ACCOMPLICES][{index}]"] = user_link.remote_id
+                index = index + 1
+
     return data
 
 
@@ -168,3 +191,36 @@ def run_cron_import():
     if config is not None and "data" in config:
         config["data"]["last_task_import"] = str(datetime.datetime.now())
     update_config_item("importer/bitrix24", config)
+
+
+def run_export(local_id=None, remote_id=None):
+    if remote_id is not None:
+        link = find_association("Task", remote_id=remote_id)
+        if link is not None:
+            local_id = link.local_id
+    if local_id is not None:
+        link = find_association("Task", local_id=local_id)
+        if link is not None:
+            remote_id = link.remote_id
+    if local_id is None:
+        print("not found")
+
+    task = Task.query.get(local_id)
+
+    if remote_id is None:
+        # add ne
+        data = filter_export_data(task)
+        print(data)
+        response = post("tasks.task.add", data)
+        print(response)
+        if "result" in response and "task" in response["result"] and "id" in response["result"]["task"]:
+            associate_item("Task", local_id=task.id, remote_id=response["result"]["task"]["id"])
+        else:
+            print("task export error", response)
+    else:
+        # update
+        data = filter_export_data(task)
+        data["taskId"] = remote_id
+        response = post("tasks.task.update", data)
+        if "result" not in response:
+            print("task export error", response)
