@@ -29,7 +29,6 @@ def add_item(data):
             new_item.travel_time_minutes = route["duration"]
     db.session.add(new_item)
     db.session.commit()
-    export_task(local_id=new_item.id)
     update_calender_events(new_item)
     return new_item
 
@@ -55,7 +54,6 @@ def update_item(id, data):
                 item.distance_km = route["distance"]
                 item.travel_time_minutes = route["duration"]
         db.session.commit()
-        export_task(local_id=item.id)
         update_calender_events(item)
         return item
     else:
