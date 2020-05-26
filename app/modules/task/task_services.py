@@ -12,7 +12,6 @@ from .models.task import Task, TaskSchema
 
 def add_item(data):
     from app.utils.google_geocoding import geocode_address, route_to_address
-    from app.modules.importer.sources.bitrix24.task import run_export as export_task
 
     new_item = Task()
     if "members" in data:
@@ -35,7 +34,6 @@ def add_item(data):
 
 def update_item(id, data):
     from app.utils.google_geocoding import geocode_address, route_to_address
-    from app.modules.importer.sources.bitrix24.task import run_export as export_task
 
     item = db.session.query(Task).get(id)
     if "members" in data:

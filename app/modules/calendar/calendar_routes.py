@@ -185,6 +185,8 @@ class Items(Resource):
     @api_response
     # @token_required("list_lead")
     def post(self):
+        from app.modules.importer.sources.bitrix24.task import run_export as export_task
+
         raw_data = request.json
         item_data = get_item_data(request.json)
         item_data["status"] = "open"
@@ -193,6 +195,7 @@ class Items(Resource):
             task = add_task(item_data)
             if task is not None:
                 item_data["task_id"] = task.id
+                export_task(local_id=task.id)
         else:
             item = add_item(data=item_data)
         return {"status": "success"}
@@ -204,17 +207,21 @@ class Item(Resource):
     @api_response
     # @token_required("list_lead")
     def put(self, id):
+        from app.modules.importer.sources.bitrix24.task import run_export as export_task
+
         raw_data = request.json
         item_data = get_item_data(raw_data)
         if "task" in raw_data and raw_data["task"] is not None and "id" in raw_data["task"]:
             item_data["members"] = raw_data["task"]["members"]
             update_task(raw_data["task"]["id"], item_data)
+            export_task(local_id=raw_data["task"]["id"])
         else:
             if "as_task" in raw_data and raw_data["as_task"]:
                 item_data["members"] = raw_data["task"]["members"]
                 task = add_task(item_data)
                 if task is not None:
                     item_data["task_id"] = task.id
+                    export_task(local_id=task.id)
             else:
                 item = update_item(id, data=item_data)
         return {"status": "success"}
