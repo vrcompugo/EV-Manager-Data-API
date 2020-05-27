@@ -129,6 +129,7 @@ class Items(Resource):
                 if event.task is not None:
                     event_data["task"] = {
                         "id": event.task.id,
+                        "remote_id": event.task.remote_id,
                         "label": event.task.label,
                         "user": None,
                         "members": []
@@ -187,9 +188,11 @@ class Items(Resource):
     def post(self):
         from app.modules.importer.sources.bitrix24.task import run_export as export_task
 
+        user = get_logged_in_user(request)
         raw_data = request.json
         item_data = get_item_data(request.json)
         item_data["status"] = "open"
+        item_data["created_by_id"] = user["id"]
         if "as_task" in raw_data and raw_data["as_task"]:
             item_data["members"] = raw_data["task"]["members"]
             task = add_task(item_data)
@@ -212,12 +215,10 @@ class Item(Resource):
         raw_data = request.json
         item_data = get_item_data(raw_data)
         if "task" in raw_data and raw_data["task"] is not None and "id" in raw_data["task"]:
-            item_data["members"] = raw_data["task"]["members"]
             update_task(raw_data["task"]["id"], item_data)
             export_task(local_id=raw_data["task"]["id"])
         else:
             if "as_task" in raw_data and raw_data["as_task"]:
-                item_data["members"] = raw_data["task"]["members"]
                 task = add_task(item_data)
                 if task is not None:
                     item_data["task_id"] = task.id
@@ -233,11 +234,17 @@ def get_item_data(item_data):
         "comment": item_data["comment"],
         "begin": item_data["begin"],
         "end": item_data["end"],
-        "user_id": item_data["user"]["id"]
+        "user_id": item_data["user"]["id"],
+        "color": item_data["color"] if "color" in item_data else ""
     }
     if "task" in item_data and item_data["task"] is not None:
-        if "user" in item_data["task"] and "id" in item_data["task"]["user"]:
+        if "user" in item_data["task"] and item_data["task"]["user"] is not None and "id" in item_data["task"]["user"]:
             data["user_id"] = item_data["task"]["user"]["id"]
+        if "members" in item_data["task"]:
+            data["members"] = item_data["task"]["members"]
+            main_member = next((member for member in data["members"] if member["id"] == data["user_id"]), None)
+            if main_member is None:
+                data["members"].append({"id": data["user_id"]})
     if "order" in item_data and item_data["order"] is not None and "id" in item_data["order"]:
         data["order_id"] = item_data["order"]["id"]
         if "customer" in item_data["order"]:

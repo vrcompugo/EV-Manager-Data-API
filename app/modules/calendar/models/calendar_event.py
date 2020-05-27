@@ -26,6 +26,7 @@ class CalendarEvent(db.Model):
     order = db.relationship("Order")
     task_id = db.Column(db.Integer(), db.ForeignKey('task.id'))
     task = db.relationship("Task")
+    color = db.Column(db.String(10))
     label = db.Column(db.String(250))
     salutation = db.Column(db.String(30))
     title = db.Column(db.String(30))

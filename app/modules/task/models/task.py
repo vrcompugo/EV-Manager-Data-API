@@ -19,6 +19,7 @@ class Task(db.Model):
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
     reseller_id = db.Column(db.Integer(), db.ForeignKey('reseller.id'))
     order_id = db.Column(db.Integer(), db.ForeignKey('order.id'))
+    created_by_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
     remote_id = db.Column(db.Integer())
     label = db.Column(db.String(250))
     salutation = db.Column(db.String(30))

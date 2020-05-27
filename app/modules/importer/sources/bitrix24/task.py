@@ -2,6 +2,7 @@ import json
 import pprint
 import datetime
 
+from app import db
 from app.models import User, Reseller, Customer, Order, Task
 from app.modules.task.task_services import add_item, update_item
 from app.utils.error_handler import error_handler
@@ -42,13 +43,17 @@ def customer_data(id, data):
 
 
 def filter_export_data(task: Task):
-    user_link = find_association("User", local_id=task.user_id)
     data = {
         "fields[START_DATE_PLAN]": str(task.begin),
         "fields[END_DATE_PLAN]": str(task.end),
         "fields[TITLE]": task.label,
         "fields[DESCRIPTION]": task.comment
     }
+    if task.created_by_id is not None:
+        user_link = find_association("User", local_id=task.created_by_id)
+        if user_link is not None:
+            data["fields[CREATED_BY]"] = user_link.remote_id
+    user_link = find_association("User", local_id=task.user_id)
     if user_link is not None:
         data["fields[RESPONSIBLE_ID]"] = user_link.remote_id
     if len(task.members) > 0:
@@ -60,7 +65,16 @@ def filter_export_data(task: Task):
             if user_link is not None:
                 data[f"fields[ACCOMPLICES][{index}]"] = user_link.remote_id
                 index = index + 1
-
+    index = 0
+    if task.order_id is not None and task.order_id > 0:
+        order_link = find_association("Order", local_id=task.order_id)
+        if order_link is not None:
+            data[f"fields[UF_CRM_TASK][{index}]"] = f"D_{order_link.remote_id}"
+            index = index + 1
+    if task.customer_id is not None and task.customer_id > 0:
+        customer_link = find_association("Customer", local_id=task.customer_id)
+        data[f"fields[UF_CRM_TASK][{index}]"] = f"C_{customer_link.remote_id}"
+        index = index + 1
     return data
 
 
@@ -101,6 +115,10 @@ def filter_import_data(item_data):
         "comment": item_data["description"],
         "status": "done" if item_data["status"] == "5" else "open"
     }
+    if "createdBy" in item_data:
+        created_user_link = find_association("User", remote_id=item_data["createdBy"])
+        if created_user_link is not None:
+            data["created_by_id"] = user_link.local_id
     if data["begin"] == data["end"] and data["end"] is not None:
         data["end"] = datetime.datetime(data["end"].year, data["end"].month, data["end"].day, 23, 59, 59)
     if data["begin"] is not None and data["end"] is None:
@@ -210,10 +228,10 @@ def run_export(local_id=None, remote_id=None):
     if remote_id is None:
         # add ne
         data = filter_export_data(task)
-        print(data)
         response = post("tasks.task.add", data)
-        print(response)
         if "result" in response and "task" in response["result"] and "id" in response["result"]["task"]:
+            task.remote_id = response["result"]["task"]["id"]
+            db.session.commit()
             associate_item("Task", local_id=task.id, remote_id=response["result"]["task"]["id"])
         else:
             print("task export error", response)

@@ -4,7 +4,7 @@ from app import db
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
-from app.models import CalendarEvent, User
+from app.models import CalendarEvent, User, Order
 from app.modules.calendar.calendar_services import add_item as event_add, update_item as event_update
 
 from .models.task import Task, TaskSchema
@@ -40,6 +40,14 @@ def update_item(id, data):
         data["members"] = convert_members(data["members"])
     if item is not None:
         old_location = item.location
+        if "order_id" in data and item.order_id != data["order_id"]:
+            if data["order_id"] is None or data["order_id"] == 0:
+                data["type"] = ""
+            else:
+                order = Order.query.filter(Order.id == data["order_id"]).first()
+                if order is not None:
+                    data["type"] = order.type
+        print(data)
         item = set_attr_by_dict(item, data, ["id"])
         if old_location is not None and old_location != "" and item.location is not None and item.location != old_location:
             location = geocode_address(item.location)
