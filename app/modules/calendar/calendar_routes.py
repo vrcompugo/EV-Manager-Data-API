@@ -227,6 +227,21 @@ class Item(Resource):
                 item = update_item(id, data=item_data)
         return {"status": "success"}
 
+    @api_response
+    # @token_required("list_lead")
+    def delete(self, id):
+        from app.modules.importer.sources.bitrix24.task import run_export as export_task
+
+        user = get_logged_in_user(request)
+        if user is None:
+            return {"status": "error"}
+        event = CalendarEvent.query.filter(CalendarEvent.id == id).first()
+        if event is None:
+            return {"status": "error", "message": "not found"}
+        db.session.delete(event)
+        db.session.commit()
+        return {"status": "success"}
+
 
 def get_item_data(item_data):
     data = {
