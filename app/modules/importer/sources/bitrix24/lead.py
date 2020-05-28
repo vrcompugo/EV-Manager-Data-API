@@ -362,6 +362,7 @@ def run_status_update_export(remote_id=None, local_id=None):
     if lead_association is None:
         print("lead link not found", local_id, remote_id)
         return
+    return
     lead = Lead.query.get(lead_association.local_id)
     if lead.status not in ["new", "contacted", "tel_not_connected", "returned", "survey_created", "offer_created"]:
         print("lead status not excepted", lead.id, lead.status)
