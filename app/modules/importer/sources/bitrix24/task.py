@@ -82,7 +82,12 @@ def filter_import_data(item_data):
     if "responsibleId" not in item_data:
         print("no user")
         return None
-    user_link = find_association("User", remote_id=item_data["responsibleId"])
+    user_link = None
+    try:
+        user_link = find_association("User", remote_id=item_data["responsibleId"])
+    except Exception as e:
+        db.session.rollback()
+
     if user_link is None:
         print("no user")
         return None
