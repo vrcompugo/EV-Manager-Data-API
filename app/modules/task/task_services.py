@@ -47,7 +47,6 @@ def update_item(id, data):
                 order = Order.query.filter(Order.id == data["order_id"]).first()
                 if order is not None:
                     data["type"] = order.type
-        print(data)
         item = set_attr_by_dict(item, data, ["id"])
         if old_location is not None and old_location != "" and item.location is not None and item.location != old_location:
             location = geocode_address(item.location)
@@ -59,7 +58,10 @@ def update_item(id, data):
             if route is not None:
                 item.distance_km = route["distance"]
                 item.travel_time_minutes = route["duration"]
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
         update_calender_events(item)
         return item
     else:
