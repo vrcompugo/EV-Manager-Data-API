@@ -71,21 +71,21 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         "cloud_monthly_cost": cloud_total,
         "eeg_refund_per_kwh": float(settings["data"]["wi_settings"]["eeg_refund_per_kwh"]),
         "refund_per_kwh": settings["data"]["wi_settings"]["refund_per_kwh"],
-        "pv_offer_total": offer.total - offer.total_tax,
+        "pv_offer_total": float(offer.total - offer.total_tax),
         "loan_interest_rate": settings["data"]["wi_settings"]["loan_interest_rate"],
         "loan_total": None,
         "cloud_total": None,
         "cost_total": None,
         "cost_benefit": None
     }
-    yearly_loan_payment = (float(offer.total) * data["loan_interest_rate"] / 100) / (1 - (1 + data["loan_interest_rate"] / 100) ** -20)
+    yearly_loan_payment = (data["pv_offer_total"] * data["loan_interest_rate"] / 100) / (1 - (1 + data["loan_interest_rate"] / 100) ** -20)
     data["loan_total_interest"] = 0
-    rest_loan = float(offer.total)
+    rest_loan = data["pv_offer_total"]
     for n in range(20):
         interest = rest_loan * (data["loan_interest_rate"] / 100)
         data["loan_total_interest"] = data["loan_total_interest"] + interest
         rest_loan = rest_loan + interest - yearly_loan_payment
-    data["loan_total"] = data["loan_total_interest"] + float(offer.total)
+    data["loan_total"] = data["loan_total_interest"] + data["pv_offer_total"]
     data["conventional_usage_cost"] = data["conventional_base_cost_per_kwh"] * float(data["usage"])
 
     data["conventional_total_usage_cost"] = data["conventional_usage_cost"]
