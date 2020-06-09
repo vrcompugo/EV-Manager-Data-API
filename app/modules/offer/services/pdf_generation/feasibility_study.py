@@ -114,6 +114,8 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         + (data["cloud_monthly_cost"] * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - 10))
     if data["runtime"] == 20:
         data["cloud_total"] = data["cloud_total"] + 1500
+    if data["runtime"] == 25:
+        data["cloud_total"] = data["cloud_total"] + 2000
     if data["runtime"] >= 30:
         data["cloud_total"] = data["cloud_total"] + 2500
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
