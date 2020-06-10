@@ -56,7 +56,8 @@ def revalidate_user():
     user = get_logged_in_user(request)
     auth_token = encode_auth_token(user["user_id"])
     if auth_token:
-        return {"token": auth_token.decode(), "roles": user["roles"]}
+        user["token"] = auth_token.decode()
+        return user
     else:
         raise ApiException("invalid_credentials", "Invalid Credentials. Please log in again.", 401)
 
@@ -66,22 +67,41 @@ def get_logged_in_user(new_request):
     auth_token = new_request.headers.get('Authorization')
     if auth_token:
         auth_token = auth_token.replace("Bearer ", "")
+        if auth_token is not None and auth_token != "":
+            user = User.query.filter(User.access_key == auth_token).filter(User.active.is_(True)).first()
+            if user is not None:
+                permission_data = get_user_permission_data(user)
+                return {
+                    'id': user.id,
+                    'user_id': user.id,
+                    'email': user.email,
+                    'roles': permission_data["roles"],
+                    'role_ids': permission_data["role_ids"],
+                    'permissions': permission_data["permissions"],
+                    'registered_on': str(user.registered_on)
+                }
         resp = decode_auth_token(auth_token)
-        user = User.query.filter_by(id=resp.get("sub")).first()
-        roles = []
-        role_ids = []
-        permissions = []
-        for role in user.roles:
-            roles.append(role.code)
-            role_ids.append(role.id)
-            permissions += role.permissions
-        return {
-            'id': user.id,
-            'user_id': user.id,
-            'email': user.email,
-            'roles': roles,
-            'role_ids': role_ids,
-            'permissions': permissions,
-            'registered_on': str(user.registered_on)
-        }
+        user = User.query.filter_by(id=resp.get("sub")).filter(User.active.is_(True)).first()
+        if user is not None:
+            permission_data = get_user_permission_data(user)
+            return {
+                'id': user.id,
+                'user_id': user.id,
+                'email': user.email,
+                'roles': permission_data["roles"],
+                'role_ids': permission_data["role_ids"],
+                'permissions': permission_data["permissions"],
+                'registered_on': str(user.registered_on)
+            }
     raise ApiException("invalid_token", "Invalid Token. Please log in again.", 401)
+
+
+def get_user_permission_data(user: User):
+    roles = []
+    role_ids = []
+    permissions = []
+    for role in user.roles:
+        roles.append(role.code)
+        role_ids.append(role.id)
+        permissions += role.permissions
+    return {"roles": roles, "role_ids": role_ids, "permissions": permissions}

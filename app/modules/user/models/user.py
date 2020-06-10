@@ -24,6 +24,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True)
     password_hash = db.Column(db.String(100))
     bitrix_department = db.Column(db.String(100))
+    access_key = db.Column(db.String(150))
     active = db.Column(db.Boolean)
     roles = db.relationship("UserRole", secondary=association_table, backref="users")
 

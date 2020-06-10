@@ -28,11 +28,12 @@ def install():
     customer_service_role = UserRole(label="Kunden Service", code="customer_service", permissions=full_permission_list)
     insurance_role = UserRole(label="Versicherung", code="insurance", permissions=full_permission_list)
     maintenance_role = UserRole(label="Wartung", code="maintenance", permissions=full_permission_list)
+    wl_partner_role = UserRole(label="White-Label-Partner", code="white-label-partner", permissions=["cloud_calculation"])
 
     db.session.add_all(
         [admin_role, dev_role, sales_role, sales_lead_role, front_office_role, bookkeeping_role, cloud_manager_role,
          evu_manager_role, construction_lead_role, construction_role, warehouse_role, customer_service_role,
-         insurance_role, maintenance_role])
+         insurance_role, maintenance_role, wl_partner_role])
     db.session.commit()
 
     role_ids = []
@@ -50,12 +51,12 @@ def install():
 def update_role_permissions():
     from app.blueprint import full_permission_list
     admin_role = db.session.query(UserRole).filter(UserRole.code == "root").first()
-    admin_role.permissions=full_permission_list + ["create_root_user"]
+    admin_role.permissions = full_permission_list + ["create_root_user"]
     for role in ["dev", "sales", "sales_lead", "front_office", "bookkeeping", "cloud_manager",
                  "evu_manager", "construction_lead", "construction", "warehouse", "customer_service",
                  "insurance", "maintenance"]:
         role_object = db.session.query(UserRole).filter(UserRole.code == role).first()
-        role_object.permissions=full_permission_list
+        role_object.permissions = full_permission_list
     db.session.commit()
 
 
@@ -82,4 +83,3 @@ def import_test_data():
         "email": email,
         "roles": role_ids
     })
-
