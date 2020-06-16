@@ -16,6 +16,7 @@ class Reseller(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey("reseller_group.id"))
     group = db.relationship("ResellerGroup")
     bitrix_department = db.Column(db.String(120))
+    ziplist = db.Column(db.JSON)
     email = db.Column(db.String(120))
     name = db.Column(db.String(120))
     number = db.Column(db.String(120))

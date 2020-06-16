@@ -32,6 +32,9 @@ def register_routes(api: Blueprint):
             data = {}
             if "sales_center" in request.form:
                 data["sales_center"] = request.form.get("sales_center")
+            if "ziplist" in request.form:
+                data["ziplist"] = request.form.get("ziplist").split("\n")
+                data["ziplist"] = [zipcode.replace("\r", "") for zipcode in data["ziplist"]]
             if "sales_range" in request.form:
                 data["sales_range"] = int(request.form.get("sales_range"))
             if "lead_balance" in request.form:
@@ -42,10 +45,12 @@ def register_routes(api: Blueprint):
                 data["min_commission"] = float(request.form.get("min_commission"))
             if "lead_year_target" in request.form:
                 data["lead_year_target"] = int(request.form.get("lead_year_target"))
-            print(reseller.__dict__)
             if len(data) > 0:
                 reseller = update_item(reseller.id, data)
-            print(reseller.__dict__)
+            if reseller.ziplist is None:
+                reseller.ziplist = ""
+            else:
+                reseller.ziplist = "\n".join(reseller.ziplist)
             return render_template(
                 "resellers/reseller.html",
                 reseller=reseller,

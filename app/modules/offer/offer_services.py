@@ -18,7 +18,7 @@ from .models.offer import Offer, OfferSchema
 from .models.offer_v2 import OfferV2
 from .models.offer_v2_item import OfferV2Item
 from .services.offer_generation import automatic_offer_creation_by_survey
-from .services.add_update_item import add_item, add_item_v2, update_item
+from .services.add_update_item import add_item, add_item_v2, update_item, update_item_v2
 from .services.pdf_generation.cloud_offer import generate_cloud_pdf
 from .services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
 from .services.pdf_generation.offer import generate_offer_pdf

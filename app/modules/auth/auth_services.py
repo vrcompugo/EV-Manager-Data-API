@@ -62,8 +62,10 @@ def revalidate_user():
         raise ApiException("invalid_credentials", "Invalid Credentials. Please log in again.", 401)
 
 
-def get_logged_in_user(new_request):
+def get_logged_in_user(new_request=None):
     # get the auth token
+    if new_request is None:
+        new_request = request
     auth_token = new_request.headers.get('Authorization')
     if auth_token:
         auth_token = auth_token.replace("Bearer ", "")

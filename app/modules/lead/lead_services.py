@@ -228,6 +228,7 @@ def lead_reseller_assignment(lead: Lead, reseller: Reseller):
 
 def find_reseller(lead):
     from app.utils.google_geocoding import geocode_address
+
     location = geocode_address(f"{lead.customer.default_address.street}, {lead.customer.default_address.zip}  {lead.customer.default_address.city}")
     print("reseller auto assign:", lead.id)
     if location is None:
@@ -239,19 +240,24 @@ def find_reseller(lead):
     min_distance = None
     min_distance_reseller = None
     for reseller in resellers:
-        if reseller.sales_lat is not None and reseller.sales_lng is not None:
-            distance = calculate_distance(
-                {
-                    "lat": reseller.sales_lat,
-                    "lng": reseller.sales_lng
-                },
-                location
-            )
-            if reseller.sales_range > 0 and distance <= reseller.sales_range:
+        if reseller.ziplist is not None:
+            if lead.customer.default_address.zip in reseller.ziplist:
+                print("reseller ziplist", reseller.id)
                 reseller_in_range.append(reseller)
-            if (min_distance is None or distance < min_distance) and distance < 60:
-                min_distance = distance
-                min_distance_reseller = reseller
+        else:
+            if reseller.sales_lat is not None and reseller.sales_lng is not None:
+                distance = calculate_distance(
+                    {
+                        "lat": reseller.sales_lat,
+                        "lng": reseller.sales_lng
+                    },
+                    location
+                )
+                if reseller.sales_range > 0 and distance <= reseller.sales_range:
+                    reseller_in_range.append(reseller)
+                if (min_distance is None or distance < min_distance) and distance < 60:
+                    min_distance = distance
+                    min_distance_reseller = reseller
 
     if len(reseller_in_range) == 0:
         if min_distance_reseller is not None:

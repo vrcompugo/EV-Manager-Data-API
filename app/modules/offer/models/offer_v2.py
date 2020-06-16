@@ -26,9 +26,12 @@ class OfferV2(db.Model):
     survey_id = db.Column(db.Integer, db.ForeignKey("survey.id"))
     survey = db.relationship("Survey")
     offer_group = db.Column(db.String(20))
+    number = db.Column(db.String(40))
     datetime = db.Column(db.DateTime)
     currency = db.Column(db.String(10))
     tax_rate = db.Column(db.Integer)
+    data = db.Column(db.JSON)
+    calculated = db.Column(db.JSON)
     subtotal = db.Column(db.Numeric(scale=4, precision=12))
     subtotal_net = db.Column(db.Numeric(scale=4, precision=12))
     shipping_cost = db.Column(db.Numeric(scale=4, precision=12))
@@ -54,7 +57,7 @@ class OfferV2(db.Model):
             .filter(S3File.model_id == self.id)\
             .first()
         if s3_file is None:
-            if self.offer_group in ["pv-offer", "enpal-offer", "heater-offer", "roof-offer", "heater-offer-con"]:
+            if self.offer_group in ["pv-offer", "cloud-offer", "enpal-offer", "heater-offer", "roof-offer", "heater-offer-con"]:
                 if self.offer_group != "pv-offer" or "pv_options" in self.survey.data:
                     generate_offer_pdf(self)
                     s3_file = S3File.query\
