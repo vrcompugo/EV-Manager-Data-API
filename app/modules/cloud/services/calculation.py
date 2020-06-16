@@ -6,6 +6,7 @@ from app.modules.auth.auth_services import get_logged_in_user
 
 from app.modules.offer.services.offer_generation._utils import base_offer_data, add_item_to_offer, add_optional_item_to_offer
 
+
 def calculate_cloud(data):
     settings = get_settings("pv-settings")
     if settings is None:
