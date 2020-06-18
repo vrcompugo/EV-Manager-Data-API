@@ -14,6 +14,8 @@ def add_item(data):
     from app.utils.google_geocoding import geocode_address, route_to_address
 
     new_item = Task()
+    if "comment" in data and len(data["comment"]) > 249:
+        data["comment"] = data["comment"][0:249]
     if "members" in data:
         data["members"] = convert_members(data["members"])
     new_item = set_attr_by_dict(new_item, data, ["id"])
@@ -36,6 +38,8 @@ def update_item(id, data):
     from app.utils.google_geocoding import geocode_address, route_to_address
 
     item = db.session.query(Task).get(id)
+    if "comment" in data and len(data["comment"]) > 249:
+        data["comment"] = data["comment"][0:249]
     if "members" in data:
         data["members"] = convert_members(data["members"])
     if item is not None:
