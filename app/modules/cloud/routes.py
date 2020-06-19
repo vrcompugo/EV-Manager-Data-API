@@ -1,12 +1,15 @@
+import datetime
 from flask import request
 from flask_restplus import Resource
 from flask_restplus import Namespace, fields
 
 from app.decorators import token_required, api_response
-from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item
+from app.modules.auth.auth_services import get_logged_in_user
+from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item_v2
+from app.models import OfferV2, Reseller
 
 from .services.offer import get_offer_by_offer_number
-from .services.calculation import calculate_cloud
+from .services.calculation import calculate_cloud, get_cloud_products
 
 
 api = Namespace('Cloud')
@@ -21,7 +24,6 @@ class Items(Resource):
         """ Stores new offer """
         data = request.json
         calucalted = calculate_cloud(data)
-        print(calucalted)
         return {"status": "success",
                 "data": calucalted}
 
@@ -33,10 +35,36 @@ class Items(Resource):
     @token_required("cloud_calculation")
     def post(self):
         data = request.json
-        item = add_item_v2(data=data)
-        item_dict = get_one_item(item.id)
+        calculated = calculate_cloud(data)
+        items = get_cloud_products(data=data)
+        offer_v2_data = {
+            "reseller_id": None,
+            "offer_group": "cloud-offer",
+            "datetime": datetime.datetime.now(),
+            "currency": "eur",
+            "tax_rate": 19,
+            "subtotal": calculated["cloud_price"],
+            "subtotal_net": calculated["cloud_price"] / 1.19,
+            "shipping_cost": 0,
+            "shipping_cost_net": 0,
+            "discount_total": 0,
+            "total_tax": calculated["cloud_price"] * 0.19,
+            "total": calculated["cloud_price"],
+            "status": "created",
+            "data": data,
+            "calculated": calculated,
+            "items": []
+        }
+        user = get_logged_in_user()
+        reseller = Reseller.query.filter(Reseller.user_id == user["id"]).first()
+        if reseller is not None:
+            offer_v2_data["reseller_id"] = reseller.id
+        item = add_item_v2(data=offer_v2_data)
+        item_dict = get_one_item_v2(item.id)
+        if item.pdf is not None:
+            item_dict["pdf_link"] = item.pdf.public_link
         return {"status": "success",
-                "data": data}
+                "data": item_dict}
 
 
 @api.route('/offer/<offer_number>')
@@ -49,14 +77,16 @@ class User(Resource):
         offer = get_offer_by_offer_number(offer_number)
         if offer is None:
             api.abort(404)
-        item_dict = get_one_item(offer.id, fields)
-        if not item_dict:
+        item_dict = get_one_item_v2(offer.id, fields)
+        if item_dict is None:
             api.abort(404)
-        else:
-            return {
-                "status": "success",
-                "data": item_dict
-            }
+        if offer.pdf is not None:
+            item_dict["pdf_link"] = offer.pdf.public_link
+        print(item_dict)
+        return {
+            "status": "success",
+            "data": item_dict
+        }
 
     @api_response
     @token_required("cloud_calculation")
@@ -66,7 +96,7 @@ class User(Resource):
         if offer is None:
             api.abort(404)
         update_item_v2(offer.id, data=data)
-        item_dict = get_one_item(offer.id, fields)
+        item_dict = get_one_item_v2(offer.id, fields)
         return {
             "status": "success",
             "data": item_dict

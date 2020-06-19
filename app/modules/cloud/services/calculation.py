@@ -156,6 +156,10 @@ def calculate_cloud(data):
     return result
 
 
+def get_cloud_products(data=None, offer=None):
+    return []
+
+
 def cloud_offer_items_by_pv_offer(offer: OfferV2):
     settings = get_settings("pv-settings")
     if settings is None:

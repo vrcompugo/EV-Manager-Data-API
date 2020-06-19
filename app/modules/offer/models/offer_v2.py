@@ -48,6 +48,20 @@ class OfferV2(db.Model):
         return db.session.query(OfferV2)
 
     @hybrid_property
+    def number_prefix(self):
+        if self.offer_group == "cloud-offer":
+            return "C-"
+        if self.offer_group == "enpal-offer":
+            return "EN-"
+        if self.offer_group == "heater-offer":
+            return "HZ-"
+        if self.offer_group == "heater-offer-con":
+            return "HZC-"
+        if self.offer_group == "roof-offer":
+            return "DA-"
+        return "?"
+
+    @hybrid_property
     def pdf(self):
         from app.models import S3File
         from ..services.pdf_generation.offer import generate_offer_pdf

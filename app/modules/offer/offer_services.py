@@ -15,7 +15,7 @@ from app.models import Lead, Product, S3File, Survey, Settings
 from app.modules.file.file_services import add_item as add_file, update_item as update_file
 
 from .models.offer import Offer, OfferSchema
-from .models.offer_v2 import OfferV2
+from .models.offer_v2 import OfferV2, OfferV2Schema
 from .models.offer_v2_item import OfferV2Item
 from .services.offer_generation import automatic_offer_creation_by_survey
 from .services.add_update_item import add_item, add_item_v2, update_item, update_item_v2
@@ -30,3 +30,7 @@ def get_items(tree, sort, offset, limit, fields):
 
 def get_one_item(id, fields=None):
     return get_one_item_by_model(Offer, OfferSchema, id, fields, [])
+
+
+def get_one_item_v2(id, fields=None):
+    return get_one_item_by_model(OfferV2, OfferV2Schema, id, fields, [])

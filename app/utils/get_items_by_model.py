@@ -1,5 +1,6 @@
 from app.utils.lucene_tree_parser import parse_tree
 from app.exceptions import ApiException
+from decimal import Decimal
 
 
 def get_items_by_model(model, model_schema, tree, sort, offset, limit, fields):
@@ -61,4 +62,7 @@ def get_one_item_by_model(model, model_schema, id, fields, options=None):
             if field in data:
                 data_filtered[field] = data[field]
         data = data_filtered
+    for key in data.keys():
+        if type(data[key]) == Decimal:
+            data[key] = float(data[key])
     return data
