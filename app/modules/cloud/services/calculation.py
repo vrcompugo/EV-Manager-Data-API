@@ -12,121 +12,148 @@ def calculate_cloud(data):
     if settings is None:
         return None
     user = get_logged_in_user()
-    print(user, data)
-    settings["data"]["cloud_settings"] = {
-        "power_to_kwp_factor": 1.78,
-        "heater_to_kwp_factor": [
-            {"from": 0, "to": 4000, "value": 1.77},
-            {"from": 4001, "to": 6500, "value": 1.88},
-            {"from": 6501, "to": 9999999, "value": 1.98}
-        ],
-        "consumer_to_kwp_factor": 1.979,
-        "kwp_to_refund_factor": 6.225,
-        "cloud_user_prices": {
-            113: [
-                {"from": 0, "to": 7000, "value": 25},
-                {"from": 7001, "to": 15000, "value": 34},
-                {"from": 15001, "to": 20000, "value": 59},
-                {"from": 20001, "to": 35000, "value": 89},
-                {"from": 35001, "to": 50000, "value": 149},
-                {"from": 50001, "to": 55000, "value": 199},
-                {"from": 55001, "to": 9999999, "value": 9999},
-            ]
-        },
-        "cloud_user_heater_prices": {
-            113: [
-                {"from": 0, "to": 4000, "value": 25},
-                {"from": 4001, "to": 6500, "value": 29},
-                {"from": 6501, "to": 9000, "value": 39},
-                {"from": 9001, "to": 999999, "value": 49}
-            ]
-        },
-        "cloud_user_consumer_prices": {
-            113: [
-                {"from": 0, "to": 3000, "value": 22},
-                {"from": 3001, "to": 4500, "value": 25},
-                {"from": 4501, "to": 6500, "value": 29},
-                {"from": 6501, "to": 9000, "value": 49},
-                {"from": 9001, "to": 15000, "value": 69},
-                {"from": 15001, "to": 25000, "value": 89},
-                {"from": 25001, "to": 35000, "value": 149},
-                {"from": 35001, "to": 55000, "value": 199},
-                {"from": 35001, "to": 55000, "value": 199},
-                {"from": 55001, "to": 75000, "value": 299},
-                {"from": 75001, "to": 99000, "value": 399},
-                {"from": 99001, "to": 999999, "value": 1999}
-            ]
-        },
-        "cloud_emove": {
-            "emove Tarif Hybrid": {"price": 9.99, "kwp": 0},
-            "emove.drive": {"price": 9.99, "kwp": 3},
-            "emove.drive I": {"price": 9.99, "kwp": 4},
-            "emove.drive II": {"price": 19.99, "kwp": 6.5},
-            "emove.drive ALL": {"price": 39.00, "kwp": 7},
-        },
-        "cloud_guarantee": {
-            113: {
-                "10_years": {"price": 399}
-            }
-        }
+    result = {
+        "lightcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
+        "heatcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"],
+        "ecloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"],
+        "consumercloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
+        "errors": [],
+        "invalid_form": False,
+        "kwp_extra": 0,
+        "min_kwp": 0,
+        "min_kwp_light": 0,
+        "min_kwp_heatcloud": 0,
+        "min_kwp_ecloud": 0,
+        "min_kwp_emove": 0,
+        "min_kwp_consumer": 0,
+        "storage_size": 0,
+        "cloud_price_extra": 0,
+        "cloud_price": 0,
+        "cloud_price_incl_refund": 0,
+        "cloud_price_light": 0,
+        "cloud_price_heatcloud": 0,
+        "cloud_price_ecloud": 0,
+        "cloud_price_emove": 0,
+        "cloud_price_consumer": 0,
+        "user_one_time_cost": 0,
+        "power_usage": 0,
+        "heater_usage": 0,
+        "ecloud_usage": 0,
+        "consumer_usage": 0,
+        "conventional_price_light": 0,
+        "conventional_price_heatcloud": 0,
+        "conventional_price_ecloud": 0
     }
-    min_kwp = 0
-    storage_size = 0
-    cloud_price = 0
-    cloud_price_refund = 0
-    user_one_time_cost = 0
-    if "power_usage" in data:
+    if "pv_kwp" in data:
+        data["pv_kwp"] = float(data["pv_kwp"])
+    else:
+        data["pv_kwp"] = 0
+
+    if "power_usage" in data and data["power_usage"] != "" and data["power_usage"] != "0" and data["power_usage"] != 0:
         data["power_usage"] = int(data["power_usage"])
-        min_kwp = data["power_usage"] * settings["data"]["cloud_settings"]["power_to_kwp_factor"] / 1000
-        storage_size = round(data["power_usage"] / 1000)
-        cloud_price = list(filter(
+        result["power_usage"] = data["power_usage"]
+        result["min_kwp_light"] = data["power_usage"] * settings["data"]["cloud_settings"]["power_to_kwp_factor"] / 1000
+        result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
+        result["cloud_price_light"] = result["cloud_price_light"] + list(filter(
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
-            settings["data"]["cloud_settings"]["cloud_user_prices"][user["id"]]
+            settings["data"]["cloud_settings"]["cloud_user_prices"][str(user["id"])]
         ))[0]["value"]
-    if "heater_usage" in data:
+        result["conventional_price_light"] = (data["power_usage"] * settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"]) / 12
+
+    if "heater_usage" in data and data["heater_usage"] != "" and data["heater_usage"] != "0" and data["heater_usage"] != 0:
         data["heater_usage"] = int(data["heater_usage"])
+        result["heater_usage"] = data["heater_usage"]
         heater_to_kwp_factor = list(filter(
             lambda item: item['from'] <= data["heater_usage"] and data["heater_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["heater_to_kwp_factor"]
         ))[0]["value"]
-        cloud_price = cloud_price + list(filter(
+        result["cloud_price_heatcloud"] = list(filter(
             lambda item: item['from'] <= data["heater_usage"] and data["heater_usage"] <= item['to'],
-            settings["data"]["cloud_settings"]["cloud_user_heater_prices"][user["id"]]
+            settings["data"]["cloud_settings"]["cloud_user_heater_prices"][str(user["id"])]
         ))[0]["value"]
-        min_kwp = min_kwp + (data["heater_usage"] * heater_to_kwp_factor / 1000)
+        result["min_kwp_heatcloud"] = data["heater_usage"] * heater_to_kwp_factor / 1000
+        result["conventional_price_heatcloud"] = (data["heater_usage"] * settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"]) / 12
+
+    if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0:
+        data["ecloud_usage"] = int(data["ecloud_usage"])
+        result["ecloud_usage"] = data["ecloud_usage"]
+        result["cloud_price_ecloud"] = settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]
+        result["min_kwp_ecloud"] = data["ecloud_usage"] / settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"]
+        result["conventional_price_ecloud"] = (data["ecloud_usage"] * settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"]) / 12
+
     if "consumers" in data:
         consumer_usage = 0
         for consumer in data["consumers"]:
             consumer_usage = consumer_usage + int(consumer["usage"])
             consumer_price = list(filter(
                 lambda item: item['from'] <= int(consumer["usage"]) and int(consumer["usage"]) <= item['to'],
-                settings["data"]["cloud_settings"]["cloud_user_consumer_prices"][user["id"]]
+                settings["data"]["cloud_settings"]["cloud_user_consumer_prices"][str(user["id"])]
             ))
             if len(consumer_price) > 0:
-                cloud_price = cloud_price + consumer_price[0]["value"]
-        min_kwp = min_kwp + (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"]) / 1000
+                result["cloud_price_consumer"] = result["cloud_price_consumer"] + consumer_price[0]["value"]
+        result["consumer_usage"] = consumer_usage
+        result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"]) / 1000
 
     if "emove_tarif" in data:
         if data["emove_tarif"] in settings["data"]["cloud_settings"]["cloud_emove"]:
-            min_kwp = min_kwp + settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["kwp"]
-            cloud_price = cloud_price + settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["price"]
+            result["min_kwp_emove"] = settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["kwp"]
+            result["cloud_price_emove"] = settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["price"]
 
-    if "pv_kwp" in data:
-        data["pv_kwp"] = float(data["pv_kwp"])
-        if data["pv_kwp"] > min_kwp:
-            extra_kwp = data["pv_kwp"] - min_kwp
-            cloud_price_refund = extra_kwp * settings["data"]["cloud_settings"]["kwp_to_refund_factor"]
     if "price_guarantee" in data:
-        if user["id"] in settings["data"]["cloud_settings"]["cloud_guarantee"]:
-            if data["price_guarantee"] in settings["data"]["cloud_settings"]["cloud_guarantee"][user["id"]]:
-                user_one_time_cost = user_one_time_cost + settings["data"]["cloud_settings"]["cloud_guarantee"][user["id"]][data["price_guarantee"]]["price"]
-    return {
-        "min_kwp": min_kwp,
-        "storage_size": storage_size,
-        "cloud_price": cloud_price,
-        "cloud_price_incl_refund": cloud_price - cloud_price_refund,
-        "user_one_time_cost": user_one_time_cost
-    }
+        if str(user["id"]) in settings["data"]["cloud_settings"]["cloud_guarantee"]:
+            if data["price_guarantee"] in settings["data"]["cloud_settings"]["cloud_guarantee"][str(user["id"])]:
+                result["user_one_time_cost"] = result["user_one_time_cost"] + settings["data"]["cloud_settings"]["cloud_guarantee"][str(user["id"])][data["price_guarantee"]]["price"]
+
+    if result["power_usage"] <= 0:
+        result["invalid_form"] = True
+        result["errors"].append("Lichtstrom muss immer bestellt werden")
+
+    if 0 < data["pv_kwp"] < result["min_kwp_emove"]:
+        result["invalid_form"] = True
+        result["errors"].append("eMove Tarife sind nür möglich sofern diese mindestens durch die Anlage abgedeckt sind.")
+
+    result["min_kwp"] = (result["min_kwp_light"]
+                         + result["min_kwp_heatcloud"]
+                         + result["min_kwp_ecloud"]
+                         + result["min_kwp_consumer"]
+                         + result["min_kwp_emove"])
+
+    if data["pv_kwp"] > 0:
+        result["kwp_extra"] = data["pv_kwp"] - result["min_kwp"]
+        if result["kwp_extra"] > 0:
+            result["cloud_price_extra"] = -1 * result["kwp_extra"] * settings["data"]["cloud_settings"]["kwp_to_refund_factor"]
+        if result["kwp_extra"] < 0:
+            max_kwp = (result["min_kwp_light"]
+                       + result["min_kwp_heatcloud"]
+                       + result["min_kwp_ecloud"]
+                       + result["min_kwp_consumer"])
+            extra_kwh_ratio = 1 - (data["pv_kwp"] - result["min_kwp_emove"]) / max_kwp
+            result["cloud_price_extra"] = (
+                ((result["min_kwp_light"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
+                + ((result["min_kwp_heatcloud"] / max_kwp) * result["heater_usage"] * extra_kwh_ratio * result["heatcloud_extra_price_per_kwh"]) / 12
+                + ((result["min_kwp_ecloud"] / max_kwp) * result["ecloud_usage"] * extra_kwh_ratio * result["ecloud_extra_price_per_kwh"]) / 12
+                + ((result["min_kwp_consumer"] / max_kwp) * result["consumer_usage"] * extra_kwh_ratio * result["consumercloud_extra_price_per_kwh"]) / 12
+            )
+
+    result["cloud_price"] = (result["cloud_price_light"]
+                             + result["cloud_price_heatcloud"]
+                             + result["cloud_price_ecloud"]
+                             + result["cloud_price_consumer"]
+                             + result["cloud_price_emove"])
+
+    result["conventional_price"] = (result["conventional_price_light"]
+                                    + result["conventional_price_heatcloud"]
+                                    + result["conventional_price_ecloud"])
+
+    result["max_kwp"] = result["min_kwp"] + result["kwp_extra"]
+    result["cloud_price_incl_refund"] = result["cloud_price"] + result["cloud_price_extra"]
+
+    if "cloud_price_wish" in data and data["cloud_price_wish"] != "" and data["cloud_price_wish"] != "0" and data["cloud_price_wish"] != 0:
+        if result["cloud_price_incl_refund"] > float(data["cloud_price_wish"]) > 0 and "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            price_diff = result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])
+            result["user_one_time_cost"] = result["user_one_time_cost"] + (result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])) * 24
+
+    return result
 
 
 def cloud_offer_items_by_pv_offer(offer: OfferV2):
