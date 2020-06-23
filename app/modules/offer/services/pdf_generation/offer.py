@@ -14,7 +14,7 @@ def generate_offer_pdf(offer: OfferV2):
     offer_number_prefix = offer.number_prefix
     if offer.offer_group == "heater-offer-con":
         offer.total_15years = float(offer.total) * 12 * 15
-    content = render_template("offer/index.html", offer=offer, offer_number_prefix=offer_number_prefix)
+    content = render_template("offer/index.html", offer=offer, items=offer.items, offer_number_prefix=offer_number_prefix)
     content_footer = render_template("offer/footer.html", offer=offer, offer_number_prefix=offer_number_prefix)
 
     pdf = generate_pdf(content, content_footer=content_footer)

@@ -59,7 +59,7 @@ def update_item_v2(id, data):
             item.items.append(item_object)
     db.session.commit()
     # loading relations for pdf creation
-    customer = new_item.customer
-    items = new_item.items
-    address = new_item.address
+    customer = item.customer
+    items = item.items
+    address = item.address
     return item

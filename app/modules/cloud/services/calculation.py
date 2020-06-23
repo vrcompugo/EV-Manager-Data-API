@@ -1,6 +1,7 @@
 import math
 
 from app.models import OfferV2
+from app.utils.jinja_filters import numberformat
 from app.modules.settings.settings_services import get_one_item as get_settings
 from app.modules.auth.auth_services import get_logged_in_user
 
@@ -157,7 +158,130 @@ def calculate_cloud(data):
 
 
 def get_cloud_products(data=None, offer=None):
-    return []
+    settings = get_settings("pv-settings")
+    if settings is None:
+        return None
+    tax_rate = 19
+    offer_data = {}
+    wish_price = False
+    if offer is not None:
+        cloud_price = 99
+        for price in settings["data"]["cloud_settings"]["cloud_prices"]:
+            if int(price["paket_range_start"]) <= int(offer.survey.data["offered_packet_number"]) <= int(price["paket_range_end"]):
+                cloud_price = float(price["price"])
+        pv_production = (
+            "<b>PV Erzeugung</b><br>\n"
+            + f"Zählernummer: {offer.survey.data['current_counter_number']}<br>\n"
+            + f"PV-Anlage laut Angebot: PV-{offer.id}<br>\n"
+            + f"{offer.survey.data['street']} {offer.survey.data['zip']} {offer.survey.data['city']}<br>\n"
+            + f"Abnahme: {offer.survey.data['pv_usage']} kWh<br>\n"
+        )
+    if data is not None:
+        cloud_price = data["calculated"]["cloud_price_light"]
+        if "cloud_price_wish" in data["data"] and data["data"]["cloud_price_wish"] != "" and 0 < float(data["data"]["cloud_price_wish"]) < data["calculated"]["cloud_price_incl_refund"]:
+            cloud_price = float(data["data"]["cloud_price_wish"])
+            wish_price = True
+        guarantee_runtime = ""
+        if data["data"]["price_guarantee"] == "2_years":
+            guarantee_runtime = "2 Jahre"
+        if data["data"]["price_guarantee"] == "10_years":
+            guarantee_runtime = "10 Jahre"
+        light_cloud_usage = int(data["calculated"]["power_usage"])
+        lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
+        pv_production = (
+            "<b>PV Erzeugung</b><br>\n"
+            + f"PV-Anlage mit mindestens: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
+        )
+        if "pv_kwp" in data['data'] and data['data']["pv_kwp"] > 0:
+            pv_production = (
+                "<b>PV Erzeugung</b><br>\n"
+                + f"PV-Anlage mindestens empfohlen: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
+                + f"PV-Anlage wird verbaut: {numberformat(float(data['data']['pv_kwp']), digits=2)}kWp<br>\n"
+            )
+    offer_data["items"] = [
+        {
+            "label": "cCloud-Zero",
+            "description": "Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Stromverbrauchen, wann immer Sie ihn brauchen.",
+            "quantity": 1,
+            "quantity_unit": "mtl.",
+            "tax_rate": tax_rate,
+            "single_price": cloud_price,
+            "single_price_net": cloud_price / (1 + tax_rate / 100),
+            "single_tax_amount": cloud_price * (tax_rate / 100),
+            "discount_rate": 0,
+            "discount_single_amount": 0,
+            "discount_single_price": cloud_price,
+            "discount_single_price_net": cloud_price / (1 + tax_rate / 100),
+            "discount_single_price_net_overwrite": None,
+            "discount_single_tax_amount": cloud_price * (tax_rate / 100),
+            "discount_total_amount": cloud_price,
+            "total_price": cloud_price,
+            "total_price_net": cloud_price / (1 + tax_rate / 100),
+            "total_tax_amount": cloud_price * (tax_rate / 100),
+        }
+    ]
+    offer_data["items"][0]["description"] = offer_data["items"][0]["description"] + "<br>\n<br>\n"\
+        + "Tarif: cCloud-Zero<br>\n" \
+        + f"Kündigungsfrist: {settings['data']['cloud_settings']['notice_period']}<br>\n" \
+        + f"Vertragslaufzeit: {guarantee_runtime}<br>\n" \
+        + f"garantierte Zero-Laufzeit für (a): {guarantee_runtime}<br>\n" \
+        + f"Durch die Cloud abgedeckter Jahresverbrauch: {light_cloud_usage} kWh<br>\n" \
+        + "<small>PV, Speicher & Netzbezug</small><br>\n" \
+        + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(lightcloud_extra_price_per_kwh * 100, digits=2)} cent / kWh</small>"
+    offer_data["items"].append(monthly_price_product_base(
+        description=pv_production,
+        single_price=0))
+    if data["calculated"]["cloud_price_heatcloud"] > 0:
+        offer_data["items"].append(monthly_price_product_base(
+            description=("<b>Wärmecloud</b><br>"
+                         + f"Durch die Cloud abgedeckter Jahresverbrauch: {data['calculated']['heater_usage']} kWh<br>\n"
+                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['heatcloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
+            single_price=(0 if wish_price else data["calculated"]["cloud_price_heatcloud"])))
+    if data["calculated"]["cloud_price_ecloud"] > 0:
+        offer_data["items"].append(monthly_price_product_base(
+            description=("<b>eCloud</b><br>"
+                         + f"Durch die Cloud abgedeckter Jahresverbrauch: {data['calculated']['ecloud_usage']} kWh<br>\n"
+                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['ecloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
+            single_price=(0 if wish_price else data["calculated"]["cloud_price_ecloud"])))
+    if data["calculated"]["cloud_price_consumer"] > 0:
+        offer_data["items"].append(monthly_price_product_base(
+            description=("<b>Consumer</b><br>"
+                         + f"Durch die Cloud abgedeckter Jahresverbrauch: {data['calculated']['consumer_usage']} kWh<br>\n"
+                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
+            single_price=(0 if wish_price else data["calculated"]["cloud_price_consumer"])))
+    if data["calculated"]["cloud_price_emove"] > 0:
+        emove_description = ("<b>eMove</b><br>"
+                             + f"Tarif: {data['data']['emove_tarif']}")
+        if data['data']['emove_tarif'] == "emove.drive":
+            emove_description = ("<b>eMove</b><br>"
+                                 + f"Tarif: {data['data']['emove_tarif']}<br>"
+                                 + f"empfohlen bis ca. 8.000 km / Jahr<br>Laden Sie 500 kWh in der Home Area, und 1.000 kWh out of Home Area")
+        if data['data']['emove_tarif'] == "emove.drive I":
+            emove_description = ("<b>eMove</b><br>"
+                                 + f"Tarif: {data['data']['emove_tarif']}<br>"
+                                 + f"empfohlen bis ca. 12.000 km / Jahr<br>Laden Sie 1.000 kWh in der Home Area, und 1.000 kWh out of Home Area")
+        if data['data']['emove_tarif'] == "emove.drive II":
+            emove_description = ("<b>eMove</b><br>"
+                                 + f"Tarif: {data['data']['emove_tarif']}<br>"
+                                 + f"empfohlen bis ca. 20.000 km / Jahr<br>Laden Sie 2.000 kWh in der Home Area, und 3.000 kWh out of Home Area")
+        if data['data']['emove_tarif'] == "emove.drive ALL":
+            emove_description = ("<b>eMove</b><br>"
+                                 + f"Tarif: {data['data']['emove_tarif']}<br>"
+                                 + f"empfohlen bis ca. 35.000 km / Jahr<br>Laden Sie 2.500 kWh in der Home Area, und 6.000 kWh out of Home Area")
+        offer_data["items"].append(monthly_price_product_base(
+            description=emove_description,
+            single_price=(0 if wish_price else data["calculated"]["cloud_price_emove"])))
+    if data["calculated"]["cloud_price_extra"] > 0:
+        offer_data["items"].append(monthly_price_product_base(
+            description=("<b>Minderverbau</b><br>"
+                         + f"PV-Anlage um {numberformat(-data['calculated']['kwp_extra'])} kWp zu klein"),
+            single_price=(0 if wish_price else data["calculated"]["cloud_price_extra"])))
+    if data["calculated"]["cloud_price_extra"] < 0:
+        offer_data["items"].append(monthly_price_product_base(
+            description=("<b>Mehrverbau</b><br>"
+                         + f"PV-Anlage um {numberformat(data['calculated']['kwp_extra'])} kWp größer"),
+            single_price=(0 if wish_price else data["calculated"]["cloud_price_extra"])))
+    return offer_data["items"]
 
 
 def cloud_offer_items_by_pv_offer(offer: OfferV2):
@@ -321,3 +445,27 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
             offer_data = add_item_to_offer(offer.survey, offer_data, product["product_link"], product["product_folder"], 0)
 
     return offer_data["items"]
+
+
+def monthly_price_product_base(description, single_price):
+    taxrate = 19
+    return {
+        "label": "",
+        "description": description,
+        "quantity": 1,
+        "quantity_unit": "mtl.",
+        "tax_rate": taxrate,
+        "single_price": single_price,
+        "single_price_net": single_price / (1 + (taxrate / 100)),
+        "single_tax_amount": single_price * (taxrate / 100),
+        "discount_rate": 0,
+        "discount_single_amount": 0,
+        "discount_single_price": single_price,
+        "discount_single_price_net": single_price / (1 + (taxrate / 100)),
+        "discount_single_price_net_overwrite": None,
+        "discount_single_tax_amount": single_price * (taxrate / 100),
+        "discount_total_amount": single_price,
+        "total_price": single_price,
+        "total_price_net": single_price / (1 + (taxrate / 100)),
+        "total_tax_amount": single_price * (taxrate / 100)
+    }

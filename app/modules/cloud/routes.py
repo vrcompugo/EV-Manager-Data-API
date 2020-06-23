@@ -53,7 +53,7 @@ class Items(Resource):
             "status": "created",
             "data": data,
             "calculated": calculated,
-            "items": []
+            "items": items
         }
         user = get_logged_in_user()
         reseller = Reseller.query.filter(Reseller.user_id == user["id"]).first()
@@ -91,13 +91,31 @@ class User(Resource):
     @api_response
     @token_required("cloud_calculation")
     def put(self, offer_number):
-        data = request.json
+        from app.modules.offer.services.pdf_generation.offer import generate_offer_pdf
+
         offer = get_offer_by_offer_number(offer_number)
         if offer is None:
             api.abort(404)
-        update_item_v2(offer.id, data=data)
-        item_dict = get_one_item_v2(offer.id, fields)
-        return {
-            "status": "success",
-            "data": item_dict
+        data = request.json
+        calculated = calculate_cloud(data)
+        items = get_cloud_products(data={
+            "data": data,
+            "calculated": calculated
+        })
+        offer_v2_data = {
+            "datetime": datetime.datetime.now(),
+            "subtotal": calculated["cloud_price"],
+            "subtotal_net": calculated["cloud_price"] / 1.19,
+            "total_tax": calculated["cloud_price"] * 0.19,
+            "total": calculated["cloud_price"],
+            "data": data,
+            "calculated": calculated,
+            "items": items
         }
+        item = update_item_v2(id=offer.id, data=offer_v2_data)
+        generate_offer_pdf(item)
+        item_dict = get_one_item_v2(item.id)
+        if item.pdf is not None:
+            item_dict["pdf_link"] = item.pdf.public_link
+        return {"status": "success",
+                "data": item_dict}

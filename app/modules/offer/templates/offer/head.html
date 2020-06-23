@@ -21,7 +21,11 @@
       <div>Angebots-Nr.:</div>
       <div>{{ offer_number_prefix }}{{ offer.id }}</div>
       <div>Kunden-Nr.:</div>
-      <div>{{ offer.customer.customer_number }}</div>
+      {% if offer.customer %}
+        <div>{{ offer.customer.customer_number }}</div>
+      {% else %}
+        <div>-</div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -45,7 +49,9 @@
 
 <div style="padding-left: 15mm;">
   <small style="text-decoration: underline;font-size: 10px;">korbacher-energieZentrum GmbH & Co KG<br>Wildunger Landstr. 14b 34497 Korbach</small><br>
-  {{ offer.address | addressblock | nltobr }}
+  {% if offer.address %}
+    {{ offer.address | addressblock | nltobr }}
+  {% endif %}
 </div>
 
 <div style="clear: both;"></div>

@@ -1,6 +1,9 @@
 {% if offer.offer_group == "pv-offer" %}
     {% include "offer/pv.html" %}
 {% endif %}
+{% if offer.offer_group == "cloud-offer" %}
+    {% include "offer/cloud.html" %}
+{% endif %}
 {% if offer.offer_group == "enpal-offer" %}
     {% include "offer/enpal.html" %}
 {% endif %}
