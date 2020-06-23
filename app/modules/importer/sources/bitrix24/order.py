@@ -35,7 +35,7 @@ def filter_import_input(item_data):
     category = ""
     if "result" in response and "NAME" in response["result"]:
         category = response["result"]["NAME"]
-    order_type = category
+    order_type = ""
     if category in CATEGORY_TYPES:
         order_type = CATEGORY_TYPES[category]
 

@@ -6,7 +6,7 @@ from app.modules.importer.sources.bitrix24.order import run_import
 
 
 def import_orders_without_category():
-    orders = db.session.query(Order).filter(Order.category == "").all()
+    orders = db.session.query(Order).filter(Order.category == "Provision").all()
     # printProgressBar(0, total, prefix='Progress:', suffix='Complete', length=50)
     for order in orders:
         print("id", order.id)
