@@ -121,7 +121,6 @@ def filter_import_input(item_data):
 
 
 def run_import(local_id=None, remote_id=None):
-    print("order ", remote_id)
     if local_id is not None:
         link = find_association("Order", local_id=local_id)
         if link is not None:
@@ -129,6 +128,7 @@ def run_import(local_id=None, remote_id=None):
     if remote_id is None:
         print("no id given")
         return None
+    print("order ", remote_id)
     response = post("crm.deal.get", {
         "ID": remote_id
     })

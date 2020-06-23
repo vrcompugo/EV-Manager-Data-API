@@ -42,6 +42,12 @@ def update_commission_values():
 
 
 @manager.command
+def import_orders_without_category():
+    from commands.import_orders_without_category import import_orders_without_category
+    import_orders_without_category()
+
+
+@manager.command
 def lead_comment_test():
     from commands.lead_comment_test import lead_comment_test
     lead_comment_test()
