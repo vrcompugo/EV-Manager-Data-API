@@ -195,7 +195,7 @@ def get_cloud_products(data=None, offer=None):
         if "pv_kwp" in data['data'] and data['data']["pv_kwp"] > 0:
             pv_production = (
                 "<b>PV Erzeugung</b><br>\n"
-                + f"PV-Anlage mindestens empfohlen: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
+                + f"PV-Anlage mindestens zu verbauen: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
                 + f"PV-Anlage wird verbaut: {numberformat(float(data['data']['pv_kwp']), digits=2)}kWp<br>\n"
             )
     offer_data["items"] = [
