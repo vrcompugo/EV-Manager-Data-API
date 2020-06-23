@@ -20,6 +20,7 @@ pp = pprint.PrettyPrinter()
 
 CATEGORY_TYPES = {
     "FastUmsatzdarstellung": "salesstats",
+    "Provision": "salesstats",
     "Verbau Photovoltaik": "pv_construction",
     "Verbau Heizung": "heating_construction",
     "Verbau BWWP": "pv_construction",
@@ -34,7 +35,7 @@ def filter_import_input(item_data):
     category = ""
     if "result" in response and "NAME" in response["result"]:
         category = response["result"]["NAME"]
-    order_type = ""
+    order_type = category
     if category in CATEGORY_TYPES:
         order_type = CATEGORY_TYPES[category]
 
