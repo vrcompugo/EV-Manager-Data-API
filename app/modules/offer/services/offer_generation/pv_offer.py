@@ -96,7 +96,7 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
                     optional_product
                 )
 
-        lead = Lead.query.filter(Lead.customer_id == survey.customer.id).first()
+        lead = Lead.query.filter(Lead.customer_id == survey.customer.id).order_by(Lead.id.desc()).first()
         if lead is not None:
             offer_data["lead_id"] = lead.id
         offer = add_item_v2(offer_data)
