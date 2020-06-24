@@ -26,6 +26,7 @@ def base_offer_data(offer_group, survey=None, order=None):
         data["payment_account_id"] = survey.customer.default_payment_account_id
         data["reseller_id"] = survey.reseller_id
         data["survey_id"] = survey.id
+        data["lead_id"] = survey.lead_id
     if order is not None:
         data["customer_id"] = order.customer_id
         data["address_id"] = order.customer.default_address_id
