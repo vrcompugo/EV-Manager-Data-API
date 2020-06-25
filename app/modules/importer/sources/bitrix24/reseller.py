@@ -38,6 +38,8 @@ def filter_import_data(item_data):
         group_id = 2
     if "EEG_EEG" in bitrix_department:
         group_id = 2
+    if "Vertrieb Rhein Main" in bitrix_department:
+        group_id = 6
     if "Buchhaltung" in bitrix_department:
         group_id = 8
     if "Finanzbuchhaltung" in bitrix_department:
