@@ -49,6 +49,8 @@ class OfferV2(db.Model):
 
     @hybrid_property
     def number_prefix(self):
+        if self.offer_group == "pv-offer":
+            return "PV-"
         if self.offer_group == "cloud-offer":
             return "C-"
         if self.offer_group == "enpal-offer":

@@ -23,12 +23,12 @@
     new_tr = trs[i].cloneNode(true)
     let description_div = trs[i].querySelector(".description > div");
     description_div.style.overflow = "hidden";
-    description_div.style.height = "500px";
+    description_div.style.height = "490px";
     trs[i].insertAdjacentElement("afterend", new_tr);
     let description2 = new_tr.querySelector(".description");
     description2.style.overflow = "hidden";
     let description2_div = new_tr.querySelector(".description > div");
-    description2_div.style.marginTop = "-540px";
+    description2_div.style.marginTop = "-530px";
     let empties = new_tr.querySelectorAll(".empty-on-split");
     for(let j=0;j < empties.length;j++){
       empties[j].innerHTML = "";

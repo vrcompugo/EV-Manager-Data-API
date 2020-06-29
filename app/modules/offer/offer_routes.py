@@ -118,6 +118,37 @@ class OfferPDF(Resource):
             db.subqueryload("address")
         ).get(id)
         data = {}
+        return generate_cloud_pdf(offer)
+        if offer.pdf is not None:
+            data["pdf"] = {
+                "public_link": offer.pdf.public_link,
+                "filename": offer.pdf.filename
+            }
+        if offer.cloud_pdf is not None:
+            data["cloud_pdf"] = {
+                "public_link": offer.cloud_pdf.public_link,
+                "filename": offer.cloud_pdf.filename
+            }
+        if offer.feasibility_study_pdf is not None:
+            data["feasibility_study_pdf"] = {
+                "public_link": offer.feasibility_study_pdf.public_link,
+                "filename": offer.feasibility_study_pdf.filename
+            }
+        return data
+
+
+@api.route('/<id>/PDF2')
+class OfferPDF(Resource):
+    def get(self, id):
+        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
+        from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
+        from app.modules.offer.services.pdf_generation.offer import generate_offer_pdf
+        offer = OfferV2.query.options(
+            db.subqueryload("items"),
+            db.subqueryload("customer"),
+            db.subqueryload("address")
+        ).get(id)
+        data = {}
         return generate_offer_pdf(offer)
         if offer.pdf is not None:
             data["pdf"] = {

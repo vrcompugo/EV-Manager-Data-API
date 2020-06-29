@@ -12,7 +12,12 @@ def calculate_cloud(data):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
-    user = get_logged_in_user()
+    user = {"id": 1}
+    try:
+        user = get_logged_in_user()
+    except Exception as e:
+        pass
+
     result = {
         "lightcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
         "heatcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"],
@@ -164,40 +169,37 @@ def get_cloud_products(data=None, offer=None):
     tax_rate = 19
     offer_data = {}
     wish_price = False
+    pv_production = (
+        "<b>PV Erzeugung</b><br>\n"
+        + f"PV-Anlage mit mindestens: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
+    )
+    if "pv_kwp" in data['data'] and data['data']["pv_kwp"] > 0:
+        pv_production = (
+            "<b>PV Erzeugung</b><br>\n"
+            + f"PV-Anlage mindestens zu verbauen: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
+            + f"PV-Anlage wird verbaut: {numberformat(float(data['data']['pv_kwp']), digits=2)}kWp<br>\n"
+        )
     if offer is not None:
-        cloud_price = 99
-        for price in settings["data"]["cloud_settings"]["cloud_prices"]:
-            if int(price["paket_range_start"]) <= int(offer.survey.data["offered_packet_number"]) <= int(price["paket_range_end"]):
-                cloud_price = float(price["price"])
         pv_production = (
             "<b>PV Erzeugung</b><br>\n"
             + f"Zählernummer: {offer.survey.data['current_counter_number']}<br>\n"
             + f"PV-Anlage laut Angebot: PV-{offer.id}<br>\n"
             + f"{offer.survey.data['street']} {offer.survey.data['zip']} {offer.survey.data['city']}<br>\n"
-            + f"Abnahme: {offer.survey.data['pv_usage']} kWh<br>\n"
         )
-    if data is not None:
-        cloud_price = data["calculated"]["cloud_price_light"]
-        if "cloud_price_wish" in data["data"] and data["data"]["cloud_price_wish"] != "" and 0 < float(data["data"]["cloud_price_wish"]) < data["calculated"]["cloud_price_incl_refund"]:
-            cloud_price = float(data["data"]["cloud_price_wish"])
-            wish_price = True
-        guarantee_runtime = ""
-        if data["data"]["price_guarantee"] == "2_years":
-            guarantee_runtime = "2 Jahre"
-        if data["data"]["price_guarantee"] == "10_years":
-            guarantee_runtime = "10 Jahre"
-        light_cloud_usage = int(data["calculated"]["power_usage"])
-        lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
-        pv_production = (
-            "<b>PV Erzeugung</b><br>\n"
-            + f"PV-Anlage mit mindestens: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
-        )
-        if "pv_kwp" in data['data'] and data['data']["pv_kwp"] > 0:
-            pv_production = (
-                "<b>PV Erzeugung</b><br>\n"
-                + f"PV-Anlage mindestens zu verbauen: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
-                + f"PV-Anlage wird verbaut: {numberformat(float(data['data']['pv_kwp']), digits=2)}kWp<br>\n"
-            )
+    cloud_price = data["calculated"]["cloud_price_light"]
+    if "cloud_price_wish" in data["data"] and data["data"]["cloud_price_wish"] != "" and 0 < float(data["data"]["cloud_price_wish"]) < data["calculated"]["cloud_price_incl_refund"]:
+        cloud_price = float(data["data"]["cloud_price_wish"])
+        wish_price = True
+    guarantee_runtime = ""
+    if data["data"]["price_guarantee"] == "2_years":
+        guarantee_runtime = "2 Jahre"
+    if data["data"]["price_guarantee"] == "10_years":
+        guarantee_runtime = "10 Jahre"
+    if data["data"]["price_guarantee"] == "12_years":
+        guarantee_runtime = "12 Jahre"
+    light_cloud_usage = int(data["calculated"]["power_usage"])
+    lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
+
     offer_data["items"] = [
         {
             "label": "cCloud-Zero",
@@ -289,6 +291,26 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
     if settings is None:
         return None
     offer_data = base_offer_data("cloud-offer", offer.survey)
+    data = {
+        # "pv_kwp": None,
+        "power_usage": offer.survey.data["pv_usage"],
+        "heater_usage": offer.survey.data["heatcloud_usage"],
+        "ecloud_usage": offer.survey.data["ecloud_usage"],
+        "consumers": [],
+        "emove_tarif": offer.survey.data["cloud_emove"],
+        "price_guarantee": "12_years"
+    }
+    if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+        for drain in offer.survey.data["extra_drains"]:
+            if "usage" in drain and drain["usage"] != "":
+                data["consumers"].append(drain)
+    offer_data["calculated"] = calculate_cloud(data=data)
+    offer_data["items"] = get_cloud_products(data={
+        "data": data,
+        "calculated": offer_data["calculated"]
+    }, offer=offer)
+    return offer_data["items"]
+
     total_drain = int(offer.survey.data['pv_usage'])
     if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
         for drain in offer.survey.data["extra_drains"]:
@@ -302,6 +324,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
     for price in settings["data"]["cloud_settings"]["cloud_prices"]:
         if int(price["paket_range_start"]) <= int(offer.survey.data["offered_packet_number"]) <= int(price["paket_range_end"]):
             cloud_price = float(price["price"])
+
     offer_data["items"] = [
         {
             "label": "cCloud-Zero",

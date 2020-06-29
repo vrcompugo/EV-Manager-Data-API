@@ -22,6 +22,7 @@ class Reseller(db.Model):
     number = db.Column(db.String(120))
     access_key = db.Column(db.String(60))
     phone = db.Column(db.String(120))
+    document_style = db.Column(db.String(80))
     sales_center = db.Column(db.String(140))
     sales_range = db.Column(db.Integer)
     sales_lat = db.Column(db.Float)
