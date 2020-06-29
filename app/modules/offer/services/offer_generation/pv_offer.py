@@ -90,7 +90,11 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
             if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                 cloud_data["consumers"].append(drain)
 
-    cloud_data = calculate_cloud(cloud_data)
+    try:
+        cloud_data = calculate_cloud(cloud_data)
+    except Exception as e:
+        return pv_offer_by_survey_old(survey=survey, old_data=old_data)
+
     extra_kwp = cloud_data["min_kwp"] - cloud_data["min_kwp_light"]
     if extra_kwp > 0:
         if survey.data["pv_module_type"] == "280":
@@ -155,9 +159,9 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
 def pv_offer_by_survey_old(survey: Survey, old_data=None):
     offer = None
     if (
-        survey.data["pv_usage"] is not None
-        and survey.data["pv_usage"] != ""
-        and int(survey.data["pv_usage"]) > 0):
+            survey.data["pv_usage"] is not None
+            and survey.data["pv_usage"] != ""
+            and int(survey.data["pv_usage"]) > 0):
 
         offer_data = base_offer_data("pv-offer", survey)
         packet_number = survey.data["offered_packet_number"]
