@@ -294,12 +294,15 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
     data = {
         # "pv_kwp": None,
         "power_usage": offer.survey.data["pv_usage"],
-        "heater_usage": offer.survey.data["heatcloud_usage"],
-        "ecloud_usage": offer.survey.data["ecloud_usage"],
         "consumers": [],
-        "emove_tarif": offer.survey.data["cloud_emove"],
         "price_guarantee": "12_years"
     }
+    if "heatcloud_usage" in offer.survey.data:
+        data["heater_usage"] = offer.survey.data["heatcloud_usage"]
+    if "ecloud_usage" in offer.survey.data:
+        data["ecloud_usage"] = offer.survey.data["ecloud_usage"]
+    if "cloud_emove" in offer.survey.data:
+        data["emove_tarif"] = offer.survey.data["cloud_emove"]
     if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
         for drain in offer.survey.data["extra_drains"]:
             if "usage" in drain and drain["usage"] != "":
