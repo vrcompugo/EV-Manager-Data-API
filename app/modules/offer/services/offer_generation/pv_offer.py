@@ -13,8 +13,8 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
     survey.data["pv_usage"] = int(survey.data["pv_usage"])
     offer_data = base_offer_data("pv-offer", survey)
     packet_number = math.ceil(survey.data["pv_usage"] / 500) * 5
-    if packet_number < 50:
-        packet_number = 50
+    if packet_number < 25:
+        packet_number = 25
     if packet_number > 300:
         packet_number = 300
     product_name = "PV Paket {}".format(packet_number)
@@ -31,25 +31,25 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
         1
     )
 
-    if int(survey.data["packet_number"]) >= 35:
+    if int(packet_number) >= 35:
         quantity = 1
-        if int(survey.data["packet_number"]) == 35 and survey.data["pv_module_type"] == "280":
+        if int(packet_number) == 35 and survey.data["pv_module_type"] == "280":
             quantity = 0
-        if 65 <= int(survey.data["packet_number"]) <= 70:
+        if 65 <= int(packet_number) <= 70:
             quantity = 2
-        if 75 <= int(survey.data["packet_number"]) <= 85:
+        if 75 <= int(packet_number) <= 85:
             quantity = 3
-        if 90 <= int(survey.data["packet_number"]) <= 125:
+        if 90 <= int(packet_number) <= 125:
             quantity = 4
-        if 130 <= int(survey.data["packet_number"]) <= 155:
+        if 130 <= int(packet_number) <= 155:
             quantity = 5
-        if 160 <= int(survey.data["packet_number"]) <= 180:
+        if 160 <= int(packet_number) <= 180:
             quantity = 6
-        if 185 <= int(survey.data["packet_number"]) <= 220:
+        if 185 <= int(packet_number) <= 220:
             quantity = 7
-        if 230 <= int(survey.data["packet_number"]) <= 300:
+        if 230 <= int(packet_number) <= 300:
             quantity = 9
-        if int(survey.data["packet_number"]) > 300:
+        if int(packet_number) > 300:
             total_usage = int(survey.data["pv_usage"])
             if "extra_drains" in survey.data:
                 for drain in survey.data["extra_drains"]:
