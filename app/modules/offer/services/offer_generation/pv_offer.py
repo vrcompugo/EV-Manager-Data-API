@@ -81,9 +81,9 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
         "consumers": []
     }
     extra_kwp = 0
-    if "heatcloud_usage" in survey.data and survey.data["heatcloud_usage"] != "":
+    if "has_heatcloud" in survey.data and survey.data["has_heatcloud"] and "heatcloud_usage" in survey.data and survey.data["heatcloud_usage"] != "":
         cloud_data["heater_usage"] = int(survey.data["heatcloud_usage"])
-    if "ecloud_usage" in survey.data and survey.data["ecloud_usage"] != "":
+    if "has_ecloud" in survey.data and survey.data["has_ecloud"] and "ecloud_usage" in survey.data and survey.data["ecloud_usage"] != "":
         cloud_data["ecloud_usage"] = int(survey.data["ecloud_usage"])
     if "extra_drains" in survey.data:
         for drain in survey.data["extra_drains"]:
@@ -165,7 +165,6 @@ def pv_offer_by_survey_old(survey: Survey, old_data=None):
 
         offer_data = base_offer_data("pv-offer", survey)
         packet_number = survey.data["offered_packet_number"]
-        print("packet number:", packet_number)
         if int(survey.data["offered_packet_number"]) > 300:
             packet_number = 300
         product_name = "PV Paket {}".format(packet_number)
