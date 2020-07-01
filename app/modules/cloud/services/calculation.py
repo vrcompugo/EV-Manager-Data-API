@@ -297,9 +297,9 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         "consumers": [],
         "price_guarantee": "12_years"
     }
-    if "has_heatcloud" in survey.data and survey.data["has_heatcloud"] and "heatcloud_usage" in offer.survey.data:
+    if "has_heatcloud" in offer.survey.data and offer.survey.data["has_heatcloud"] and "heatcloud_usage" in offer.survey.data:
         data["heater_usage"] = offer.survey.data["heatcloud_usage"]
-    if "has_ecloud" in survey.data and survey.data["has_ecloud"] and "ecloud_usage" in offer.survey.data:
+    if "has_ecloud" in offer.survey.data and offer.survey.data["has_ecloud"] and "ecloud_usage" in offer.survey.data:
         data["ecloud_usage"] = offer.survey.data["ecloud_usage"]
     if "cloud_emove" in offer.survey.data:
         data["emove_tarif"] = offer.survey.data["cloud_emove"]
