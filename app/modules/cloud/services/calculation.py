@@ -166,7 +166,7 @@ def get_cloud_products(data=None, offer=None):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
-    tax_rate = 19
+    tax_rate = 16
     offer_data = {}
     wish_price = False
     pv_production = (
@@ -322,7 +322,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
     extra_usage = 0
     if total_drain > int(offer.survey.data['offered_usage']):
         extra_usage = total_drain - int(offer.survey.data['offered_usage'])
-    tax_rate = 19
+    tax_rate = 16
     cloud_price = 99
     for price in settings["data"]["cloud_settings"]["cloud_prices"]:
         if int(price["paket_range_start"]) <= int(offer.survey.data["offered_packet_number"]) <= int(price["paket_range_end"]):
@@ -369,7 +369,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         ),
         "quantity": 1,
         "quantity_unit": "mtl.",
-        "tax_rate": 19,
+        "tax_rate": 16,
         "single_price": 0,
         "single_price_net": 0,
         "single_tax_amount": 0,
@@ -397,7 +397,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
                     ),
                     "quantity": 1,
                     "quantity_unit": "mtl.",
-                    "tax_rate": 19,
+                    "tax_rate": 16,
                     "single_price": 0,
                     "single_price_net": 0,
                     "single_tax_amount": 0,
@@ -422,7 +422,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         ),
         "quantity": 1,
         "quantity_unit": "mtl.",
-        "tax_rate": 19,
+        "tax_rate": 16,
         "single_price": extra_usage_cost,
         "single_price_net": 0,
         "single_tax_amount": 0,
@@ -451,7 +451,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
                 ),
                 "quantity": 1,
                 "quantity_unit": "mtl.",
-                "tax_rate": 19,
+                "tax_rate": 16,
                 "single_price": 0,
                 "single_price_net": 0,
                 "single_tax_amount": 0,
@@ -474,7 +474,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
 
 
 def monthly_price_product_base(description, single_price):
-    taxrate = 19
+    taxrate = 16
     return {
         "label": "",
         "description": description,

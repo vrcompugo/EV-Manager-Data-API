@@ -199,10 +199,10 @@
           {%- endif %}
         </tbody>
         <tfoot>
-          {% if totals.update({"tax": totals.subtotal * 0.19}) %} {% endif %}
-          {% if totals.update({"tax_checked": totals.subtotal_checked * 0.19}) %} {% endif %}
-          {% if totals.update({"total": totals.subtotal * 1.19}) %} {% endif %}
-          {% if totals.update({"total_checked": totals.subtotal_checked * 1.19}) %} {% endif %}
+          {% if totals.update({"tax": totals.subtotal * 0.16}) %} {% endif %}
+          {% if totals.update({"tax_checked": totals.subtotal_checked * 0.16}) %} {% endif %}
+          {% if totals.update({"total": totals.subtotal * 1.16}) %} {% endif %}
+          {% if totals.update({"total_checked": totals.subtotal_checked * 1.16}) %} {% endif %}
           {% if reseller.min_commission -%}
             <tr>
               <td class="right" colspan="8">Summe:</td>

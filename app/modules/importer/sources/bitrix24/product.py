@@ -55,7 +55,7 @@ def filter_import_data(item_data):
         "packet_range_start": packet_range_start,
         "packet_range_end": packet_range_end,
         "shipping_time": "",
-        "tax_rate": 19,
+        "tax_rate": 16,
         "min_purchase": 1,
         "price_net": item_data["PRICE"],
         "discount_percent": 0,
