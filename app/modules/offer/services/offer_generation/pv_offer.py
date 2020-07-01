@@ -85,7 +85,7 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
         cloud_data["heater_usage"] = int(survey.data["heatcloud_usage"])
     if "has_ecloud" in survey.data and survey.data["has_ecloud"] and "ecloud_usage" in survey.data and survey.data["ecloud_usage"] != "":
         cloud_data["ecloud_usage"] = int(survey.data["ecloud_usage"])
-    if "extra_drains" in survey.data:
+    if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"] and "extra_drains" in offer.survey.data:
         for drain in survey.data["extra_drains"]:
             if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                 cloud_data["consumers"].append(drain)
