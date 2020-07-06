@@ -184,6 +184,8 @@ def filter_export_input(lead):
             source_id = "3"
         if lead.data["Quelle"] == "Hausfrage":
             source_id = "4"
+        if lead.data["Quelle"] == "aroundhome":
+            source_id = "16"
         data["fields[SOURCE_ID]"] = source_id
         if source_id == "OTHER":
             data["fields[SOURCE_DESCRIPTION]"] = lead.data["Quelle"]

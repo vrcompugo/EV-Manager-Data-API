@@ -9,6 +9,8 @@ fields = {
         "2": "WattFox",
         "3": "Senec",
         "11": "T-Leads",
+        "4": "Hausfrage",
+        "16": "aroundhome",
         "OTHER": "other",
     },
     "UF_CRM_1576169522": {
@@ -993,6 +995,8 @@ t_lead_zip_codes = [
 
 
 def convert_field_value_from_remote(field, data):
+    if field == "SOURCE_ID":
+        print(data[field])
     if field in fields and data[field] in fields[field]:
         return fields[field][data[field]]
     return None
