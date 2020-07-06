@@ -130,5 +130,5 @@ def run_cron_import():
                 print("already known", lead["offer_contact"]["email"])
         config = get_config_item("importer/aroundhome")
         if config is not None and "data" in config:
-            config["data"]["last_lead_import_time"] = import_time
+            config["data"]["last_lead_import_time"] = str(import_time)
         update_config_item("importer/aroundhome", config)
