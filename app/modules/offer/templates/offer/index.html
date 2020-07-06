@@ -16,6 +16,13 @@
 {% if offer.offer_group == "roof-offer" %}
     {% include "offer/roof.html" %}
 {% endif %}
+{% if offer.reseller.document_style == "rhein_main" %}
+  {% set height_bottom = 450 %}
+  {% set height_bottom2 = 453 %}
+{% else %}
+  {% set height_bottom = 500 %}
+  {% set height_bottom2 = 490 %}
+{% endif %}
 <script>
   let trs = document.querySelectorAll("table tr");
   let i = 1;
@@ -23,12 +30,12 @@
     new_tr = trs[i].cloneNode(true)
     let description_div = trs[i].querySelector(".description > div");
     description_div.style.overflow = "hidden";
-    description_div.style.height = "450px";
+    description_div.style.height = "{{ height_bottom }}px";
     trs[i].insertAdjacentElement("afterend", new_tr);
     let description2 = new_tr.querySelector(".description");
     description2.style.overflow = "hidden";
     let description2_div = new_tr.querySelector(".description > div");
-    description2_div.style.marginTop = "-490px";
+    description2_div.style.marginTop = "-{{ height_bottom2 }}px";
     let empties = new_tr.querySelectorAll(".empty-on-split");
     for(let j=0;j < empties.length;j++){
       empties[j].innerHTML = "";
