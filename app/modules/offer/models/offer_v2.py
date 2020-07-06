@@ -117,15 +117,14 @@ class OfferV2(db.Model):
             .filter(S3File.model_id == self.id)\
             .first()
         if s3_file is None:
-            if self.offer_group == "pv-offer":
-                if "pv_options" in self.survey.data:
-                    generate_feasibility_study_pdf(self)
-                    s3_file = S3File.query\
-                        .filter(S3File.model == "OfferV2FeasibilityStudy")\
-                        .filter(S3File.model_id == self.id)\
-                        .first()
-                    if s3_file is not None:
-                        return s3_file
+            if self.offer_group == "pv-offer" or self.offer_group == "cloud-offer":
+                generate_feasibility_study_pdf(self)
+                s3_file = S3File.query\
+                    .filter(S3File.model == "OfferV2FeasibilityStudy")\
+                    .filter(S3File.model_id == self.id)\
+                    .first()
+                if s3_file is not None:
+                    return s3_file
             return None
         return s3_file
 

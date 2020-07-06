@@ -17,49 +17,64 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
-    items = cloud_offer_items_by_pv_offer(offer)
-    cloud_total = 0
-    for item in items:
-        cloud_total = cloud_total + float(item["total_price"])
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
-    consumer = 1
-    if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
-        for drain in offer.survey.data["extra_drains"]:
-            if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
-                consumer = consumer + 1
-    orientation_label = "West/Ost"
-    pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
-    if "direction" in offer.survey.data["roof_datas"][0]:
-        if offer.survey.data["roof_datas"][0]["direction"] == "south":
-            orientation_label = "Süd"
-            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["south"]
-        if offer.survey.data["roof_datas"][0]["direction"] == "north":
-            orientation_label = "Nord"
-            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["north"]
+    if offer.offer_group == "cloud-offer":
+        consumer = 1
+        usage = 1000
+        run_time = 30
+        price_increase = 5.75
+        inflation_rate = 2.5
+        packet = 50
+        orientation = "west"
+        orientation_label = "West/Ost"
+        pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
+        cloud_total = float(offer.total)
     else:
-        offer.survey.data["roof_datas"][0]["direction"] = "west"
+        cloud_total = 0
+        items = cloud_offer_items_by_pv_offer(offer)
+        for item in items:
+            cloud_total = cloud_total + float(item["total_price"])
+        consumer = 1
+        if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+            for drain in offer.survey.data["extra_drains"]:
+                if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
+                    consumer = consumer + 1
+        orientation_label = "West/Ost"
+        pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
+        if "direction" in offer.survey.data["roof_datas"][0]:
+            if offer.survey.data["roof_datas"][0]["direction"] == "south":
+                orientation_label = "Süd"
+                pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["south"]
+            if offer.survey.data["roof_datas"][0]["direction"] == "north":
+                orientation_label = "Nord"
+                pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["north"]
+        else:
+            offer.survey.data["roof_datas"][0]["direction"] = "west"
 
-    usage = float(offer.survey.data["pv_usage"])
-    if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
-        for drain in offer.survey.data["extra_drains"]:
-            if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
-                usage = usage + float(drain["usage"])
-    run_time = 30
-    if "run_time" in offer.survey.data:
-        run_time = int(offer.survey.data["run_time"])
-    price_increase = 5.75
-    if "price_increase" in offer.survey.data:
-        price_increase = float(offer.survey.data["price_increase"])
-    inflation_rate = 2.5
-    if "inflation_rate" in offer.survey.data:
-        inflation_rate = float(offer.survey.data["inflation_rate"])
+        usage = float(offer.survey.data["pv_usage"])
+        if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+            for drain in offer.survey.data["extra_drains"]:
+                if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
+                    usage = usage + float(drain["usage"])
+        run_time = 30
+        if "run_time" in offer.survey.data:
+            run_time = int(offer.survey.data["run_time"])
+        price_increase = 5.75
+        if "price_increase" in offer.survey.data:
+            price_increase = float(offer.survey.data["price_increase"])
+        inflation_rate = 2.5
+        if "inflation_rate" in offer.survey.data:
+            inflation_rate = float(offer.survey.data["inflation_rate"])
+        packet = int(offer.survey.data["packet_number"])
+        orientation = offer.survey.data["roof_datas"][0]["direction"]
+        orientation_label = "Süd" if offer.survey.data["roof_datas"][0]["direction"] == "south" else "West/Ost"
     data = {
         "runtime": run_time,
         "usage": usage,
-        "paket": int(offer.survey.data["packet_number"]),
+        "paket": packet,
         "pv_efficiancy": pv_efficiancy,
-        "orientation": offer.survey.data["roof_datas"][0]["direction"],
-        "orientation_label": "Süd" if offer.survey.data["roof_datas"][0]["direction"] == "south" else "West/Ost",
+        "orientation": orientation,
+        "orientation_label": orientation_label,
         "in_use_date": in_use_date,
         "conventional_base_cost_per_year": settings["data"]["wi_settings"]["conventional_base_cost_per_year"],
         "conventional_base_cost_per_kwh": settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"],
