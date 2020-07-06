@@ -36,7 +36,7 @@ class Items(Resource):
     def post(self):
         data = request.json
         calculated = calculate_cloud(data)
-        items = get_cloud_products(data=data)
+        items = get_cloud_products(data={"calculated": calculated, "data": data})
         offer_v2_data = {
             "reseller_id": None,
             "offer_group": "cloud-offer",
