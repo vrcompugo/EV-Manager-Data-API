@@ -49,18 +49,23 @@ class OfferV2(db.Model):
 
     @hybrid_property
     def number_prefix(self):
+        suffix = ""
+        if self.reseller is not None and self.reseller.document_style == "bsh":
+            suffix = "BSH-"
+        if self.reseller is not None and self.reseller.document_style == "eeg":
+            suffix = "EEG-"
         if self.offer_group == "pv-offer":
-            return "PV-"
+            return suffix + "PV-"
         if self.offer_group == "cloud-offer":
-            return "C-"
+            return suffix + "C-"
         if self.offer_group == "enpal-offer":
-            return "EN-"
+            return suffix + "EN-"
         if self.offer_group == "heater-offer":
-            return "HZ-"
+            return suffix + "HZ-"
         if self.offer_group == "heater-offer-con":
-            return "HZC-"
+            return suffix + "HZC-"
         if self.offer_group == "roof-offer":
-            return "DA-"
+            return suffix + "DA-"
         return "?"
 
     @hybrid_property

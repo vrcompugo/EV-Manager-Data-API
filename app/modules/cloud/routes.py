@@ -35,6 +35,10 @@ class Items(Resource):
     @token_required("cloud_calculation")
     def post(self):
         data = request.json
+        user = get_logged_in_user()
+        reseller = Reseller.query.filter(Reseller.user_id == user["id"]).first()
+        if reseller is not None:
+            data["document_style"] = reseller.document_style
         calculated = calculate_cloud(data)
         items = get_cloud_products(data={"calculated": calculated, "data": data})
         offer_v2_data = {
@@ -55,8 +59,6 @@ class Items(Resource):
             "calculated": calculated,
             "items": items
         }
-        user = get_logged_in_user()
-        reseller = Reseller.query.filter(Reseller.user_id == user["id"]).first()
         if reseller is not None:
             offer_v2_data["reseller_id"] = reseller.id
         item = add_item_v2(data=offer_v2_data)
@@ -82,7 +84,8 @@ class User(Resource):
             api.abort(404)
         if offer.pdf is not None:
             item_dict["pdf_link"] = offer.pdf.public_link
-        print(item_dict)
+        # if offer.feasibility_study_pdf is not None:
+            # item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
         return {
             "status": "success",
             "data": item_dict
@@ -97,6 +100,10 @@ class User(Resource):
         if offer is None:
             api.abort(404)
         data = request.json
+        user = get_logged_in_user()
+        reseller = Reseller.query.filter(Reseller.user_id == user["id"]).first()
+        if reseller is not None:
+            data["document_style"] = reseller.document_style
         calculated = calculate_cloud(data)
         items = get_cloud_products(data={
             "data": data,

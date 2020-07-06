@@ -1,4 +1,5 @@
 import math
+from flask import render_template
 
 from app.models import OfferV2
 from app.utils.jinja_filters import numberformat
@@ -199,11 +200,23 @@ def get_cloud_products(data=None, offer=None):
         guarantee_runtime = "12 Jahre"
     light_cloud_usage = int(data["calculated"]["power_usage"])
     lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
-
+    cloud_label = "cCloud-Zero"
+    cloud_description = "Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Stromverbrauchen, wann immer Sie ihn brauchen."
+    cloud_tarif = "cCloud-Zero"
+    if "document_style" in data["data"]:
+        if data["data"]["document_style"] == "bsh":
+            cloud_label = "BSH-Cloud"
+            cloud_description = "Genial einfach – einfach genial<br>Stromverbrauchen, wann immer Sie ihn brauchen."
+            cloud_tarif = "BSH-Cloud"
+        if data["data"]["document_style"] == "eeg":
+            cloud_label = "EEG-Cloud"
+            logo = render_template("offer/logo-eeg.html")
+            cloud_description = f"<div style='float: right'>{logo}</div>Genial einfach – einfach genial<br>Stromverbrauchen, wann immer Sie ihn brauchen."
+            cloud_tarif = "EEG-Cloud"
     offer_data["items"] = [
         {
-            "label": "cCloud-Zero",
-            "description": "Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Stromverbrauchen, wann immer Sie ihn brauchen.",
+            "label": cloud_label,
+            "description": cloud_description,
             "quantity": 1,
             "quantity_unit": "mtl.",
             "tax_rate": tax_rate,
@@ -223,7 +236,7 @@ def get_cloud_products(data=None, offer=None):
         }
     ]
     offer_data["items"][0]["description"] = offer_data["items"][0]["description"] + "<br>\n<br>\n"\
-        + "Tarif: cCloud-Zero<br>\n" \
+        + f"Tarif: {cloud_tarif}<br>\n" \
         + f"Kündigungsfrist: {settings['data']['cloud_settings']['notice_period']}<br>\n" \
         + f"Vertragslaufzeit: {guarantee_runtime}<br>\n" \
         + f"garantierte Zero-Laufzeit für (a): {guarantee_runtime}<br>\n" \
