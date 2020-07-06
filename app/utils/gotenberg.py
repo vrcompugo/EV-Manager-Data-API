@@ -6,7 +6,7 @@ from io import StringIO
 def generate_pdf(content, output_path=None, content_footer=None, content_header=None, landscape=False):
     data = {
         "index.html": StringIO(content),
-        "marginBottom": (None, "1.4"),
+        "marginBottom": (None, "1.6"),
         "marginLeft": (None, "0.3"),
         "marginRight": (None, "0.3"),
         "marginTop": (None, "0.3"),
