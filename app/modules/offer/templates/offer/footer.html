@@ -22,6 +22,9 @@
           </div>
           <div class="cols" style="font-size: 6.5px; line-height: 1.2em; margin-top: 2em">
             <div style="margin-right: 3em;">
+              {% if offer.reseller.document_style in ["bsh", "eeg"] %}
+                <b>Cloud Vertragspartner</b><br>
+              {% endif %}
               korbacher-energieZentrum GmbH & Co. KG<br>
               Steuernummer: 027 337 60133<br>
               USt-IdNr.: DE286327264<br>
