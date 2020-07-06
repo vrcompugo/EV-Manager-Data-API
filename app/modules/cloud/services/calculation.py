@@ -278,11 +278,11 @@ def get_cloud_products(data=None, offer=None):
             description=("<b>Minderverbau</b><br>"
                          + f"PV-Anlage um {numberformat(-data['calculated']['kwp_extra'])} kWp zu klein"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_extra"])))
-    if data["calculated"]["cloud_price_extra"] < 0:
+    if "zero_option" in data["data"] and data["data"]["zero_option"] is True:
         offer_data["items"].append(monthly_price_product_base(
-            description=("<b>Mehrverbau</b><br>"
-                         + f"PV-Anlage um {numberformat(data['calculated']['kwp_extra'])} kWp größer"),
-            single_price=(0 if wish_price else data["calculated"]["cloud_price_extra"])))
+            description="<b>ZERO-Paket</b>",
+            single_price=-data["calculated"]["cloud_price_incl_refund"]))
+
     return offer_data["items"]
 
 
@@ -307,6 +307,9 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         for drain in offer.survey.data["extra_drains"]:
             if "usage" in drain and drain["usage"] != "":
                 data["consumers"].append(drain)
+    for optional_product in offer.survey.data["pv_options"]:
+        if optional_product["label"] == "ZERO-Paket" and "is_selected" in optional_product and optional_product["is_selected"]:
+            data["zero_option"] = True
     offer_data["calculated"] = calculate_cloud(data=data)
     offer_data["items"] = get_cloud_products(data={
         "data": data,
