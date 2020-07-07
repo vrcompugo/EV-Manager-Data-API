@@ -295,6 +295,9 @@ def get_cloud_products(data=None, offer=None):
         offer_data["items"].append(monthly_price_product_base(
             description="<b>ZERO-Paket</b>",
             single_price=-cloud_price))
+    offer_data["items"].append(monthly_price_product_base(
+        description="<b>Cashback</b><br>Wird weniger Strom verbraucht als bei (a) vereinbart,<br>So erhälten Sie 10cent inkl. mwst als Energiespar-Bonus von uns zurück.<br>Die ersten 250kwh bleiben davon ausgenommen.",
+        single_price=0))
 
     return offer_data["items"]
 
