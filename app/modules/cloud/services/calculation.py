@@ -294,7 +294,7 @@ def get_cloud_products(data=None, offer=None):
     if "zero_option" in data["data"] and data["data"]["zero_option"] is True:
         offer_data["items"].append(monthly_price_product_base(
             description="<b>ZERO-Paket</b>",
-            single_price=-data["calculated"]["cloud_price_incl_refund"]))
+            single_price=-cloud_price))
 
     return offer_data["items"]
 
