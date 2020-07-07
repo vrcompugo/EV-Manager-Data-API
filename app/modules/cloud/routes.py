@@ -84,8 +84,8 @@ class User(Resource):
             api.abort(404)
         if offer.pdf is not None:
             item_dict["pdf_link"] = offer.pdf.public_link
-        # if offer.feasibility_study_pdf is not None:
-            # item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
+        if offer.feasibility_study_pdf is not None:
+            item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
         return {
             "status": "success",
             "data": item_dict

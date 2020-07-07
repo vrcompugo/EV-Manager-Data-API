@@ -55,11 +55,17 @@ def calculate_cloud(data):
         data["pv_kwp"] = float(data["pv_kwp"])
     else:
         data["pv_kwp"] = 0
+    direction_factor = 1
+    if "roof_direction" in data:
+        if data["roof_direction"] == "north":
+            direction_factor = 1.15
+        if data["roof_direction"] == "south":
+            direction_factor = 0.9
 
     if "power_usage" in data and data["power_usage"] != "" and data["power_usage"] != "0" and data["power_usage"] != 0:
         data["power_usage"] = int(data["power_usage"])
         result["power_usage"] = data["power_usage"]
-        result["min_kwp_light"] = data["power_usage"] * settings["data"]["cloud_settings"]["power_to_kwp_factor"] / 1000
+        result["min_kwp_light"] = data["power_usage"] * settings["data"]["cloud_settings"]["power_to_kwp_factor"] * direction_factor / 1000
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
         result["cloud_price_light"] = result["cloud_price_light"] + list(filter(
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
@@ -78,7 +84,7 @@ def calculate_cloud(data):
             lambda item: item['from'] <= data["heater_usage"] and data["heater_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_heater_prices"][str(user["id"])]
         ))[0]["value"]
-        result["min_kwp_heatcloud"] = data["heater_usage"] * heater_to_kwp_factor / 1000
+        result["min_kwp_heatcloud"] = data["heater_usage"] * heater_to_kwp_factor * direction_factor / 1000
         result["conventional_price_heatcloud"] = (data["heater_usage"] * settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"]) / 12
 
     if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0:
@@ -99,7 +105,7 @@ def calculate_cloud(data):
             if len(consumer_price) > 0:
                 result["cloud_price_consumer"] = result["cloud_price_consumer"] + consumer_price[0]["value"]
         result["consumer_usage"] = consumer_usage
-        result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"]) / 1000
+        result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor) / 1000
 
     if "emove_tarif" in data:
         if data["emove_tarif"] in settings["data"]["cloud_settings"]["cloud_emove"]:
