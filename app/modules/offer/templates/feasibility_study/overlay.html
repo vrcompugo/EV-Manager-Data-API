@@ -42,80 +42,56 @@
   </style>
 </head>
 <body>
+  {% set page = 0 %}
+  {% set page = page + 1 %}
   <div class="page page0">
     {% include("feasibility_study/pages/page0.html") %}
   </div>
+  {% set page = page + 1 %}
   <div class="page page1">
     {% include("feasibility_study/pages/page1.html") %}
-    <div class="foot-pages">Seite 2 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page2">
     {% include("feasibility_study/pages/page2.html") %}
-    <div class="foot-pages">Seite 3 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page3">
     {% include("feasibility_study/pages/page3.html") %}
-    <div class="foot-pages">Seite 4 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page4">
     {% include("feasibility_study/pages/page4.html") %}
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 5 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
-  <div class="page page5">
-    <style>
-      .page5 .header1 {
-        position: absolute;
-        left: 20.7mm;
-        top: 10.0mm;
-        width: 220mm;
-        font-size: 16pt;
-        color: #0a60aa;
-        letter-spacing: -0.05em;
-        background-color: #ffffff;
-      }
-      .page5 .header2 {
-        position: absolute;
-        left: 20.7mm;
-        top: 35.0mm;
-        width: 220mm;
-        font-size: 11pt;
-        color: #3c3c3c;
-        letter-spacing: -0.05em;
-        background-color: #f4f8fb;
-      }
-    </style>
-    <div class="header1">
-      100 % stromautark mit der Cloud. Jederzeit und überall.
-    </div>
-    <div class="header2">
-      So funktioniert der SENEC-Batteriespeicher und die Cloud:
-    </div>
-    <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 6 von {{ data.total_pages }}</div>
-  </div>
-
-
+  {% set page = page + 1 %}
   <div class="page page6">
     {% include("feasibility_study/pages/page6.html") %}
-    <div class="foot-pages">Seite 7 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page7">
     {% include("feasibility_study/pages/page7.html") %}
-    <div class="foot-pages">Seite 8 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
+  {% if "ecloud" in data %}
+    {% set page = page + 1 %}
+    <div class="page page-ecloud">
+      {% include("feasibility_study/pages/page-ecloud.html") %}
+      <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
+    </div>
+  {% endif %}
 
-
+  {% set page = page + 1 %}
   <div class="page page8">
     <style>
       .page8 .header1 {
@@ -146,22 +122,22 @@
     </div>
 
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 9 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page9">
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 10 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page10">
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 11 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page11">
     <style>
       .page11 .header1 {
@@ -186,10 +162,10 @@
       </ul>
     </div>
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 12 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page12">
     <style>
       .page12 .header1 {
@@ -212,39 +188,33 @@
       {% endif %}
     </div>
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 13 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page13">
     {% include("feasibility_study/pages/page13.html") %}
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 14 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page14">
     <div class="foot-date">{{ offer.datetime | dateformat }}</div>
-    <div class="foot-pages">Seite 15 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page15">
     {% include("feasibility_study/pages/page15.html") %}
-    <div class="foot-pages">Seite 16 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
 
-
+  {% set page = page + 1 %}
   <div class="page page16">
     {% include("feasibility_study/pages/page16.html") %}
-    <div class="foot-pages">Seite 17 von {{ data.total_pages }}</div>
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
-
-
-
-
-
-
 
 
 </body>

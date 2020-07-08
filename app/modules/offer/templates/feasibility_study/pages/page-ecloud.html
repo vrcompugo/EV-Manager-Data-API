@@ -1,0 +1,76 @@
+
+<div class="box" style="left: 68mm; width: 37.5mm; top: 35.6mm; background-color: #f3f7fa; text-align: center; padding-bottom: 2mm;">
+  ECLOUD
+</div>
+
+<div class="box" style="
+  top: auto;
+  left: 68mm;
+  width: 170mm;
+  bottom: 108mm;
+  height: 55mm;
+  background-color: #f3f7fa;">
+</div>
+<div class="box" style="
+  text-align: center;
+  top: auto;
+  left: 68mm;
+  width: 37.5mm;
+  bottom: 108mm;
+  height: {{ (55 * data.cost_conventional_rate - 6) }}mm;
+  padding-top: 6mm;
+  font-size: 13pt;
+  color: #ffffff;
+  background-color: #ff9902;">
+  {{ data.conventional_total_cost | currencyformat("de", 0) }}
+</div>
+
+<div class="box" style="top: 35.6mm; left: auto; right: 67.5mm; width: 37.5mm; background-color: #f3f7fa; text-align: center; padding-bottom: 2mm;">
+  SENEC-Lösung<br>in {{ data.runtime }} Jahren
+</div>
+
+<div class="box" style="
+  text-align: center;
+  top: auto;
+  left: auto;
+  right: 67.5mm;
+  width: 37.5mm;
+  bottom: 108mm;
+  height: {{ (55 * data.cost_cloud_rate - 6) }}mm;
+  padding-top: 6mm;
+  font-size: 13pt;
+  color: #ffffff;
+  background-color: #8aaddc;">
+  {{ data.cost_total | currencyformat("de", 0) }}
+</div>
+<div class="box" style="left: 63mm; width: 47.5mm; top: 107.6mm; background-color: #f2f6f9; text-align: center;font-size: 8pt;">
+  Stromkosten in {{ data.runtime }} Jahren
+</div>
+<div class="box" style="left: 112.2mm; width: 30mm; top: 128.6mm; background-color: #e3e3e3; text-align: right;">
+  {{ data.conventional_total_cost_usage | currencyformat("de", 0) }}
+</div>
+<div class="box" style="left: 112.2mm; width: 30mm; top: 134.6mm; background-color: #ffffff; text-align: right;">
+  {{ data.conventional_total_cost_base | currencyformat("de", 0) }}
+</div>
+<div class="box" style="left: 112.2mm; width: 30mm; top: 152.3mm; background-color: #ff9902; text-align: right; color: #ffffff;">
+  {{ data.conventional_total_cost | currencyformat("de", 0) }}
+</div>
+<div class="box" style="left: 244.4mm; width: 30mm; top: 128.6mm; background-color: #e3e3e3; text-align: right;">
+  {{ data.loan_total | currencyformat("de", 0) }}
+</div>
+<div class="box" style="left: 244.4mm; width: 30mm; top: 135.6mm; background-color: #ffffff; text-align: right;">
+  {{ data.cloud_total | currencyformat("de", 0) }}
+</div>
+<div class="box" style="left: 244.4mm; width: 30mm; top: 142.3mm; background-color: #ff9902; color: #ffffff; text-align: right;">
+  {{ data.cost_total | currencyformat("de", 0) }}
+</div>
+<div class="box" style="left: 158.8mm; width: 30mm; top: 148.8mm; background-color: #8aaddc; color: #ffffff;">
+  Vorteil über {{ data.runtime }} Jahre
+</div>
+<div class="box" style="left: 244.4mm; width: 30mm; top: 148.8mm; background-color: #8aaddc; color: #ffffff; text-align: right;">
+  {{ data.cost_benefit | currencyformat("de", 0) }}
+</div>
+<div class="box" style="left: 244.4mm; width: 30mm; top: 155.6mm; background-color: #ffffff; text-align: right;">
+  {{ (data.cost_benefit / data.runtime / 12) | currencyformat("de", 2) }}
+</div>
+<div class="foot-date">{{ offer.datetime | dateformat }}</div>

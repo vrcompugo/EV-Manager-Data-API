@@ -9,3 +9,4 @@ telepresence.log
 __pycache__
 venv
 devspace.yaml
+.DS_Store

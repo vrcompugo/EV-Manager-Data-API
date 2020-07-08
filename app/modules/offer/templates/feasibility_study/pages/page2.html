@@ -11,9 +11,10 @@
 <div class="cloud">
   Cloud Beitrag
 </div>
-<div class="box" style="left: 55.6mm; top: 191.2mm; font-size: 6pt; letter-spacing: -0.05em; line-height: 1.5em;">
-  * für 10 Jahre garantiert<br>
-  ** Derzeitig gültige EEG-Vergütungszätze Stand: 02.2020
+<div class="box" style="left: 55.6mm; top: 188.2mm; font-size: 6pt; letter-spacing: -0.05em; line-height: 1.5em;">
+  * für {{ data.cloud_runtime }} Jahre garantiert<br>
+  ** Derzeitig gültige EEG-Vergütungszätze Stand: 08.2020<br>
+  *** Die ersten 250kWh sind dabei ausgenommen
 </div>
 
 <div class="box" style="left: 66.5mm; width: 35mm; top: 55.1mm; background-color: #e3e3e3; text-align: center;">
@@ -51,12 +52,6 @@
 <div class="box" style="left: 71.5mm; width: 30mm; top: 105.1mm; background-color: #e3e3e3; text-align: center;">
   {{ data.orientation_label }}
 </div>
-<div class="box" style="left: 71.5mm; width: 30mm; top: 111.1mm; background-color: #ffffff; text-align: center;">
-  ca. 70%
-</div>
-<div class="box" style="left: 71.5mm; width: 30mm; top: 117.1mm; background-color: #e3e3e3; text-align: center;">
-  70%
-</div>
 <div class="box" style="left: 71.5mm; width: 30mm; top: 122.8mm; background-color: #ffffff; text-align: center;">
   {{ data.in_use_date | dateformat }}
 </div>
@@ -72,21 +67,20 @@
 <div class="box" style="left: 158.6mm; width: 30mm; top: 72.8mm; background-color: #ffffff; text-align: center;">
   {{ data.cost_increase_rate | percentformat(2) }} pro Jahr
 </div>
+<div class="box" style="left: 104.0mm; width: 60mm; top: 84.5mm; background-color: #ffffff; text-align: center;">
+  Anzahl Stromzähler / Abnahmestellen
+</div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 84.5mm; background-color: #ffffff; text-align: center;">
   {{ data.consumer_count }}
+</div>
+<div class="box" style="left: 109.6mm; width: 50mm; top: 90.7mm; background-color: #E3E3E3; text-align: left;">
+  Cloud Betrag (brutto)
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 90.7mm; background-color: #E3E3E3; text-align: center;">
   {{ data.cloud_monthly_cost | currencyformat }} pro Monat*
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 108.2mm; background-color: #ffffff; text-align: center;">
   {{ (100 * data.eeg_refund_per_kwh) | numberformat('de', 2) }} cent pro kWh**
-</div>
-<div class="box" style="left: 158.0mm; width: 30mm; top: 114mm; background-color: #e3e3e3; text-align: center;">
-  {% if data.paket >= 55 %}
-    Ja
-  {% else %}
-    Nein
-  {% endif %}
 </div>
 <div class="box" style="left: 158.0mm; width: 30mm; top: 119.8mm; background-color: #ffffff; text-align: center;">
   {{ (100 * data.refund_per_kwh) | numberformat('de', 2) }} cent pro kWh

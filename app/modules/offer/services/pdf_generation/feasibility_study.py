@@ -19,6 +19,9 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         return None
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
     if offer.offer_group == "cloud-offer":
+        cloud_runtime = 2
+        if offer.data["price_guarantee"] == "10_years":
+            cloud_runtime = 10
         consumer = 1
         usage = 1000
         run_time = 30
@@ -30,6 +33,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
         cloud_total = float(offer.total)
     else:
+        cloud_runtime = 12
         cloud_total = 0
         items = cloud_offer_items_by_pv_offer(offer)
         for item in items:
@@ -69,6 +73,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         orientation = offer.survey.data["roof_datas"][0]["direction"]
         orientation_label = "Süd" if offer.survey.data["roof_datas"][0]["direction"] == "south" else "West/Ost"
     data = {
+        "cloud_runtime": cloud_runtime,
         "runtime": run_time,
         "usage": usage,
         "paket": packet,
@@ -140,7 +145,11 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         max_cost = data["cost_total"]
     data["cost_conventional_rate"] = data["conventional_total_cost"] / max_cost
     data["cost_cloud_rate"] = data["cost_total"] / max_cost
-    data["total_pages"] = 17
+    data["total_pages"] = 16
+    if False:
+        data["total_pages"] = data["total_pages"] + 1
+        data["ecloud"] = {}
+
     content = render_template("feasibility_study/overlay.html", offer=offer, data=data, settings=settings)
     config = pdfkit.configuration(wkhtmltopdf="./wkhtmltopdf")
     overlay_binary = pdfkit.from_string(content, configuration=config, output_path=False, options={
@@ -151,8 +160,12 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         output = PdfFileWriter()
         base_study_pdf = PdfFileReader(open("app/modules/offer/static/feasibility_study.pdf", 'rb'))
         overlay_pdf = PdfFileReader(BytesIO(overlay_binary))
-        for i in range(base_study_pdf.getNumPages()):
-            page = base_study_pdf.getPage(i)
+        shift = 0
+        for i in range(data["total_pages"]):
+            page = base_study_pdf.getPage(i + shift)
+            if "ecloud" in data and i == 7:
+                page = base_study_pdf.getPage(16)
+                shift = shift - 1
             if i < overlay_pdf.getNumPages():
                 page.mergePage(overlay_pdf.getPage(i))
             output.addPage(page)
