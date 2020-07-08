@@ -273,22 +273,22 @@ def get_cloud_products(data=None, offer=None):
     if data["calculated"]["cloud_price_emove"] > 0:
         emove_description = ("<b>eMove</b><br>"
                              + f"Tarif: {data['data']['emove_tarif']}")
-        if data['data']['emove_tarif'] == "emove.drive":
-            emove_description = ("<b>eMove</b><br>"
-                                 + f"Tarif: {data['data']['emove_tarif']}<br>"
-                                 + f"empfohlen bis ca. 8.000 km / Jahr<br>Laden Sie 500 kWh in der Home Area, und 1.000 kWh out of Home Area")
         if data['data']['emove_tarif'] == "emove.drive I":
             emove_description = ("<b>eMove</b><br>"
                                  + f"Tarif: {data['data']['emove_tarif']}<br>"
-                                 + f"empfohlen bis ca. 12.000 km / Jahr<br>Laden Sie 1.000 kWh in der Home Area, und 1.000 kWh out of Home Area")
+                                 + f"empfohlen bis ca. 8.000 km / Jahr<br>Laden Sie 500 kWh in der Home Area, und 1.000 kWh out of Home Area")
         if data['data']['emove_tarif'] == "emove.drive II":
+            emove_description = ("<b>eMove</b><br>"
+                                 + f"Tarif: {data['data']['emove_tarif']}<br>"
+                                 + f"empfohlen bis ca. 12.000 km / Jahr<br>Laden Sie 1.000 kWh in der Home Area, und 1.000 kWh out of Home Area")
+        if data['data']['emove_tarif'] == "emove.drive III":
             emove_description = ("<b>eMove</b><br>"
                                  + f"Tarif: {data['data']['emove_tarif']}<br>"
                                  + f"empfohlen bis ca. 20.000 km / Jahr<br>Laden Sie 2.000 kWh in der Home Area, und 3.000 kWh out of Home Area")
         if data['data']['emove_tarif'] == "emove.drive ALL":
             emove_description = ("<b>eMove</b><br>"
                                  + f"Tarif: {data['data']['emove_tarif']}<br>"
-                                 + f"empfohlen bis ca. 35.000 km / Jahr<br>Laden Sie 2.500 kWh in der Home Area, und 6.000 kWh out of Home Area")
+                                 + f"empfohlen bis ca. 25.000 km / Jahr<br>Laden Sie 2.500 kWh in der Home Area, und 6.000 kWh out of Home Area")
         offer_data["items"].append(monthly_price_product_base(
             description=emove_description,
             single_price=(0 if wish_price else data["calculated"]["cloud_price_emove"])))
