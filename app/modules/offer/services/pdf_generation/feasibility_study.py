@@ -10,6 +10,7 @@ from app.modules.file.file_services import add_item as add_file, update_item as 
 from app.models import OfferV2, S3File
 
 from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
+from app.modules.cloud.services.calculation import cloud_offer_calculation_by_pv_offer
 
 
 def generate_feasibility_study_pdf(offer: OfferV2):
@@ -22,6 +23,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         cloud_runtime = 2
         if offer.data["price_guarantee"] == "10_years":
             cloud_runtime = 10
+        cloud_calulation = offer.calculated
         consumer = 1
         usage = 1000
         run_time = 30
@@ -32,10 +34,15 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         orientation_label = "West/Ost"
         pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
         cloud_total = float(offer.total)
+        if "emove_tarif" in offer.data:
+            emove_tarif = offer.data["emove_tarif"]
     else:
         cloud_runtime = 12
         cloud_total = 0
         items = cloud_offer_items_by_pv_offer(offer)
+        cloud_calulation = cloud_offer_calculation_by_pv_offer(offer)
+        if "cloud_emove" in offer.survey.data:
+            emove_tarif = offer.survey.data["cloud_emove"]
         for item in items:
             cloud_total = cloud_total + float(item["total_price"])
         consumer = 1
@@ -130,14 +137,10 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         base_base = base_base * (1 + data["full_cost_increase_rate"] / 100)
         base_usage = base_usage * (1 + data["full_cost_increase_rate"] / 100)
 
-    data["cloud_total"] = data["cloud_monthly_cost"] * 12 * 10 \
-        + (data["cloud_monthly_cost"] * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - 10))
-    if data["runtime"] == 20:
-        data["cloud_total"] = data["cloud_total"] + 1500
-    if data["runtime"] == 25:
-        data["cloud_total"] = data["cloud_total"] + 2000
-    if data["runtime"] >= 30:
-        data["cloud_total"] = data["cloud_total"] + 2500
+    # 5.88 for remote care cost
+    data["cloud_total"] = (data["cloud_monthly_cost"] + 5.88) * 12 * int(cloud_runtime) \
+        + ((data["cloud_monthly_cost"] + 5.88) * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - int(cloud_runtime)))
+        
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
     data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
     max_cost = data["conventional_total_cost"]
@@ -145,29 +148,82 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         max_cost = data["cost_total"]
     data["cost_conventional_rate"] = data["conventional_total_cost"] / max_cost
     data["cost_cloud_rate"] = data["cost_total"] / max_cost
-    data["total_pages"] = 16
-    if False:
+    data["total_pages"] = 17
+    data["lightcloud"] = {
+        "price_today": (data["conventional_base_cost_per_year"] + data["conventional_usage_cost"]) / 12,
+        "price_tomorrow": float(cloud_calulation["cloud_price_light"]) + float(cloud_calulation["cloud_price_consumer"])
+    }
+    data["lightcloud"]["price_half_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** (data["cloud_runtime"] / 2)
+    data["lightcloud"]["price_full_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** data["cloud_runtime"]
+    if cloud_calulation["cloud_price_ecloud"] > 0:
         data["total_pages"] = data["total_pages"] + 1
-        data["ecloud"] = {}
-
+        data["ecloud"] = {
+            "price_today": cloud_calulation["ecloud_usage"] * 0.0598,
+            "price_tomorrow": cloud_calulation["cloud_price_ecloud"]
+        }
+        data["ecloud"]["price_half_time"] = data["ecloud"]["price_today"] * (1 + 4.8 / 100) ** (data["cloud_runtime"] / 2)
+        data["ecloud"]["price_full_time"] = data["ecloud"]["price_today"] * (1 + 4.8 / 100) ** data["cloud_runtime"]
+    if cloud_calulation["cloud_price_heatcloud"] > 0:
+        data["total_pages"] = data["total_pages"] + 1
+        data["heatcloud"] = {
+            "price_today": cloud_calulation["heater_usage"] * 0.23,
+            "price_tomorrow": cloud_calulation["cloud_price_heatcloud"]
+        }
+        data["heatcloud"]["price_half_time"] = data["heatcloud"]["price_today"] * (1 + 4.8 / 100) ** (data["cloud_runtime"] / 2)
+        data["heatcloud"]["price_full_time"] = data["heatcloud"]["price_today"] * (1 + 4.8 / 100) ** data["cloud_runtime"]
+    if cloud_calulation["cloud_price_emove"] > 0:
+        data["total_pages"] = data["total_pages"] + 1
+        data["emove"] = {
+            "price_today": 0,
+            "price_tomorrow": cloud_calulation["cloud_price_emove"]
+        }
+        if emove_tarif == "emove.drive I":
+            data["emove"]["price_today"] = 8000/100*7*1.19 / 12
+        if emove_tarif == "emove.drive II":
+            data["emove"]["price_today"] = 12000/100*7*1.19 / 12
+        if emove_tarif == "emove.drive III":
+            data["emove"]["price_today"] = 20000/100*7*1.19 / 12
+        if emove_tarif == "emove.drive ALL":
+            data["emove"]["price_today"] = 25000/100*7*1.19 / 12
+        data["emove"]["price_half_time"] = data["emove"]["price_today"] * (1 + 3.95 / 100) ** (data["cloud_runtime"] / 2)
+        data["emove"]["price_full_time"] = data["emove"]["price_today"] * (1 + 3.95 / 100) ** data["cloud_runtime"]
+ 
     content = render_template("feasibility_study/overlay.html", offer=offer, data=data, settings=settings)
     config = pdfkit.configuration(wkhtmltopdf="./wkhtmltopdf")
     overlay_binary = pdfkit.from_string(content, configuration=config, output_path=False, options={
         'disable-smart-shrinking': ''
     })
-    if overlay_binary is not None:
+    if True and overlay_binary is not None:
         pdf = BytesIO()
         output = PdfFileWriter()
         base_study_pdf = PdfFileReader(open("app/modules/offer/static/feasibility_study.pdf", 'rb'))
         overlay_pdf = PdfFileReader(BytesIO(overlay_binary))
-        shift = 0
+        i2 = 0
+        extra_pages = 0
+        extra_pages2 = 0
+        extra_pages3 = 0
         for i in range(data["total_pages"]):
-            page = base_study_pdf.getPage(i + shift)
-            if "ecloud" in data and i == 7:
+            print(i,":")
+            if i == 7:
                 page = base_study_pdf.getPage(16)
-                shift = shift - 1
-            if i < overlay_pdf.getNumPages():
-                page.mergePage(overlay_pdf.getPage(i))
+                print(16)
+            elif i == 8 and "ecloud" in data:
+                page = base_study_pdf.getPage(17)
+                extra_pages = extra_pages + 1
+                print(17)
+            elif i == 8 + extra_pages and "heatcloud" in data:
+                page = base_study_pdf.getPage(18)
+                extra_pages2 = extra_pages2 + 1
+                print(18)
+            elif i == 8 + extra_pages + extra_pages2 and "emove" in data:
+                page = base_study_pdf.getPage(19)
+                extra_pages3 = extra_pages3 + 1
+                print(19)
+            else:
+                page = base_study_pdf.getPage(i2)
+                print(i2)
+                i2 = i2 + 1
+            page.mergePage(overlay_pdf.getPage(i))
             output.addPage(page)
         output.write(pdf)
         pdf.seek(0)

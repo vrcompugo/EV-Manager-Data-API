@@ -308,6 +308,34 @@ def get_cloud_products(data=None, offer=None):
     return offer_data["items"]
 
 
+def cloud_offer_calculation_by_pv_offer(offer: OfferV2):
+    settings = get_settings("pv-settings")
+    if settings is None:
+        return None
+    offer_data = base_offer_data("cloud-offer", offer.survey)
+    data = {
+        # "pv_kwp": None,
+        "power_usage": offer.survey.data["pv_usage"],
+        "consumers": [],
+        "price_guarantee": "12_years"
+    }
+    if "has_heatcloud" in offer.survey.data and offer.survey.data["has_heatcloud"] and "heatcloud_usage" in offer.survey.data:
+        data["heater_usage"] = offer.survey.data["heatcloud_usage"]
+    if "has_ecloud" in offer.survey.data and offer.survey.data["has_ecloud"] and "ecloud_usage" in offer.survey.data:
+        data["ecloud_usage"] = offer.survey.data["ecloud_usage"]
+    if "cloud_emove" in offer.survey.data:
+        data["emove_tarif"] = offer.survey.data["cloud_emove"]
+    if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+        for drain in offer.survey.data["extra_drains"]:
+            if "usage" in drain and drain["usage"] != "":
+                data["consumers"].append(drain)
+    for optional_product in offer.survey.data["pv_options"]:
+        if optional_product["label"] == "ZERO-Paket" and "is_selected" in optional_product and optional_product["is_selected"]:
+            data["zero_option"] = True
+    offer_data["calculated"] = calculate_cloud(data=data)
+    return offer_data["calculated"]
+
+
 def cloud_offer_items_by_pv_offer(offer: OfferV2):
     settings = get_settings("pv-settings")
     if settings is None:

@@ -64,13 +64,13 @@
 
 <div class="box" style="left: 20.7mm; top: 38.0mm; width: 255.6mm; display: flex; font-size: 12px;">
   <div style="float: left; width:50%">
-    <b>Gaskosten pro Monat:</b><br>
+    <b>KFZ-Tankkosten pro Monat:</b><br>
     <br>
     <br>
     <div class="graph-column">
       <div class="bar">
-        <div style="height: {{ data.ecloud.price_today / data.ecloud.price_full_time * 100 }}%">
-          <span>{{ data.ecloud.price_today | currencyformat }}</span>
+        <div style="height: {{ data.emove.price_today / data.emove.price_full_time * 100 }}%">
+          <span>{{ data.emove.price_today | currencyformat }}</span>
         </div>
       </div>
       <hr />
@@ -78,8 +78,8 @@
     </div>
     <div class="graph-column">
       <div class="bar">
-        <div style="height: {{ data.ecloud.price_half_time / data.ecloud.price_full_time * 100 }}%">
-          <span>{{ data.ecloud.price_half_time | currencyformat }}</span>
+        <div style="height: {{ data.emove.price_half_time / data.emove.price_full_time * 100 }}%">
+          <span>{{ data.emove.price_half_time | currencyformat }}</span>
         </div>
       </div>
       <hr />
@@ -88,7 +88,7 @@
     <div class="graph-column">
       <div class="bar">
         <div style="height: 100%">
-          <span>{{ data.ecloud.price_full_time | currencyformat }}</span>
+          <span>{{ data.emove.price_full_time | currencyformat }}</span>
         </div>
       </div>
       <hr />
@@ -101,8 +101,8 @@
     <br>
     <div class="graph-column">
       <div class="bar">
-        <div style="height: {{ data.ecloud.price_tomorrow / data.ecloud.price_full_time * 100 }}%; background-color: #93abdf;">
-          <span style="top:-20px; color: #333333">{{ data.ecloud.price_tomorrow | currencyformat }}</span>
+        <div style="height: {{ data.emove.price_tomorrow / data.emove.price_full_time * 100 }}%; background-color: #93abdf;">
+          <span style="top:-20px; color: #333333">{{ data.emove.price_tomorrow | currencyformat }}</span>
         </div>
       </div>
       <hr />
@@ -110,8 +110,8 @@
     </div>
     <div class="graph-column">
       <div class="bar">
-        <div style="height: {{ data.ecloud.price_tomorrow / data.ecloud.price_full_time * 100 }}%; background-color: #93abdf;">
-          <span style="top:-20px; color: #333333">{{ data.ecloud.price_tomorrow | currencyformat }}</span>
+        <div style="height: {{ data.emove.price_tomorrow / data.emove.price_full_time * 100 }}%; background-color: #93abdf;">
+          <span style="top:-20px; color: #333333">{{ data.emove.price_tomorrow | currencyformat }}</span>
         </div>
       </div>
       <hr />
@@ -119,8 +119,8 @@
     </div>
     <div class="graph-column">
       <div class="bar">
-        <div style="height: {{ data.ecloud.price_tomorrow / data.ecloud.price_full_time * 100 }}%; background-color: #93abdf;">
-          <span style="top:-20px; color: #333333">{{ data.ecloud.price_tomorrow | currencyformat }}</span>
+        <div style="height: {{ data.emove.price_tomorrow / data.emove.price_full_time * 100 }}%; background-color: #93abdf;">
+          <span style="top:-20px; color: #333333">{{ data.emove.price_tomorrow | currencyformat }}</span>
         </div>
       </div>
       <hr />
@@ -143,24 +143,24 @@
     </tr>
     <tr class="data">
       <td>Stromkosten pro Monat</td>
-      <td class="center">{{ data.ecloud.price_today | currencyformat }}</td>
-      <td class="center" style="text-decoration: line-through;">{{ data.ecloud.price_today | currencyformat }}</td>
-      <td class="center" style="text-decoration: line-through;">{{ data.ecloud.price_half_time | currencyformat }}</td>
-      <td class="center" style="text-decoration: line-through;">{{ data.ecloud.price_full_time | currencyformat }}</td>
+      <td class="center">{{ data.emove.price_today | currencyformat }}</td>
+      <td class="center" style="text-decoration: line-through;">{{ data.emove.price_today | currencyformat }}</td>
+      <td class="center" style="text-decoration: line-through;">{{ data.emove.price_half_time | currencyformat }}</td>
+      <td class="center" style="text-decoration: line-through;">{{ data.emove.price_full_time | currencyformat }}</td>
     </tr>
     <tr class="data">
       <td>Cloudgebühr pro Monat</td>
-      <td class="center">{{ data.ecloud.price_today | currencyformat }}</td>
-      <td class="center">{{ data.ecloud.price_tomorrow | currencyformat }}</td>
-      <td class="center">{{ data.ecloud.price_tomorrow | currencyformat }}</td>
-      <td class="center">{{ data.ecloud.price_tomorrow | currencyformat }}</td>
+      <td class="center">{{ data.emove.price_today | currencyformat }}</td>
+      <td class="center">{{ data.emove.price_tomorrow | currencyformat }}</td>
+      <td class="center">{{ data.emove.price_tomorrow | currencyformat }}</td>
+      <td class="center">{{ data.emove.price_tomorrow | currencyformat }}</td>
     </tr>
     <tr class="footer">
       <td>Monatliche Ersparnis</td>
       <td class="center">0 €</td>
-      <td class="center">{{ (data.ecloud.price_today - data.ecloud.price_tomorrow) | currencyformat }}</td>
-      <td class="center">{{ (data.ecloud.price_half_time - data.ecloud.price_tomorrow) | currencyformat }}</td>
-      <td class="center">{{ (data.ecloud.price_full_time - data.ecloud.price_tomorrow) | currencyformat }}</td>
+      <td class="center">{{ (data.emove.price_today - data.emove.price_tomorrow) | currencyformat }}</td>
+      <td class="center">{{ (data.emove.price_half_time - data.emove.price_tomorrow) | currencyformat }}</td>
+      <td class="center">{{ (data.emove.price_full_time - data.emove.price_tomorrow) | currencyformat }}</td>
     </tr>
   </table>
   <br>

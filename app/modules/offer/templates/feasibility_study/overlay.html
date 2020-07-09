@@ -39,6 +39,10 @@
       left: 10mm;
       top: 10mm;
     }
+    .layout.horizontal {
+      display: flex;
+      flex-direction: row;
+    }
   </style>
 </head>
 <body>
@@ -83,10 +87,33 @@
     {% include("feasibility_study/pages/page7.html") %}
     <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
   </div>
+
+  {% set page = page + 1 %}
+  <div class="page page-lightcloud">
+    {% include("feasibility_study/pages/page-lightcloud.html") %}
+    <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
+  </div>
+
   {% if "ecloud" in data %}
     {% set page = page + 1 %}
     <div class="page page-ecloud">
       {% include("feasibility_study/pages/page-ecloud.html") %}
+      <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
+    </div>
+  {% endif %}
+
+  {% if "heatcloud" in data %}
+    {% set page = page + 1 %}
+    <div class="page page-heatcloud">
+      {% include("feasibility_study/pages/page-heatcloud.html") %}
+      <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
+    </div>
+  {% endif %}
+
+  {% if "emove" in data %}
+    {% set page = page + 1 %}
+    <div class="page page-emove">
+      {% include("feasibility_study/pages/page-emove.html") %}
       <div class="foot-pages">Seite {{ page }} von {{ data.total_pages }}</div>
     </div>
   {% endif %}
