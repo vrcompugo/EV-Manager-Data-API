@@ -357,6 +357,8 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         for drain in offer.survey.data["extra_drains"]:
             if "usage" in drain and drain["usage"] != "":
                 data["consumers"].append(drain)
+    if "pv_options" not in offer.survey.data:
+        offer.survey.data["pv_options"] = []
     for optional_product in offer.survey.data["pv_options"]:
         if optional_product["label"] == "ZERO-Paket" and "is_selected" in optional_product and optional_product["is_selected"]:
             data["zero_option"] = True
