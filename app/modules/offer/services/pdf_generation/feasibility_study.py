@@ -115,39 +115,10 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     data["loan_total"] = data["loan_total_interest"] + data["pv_offer_total"]
     data["conventional_usage_cost"] = data["conventional_base_cost_per_kwh"] * float(data["usage"])
 
-    data["conventional_total_usage_cost"] = data["conventional_usage_cost"]
-    for n in range(data["runtime"]):
-        data["conventional_total_usage_cost"] = data["conventional_total_usage_cost"] + data["conventional_total_usage_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
-
-    data["conventional_total_base_cost"] = data["conventional_base_cost_per_year"]
-    for n in range(data["runtime"]):
-        data["conventional_total_base_cost"] = data["conventional_total_base_cost"] + data["conventional_total_base_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
-
-    data["conventional_total_cost"] = 0
-    data["conventional_total_cost_base"] = 0
-    data["conventional_total_cost_usage"] = 0
     base = data["conventional_usage_cost"] + data["conventional_base_cost_per_year"]
     base_base = data["conventional_base_cost_per_year"]
     base_usage = data["conventional_usage_cost"]
-    for n in range(data["runtime"]):
-        data["conventional_total_cost"] = data["conventional_total_cost"] + base
-        data["conventional_total_cost_base"] = data["conventional_total_cost_base"] + base_base
-        data["conventional_total_cost_usage"] = data["conventional_total_cost_usage"] + base_usage
-        base = base * (1 + data["full_cost_increase_rate"] / 100)
-        base_base = base_base * (1 + data["full_cost_increase_rate"] / 100)
-        base_usage = base_usage * (1 + data["full_cost_increase_rate"] / 100)
 
-    # 5.88 for remote care cost
-    data["cloud_total"] = (data["cloud_monthly_cost"] + 5.88) * 12 * int(cloud_runtime) \
-        + ((data["cloud_monthly_cost"] + 5.88) * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - int(cloud_runtime)))
-        
-    data["cost_total"] = data["cloud_total"] + data["loan_total"]
-    data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
-    max_cost = data["conventional_total_cost"]
-    if data["cost_total"] > max_cost:
-        max_cost = data["cost_total"]
-    data["cost_conventional_rate"] = data["conventional_total_cost"] / max_cost
-    data["cost_cloud_rate"] = data["cost_total"] / max_cost
     data["total_pages"] = 17
     data["lightcloud"] = {
         "price_today": (data["conventional_base_cost_per_year"] + data["conventional_usage_cost"]) / 12,
@@ -158,17 +129,19 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     if cloud_calulation["cloud_price_ecloud"] > 0:
         data["total_pages"] = data["total_pages"] + 1
         data["ecloud"] = {
-            "price_today": cloud_calulation["ecloud_usage"] * 0.0598,
+            "price_today": (cloud_calulation["ecloud_usage"] * 0.0598) / 12,
             "price_tomorrow": cloud_calulation["cloud_price_ecloud"]
         }
+        base = base + data["ecloud"]["price_today"] * 12
         data["ecloud"]["price_half_time"] = data["ecloud"]["price_today"] * (1 + 4.8 / 100) ** (data["cloud_runtime"] / 2)
         data["ecloud"]["price_full_time"] = data["ecloud"]["price_today"] * (1 + 4.8 / 100) ** data["cloud_runtime"]
     if cloud_calulation["cloud_price_heatcloud"] > 0:
         data["total_pages"] = data["total_pages"] + 1
         data["heatcloud"] = {
-            "price_today": cloud_calulation["heater_usage"] * 0.23,
+            "price_today": (cloud_calulation["heater_usage"] * 0.23) / 12,
             "price_tomorrow": cloud_calulation["cloud_price_heatcloud"]
         }
+        base = base + data["heatcloud"]["price_today"] * 12
         data["heatcloud"]["price_half_time"] = data["heatcloud"]["price_today"] * (1 + 4.8 / 100) ** (data["cloud_runtime"] / 2)
         data["heatcloud"]["price_full_time"] = data["heatcloud"]["price_today"] * (1 + 4.8 / 100) ** data["cloud_runtime"]
     if cloud_calulation["cloud_price_emove"] > 0:
@@ -185,8 +158,44 @@ def generate_feasibility_study_pdf(offer: OfferV2):
             data["emove"]["price_today"] = 20000/100*7*1.19 / 12
         if emove_tarif == "emove.drive ALL":
             data["emove"]["price_today"] = 25000/100*7*1.19 / 12
+        base = base + data["emove"]["price_today"] * 12
         data["emove"]["price_half_time"] = data["emove"]["price_today"] * (1 + 3.95 / 100) ** (data["cloud_runtime"] / 2)
         data["emove"]["price_full_time"] = data["emove"]["price_today"] * (1 + 3.95 / 100) ** data["cloud_runtime"]
+
+    data["conventional_total_usage_cost"] = data["conventional_usage_cost"]
+    for n in range(data["runtime"]):
+        data["conventional_total_usage_cost"] = data["conventional_total_usage_cost"] + data["conventional_total_usage_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
+
+    data["conventional_total_base_cost"] = data["conventional_base_cost_per_year"]
+    for n in range(data["runtime"]):
+        data["conventional_total_base_cost"] = data["conventional_total_base_cost"] + data["conventional_total_base_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
+
+    data["conventional_total_cost"] = 0
+    data["conventional_total_cost_base"] = 0
+    data["conventional_total_cost_usage"] = 0
+    for n in range(data["runtime"]):
+        data["conventional_total_cost"] = data["conventional_total_cost"] + base
+        data["conventional_total_cost_base"] = data["conventional_total_cost_base"] + base_base
+        data["conventional_total_cost_usage"] = data["conventional_total_cost_usage"] + base_usage
+        base = base * (1 + data["full_cost_increase_rate"] / 100)
+        base_base = base_base * (1 + data["full_cost_increase_rate"] / 100)
+        base_usage = base_usage * (1 + data["full_cost_increase_rate"] / 100)
+
+    insurance_cost = data["loan_total"] * 0.08
+    if insurance_cost > 4500:
+        insurance_cost = 4500
+    # 5.88 for remote care cost
+    data["cloud_total"] = (data["cloud_monthly_cost"] + 5.88) * 12 * int(cloud_runtime) \
+        + ((data["cloud_monthly_cost"] + 5.88) * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - int(cloud_runtime))) \
+        + insurance_cost
+        
+    data["cost_total"] = data["cloud_total"] + data["loan_total"]
+    data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
+    max_cost = (data["conventional_total_cost_base"] + data["conventional_total_cost_usage"])
+    if data["cost_total"] > max_cost:
+        max_cost = data["cost_total"]
+    data["cost_conventional_rate"] = (data["conventional_total_cost_base"] + data["conventional_total_cost_usage"]) / max_cost
+    data["cost_cloud_rate"] = data["cost_total"] / max_cost
  
     content = render_template("feasibility_study/overlay.html", offer=offer, data=data, settings=settings)
     config = pdfkit.configuration(wkhtmltopdf="./wkhtmltopdf")
