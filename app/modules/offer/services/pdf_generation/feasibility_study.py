@@ -1,5 +1,6 @@
 
 import pdfkit
+import json
 from flask import render_template, request, make_response
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from io import StringIO, BytesIO
@@ -36,15 +37,23 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         cloud_total = float(offer.total)
         if "emove_tarif" in offer.data:
             emove_tarif = offer.data["emove_tarif"]
+        cloud_zero = False
     else:
         cloud_runtime = 12
         cloud_total = 0
-        items = cloud_offer_items_by_pv_offer(offer)
+        cloud_zero = False
+        if "pv_options" in offer.survey.data:
+            for option in offer.survey.data["pv_options"]:
+                if option["label"] == "ZERO-Paket" and "is_selected" in option and option["is_selected"]:
+                    cloud_zero = True
+
         cloud_calulation = cloud_offer_calculation_by_pv_offer(offer)
         if "cloud_emove" in offer.survey.data:
             emove_tarif = offer.survey.data["cloud_emove"]
-        for item in items:
-            cloud_total = cloud_total + float(item["total_price"])
+        cloud_total = cloud_calulation["cloud_price_incl_refund"]
+        cloud_total = cloud_total - cloud_calulation["cloud_price_light"]
+        cloud_calulation["cloud_price_light"] = 0
+        print(json.dumps(cloud_calulation, indent=2))
         consumer = 1
         if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
             for drain in offer.survey.data["extra_drains"]:
@@ -82,6 +91,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     data = {
         "cloud_runtime": cloud_runtime,
         "runtime": run_time,
+        "cloud_zero": cloud_zero,
         "usage": usage,
         "paket": packet,
         "pv_efficiancy": pv_efficiancy,
@@ -212,25 +222,19 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         extra_pages2 = 0
         extra_pages3 = 0
         for i in range(data["total_pages"]):
-            print(i,":")
             if i == 7:
                 page = base_study_pdf.getPage(16)
-                print(16)
             elif i == 8 and "ecloud" in data:
                 page = base_study_pdf.getPage(17)
                 extra_pages = extra_pages + 1
-                print(17)
             elif i == 8 + extra_pages and "heatcloud" in data:
                 page = base_study_pdf.getPage(18)
                 extra_pages2 = extra_pages2 + 1
-                print(18)
             elif i == 8 + extra_pages + extra_pages2 and "emove" in data:
                 page = base_study_pdf.getPage(19)
                 extra_pages3 = extra_pages3 + 1
-                print(19)
             else:
                 page = base_study_pdf.getPage(i2)
-                print(i2)
                 i2 = i2 + 1
             page.mergePage(overlay_pdf.getPage(i))
             output.addPage(page)
