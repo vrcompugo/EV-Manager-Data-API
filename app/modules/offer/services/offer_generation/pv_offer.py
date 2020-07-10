@@ -117,7 +117,7 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
         if survey.data["cloud_emove"] == "emove.drive I":
             emove_label = "e.move.drive I"
         if survey.data["cloud_emove"] == "emove.drive II":
-            emove_label = "e.move.drive III"
+            emove_label = "e.move.drive II"
         if survey.data["cloud_emove"] == "emove.drive III":
             emove_label = "e.move.drive III"
         if survey.data["cloud_emove"] == "emove.drive ALL":
