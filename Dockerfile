@@ -21,5 +21,7 @@ USER appuser
 
 ENV PYTHONUNBUFFERED 1
 
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
 
 CMD ["python3", "manage.py", "run" ]

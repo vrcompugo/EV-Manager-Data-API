@@ -2,6 +2,7 @@ import json
 import math
 
 from app.models import OfferV2, Survey, Settings, Lead
+from app.modules.settings.settings_services import get_one_item as get_settings
 
 from ..add_update_item import add_item_v2
 from ._utils import base_offer_data, add_item_to_offer, add_optional_item_to_offer
@@ -13,6 +14,11 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
     survey.data["pv_usage"] = int(survey.data["pv_usage"])
     offer_data = base_offer_data("pv-offer", survey)
     packet_number = math.ceil(survey.data["pv_usage"] / 500) * 5
+    pv_kwp = None
+    if int(survey.data["max_packet_number"]) > 0 and int(survey.data["max_packet_number"]) < packet_number:
+        settings = get_settings("pv-settings")
+        packet_number = int(survey.data["max_packet_number"])
+        pv_kwp = packet_number * 100 * settings["data"]["cloud_settings"]["power_to_kwp_factor"] / 1000
     if packet_number < 25:
         packet_number = 25
     if packet_number > 300:
@@ -80,6 +86,8 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
         "power_usage": survey.data["pv_usage"],
         "consumers": []
     }
+    if pv_kwp is not None:
+        cloud_data["pv_kwp"] = pv_kwp
     extra_kwp = 0
     if "has_heatcloud" in survey.data and survey.data["has_heatcloud"] and "heatcloud_usage" in survey.data and survey.data["heatcloud_usage"] != "":
         cloud_data["heater_usage"] = int(survey.data["heatcloud_usage"])
