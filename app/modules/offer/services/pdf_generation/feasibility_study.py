@@ -51,9 +51,9 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         if "cloud_emove" in offer.survey.data:
             emove_tarif = offer.survey.data["cloud_emove"]
         cloud_total = cloud_calulation["cloud_price_incl_refund"]
-        cloud_total = cloud_total - cloud_calulation["cloud_price_light"]
-        cloud_calulation["cloud_price_light"] = 0
-        print(json.dumps(cloud_calulation, indent=2))
+        if cloud_zero:
+            cloud_total = cloud_total - cloud_calulation["cloud_price_light"]
+            cloud_calulation["cloud_price_light"] = 0
         consumer = 1
         if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
             for drain in offer.survey.data["extra_drains"]:
