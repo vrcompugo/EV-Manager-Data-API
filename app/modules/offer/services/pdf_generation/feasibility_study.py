@@ -50,6 +50,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         cloud_calulation = cloud_offer_calculation_by_pv_offer(offer)
         if "cloud_emove" in offer.survey.data:
             emove_tarif = offer.survey.data["cloud_emove"]
+        print(json.dumps(cloud_calulation, indent=2))
         cloud_total = cloud_calulation["cloud_price_incl_refund"]
         if cloud_zero:
             cloud_total = cloud_total - cloud_calulation["cloud_price_light"]

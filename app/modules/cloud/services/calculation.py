@@ -319,6 +319,13 @@ def cloud_offer_calculation_by_pv_offer(offer: OfferV2):
         "consumers": [],
         "price_guarantee": "12_years"
     }
+    packet_number = math.ceil(int(offer.survey.data["pv_usage"]) / 500) * 5
+    pv_kwp = None
+    if int(offer.survey.data["max_packet_number"]) > 0 and int(offer.survey.data["max_packet_number"]) < packet_number:
+        settings = get_settings("pv-settings")
+        packet_number = int(offer.survey.data["max_packet_number"])
+        pv_kwp = packet_number * 100 * settings["data"]["cloud_settings"]["power_to_kwp_factor"] / 1000
+        data["pv_kwp"] = pv_kwp
     if "has_heatcloud" in offer.survey.data and offer.survey.data["has_heatcloud"] and "heatcloud_usage" in offer.survey.data:
         data["heater_usage"] = offer.survey.data["heatcloud_usage"]
     if "has_ecloud" in offer.survey.data and offer.survey.data["has_ecloud"] and "ecloud_usage" in offer.survey.data:
