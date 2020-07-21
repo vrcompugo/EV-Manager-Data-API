@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>asd</title>
+  <style>
+    html, body {
+      font-family: sans-serif;
+      padding: 0;
+      margin: 0;
+      font-family: 'Open Sans', sans-serif;
+      color: #707070;
+    }
+    .page {
+      /* width: 1121px; height: 792px */
+      height: 100vh;
+      position: relative;
+    }
+    .layout.horizontal {
+      display: flex;
+      flex-direction: row;
+    }
+    .flex {
+      flex: 1;
+    }
+
+    .arrow {
+      background-color: #464545;
+      position: relative;
+      margin: 0.6em 0;
+      color: #ffffff;
+      padding: 0.3em 3em;
+      display: inline-block;
+    }
+    .arrow::before {
+      position: absolute;
+      content: " ";
+      top: 0;
+      left: -50px;
+      background-color: #2E2E2D;
+      width: 50px;
+      height: 100%;
+      transform: skewY(8deg) translateY(-4px);
+    }
+    .arrow--left::before {
+      left: auto;
+      right: -50px;
+      transform: skewY(-8deg) translateY(-3px);
+    }
+    .arrow::after {
+      position: absolute;
+      content: " ";
+      right: -38px;
+      top: -7px;
+      width: 0;
+      height: 0;
+      border: 23px solid transparent;
+      border-left: 15px solid #464545;
+    }
+    .arrow--left::after {
+      right: auto;
+      left: -38px;
+      border: 23px solid transparent;
+      border-right: 15px solid #464545;
+    }
+    .step {
+      display: flex;
+      flex-direction: row;
+      background-color: #E8E8E8;
+      border-bottom: 1px solid #707070;
+      padding-left: 50px;
+      margin-bottom: 2em;
+    }
+    .step__number {
+      width: 5em;
+      position: relative;
+    }
+    .step__number  span {
+      position: absolute;
+      z-index: 2;
+      right: 8px;
+      width: 32px;
+      text-align: center;
+      color: #fff;
+    }
+    .step__number::before {
+      position: absolute;
+      content: ' ';
+      top: -16px;
+      bottom: -17px;
+      width: 10em;
+      background: url("{{ data.base_url }}/static/feasibility_study_2020/step_ribbon.png") no-repeat;
+      background-size: contain;
+      z-index: 0;
+    }
+    .step__label {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 32px;
+      padding: 0.1em 1em;
+    }
+    table {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+    table tr:nth-child(2n) {
+      background-color: #E8E8E8;
+    }
+    table tr.highlight {
+      background-color: #AEBF00;
+    }
+    table tr.highlight td {
+      font-weight: bold;
+    }
+    table td:first-child {
+      padding-left: 2.4em;
+    }
+    table:not(.right) tr:nth-child(2n) td:first-child,
+    table:not(.right) tr.highlight td:first-child {
+      position: relative;
+    }
+    table:not(.right) tr:nth-child(2n) td:first-child::before,
+    table:not(.right) tr.highlight td:first-child::before {
+      position: absolute;
+      content: " ";
+      left: -50px;
+      background-color: #D2D1D1;
+      width: 50px;
+      height: 100%;
+      transform: skewY(19deg) translateY(-13px);
+    }
+    table:not(.right) tr.highlight td:first-child::before {
+      background-color: #96B603;
+    }
+    table.right tr:nth-child(2n) td:last-child,
+    table.right tr.highlight td:last-child {
+      position: relative;
+    }
+    table.right tr:nth-child(2n) td:last-child::before,
+    table.right tr.highlight td:last-child::before {
+      position: absolute;
+      content: " ";
+      right: -50px;
+      background-color: #D2D1D1;
+      width: 50px;
+      height: 100%;
+      transform: skewY(-19deg) translateY(-13px);
+    }
+    table.right tr.highlight td:last-child::before {
+      background-color: #96B603;
+    }
+    table tr td {
+      padding: 0.3em 0.4em;
+    }
+    small {
+      font-size: 12px;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&family=Quicksand:wght@300&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  {% set total_pages = 22 %}
+  {% set current_page = 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/cover.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page2.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page_address.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page_calculation_params.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page_finance_data.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page_no_cost_x_years.html') %}
+  </div>
+
+
+</body>
+</html>
+
+

@@ -1,0 +1,74 @@
+<style>
+  .page_address {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_address .left-side {
+    flex: 10;
+    padding-left: 50px;
+  }
+  .page_address .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 44px;
+    padding: 80px 0 50px;
+
+  }
+  .page_address .cable-img {
+    flex: 1;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/cable.jpg") no-repeat top right;
+    background-size: contain;
+  }
+  .page_address .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/child-running.jpg");
+    background-size: cover;
+  }
+</style>
+
+
+<div class="page_address">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+      <div class="layout horizontal">
+        <div class="headline">
+          Das ganzheitliche<br>
+          Energie-Ökosystem<br>
+          für Ihr Zuhause
+        </div>
+        <div class="cable-img"></div>
+      </div>
+      <div class="layout horizontal">
+        <div style="display: flex; justify-content: flex-start; align-items: center;">
+          <div class="arrow arrow--right">Stromerzeuger</div>
+        </div>
+        <div class="address-customer" style="min-height: 10em;">
+          {% if offer.address %}
+            {{ offer.address | addressblock | nltobr }}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="layout horizontal">
+        <div class="flex address-sales">
+          SENEC-NIEDERLASSUNG-HESSEN<br>
+          KorbacherEnergieZentrum<br>
+          Andre Schön<br>
+          Wildunger Landstr. 14b<br>
+          34497 Korbach<br>
+          schoen@korbacher-energiezentrum.de
+        </div>
+        <div class="flex" style="display: flex; justify-content: flex-end; align-items: center; padding-right: 50px;">
+          <div class="arrow arrow--left">Ihr SENEC-Partner</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="right-side">&nbsp;</div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}

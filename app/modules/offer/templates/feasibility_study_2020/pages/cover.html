@@ -1,0 +1,109 @@
+
+
+<style>
+  .page_cover .banner {
+    position: absolute;
+    background-color: #2E2E2D;
+    padding: 0.4em 0.7em 0.4em 2.5em;
+    margin-top: 110px;
+    right: 0;
+    color: #ffffff;
+    font-size: 22px;
+    z-index: 2;
+    box-shadow: 0px 4px 5px 0px rgba(0,0,0,0.4);
+  }
+  .page_cover .banner::before {
+    position: absolute;
+    content: " ";
+    top: -14px;
+    left: -40px;
+    width: 84px;
+    height: 76px;
+    background-image: url("{{ data.base_url }}/static/feasibility_study_2020/cover_page_ribbon.png");
+    background-size: contain;
+  }
+
+  .page_cover .left_side {
+    flex: 1 0 70%;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    background-image: url("{{ data.base_url }}/static/feasibility_study_2020/world_in_hands.jpg");
+    background-size: cover;
+    border-bottom: 12px solid #1A61AC;
+  }
+  .page_cover .left_side::after {
+    position: absolute;
+    content: " ";
+    left: -10%;
+    bottom: -40px;
+    height: 40px;
+    width: 120%;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100;Neutral+Density */
+    background: -moz-radial-gradient(center, ellipse contain,  rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+    background: -webkit-radial-gradient(center, ellipse contain,  rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: radial-gradient(ellipse farthest-side at center top,  rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  }
+
+  .page_cover .heading {
+    background-color: rgba(255,255,255,0.3);
+    margin-top: 430px;
+    padding: 1.5em 4.5em;
+    color: #ffffff;
+    position: relative;
+      /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffffff+0,b0ca0a+53&0.3+0,0.3+54 */
+    background: -moz-linear-gradient(left,  rgba(255,255,255,0.3) 0%, rgba(176,202,10,0.3) 53%, rgba(176,202,10,0.3) 54%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(left,  rgba(255,255,255,0.3) 0%,rgba(176,202,10,0.3) 53%,rgba(176,202,10,0.3) 54%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right,  rgba(255,255,255,0.3) 0%,rgba(176,202,10,0.3) 53%,rgba(176,202,10,0.3) 54%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dffffff', endColorstr='#4db0ca0a',GradientType=1 ); /* IE6-9 */
+
+  }
+  .page_cover .heading::after {
+    position: absolute;
+    content: " ";
+    left: -10%;
+    bottom: -40px;
+    height: 40px;
+    width: 120%;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100;Neutral+Density */
+    background: -moz-radial-gradient(center, ellipse contain,  rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+    background: -webkit-radial-gradient(center, ellipse contain,  rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: radial-gradient(ellipse farthest-side at center top,  rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  }
+  .page_cover .heading .large {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 40px;
+  }
+  .page_cover .heading .small {
+    font-size: 25px;
+    font-weight: 300;
+  }
+  .page_cover .right_side {
+    flex: 1 0 30%;
+    background-image: url("{{ data.base_url }}/static/feasibility_study_2020/green_field.jpg");
+    background-size: cover;
+  }
+</style>
+
+<div class="page_cover">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="banner">100% Selbstversorger - Strom und Wärme</div>
+  <div class="layout horizontal">
+
+    <div class="left_side">
+      <div class="heading">
+        <div class="large">Ihr virtuelles Energiekonto</div>
+        <div class="small">individuelle Wirtschaftlichkeitsrechnung</div>
+      </div>
+    </div>
+    <div class="right_side">
+      &nbsp;
+    </div>
+
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+

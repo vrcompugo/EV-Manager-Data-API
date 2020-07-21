@@ -1,6 +1,6 @@
 import os
 from flask_restplus import Api, apidoc
-from flask import Blueprint, Response, url_for
+from flask import Blueprint, Response, url_for, send_from_directory
 from flask_httpauth import HTTPBasicAuth
 
 from app.modules.auth.auth_routes import api as auth_ns

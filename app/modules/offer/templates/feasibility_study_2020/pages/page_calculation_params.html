@@ -1,0 +1,97 @@
+<style>
+  .page_address {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_address .left-side {
+    flex: 10;
+    padding-left: 50px;
+  }
+  .page_address .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 38px;
+    padding: 30px 20px 30px 0;
+
+  }
+  .page_address .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/house_against_sun.jpg");
+    background-size: cover;
+  }
+</style>
+
+
+<div class="page_address">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+      <div class="headline">
+        Die Grundlage für Ihre Unabhängigkeit
+        Berechnungsparameter im Überblick.
+      </div>
+
+      <div class="step" style="margin-left: -50px;">
+        <div class="step__number"><span>1</span></div>
+        <div class="step__label">Anlage und Haus</div>
+      </div>
+
+      <table cellspacing="0">
+        <tr>
+          <td>Immobilienart</td>
+          <td>Ein- bis Zweifamilienhaus</td>
+        </tr>
+        <tr>
+          <td>Lastprofil</td>
+          <td>H0D - Privathaushalt</td>
+        </tr>
+        <tr>
+          <td>Verbrauch nach Haushaltsstrom</td>
+          <td><b>{{ data.usage | numberformat('de', 0) }}</b> kWh pro Jahr</td>
+        </tr>
+        <tr>
+          <td>Größe der PV-Anlage</td>
+          <td>Paket {{ data.paket }}</td>
+        </tr>
+        <tr>
+          <td>Ertrag der PV-Anlage</td>
+          <td><b>{{ data.pv_efficiancy }} kWh</b> je kWp pro Jahr</td>
+        </tr>
+        <tr>
+          <td>Degradation der PV-Anlage</td>
+          <td><b>0,15 %</b></td>
+        </tr>
+        <tr>
+          <td>Speichersysteme</td>
+          <td>Senec LI laut Paket</td>
+        </tr>
+        <tr>
+          <td>Ausrichtung der PV-Anlage</td>
+          <td>{{ data.orientation_label }}</td>
+        </tr>
+        <tr>
+          <td>Autarkiegrad gemäß Hersteller</td>
+          <td>ca. <b>70 %</b></td>
+        </tr>
+        <tr>
+          <td>Verwendeter Autarkiegrad</td>
+          <td><b>70 %</b></td>
+        </tr>
+        <tr>
+          <td>Inbetriebnahme der PV-Anlage</td>
+          <td>{{ data.in_use_date | dateformat }}</td>
+        </tr>
+        <tr>
+          <td>Inbetriebnahme des Speichers</td>
+          <td>{{ data.in_use_date | dateformat }}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="right-side">&nbsp;</div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

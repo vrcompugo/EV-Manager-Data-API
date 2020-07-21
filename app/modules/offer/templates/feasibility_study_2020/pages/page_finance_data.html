@@ -1,0 +1,143 @@
+<style>
+  .page_finance_data {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_finance_data .left-side {
+    flex: 1;
+    padding-left: 50px;
+  }
+  .page_finance_data .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 38px;
+    padding: 30px 20px 30px 0;
+
+  }
+  .page_finance_data .right-side {
+    flex: 1;
+    padding-right: 50px;
+  }
+</style>
+
+
+<div class="page_finance_data">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+
+      <div class="step" style="margin-left: -50px;">
+        <div class="step__number"><span>2</span></div>
+        <div class="step__label">Wirtschaftliche Daten </div>
+      </div>
+      <div style="border-right: 2px solid #B0CA0A;">
+        <table cellspacing="0" style="margin-right: 1em; width: calc(100% - 1em); ">
+          <tr class="highlight">
+            <td colspan="2">Bisher</td>
+          </tr>
+          <tr>
+            <td>Grundgebühr Haushaltsstrom (Brutto)</td>
+            <td><b>{{ data.conventional_base_cost_per_year | currencyformat }}</b> pro Jahr</td>
+          </tr>
+          <tr>
+            <td>Zähler 1 Strompreis (Brutto)</td>
+            <td><b>{{ (100 * data.conventional_base_cost_per_kwh) | numberformat('de', 2) }}</b> cent pro kWh</td>
+          </tr>
+          <tr>
+            <td>Strompreissteigerung</td>
+            <td><b>{{ data.cost_increase_rate | percentformat(2) }}</b> pro Jahr</td>
+          </tr>
+          <tr class="highlight">
+            <td colspan="2">Zukünftig</td>
+          </tr>
+          <tr>
+            <td>Anzahl Stromzähler</td>
+            <td>{{ data.consumer_count }}</td>
+          </tr>
+          <tr>
+            <td>Cloud-Beitrag</td>
+            <td>{{ data.cloud_monthly_cost | currencyformat }} pro Monat*</td>
+          </tr>
+          <tr class="highlight">
+            <td colspan="2">Vergütung</td>
+          </tr>
+          <tr>
+            <td>Einspeisevergütung</td>
+            <td>gemäß EEG</td>
+          </tr>
+          <tr>
+            <td>EEG-Einspeisevergütung</td>
+            <td>{{ (100 * data.eeg_refund_per_kwh) | numberformat('de', 2) }} cent pro kWh**</td>
+          </tr>
+          <tr>
+            <td>Einspeisevergütung nach Ablauf EEG</td>
+            <td>{{ (100 * data.refund_per_kwh) | numberformat('de', 2) }} cent pro kWh</td>
+          </tr>
+          <tr>
+            <td>Inflationsrate</td>
+            <td>{{ data.inflation_rate | percentformat(2) }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="right-side">
+
+      <div class="step" style="margin-left: -20px;">
+        <div class="step__number"><span>3</span></div>
+        <div class="step__label">Finanzdaten</div>
+      </div>
+      <div style="margin-left: 1em; width: calc(100% - 1em);">
+        <table cellspacing="0" class="right">
+          <tr class="highlight">
+            <td colspan="2">Steuern</td>
+          </tr>
+          <tr>
+            <td>PV-Anlagenbetreiber</td>
+            <td>als Unternehmer</td>
+          </tr>
+          <tr>
+            <td>Mehrwertsteuer</td>
+            <td>16 %</td>
+          </tr>
+          <tr class="highlight">
+            <td colspan="2">Finanzierung</td>
+          </tr>
+          <tr>
+            <td>Kreditsumme</td>
+            <td>{{ data.pv_offer_total | currencyformat }}</td>
+          </tr>
+          <tr>
+            <td>Laufzeit der Finanzierung</td>
+            <td>20 Jahre</td>
+          </tr>
+          <tr>
+            <td>Soll-Zinssatzinssatz (Beispiel)</td>
+            <td>{{ data.loan_interest_rate | percentformat }} pro Jahr</td>
+          </tr>
+          <tr>
+            <td>Gesamtinvestition</td>
+            <td>{{ data.loan_total | currencyformat }}</td>
+          </tr>
+        </table>
+        <br>
+        <br>
+        <br>
+        * für 12 Jahre garantiert<br>
+        ** Derzeitig gültige EEG-Vergütungszätze Stand: 02.2020<br>
+        <br>
+        <small>
+          Bezüglich des Netto- oder Bruttoausweises der vorliegenden<br>
+          Angaben wird auf die Erläuterungen im Anhang verwiesen.<br>
+          <br>
+          Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt.<br>
+          Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
+        </small>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

@@ -1,0 +1,59 @@
+<style>
+  .page_no_cost_x_years {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_no_cost_x_years .left-side {
+    flex: 10;
+    padding-left: 50px;
+  }
+  .page_no_cost_x_years .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 38px;
+    padding: 60px 20px 30px 0;
+
+  }
+  .page_no_cost_x_years .sub-headline {
+    font-size: 20px;
+  }
+  .page_no_cost_x_years .extra-large {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 140px;
+    padding: 0.5em 0;
+  }
+
+  .page_no_cost_x_years .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/house_against_sun.jpg");
+    background-size: cover;
+  }
+</style>
+
+
+<div class="page_no_cost_x_years">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+      <div class="headline">
+        Keine hohen Stromkosten mehr
+      </div>
+
+      <div class="sub-headline">Das geben Sie in den nächsten {{ data.runtime }} Jahren für Strom aus:</div>
+
+      <div class="extra-large">{{ data.conventional_total_cost | currencyformat("de", 0) }}</div>
+
+      <small>
+        Die oben genannten Stromkosten ergeben sich aus den von Ihnen zu zahlenden Grundgebühren und Strompreisen pro kWh für
+        Ihren Stromverbrauch unter der Berücksichtigung einer Strompreissteigerung von {{ data.cost_increase_rate | numberformat("de", 2) }} Prozent sowie der kalkulierten Inflation
+        innerhalb der kommenden {{ data.runtime }} Jahre.
+      </small>
+    </div>
+    <div class="right-side">&nbsp;</div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

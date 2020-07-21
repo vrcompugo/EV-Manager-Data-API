@@ -1,0 +1,104 @@
+<style>
+  .page_2 {
+    height: 100%;
+    overflow: hidden;
+  }
+  .page_2 .senec-storage {
+    position: absolute;
+    right: 20px;
+    width: 320px;
+    margin-top: 70px;
+  }
+  .page_2 .head-bulb {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin-left: -215px;
+    width: 410px;
+  }
+  .page_2 .triangle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 0;
+    width: 0;
+    border-right: 660px solid transparent;
+    border-bottom: 420px solid #AEBF00;
+  }
+  .page_2 .content {
+    position: relative;
+    z-index: 2;
+    padding: 50px 0 0 50px;
+    margin-right: 350px;
+  }
+  .page_2 .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 36px;
+    padding-bottom: 50px;
+  }
+  .page_2 .banner {
+    padding-bottom: 60px;
+  }
+  .page_2 ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .page_2 ul li:first-child .arrow:before {
+    transform: skewY(29deg) translateY(-14px);
+  }
+  .page_2 ul li:last-child .arrow:before {
+    transform: skewY(-18deg) translateY(8px);
+  }
+  .page_2 .benefit {
+    padding: 70px 0 0 60px;
+    font-size: 18px;
+  }
+
+  .page_2 .benefit .large {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 44px;
+  }
+</style>
+
+
+<div class="page_2">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="triangle"></div>
+  <img class="senec-storage" src="{{ data.base_url }}/static/feasibility_study_2020/senec-storage.jpg" />
+  <img class="head-bulb" src="{{ data.base_url }}/static/feasibility_study_2020/head-bulb.png" />
+
+  <div class="content">
+    <div class="headline">Ihre Energie-Unabhängigkeit</div>
+    <div class="banner">
+      Eigenen Strom produzieren, mit SENEC speichern und nach Bedarf nutzen.
+      Sie sind zu 100% unabhängig vom klassischen Energie-Versorger.
+    </div>
+    <ul>
+      <li>
+        <div class="arrow">
+          100 % Unabhängig
+        </div>
+      </li>
+      <li>
+        <div class="arrow">
+          100 % Ökostrom
+        </div>
+      </li>
+      <li>
+        <div class="arrow">
+          100 % Flexibel
+        </div>
+      </li>
+    </ul>
+
+    <div class="benefit">
+      <div class="large">{{ data.cost_benefit | currencyformat("de", 0) }}</div>
+      <div>Vorteil über {{ data.runtime }} Jahre</div>
+    </div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}

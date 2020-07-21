@@ -197,3 +197,16 @@ class OfferPDF3(Resource):
                 "filename": offer.feasibility_study_pdf.filename
             }
         return data
+
+
+@api.route('/<id>/PDF4')
+class OfferPDF3(Resource):
+    def get(self, id):
+        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_2020_pdf
+        offer = OfferV2.query.options(
+            db.subqueryload("items"),
+            db.subqueryload("customer"),
+            db.subqueryload("address")
+        ).get(id)
+        data = {}
+        return generate_feasibility_study_2020_pdf(offer)

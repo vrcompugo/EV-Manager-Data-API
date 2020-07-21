@@ -9,13 +9,13 @@ import dateutil
 from app.modules.settings.settings_services import get_one_item as get_settings
 from app.modules.file.file_services import add_item as add_file, update_item as update_file
 from app.models import OfferV2, S3File
-
-from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
+from app.utils.gotenberg import generate_pdf as gotenberg_pdf
 from app.modules.cloud.services.calculation import cloud_offer_calculation_by_pv_offer
 
+from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
 
-def generate_feasibility_study_pdf(offer: OfferV2):
 
+def calculate_feasibility_study(offer: OfferV2):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
@@ -50,7 +50,6 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         cloud_calulation = cloud_offer_calculation_by_pv_offer(offer)
         if "cloud_emove" in offer.survey.data:
             emove_tarif = offer.survey.data["cloud_emove"]
-        print(json.dumps(cloud_calulation, indent=2))
         cloud_total = cloud_calulation["cloud_price_incl_refund"]
         if cloud_zero:
             cloud_total = cloud_total - cloud_calulation["cloud_price_light"]
@@ -162,13 +161,13 @@ def generate_feasibility_study_pdf(offer: OfferV2):
             "price_tomorrow": cloud_calulation["cloud_price_emove"]
         }
         if emove_tarif == "emove.drive I":
-            data["emove"]["price_today"] = 8000/100*7*1.19 / 12
+            data["emove"]["price_today"] = 8000 / 100 * 7 * 1.19 / 12
         if emove_tarif == "emove.drive II":
-            data["emove"]["price_today"] = 12000/100*7*1.19 / 12
+            data["emove"]["price_today"] = 12000 / 100 * 7 * 1.19 / 12
         if emove_tarif == "emove.drive III":
-            data["emove"]["price_today"] = 20000/100*7*1.19 / 12
+            data["emove"]["price_today"] = 20000 / 100 * 7 * 1.19 / 12
         if emove_tarif == "emove.drive ALL":
-            data["emove"]["price_today"] = 25000/100*7*1.19 / 12
+            data["emove"]["price_today"] = 25000 / 100 * 7 * 1.19 / 12
         base = base + data["emove"]["price_today"] * 12
         data["emove"]["price_half_time"] = data["emove"]["price_today"] * (1 + 3.95 / 100) ** (data["cloud_runtime"] / 2)
         data["emove"]["price_full_time"] = data["emove"]["price_today"] * (1 + 3.95 / 100) ** data["cloud_runtime"]
@@ -199,7 +198,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
     data["cloud_total"] = (data["cloud_monthly_cost"] + 5.88) * 12 * int(cloud_runtime) \
         + ((data["cloud_monthly_cost"] + 5.88) * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - int(cloud_runtime))) \
         + insurance_cost
-        
+
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
     data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
     max_cost = (data["conventional_total_cost_base"] + data["conventional_total_cost_usage"])
@@ -207,7 +206,32 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         max_cost = data["cost_total"]
     data["cost_conventional_rate"] = (data["conventional_total_cost_base"] + data["conventional_total_cost_usage"]) / max_cost
     data["cost_cloud_rate"] = data["cost_total"] / max_cost
- 
+    return data
+
+
+def generate_feasibility_study_2020_pdf(offer: OfferV2):
+    settings = get_settings("pv-settings")
+    if settings is None:
+        return None
+    data = calculate_feasibility_study(offer)
+    data["base_url"] = "https://api.korbacher-energiezentrum.de.ah.hbbx.de"
+    content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
+    if True:
+        pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0])
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        return response
+    response = make_response(content)
+    response.headers['Content-Type'] = 'text/html'
+    return response
+
+
+def generate_feasibility_study_pdf(offer: OfferV2):
+    settings = get_settings("pv-settings")
+    if settings is None:
+        return None
+    data = calculate_feasibility_study(offer)
+
     content = render_template("feasibility_study/overlay.html", offer=offer, data=data, settings=settings)
     config = pdfkit.configuration(wkhtmltopdf="./wkhtmltopdf")
     overlay_binary = pdfkit.from_string(content, configuration=config, output_path=False, options={

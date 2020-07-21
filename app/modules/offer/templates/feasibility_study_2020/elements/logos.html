@@ -1,0 +1,37 @@
+<style>
+  .logos {
+    padding-left: 40%;
+  }
+  .logos img {
+    height: 60px
+  }
+  .logos .kez,
+  .logos .senec {
+    padding: 40px 0 30px;
+    position: relative;
+    text-align: center;
+  }
+  .logos .kez::before,
+  .logos .senec::before {
+    position: absolute;
+    content: " ";
+    background-color: #B0CA0A;
+    height: 8px;
+    width: 36%;
+    top: 0;
+    left: 32%;
+  }
+  .logos .senec::before {
+    background-color: #1A61AC;
+
+  }
+</style>
+
+<div class="logos layout horizontal">
+  <div class="kez flex">
+    <img src="{{ data.base_url }}/static/feasibility_study_2020/kez-logo.jpg" />
+  </div>
+  <div class="senec flex">
+    <img src="{{ data.base_url }}/static/feasibility_study_2020/senec-logo.jpg" />
+  </div>
+</div>
