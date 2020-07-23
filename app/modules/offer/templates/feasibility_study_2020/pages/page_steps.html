@@ -1,0 +1,50 @@
+<style>
+  .page_steps {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_steps .left-side {
+    flex: 10;
+    padding-left: 50px;
+  }
+  .page_steps .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 36px;
+    padding: 40px 100px 50px 0;
+
+  }
+  .page_steps .subheadline {
+    font-size: 20px;
+    padding-bottom: 2em;
+  }
+  .page_steps .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/engineer.jpg");
+    background-size: cover;
+  }
+</style>
+
+
+<div class="page_steps">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+      <div class="headline">
+        Wir begleiten Sie Schritt für Schritt in Ihre persönliche Energierzukunft
+      </div>
+      <div class="subheadline">
+        Vom Beratungsgespräch bis zur Installation immer an Ihrer Seite
+      </div>
+      <br>
+      <img style="width: 90%;" src="{{ data.base_url }}/static/feasibility_study_2020/steps.jpg" />
+
+    </div>
+    <div class="right-side">&nbsp;</div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

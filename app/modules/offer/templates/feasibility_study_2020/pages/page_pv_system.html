@@ -1,0 +1,170 @@
+<style>
+  .page_pv_system {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_pv_system .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 38px;
+    padding: 0 36vw 30px 50px;
+    position: relative;
+  }
+  .page_pv_system .left-side {
+    position: relative;
+    flex: 1;
+    padding-left: 50px;
+  }
+  .page_pv_system .right-side {
+    position: relative;
+    flex: 1;
+    padding-right: 50px;
+  }
+  .page_pv_system .large {
+    padding: 1em 0 0.5em;
+    font-size: 35px;
+    font-family: 'Quicksand', sans-serif;
+  }
+  .page_pv_system .bar {
+    margin-right: 1em;
+  }
+
+  .page_pv_system ul {
+    list-style: none;
+    padding: 0.4em 1em 0 1em;
+  }
+  .page_pv_system ul li {
+    position: relative;
+    padding-left: 3em;
+    margin: 1.5em 0;
+  }
+  .page_pv_system ul li::before {
+    position: absolute;
+    content: " ";
+    background-color: #96B603;
+    border-radius: 100%;
+    width: 0.55em;
+    height: 0.55em;
+    left: 0;
+    top: 50%;
+    margin-top: -0.275em;
+  }
+  .page_pv_system ul li::after {
+    position: absolute;
+    content: " ";
+    border-bottom: 1px solid #96B603;
+    width: 2em;
+    height: 0em;
+    left: 0;
+    top: 50%;
+  }
+  .page_pv_system ul li.dark-green::before,
+  .page_pv_system ul li.dark-green::after {
+    background-color: #5EA31E;
+    border-bottom-color: #5EA31E;
+  }
+  .page_pv_system ul li.brown::before,
+  .page_pv_system ul li.brown::after {
+    background-color: #2F3700;
+    border-bottom-color: #2F3700;
+  }
+  .page_pv_system ul li.blue::before,
+  .page_pv_system ul li.blue::after {
+    background-color: #1475BD;
+    border-bottom-color: #1475BD;
+  }
+</style>
+
+
+<div class="page_pv_system">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="headline">
+    Ihre Photovoltaik-Anlage
+  </div>
+
+  <div class="layout horizontal">
+
+    <div class="left-side">
+
+      PV-Stromproduktion pro Monat in kWh:<br>
+      <br>
+      <div style="text-align: center;">
+        <img style="height: 260px;" src="{{ data.base_url }}/static/feasibility_study_2020/yearly_production_graph.jpg" />
+      </div>
+      <br>
+      <div style="border-right: 2px solid #B0CA0A;">
+        <table cellspacing="0" style="margin-right: 1em; width: calc(100% - 1em); ">
+          <tr>
+            <td>Größe der PV-Anlage</td>
+            <td><b>{{ data.conventional_total_cost_usage | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Ertrag der PV-Anlage</td>
+            <td><b>{{ data.conventional_total_cost_base | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Autarkiegrad PV + Speicher</td>
+            <td><b>0 €</b></td>
+          </tr>
+        </table>
+      </div>
+      <small>
+        *Bei Verwendung von 2 Stromzählern wird der Autarkiegrad ausschließlich auf Basis des Haushaltsstromverbrauches ermittelt.
+      </small>
+    </div>
+    <div class="right-side">
+
+      Stromverbrauch pro Jahr:<br>
+      <br>
+      <div class="layout horizontal">
+        <div>
+          <img style="height: 200px;" src="{{ data.base_url }}/static/feasibility_study_2020/70_30_pie_chart.jpg" />
+        </div>
+        <div class="flex">
+          <ul>
+            <li>Energieverbrauch (70 %)</li>
+            <li class="blue">C.Cloud (30 %)</li>
+          </ul>
+        </div>
+      </div>
+      <br>
+      <div style="margin-left: 1em; width: calc(100% - 1em);">
+        <table cellspacing="0" class="right">
+          <tr>
+            <td>Haushaltsstromverbrauch</td>
+            <td><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Gesamtstromverbrauch</td>
+            <td><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Strompreissteigerung</td>
+            <td><b>{{ data.cost_total | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Eigenverbrauch</td>
+            <td><b>{{ data.cost_benefit | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>C.Cloud</td>
+            <td><b>{{ (data.cost_benefit / data.runtime / 12) | currencyformat("de", 2) }}</b></td>
+          </tr>
+        </table>
+        <small>
+          Ändert sich Ihr Verbrauchsverhalten, ändert sich der Cloudpreis bei uns nicht.<br>
+          68,97 € garantiert für 12 Jahre.*
+        </small>
+      </div>
+    </div>
+
+  </div>
+  <small style="padding: 1em 50px 0 50px;">
+    * gilt für den vereinbarten Gesamtverbrauch abgedeckt durch PV und Speicher sowie Netzbezug. Bezüglich des Netto- oder Bruttoausweises der vorliegenden Angaben wird auf die Erläuterungen im Anhang verwiesen. Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt. Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
+  </small>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

@@ -1,0 +1,96 @@
+<style>
+  .page_contact {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_contact .left-side {
+    flex: 10;
+    padding-left: 50px;
+  }
+  .page_contact .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 36px;
+    padding: 40px 20px 0 0;
+
+  }
+  .page_contact .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/village.jpg");
+    background-size: cover;
+  }
+  .page_contact .content {
+    font-size: 0.8em;
+    line-height: 1.7em;
+  }
+  .page_contact .content h2 {
+    margin-top: 2em;
+  }
+</style>
+
+
+<div class="page_contact">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+      <div class="headline">
+        Ihr verlässlicher Ansprechpartner vor Ort
+
+      </div>
+
+      <div class="content layout horizontal">
+        <div class="flex">
+          <div class="highlight-box">
+            <h2>Wer wir sind und was wir tun</h2>
+            <p>
+              2009 gründete André Schön<br>
+              das korbacher-energieZENTRUM<br>
+              mit Hauptsitz in Korbach sowie Zweigstellen in Weilburg & Neuss.
+            </p>
+            <p>
+              Das auf erneuerbare Energien spezialisierte Unternehmen bietet eine "Rundum-Versorgung" für alle Energie-Projekte. 4-facher Meisterbetrieb
+              in den Gewerken, Dach, Heizung, Sanitär, Elektrik stehen für Qualität und Innovation.
+            </p>
+            <p>
+              Von der Beratung über die Montage bis hin zur Wartung - alles aus einer Hand. Mit über 1000 verbauten Speichern gehören wir zu den grössten SENEC Partnern Deutschlands.
+            </p>
+            <h2>Unser Ziel</h2>
+            <p>
+              Sie individuell zu beraten, Energiesparpotentiale aufzuzeigen und Ihnen maßgeschneiderte Lösungen für Ihre Bedürfnisse anzubieten. Zu unseren Kunden zählen private Haushalte, gewerbliche und industrielle Unternehmen sowie die öffentliche Hand.
+            </p>
+          </div>
+        </div>
+        <div style="width: 1em;"></div>
+        <div class="flex">
+          <h2>Die Geschäftsführung</h2>
+          <p>
+            <b>André Schön</b><br>
+            EnergieManager & Sachverständiger für <br>
+            Photovoltaikanlagen ist Gesellschafter und Geschäftsführer der korbacher-energieZENTRUM GmbH & Co KG.
+          </p>
+          <p>
+            Er ist seit über 14 Jahren in der Solarbranche tätig und besitzt langjährige Erfahrung im Bereich der erneuerbaren Energien.
+          </p>
+          <p>
+            Als Senec Partner der ersten Stunde besteht eine enge und besondere Verbindung zwischen uns  und unserem Speicherhersteller.
+          </p>
+          <p>
+            Qualität ist nicht verhandelbar!
+          </p>
+          <br>
+          <div class="align-center">
+            <img style="width: 80%;" src="{{ data.base_url }}/static/feasibility_study_2020/kez-logo.jpg" />
+          </div>
+        </div>
+        <div style="width: 2em;"></div>
+      </div>
+
+    </div>
+    <div class="right-side">&nbsp;</div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

@@ -218,9 +218,11 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
     if True:
         pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0])
-        response = make_response(pdf)
-        response.headers['Content-Type'] = 'application/pdf'
-        return response
+        print(pdf)
+        if pdf:
+            response = make_response(pdf)
+            response.headers['Content-Type'] = 'application/pdf'
+            return response
     response = make_response(content)
     response.headers['Content-Type'] = 'text/html'
     return response

@@ -1,0 +1,167 @@
+<style>
+  .page_price_change {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_price_change .left-side {
+    position: relative;
+    flex: 1;
+    padding-left: 50px;
+  }
+  .page_price_change .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 38px;
+    padding: 0 36vw 30px 50px;
+    position: relative;
+  }
+  .page_price_change .headline::before {
+    position: absolute;
+    content: " ";
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/cable.jpg") no-repeat;
+    background-size: contain;
+    right: 0;
+    top: -30px;
+    width: 36vw;
+    height: 300px;
+  }
+  .page_price_change .right-side {
+    position: relative;
+    flex: 1;
+    padding-right: 50px;
+  }
+  .page_price_change .large {
+    padding: 1em 0 0.5em;
+    font-size: 35px;
+    font-family: 'Quicksand', sans-serif;
+  }
+  .page_price_change .bar {
+    margin-right: 1em;
+  }
+</style>
+
+
+<div class="page_price_change">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="headline">
+    Machen Sie sich unabhängig von Preisschwankungen am Strommarkt
+  </div>
+
+  <div class="flex layout horizontal">
+
+    <div class="left-side">
+
+      <div class="layout horizontal">
+        <div style="display: flex; align-items: flex-end;">
+          <div class="bar bar--grey" style="height: 100%;">
+            <div class="left"></div>
+            <div class="right"></div>
+            <div class="top">
+              <div class="left"></div>
+              <div class="right"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          Ist-Situation bei Stromverbrauch<br>in {{ data.runtime }} Jahren
+          <div class="large">
+            {{ (data.conventional_total_cost_base + data.conventional_total_cost_usage) | currencyformat("de", 0) }}
+          </div>
+          <div class="smaller">Stromkosten in {{ data.runtime }} Jahren</div>
+        </div>
+      </div>
+      <br>
+      <div style="border-right: 2px solid #B0CA0A;">
+        <table cellspacing="0" style="margin-right: 1em; width: calc(100% - 1em); ">
+          <tr class="highlight highlight--dark">
+            <td colspan="2">Zusammensetzung</td>
+          </tr>
+          <tr>
+            <td>Stromkosten für Haushaltsstrom</td>
+            <td><b>{{ data.conventional_total_cost_usage | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Grundgebühr für Haushaltsstrom</td>
+            <td><b>{{ data.conventional_total_cost_base | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Stromkosten für Wärmestrom</td>
+            <td><b>0 €</b></td>
+          </tr>
+          <tr>
+            <td>Grundgebühr für Wärmestrom</td>
+            <td><b>0 €</b></td>
+          </tr>
+          <tr class="highlight highlight--dark">
+            <td>Gesamtkosten</td>
+            <td>{{ (data.conventional_total_cost_base + data.conventional_total_cost_usage) | currencyformat("de", 0) }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="right-side">
+
+      <div class="layout horizontal" style="padding-left: 1em;">
+        <div style="display: flex; align-items: flex-end;">
+          <div class="bar" style="height: {{ (data.cost_total / (data.conventional_total_cost_base + data.conventional_total_cost_usage)) * 85 + 15 }}%;">
+            <div class="left"></div>
+            <div class="right"></div>
+            <div class="top">
+              <div class="left"></div>
+              <div class="right"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          SENEC-Lösung<br>
+          in {{ data.runtime }} Jahren
+          <div class="large">
+            {{ data.cost_total | currencyformat("de", 0) }}
+          </div>
+          <div class="smaller">Investition + laufende Ausgaben - Einnahmen aus EEG</div>
+        </div>
+      </div>
+      <br>
+      <div style="margin-left: 1em; width: calc(100% - 1em);">
+        <table cellspacing="0" class="right">
+          <tr class="highlight">
+            <td colspan="2">Zusammensetzung</td>
+          </tr>
+          <tr>
+            <td>Investitionskosten</td>
+            <td><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Cloud Gebühren<br><small>inkl. Remote Care | Versicherung und Rücklagen</small></td>
+            <td><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr class="highlight">
+            <td>Gesamtkosten</td>
+            <td><b>{{ data.cost_total | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Vorteil über {{ data.runtime }} Jahre</td>
+            <td><b>{{ data.cost_benefit | currencyformat("de", 0) }}</b></td>
+          </tr>
+          <tr>
+            <td>Durchschnittlicher Monatlicher Vorteil</td>
+            <td><b>{{ (data.cost_benefit / data.runtime / 12) | currencyformat("de", 2) }}</b></td>
+          </tr>
+        </table>
+        <br>
+        <small>
+          Bezüglich des Netto- oder Bruttoausweises der vorliegenden<br>
+          Angaben wird auf die Erläuterungen im Anhang verwiesen.<br>
+          <br>
+          Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt.<br>
+          Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
+        </small>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

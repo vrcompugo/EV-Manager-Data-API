@@ -8,7 +8,8 @@ def generate_pdf(content, output_path=None, content_footer=None, content_header=
         "index.html": StringIO(content),
         "landscape": (None, landscape),
         "scale": (None, "1"),
-        "waitDelay": (None, wait_delay)
+        "waitDelay": (None, wait_delay),
+        "waitTimeout": (None, 30)
     }
     if len(margins) == 0:
         data["marginBottom"] = (None, "1.4")

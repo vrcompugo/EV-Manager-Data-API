@@ -1,0 +1,74 @@
+<style>
+
+  .graph-line {
+    --graph-height: var(--full-height, 240px);
+    --graph-label-height: var(--label-height, 3em);
+    --graph-bar-height: calc(var(--graph-height) - var(--graph-label-height));
+    display: flex;
+    flex-direction: row;
+    height: var(--graph-height);
+  }
+  .graph-line .column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .graph-line .column .label {
+    border-top: 3px solid #D2D1D1;
+    height: var(--graph-label-height);
+    text-align: center;
+    padding-top: 0.2em;
+  }
+  .graph-line .column .bar {
+    --percent: calc(var(--value) / var(--max-value));
+    --new-height: calc(var(--graph-bar-height) * var(--percent));
+    background-color: #8C8B8B;
+    position: relative;
+    height: var(--new-height);
+    margin: 0 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #ffffff;
+  }
+  .graph-line .column .bar.label-above {
+    align-items: flex-start;
+    color: #5D5C5C;
+  }
+  .graph-line .column .bar.label-above span {
+    transform: translate(5px, -2em);
+
+  }
+  .graph-line .column .bar::before {
+    position: absolute;
+    content: " ";
+    background-color: #5D5C5C;
+    width: 100%;
+    height: 5px;
+    top: -5px;
+    left: 5px;
+    transform: skewX(-60deg);
+  }
+  .graph-line .column .bar::after {
+    position: absolute;
+    content: " ";
+    background-color: #5D5C5C;
+    width: 9px;
+    height: 100%;
+    top: -2px;
+    right: -9px;
+    transform: skewY(-29deg);
+  }
+  .graph-line.graph--green .column .bar {
+    background-color: #AEBF00;
+  }
+  .graph-line.graph--green .column .bar::before {
+    background-color: #dae000;
+  }
+  .graph-line.graph--green .column .bar::after {
+    background-color: #96B603;
+  }
+</style>

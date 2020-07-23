@@ -1,0 +1,70 @@
+<style>
+  .page_map {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_map .left-side {
+    flex: 10;
+    padding-left: 50px;
+    padding-top: 4em;
+  }
+  .page_map .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 36px;
+    padding: 0 100px 50px 0;
+
+  }
+  .page_map .cable-img {
+    flex: 1;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/cable.jpg") no-repeat top right;
+    background-size: contain;
+  }
+  .page_map .right-side {
+    flex: 1 0 20%;
+    padding-top: 4em;
+  }
+  .page_map ul{
+    padding-left: 1.5em;
+  }
+  .page_map ul li {
+    padding: 0.5em 0;
+  }
+</style>
+
+
+<div class="page_map">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+      <div class="headline">
+        Mit einer cleveren Speicherlösung liegen Sie voll im Trend.
+      </div>
+
+      <div style="padding-right: 10em;">
+        <ul>
+          <li>Speichererfahrung seit 2009</li>
+          <li>Vorreiter für innovative speicherbasierte Energielösungen</li>
+          <li>Einzigartiges Fachpartner-Konzept mit mehr als 650 Fachpartnern</li>
+          <li>EnBW als Gesellschafter – ein starker Partner im Rücken</li>
+          <li>Mehr als 20.000 Speichersysteme deutschlandweit installiert
+            mit über 1200 verbauten Speichersystemen sind wir einer der
+            grössten SENEC-Partner</li>
+          <li>Seit 2009 verbauen wir Senec Speicher und sind Senec Partner
+            der ersten Stunde</li>
+          <li>Als Meisterbetrieb ist es unser Anspruch Ihr Ansprechpartner
+            für das gesamte Thema Energie zu sein</li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="right-side">
+      <img style="width: auto; height: 70vh;" src="{{ data.base_url }}/static/feasibility_study_2020/germany_map.jpg" />
+    </div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

@@ -1,0 +1,105 @@
+<style>
+  .page_100_autark {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_100_autark .left-side {
+    flex: 10;
+    padding-left: 50px;
+  }
+  .page_100_autark .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 38px;
+    padding: 10px 20px 30px 0;
+
+  }
+  .page_100_autark .sub-headline {
+    font-size: 20px;
+  }
+
+  .page_100_autark ul {
+    list-style: none;
+    padding: 3em 1em 0 1em;
+  }
+  .page_100_autark ul li {
+    position: relative;
+    padding-left: 3em;
+    margin: 1.5em 0;
+  }
+  .page_100_autark ul li::before {
+    position: absolute;
+    content: " ";
+    background-color: #96B603;
+    border-radius: 100%;
+    width: 0.55em;
+    height: 0.55em;
+    left: 0;
+    top: 50%;
+    margin-top: -0.275em;
+  }
+  .page_100_autark ul li::after {
+    position: absolute;
+    content: " ";
+    border-bottom: 1px solid #96B603;
+    width: 2em;
+    height: 0em;
+    left: 0;
+    top: 50%;
+  }
+  .page_100_autark ul li.dark-green::before,
+  .page_100_autark ul li.dark-green::after {
+    background-color: #5EA31E;
+    border-bottom-color: #5EA31E;
+  }
+  .page_100_autark ul li.brown::before,
+  .page_100_autark ul li.brown::after {
+    background-color: #2F3700;
+    border-bottom-color: #2F3700;
+  }
+  .page_100_autark ul li.blue::before,
+  .page_100_autark ul li.blue::after {
+    background-color: #1475BD;
+    border-bottom-color: #1475BD;
+  }
+
+  .page_100_autark .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/cloud.jpg");
+    background-size: cover;
+  }
+</style>
+
+
+<div class="page_100_autark">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+      <div class="headline">
+        100 % stromautark<br>mit SENEC-Speicher & C.Cloud<br>jederzeit und überall
+      </div>
+
+      <div class="sub-headline">So funktioniert der SENEC-Batteriespeicher und die Cloud</div>
+      <br>
+      <div class="layout horizontal">
+        <div>
+          <img style="height: 46vh;" src="{{ data.base_url }}/static/feasibility_study_2020/bars_cloud.jpg" />
+        </div>
+        <div class="flex">
+          <ul>
+            <li class="dark-green">Überschüssige Energie die in die Cloud fließt</li>
+            <li class="brown">Stromverbrauch im Jahresverlauf</li>
+            <li class="blue">gedeckter Verbrauch aus der Cloud</li>
+            <li class="green">gedeckter Verbrauch aus PV-Anlage und Speicher</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="right-side">&nbsp;</div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

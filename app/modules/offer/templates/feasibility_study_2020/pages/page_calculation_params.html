@@ -1,20 +1,20 @@
 <style>
-  .page_address {
+  .page_calculation_params {
     height: 100%;
     display: flex;
     flex-direction: column;
   }
-  .page_address .left-side {
+  .page_calculation_params .left-side {
     flex: 10;
     padding-left: 50px;
   }
-  .page_address .headline {
+  .page_calculation_params .headline {
     font-family: 'Quicksand', sans-serif;
     font-size: 38px;
     padding: 30px 20px 30px 0;
 
   }
-  .page_address .right-side {
+  .page_calculation_params .right-side {
     flex: 1 0 20%;
     background: url("{{ data.base_url }}/static/feasibility_study_2020/house_against_sun.jpg");
     background-size: cover;
@@ -22,7 +22,7 @@
 </style>
 
 
-<div class="page_address">
+<div class="page_calculation_params">
   {% include('feasibility_study_2020/elements/logos.html') %}
 
   <div class="flex layout horizontal">

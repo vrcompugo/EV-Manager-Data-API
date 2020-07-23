@@ -1,0 +1,129 @@
+<style>
+  .page_monthly_ecloud .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 38px;
+    padding: 0 36vw 10px 50px;
+  }
+  .page_monthly_ecloud .left-side {
+    position: relative;
+    flex: 1;
+    padding-left: 50px;
+    padding-right: 1em;
+  }
+  .page_monthly_ecloud .right-side {
+    position: relative;
+    flex: 1;
+    padding-right: 50px;
+    padding-left: 1em;
+  }
+  .page_monthly_ecloud table td:last-child {
+    padding-right: 2.4em;
+  }
+</style>
+
+
+<div class="page_monthly_ecloud">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="headline">
+    Profitieren Sie heute und in Zukunft<br>
+    von der cleveren Cloud Lösung
+  </div>
+
+  <div class="layout horizontal">
+
+    <div class="left-side">
+      <div style="display: flex; justify-content: flex-start;">
+        <div class="arrow arrow--below">Gaskosten pro Monat</div>
+      </div>
+      <br>
+      <div class="graph-line" style="--max-value: {{ data.ecloud.price_full_time }}">
+      <div class="column" style="--value: {{ data.ecloud.price_today }}">
+          <div class="bar"><span>{{ data.ecloud.price_today | currencyformat }}</span></div>
+          <div class="label">Heute</div>
+        </div>
+        <div class="column" style="--value: {{ data.ecloud.price_half_time }}">
+          <div class="bar"><span>{{ data.ecloud.price_half_time | currencyformat }}</div>
+          <div class="label">In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren</div>
+        </div>
+        <div class="column" style="--value: {{ data.ecloud.price_full_time }}">
+          <div class="bar"><span>{{ data.ecloud.price_full_time | currencyformat }}</div>
+          <div class="label">In {{ data.cloud_runtime | numberformat("de", 0) }} Jahren</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="right-side">
+
+      <div style="display: flex; justify-content: flex-end;">
+        <div class="arrow arrow--left arrow--below">Kosten der Cloud-Lösung</div>
+      </div>
+      <br>
+    <div class="graph-line graph--green" style="--max-value: {{ data.ecloud.price_full_time }}">
+        <div class="column" style="--value: {{ data.price_tomorrow }}">
+          <div class="bar label-above"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
+          <div class="label">Heute</div>
+        </div>
+        <div class="column" style="--value: {{ data.price_tomorrow }}">
+          <div class="bar label-above"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
+          <div class="label">In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren</div>
+        </div>
+      <div class="column" style="--value: {{ data.price_tomorrow }}">
+          <div class="bar label-above"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
+          <div class="label">In {{ data.cloud_runtime | numberformat("de", 0) }} Jahren</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="padding: 0 50px;">
+    <table cellspacing="0" class="no-flag no-highlight">
+      <tr style="background-color: #E8E8E8;">
+        <td></td>
+        <td class="align-center"><b>Heute</b><br>ohne Cloud</td>
+        <td class="align-center"><b>Morgen</b><br>mit Cloud</td>
+        <td class="align-center"><b>In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren</b><br>mit Cloud</td>
+        <td class="align-center"><b>In {{ data.cloud_runtime | numberformat("de", 0) }} Jahren</b><br>mit Cloud</td>
+      </tr>
+      <tr>
+        <td>Stromkosten pro Monat</td>
+        <td class="align-center"><b>{{ data.ecloud.price_today | currencyformat }}</b></td>
+        <td class="align-center" style="text-decoration: line-through;">{{ data.ecloud.price_today | currencyformat }}</td>
+        <td class="align-center" style="text-decoration: line-through;">{{ data.ecloud.price_half_time | currencyformat }}</td>
+        <td class="align-center" style="text-decoration: line-through;">{{ data.ecloud.price_full_time | currencyformat }}</td>
+      </tr>
+      <tr>
+        <td>Cloudgebühr pro Monat</td>
+        <td class="align-center"><b>{{ data.ecloud.price_today | currencyformat }}</b></td>
+        <td class="align-center">{{ data.ecloud.price_tomorrow | currencyformat }}</td>
+        <td class="align-center">{{ data.ecloud.price_tomorrow | currencyformat }}</td>
+        <td class="align-center">{{ data.ecloud.price_tomorrow | currencyformat }}</td>
+      </tr>
+      <tr style="background-color: #E8E8E8;">
+        <td>Monatliche Ersparnis</td>
+        <td class="align-center"><b>0 €</b></td>
+        <td class="align-center"><b>{{ (data.ecloud.price_today - data.ecloud.price_tomorrow) | currencyformat("de", 0) }}</b></td>
+        <td class="align-center"><b>{{ (data.ecloud.price_half_time - data.ecloud.price_tomorrow) | currencyformat("de", 0) }}</b></td>
+        <td class="align-center"><b>{{ (data.ecloud.price_full_time - data.ecloud.price_tomorrow) | currencyformat("de", 0) }}</b></td>
+      </tr>
+    </table>
+
+    <div style="padding: 1em;"><b>Bei steigenden Stromkosten wächst Ihre Ersparnis</b></div>
+  </div>
+
+  <div class="layout horizontal" style="padding: 0 100px 0 190px;">
+    <small style="padding-right: 2em;">
+      Bezüglich des Netto- oder Bruttoausweises der vorliegenden
+      Angaben wird auf die Erläuterungen im Anhang verwiesen.
+    </small>
+    <small>
+      Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt.
+      Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
+    </small>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}
