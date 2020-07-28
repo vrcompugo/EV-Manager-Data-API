@@ -61,12 +61,19 @@ def calculate_cloud(data):
             direction_factor = 1.15
         if data["roof_direction"] == "south":
             direction_factor = 0.9
-
     if "power_usage" in data and data["power_usage"] != "" and data["power_usage"] != "0" and data["power_usage"] != 0:
         data["power_usage"] = int(data["power_usage"])
+        power_to_kwp_factor = settings["data"]["cloud_settings"]["power_to_kwp_factor"]
+        if data["power_usage"] <= 7000 and "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            power_to_kwp_factor = 1.62
         result["power_usage"] = data["power_usage"]
-        result["min_kwp_light"] = data["power_usage"] * settings["data"]["cloud_settings"]["power_to_kwp_factor"] * direction_factor / 1000
+        result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor / 1000
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
+        if user["name"].lower() == "bsh":
+            if result["storage_size"] < 5:
+                result["storage_size"] = 5
+            if result["storage_size"] > 10:
+                result["storage_size"] = 10
         result["cloud_price_light"] = result["cloud_price_light"] + list(filter(
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_prices"][str(user["id"])]
@@ -114,6 +121,7 @@ def calculate_cloud(data):
 
     if "price_guarantee" in data:
         if str(user["id"]) in settings["data"]["cloud_settings"]["cloud_guarantee"]:
+            print(data["price_guarantee"])
             if data["price_guarantee"] in settings["data"]["cloud_settings"]["cloud_guarantee"][str(user["id"])]:
                 result["user_one_time_cost"] = result["user_one_time_cost"] + settings["data"]["cloud_settings"]["cloud_guarantee"][str(user["id"])][data["price_guarantee"]]["price"]
 
