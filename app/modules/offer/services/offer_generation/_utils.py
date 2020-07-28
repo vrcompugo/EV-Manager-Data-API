@@ -102,6 +102,7 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
 
 def add_optional_item_to_offer(survey: Survey, offer_data, optional_product):
     quantity = 0
+    packet_number = math.ceil(survey.data["pv_usage"] / 500) * 5
     if "is_selected" in optional_product and optional_product["is_selected"]:
         quantity = 1
     include_always = "top"
@@ -120,7 +121,7 @@ def add_optional_item_to_offer(survey: Survey, offer_data, optional_product):
                 )
     if "has_special_packet_variants" in optional_product and optional_product["has_special_packet_variants"]:
         for option in optional_product["variants"]:
-            if int(option["paket_range_start"]) <= int(survey.data["packet_number"]) <= int(option["paket_range_end"]):
+            if int(option["paket_range_start"]) <= packet_number <= int(option["paket_range_end"]):
                 return add_item_to_offer(
                     survey,
                     offer_data,
