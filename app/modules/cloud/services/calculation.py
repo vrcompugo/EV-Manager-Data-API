@@ -69,7 +69,7 @@ def calculate_cloud(data):
         result["power_usage"] = data["power_usage"]
         result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor / 1000
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
-        if user["name"].lower() == "bsh":
+        if "name" in user and user["name"].lower() == "bsh":
             if result["storage_size"] < 5:
                 result["storage_size"] = 5
             if result["storage_size"] > 10:
