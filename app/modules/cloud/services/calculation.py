@@ -355,6 +355,8 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         "consumers": [],
         "price_guarantee": "12_years"
     }
+    if "price_guarantee" in offer.survey.data:
+        data["price_guarantee"] = offer.survey.data["price_guarantee"]
 
     packet_number = math.ceil(int(offer.survey.data["pv_usage"]) / 500) * 5
     pv_kwp = None
