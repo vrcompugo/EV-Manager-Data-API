@@ -1,0 +1,86 @@
+<style>
+  .page_contact {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_contact .left-side {
+    flex: 10;
+    padding-left: 50px;
+  }
+  .page_contact .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 36px;
+    padding: 40px 20px 0 0;
+
+  }
+  .page_contact .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/bsh_building.jpg");
+    background-size: cover;
+  }
+  .page_contact .content {
+    font-size: 0.8em;
+    line-height: 1.7em;
+  }
+  .page_contact .content h2 {
+    margin-top: 1.5em;
+  }
+</style>
+
+
+<div class="page_contact">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="flex layout horizontal">
+    <div class="left-side">
+      <div class="headline">
+        Ihr verlässlicher Ansprechpartner vor Ort
+
+      </div>
+
+      <div class="content layout horizontal">
+        <div class="flex">
+          <div class="highlight-box">
+            <h2>Wer wir sind und was wir tun</h2>
+            <p>
+              <b>Wir sind 80 Experten, die jeden Tag für Sie im Einsatz sind. </b>
+            </p>
+            <p>
+              Jeden Tag treiben wir mit unserer Arbeit die Energiezukunft voran. Mit Ehrgeiz, fachlicher Kompetenz und fränkischem Humor. So haben wir bereits über 3.500 Photovoltaikanlagen, davon 2500 verbaute Senec- Speicher, in Franken und darüber hinaus gebaut und arbeiten für viele zufriedene Kunden seit 16 Jahren.
+            </p>
+            <p>
+              Wir begleiten Privatkunden bei dem Einstieg in die nachhaltige, erneuerbare Energieversorgung und legen als ein starkes Team den Grundstein für die Energieunabhängigkeit.
+            </p>
+            <h2>Unsere Vision</h2>
+            <p>
+              Wir glauben daran, dass wir mit Photovoltaikanlagen und Speichersystemen zu einer positiveren Zukunft mit mehr Unabhängigkeit beitragen. Unser Handeln ist geprägt von absoluter Kundenorientiertheit mit Rund- um- Sorglos Paket und ganzheitlicher Betreuung.
+            </p>
+          </div>
+        </div>
+        <div style="width: 1em;"></div>
+        <div class="flex">
+          <div style="padding-top: 4em;">
+            <img style="width: 80%;" src="{{ data.base_url }}/static/feasibility_study_2020/bsh_team.jpg" />
+          </div>
+          <h2 style="margin-top: 0.7em;">Die Geschäftsführung</h2>
+          <p>
+            <b>Reiner Bötsch</b><br>
+            Geschäftsführender Gesellschafter
+          </p>
+          <p>
+            <b>Christian Grünberg</b><br>
+            Geschäftsführer
+          </p>
+        </div>
+        <div style="width: 2em;"></div>
+      </div>
+
+    </div>
+    <div class="right-side">&nbsp;</div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

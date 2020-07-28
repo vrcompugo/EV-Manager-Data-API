@@ -25,12 +25,27 @@
     background-color: #1A61AC;
 
   }
+  .logos .bsh-logo {
+    padding-top: 0;
+  }
+  .logos .bsh-logo::before {
+    display: none;
+  }
+  .logos .bsh-logo img {
+    height: 100px;
+  }
 </style>
 
 <div class="logos layout horizontal">
-  <div class="kez flex">
-    <img src="{{ data.base_url }}/static/feasibility_study_2020/kez-logo.jpg" />
-  </div>
+  {% if offer.reseller.document_style == "bsh" %}
+    <div class="kez bsh-logo flex">
+      <img class="" src="{{ data.base_url }}/static/feasibility_study_2020/bsh-logo.jpg" />
+    </div>
+  {% else %}
+    <div class="kez flex">
+      <img src="{{ data.base_url }}/static/feasibility_study_2020/kez-logo.jpg" />
+    </div>
+  {% endif %}
   <div class="senec flex">
     <img src="{{ data.base_url }}/static/feasibility_study_2020/senec-logo.jpg" />
   </div>
