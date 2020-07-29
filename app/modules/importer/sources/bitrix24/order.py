@@ -1,19 +1,22 @@
 import pprint
 import json
+import requests
+import base64
 from datetime import datetime, timedelta
 
 from app import db
-from app.models import Lead, Reseller, Customer
+from app.models import Lead, Reseller, Customer, Order
 from app.utils.error_handler import error_handler
-from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
+from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item, get_settings
 from app.modules.order.order_services import commission_calulation, add_item, update_item
 from app.modules.reseller.services.reseller_services import update_item as update_reseller
 from app.modules.offer.services.offer_generation.enpal_offer import enpal_offer_by_order
 
 from ._connector import post, get
 from ._association import find_association, associate_item
-from ._field_values import convert_field_value_from_remote, convert_field_value_to_remote, convert_field_euro_from_remote
+from ._field_values import convert_field_value_from_remote, convert_field_value_to_remote, convert_field_euro_from_remote, convert_data_to_post_data
 from .customer import run_import as customer_import
+from .drive import get_file
 
 
 pp = pprint.PrettyPrinter()
@@ -247,3 +250,72 @@ def run_offer_pdf_export(local_id=None, remote_id=None, public_link=None):
             "fields[UF_CRM_1587121259]": public_link
         })
         print("offer pdf link resp:", response)
+
+
+def filter_export_input(order: Order):
+    if order.category != "Cloud Verträge":
+        return None
+    config = get_settings("external/bitrix24")
+    data = {
+        "TITLE": order.label,
+        "TYPE_ID": "SALE",
+        "STAGE_ID": convert_field_value_to_remote("status", order.__dict__),
+        "CURRENCY_ID": "EUR",
+        "OPPORTUNITY": float(order.value_net),
+        # "COMPANY_ID": "0",
+        # "CONTACT_ID": "34392",
+        "BEGINDATE": str(order.datetime),
+        "DATE_CREATE": str(order.datetime),
+        "OPENED": "Y",
+        "CLOSED": "N",
+        "CATEGORY_ID": convert_field_value_to_remote("category", order.__dict__),
+        "SOURCE_ID": convert_field_value_to_remote("contact_source", order.__dict__),
+        "cloud_files": []
+    }
+    if order.category == "Cloud Verträge":
+        data["TITLE"] = f"{data['TITLE']} | Cloud"
+        for field in ["street", "street_nb", "city", "zip"]:
+            data[field.upper()] = order.data["address"][field]
+        for field in ["counter_number", "power_usage"]:
+            if field in order.data:
+                data[field.upper()] = order.data[field]
+        if "signed_offer_pdf_id" in order.data:
+            file = get_file(order.data["signed_offer_pdf_id"])
+            r = requests.get(file["DOWNLOAD_URL"])
+            data["cloud_files"].append({
+                "fileData": [
+                    file["NAME"],
+                    base64.encodestring(r.content).decode("utf-8")
+                ]
+            })
+        if "refund_transfer_pdf_id" in order.data:
+            file = get_file(order.data["refund_transfer_pdf_id"])
+            r = requests.get(file["DOWNLOAD_URL"])
+            data["cloud_files"].append({
+                "fileData": [
+                    file["NAME"],
+                    base64.encodestring(r.content).decode("utf-8")
+                ]
+            })
+    return convert_data_to_post_data(data, "deal")
+
+
+def run_export(local_id=None, remote_id=None):
+    if local_id is not None:
+        link = find_association("Order", local_id=local_id)
+    if remote_id is not None:
+        link = find_association("Order", remote_id=remote_id)
+
+    if link is None and local_id is not None:
+        print("run export order new")
+        order = Order.query.get(local_id)
+        post_data = filter_export_input(order)
+        response = post("crm.deal.add", post_data)
+        if "result" in response:
+            associate_item("Order", local_id=local_id, remote_id=response["result"])
+    if link is not None:
+        print("run export order update", link.remote_id)
+        order = Order.query.get(link.local_id)
+        post_data = filter_export_input(order)
+        post_data["id"] = link.remote_id
+        response = post("crm.deal.update", post_data)

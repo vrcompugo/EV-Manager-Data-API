@@ -18,6 +18,8 @@ class Order(db.Model):
     customer = db.relationship("Customer")
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
     reseller = db.relationship("Reseller")
+    offer_id = db.Column(db.Integer, db.ForeignKey("offer_v2.id"))
+    offer = db.relationship("OfferV2")
     category = db.Column(db.String(80))
     type = db.Column(db.String(60))
     street = db.Column(db.String(90))

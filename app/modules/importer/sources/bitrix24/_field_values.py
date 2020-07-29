@@ -1,5 +1,7 @@
 import json
 
+from app.modules.settings.settings_services import get_settings
+
 from ._connector import post, get
 
 
@@ -11,6 +13,7 @@ fields = {
         "11": "T-Leads",
         "4": "Hausfrage",
         "16": "aroundhome",
+        "17": "BSH",
         "OTHER": "other",
     },
     "UF_CRM_1576169522": {
@@ -1003,9 +1006,14 @@ def convert_field_value_from_remote(field, data):
 
 
 def convert_field_value_to_remote(field, data):
+    config = get_settings("external/bitrix24")
+    if field in config["select_lists"]:
+        inv_map = {v: k for k, v in config["select_lists"][field].items()}
+        if data[field] in inv_map:
+            return inv_map[data[field]]
     if field in fields:
         inv_map = {v: k for k, v in fields[field].items()}
-        if value in inv_map:
+        if data[field] in inv_map:
             return inv_map[data[field]]
     return None
 
@@ -1018,3 +1026,26 @@ def convert_field_euro_from_remote(field, data):
         print("wrong format error: ", value)
         return 0
     return float(value[:value.find("|")])
+
+
+def convert_data_to_post_data(data, data_type):
+    config = get_settings("external/bitrix24")
+    post_data = {}
+    for field in data.keys():
+        online_field = field.upper()
+        if field.lower() in config[data_type]["fields"]:
+            online_field = config[data_type]["fields"][field.lower()]
+        if type(data[field]) is list:
+            for i in range(len(data[field])):
+                if type(data[field][i]) is dict:
+                    for field2 in data[field][i].keys():
+                        if type(data[field][i][field2]) is list:
+                            for i2 in range(len(data[field][i][field2])):
+                                post_data[f"fields[{online_field}][{i}][{field2}][{i2}]"] = data[field][i][field2][i2]
+                        else:
+                            post_data[f"fields[{online_field}][{i}][{field2}]"] = data[field][i][field2]
+                else:
+                    post_data[f"fields[{online_field}][{i}]"] = data[field][i]
+        else:
+            post_data[f"fields[{online_field}]"] = data[field]
+    return post_data

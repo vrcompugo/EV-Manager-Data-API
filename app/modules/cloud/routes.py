@@ -1,8 +1,10 @@
 import datetime
+import json
 from flask import request
 from flask_restplus import Resource
 from flask_restplus import Namespace, fields
 
+from app.exceptions import ApiException
 from app.decorators import token_required, api_response
 from app.modules.auth.auth_services import get_logged_in_user
 from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item_v2
@@ -62,13 +64,14 @@ class Items(Resource):
         }
         if "email" in data:
             offer_v2_data["customer_raw"] = {
-                "company": data["address"]["company"],
                 "firstname": data["address"]["firstname"],
                 "lastname": data["address"]["lastname"],
                 "email": data["email"],
                 "phone": data["phone"],
                 "default_address": data["address"]
             }
+            if "company" in data["address"]:
+                offer_v2_data["company"] = data["address"]["company"]
         if reseller is not None:
             offer_v2_data["reseller_id"] = reseller.id
         item = add_item_v2(data=offer_v2_data)
@@ -138,13 +141,14 @@ class User(Resource):
         }
         if "email" in data:
             offer_v2_data["customer_raw"] = {
-                "company": data["address"]["company"],
                 "firstname": data["address"]["firstname"],
                 "lastname": data["address"]["lastname"],
                 "email": data["email"],
                 "phone": data["phone"],
                 "default_address": data["address"]
             }
+            if "company" in data["address"]:
+                offer_v2_data["company"] = data["address"]["company"]
         item = update_item_v2(id=offer.id, data=offer_v2_data)
         generate_offer_pdf(item)
         generate_feasibility_study_pdf(item)
@@ -155,3 +159,94 @@ class User(Resource):
             item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
         return {"status": "success",
                 "data": item_dict}
+
+
+@api.route('/offer/<offer_number>/upload')
+class OfferUpload(Resource):
+
+    @api_response
+    @token_required("cloud_calculation")
+    def post(self, offer_number):
+        from app.modules.importer.sources.bitrix24.drive import add_file
+
+        allowed_file_list = [".pdf", ".jpg", "jpeg", ".png"]
+        signed_offer_pdf = request.files['signed_offer_pdf']
+        refund_transfer_pdf = request.files['refund_transfer_pdf']
+        if signed_offer_pdf.filename[-4:].lower() not in allowed_file_list:
+            raise ApiException("upload-failed", "upload failed", 415)
+        if refund_transfer_pdf.filename[-4:].lower() not in allowed_file_list:
+            raise ApiException("upload-failed", "upload failed", 415)
+        file_ending_signed_offer = signed_offer_pdf.filename[-4:].lower()
+        file_ending_refund_transfer = refund_transfer_pdf.filename[-4:].lower()
+        if file_ending_signed_offer == "jpeg":
+            file_ending_signed_offer = "." + file_ending_signed_offer
+        if file_ending_refund_transfer == "jpeg":
+            file_ending_refund_transfer = "." + file_ending_refund_transfer
+
+        signed_offer_pdf_id = add_file({
+            "foldername": f"Angebotsdateien {offer_number}",
+            "filename": f"Unterschriebenes Angebot{file_ending_signed_offer}",
+            "file_content": signed_offer_pdf.read()
+        })
+        refund_transfer_pdf_id = add_file({
+            "foldername": f"Angebotsdateien {offer_number}",
+            "filename": f"Unterschriebene Abtrettungserklärung{file_ending_refund_transfer}",
+            "file_content": refund_transfer_pdf.read()
+        })
+        if signed_offer_pdf_id is None:
+            raise ApiException("upload-failed", "upload failed", 418)
+        if refund_transfer_pdf_id is None:
+            raise ApiException("upload-failed", "upload failed", 418)
+        return {"status": "success",
+                "data": {
+                    "signed_offer_pdf_id": signed_offer_pdf_id,
+                    "refund_transfer_pdf_id": refund_transfer_pdf_id
+                }}
+
+
+@api.route('/order')
+class OrderUpload(Resource):
+
+    @api_response
+    @token_required("cloud_calculation")
+    def post(self):
+        from app.modules.order.order_services import add_item, Order
+        data = request.json
+        user = get_logged_in_user()
+        if user is None:
+            raise ApiException("item_doesnt_exist", "Item doesn't exist.", 401)
+        offer = get_offer_by_offer_number(data["offer_number"])
+        if offer is None:
+            raise ApiException("item_doesnt_exist", "Item doesn't exist.", 404)
+        offer_v2_data = {"data": json.loads(json.dumps(offer.data))}
+        offer_v2_data["data"]["offer_number"] = data["offer_number"]
+        offer_v2_data["data"]["signed_offer_pdf_id"] = data["signed_offer_pdf_id"]
+        offer_v2_data["data"]["refund_transfer_pdf_id"] = data["refund_transfer_pdf_id"]
+        offer = update_item_v2(id=offer.id, data=offer_v2_data)
+        order = Order.query.filter(Order.offer_id == offer.id).first()
+        if order is not None:
+            raise ApiException("already-sent", "Already sent", 412)
+        order_data = {
+            "datetime": datetime.datetime.now(),
+            "lead_number": None,
+            "label": offer.customer.lastname,
+            "customer_id": offer.customer_id,
+            "reseller_id": offer.reseller_id,
+            "offer_id": offer.id,
+            "category": "Cloud Verträge",
+            "type": "",
+            "street": offer.customer.default_address.street,
+            "street_nb": offer.customer.default_address.street_nb,
+            "zip": offer.customer.default_address.zip,
+            "city": offer.customer.default_address.city,
+            "data": offer.data,
+            "value_net": offer.total,
+            "contact_source": user["name"],
+            "status": "new",
+            "is_checked": False
+        }
+        order = add_item(order_data)
+        if order is None:
+            raise ApiException("already-sent", "Already sent", 404)
+        return {"status": "success",
+                "data": order.id}

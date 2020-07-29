@@ -54,3 +54,38 @@ def get_one_item(section, fields = None, options = None):
         data = data_filtered
     return data
 
+
+def get_settings(section=None):
+    if section == "external/bitrix24":
+        return {
+            "select_lists": {
+                "category": {
+                    "15": "Cloud Verträge"
+                },
+                "status": {
+                    "C15:NEW": "new"
+                },
+                "contact_source": {
+                    "1": "DAA",
+                    "2": "WattFox",
+                    "3": "Senec",
+                    "11": "T-Leads",
+                    "4": "Hausfrage",
+                    "16": "aroundhome",
+                    "17": "BSH",
+                    "OTHER": "other",
+                },
+            },
+            "deal": {
+                "fields": {
+                    "street": "UF_CRM_5DD4F51D40C8D",
+                    "street_nb": "UF_CRM_5DD4F51D4CA3E",
+                    "city": "UF_CRM_5DD4F51D57898",
+                    "zip": "UF_CRM_5DD4F51D603E2",
+                    "counter_number": "UF_CRM_1585821761",
+                    "power_usage": "UF_CRM_1585822072",
+                    "cloud_files": "UF_CRM_1572966728920"
+                }
+            }
+        }
+    return get_one_item(section)
