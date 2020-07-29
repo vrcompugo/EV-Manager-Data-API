@@ -211,6 +211,8 @@ class OrderUpload(Resource):
     @token_required("cloud_calculation")
     def post(self):
         from app.modules.order.order_services import add_item, Order
+        from app.modules.importer.sources.bitrix24.order import run_export as run_order_export
+
         data = request.json
         user = get_logged_in_user()
         if user is None:
@@ -248,5 +250,6 @@ class OrderUpload(Resource):
         order = add_item(order_data)
         if order is None:
             raise ApiException("already-sent", "Already sent", 404)
+        run_order_export(local_id=order.id)
         return {"status": "success",
                 "data": order.id}
