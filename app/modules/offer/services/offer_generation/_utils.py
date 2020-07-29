@@ -1,5 +1,6 @@
 import datetime
 import json
+import math
 
 from app.models import Survey, Product
 
