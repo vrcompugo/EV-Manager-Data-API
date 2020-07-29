@@ -37,7 +37,7 @@ def add_item(data):
     else:
         if "UPDATE_IF_EXISTS" in data and data["UPDATE_IF_EXISTS"]:
             return update_item(item.id, data=data)
-        raise ApiException("item_already_exists", "Item already exists.", 409)
+        raise ApiException("item_already_exists", "Item already exists.", 409, {"customer": item})
 
 
 def update_item(id, data):
@@ -48,7 +48,7 @@ def update_item(id, data):
             customer_address = None
             if item.default_address_id is not None and item.default_address_id > 0:
                 customer_address = CustomerAddress.query\
-                    .filter(CustomerAddress.id == item.default_address_id ).first()
+                    .filter(CustomerAddress.id == item.default_address_id).first()
             if customer_address is None:
                 customer_address = CustomerAddress()
                 db.session.add(customer_address)

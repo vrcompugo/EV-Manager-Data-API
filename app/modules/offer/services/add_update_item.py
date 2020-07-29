@@ -2,6 +2,7 @@ import datetime
 
 from app import db
 from app.models import Offer, OfferV2, OfferV2Item
+from app.modules.customer.services.customer_services import add_item as add_customer
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.exceptions import ApiException
 
@@ -26,8 +27,14 @@ def update_item(id, data):
 
 
 def add_item_v2(data):
+    if "customer_raw" in data:
+        data["customer_raw"]["UPDATE_IF_EXISTS"] = True
+        customer = add_customer(data["customer_raw"])
+        if customer is not None:
+            data["customer_id"] = customer.id
+            data["address_id"] = customer.default_address.id
     new_item = OfferV2()
-    new_item = set_attr_by_dict(new_item, data, ["id", "items"])
+    new_item = set_attr_by_dict(new_item, data, ["id", "items", "customer_raw"])
     if "items" in data:
         new_item.items = []
         for item_data in data["items"]:
@@ -47,10 +54,16 @@ def add_item_v2(data):
 
 
 def update_item_v2(id, data):
+    if "customer_raw" in data:
+        data["customer_raw"]["UPDATE_IF_EXISTS"] = True
+        customer = add_customer(data["customer_raw"])
+        if customer is not None:
+            data["customer_id"] = customer.id
+            data["address_id"] = customer.default_address.id
     item = db.session.query(OfferV2).get(id)
     if item is None:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
-    item = set_attr_by_dict(item, data, ["id", "items"])
+    item = set_attr_by_dict(item, data, ["id", "items", "customer_raw"])
     if "items" in data:
         item.items = []
         for item_data in data["items"]:

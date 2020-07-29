@@ -6,6 +6,7 @@ from flask_restplus import Namespace, fields
 from app.decorators import token_required, api_response
 from app.modules.auth.auth_services import get_logged_in_user
 from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item_v2
+from app.modules.customer.services.customer_address_services import get_one_item as get_address_data
 from app.models import OfferV2, Reseller
 
 from .services.offer import get_offer_by_offer_number
@@ -59,6 +60,15 @@ class Items(Resource):
             "calculated": calculated,
             "items": items
         }
+        if "email" in data:
+            offer_v2_data["customer_raw"] = {
+                "company": data["address"]["company"],
+                "firstname": data["address"]["firstname"],
+                "lastname": data["address"]["lastname"],
+                "email": data["email"],
+                "phone": data["phone"],
+                "default_address": data["address"]
+            }
         if reseller is not None:
             offer_v2_data["reseller_id"] = reseller.id
         item = add_item_v2(data=offer_v2_data)
@@ -82,6 +92,9 @@ class User(Resource):
         item_dict = get_one_item_v2(offer.id, fields)
         if item_dict is None:
             api.abort(404)
+        item_dict["address"] = {}
+        if offer.address_id is not None and offer.address_id > 0:
+            item_dict["address"] = get_address_data(offer.address_id)
         if offer.pdf is not None:
             item_dict["pdf_link"] = offer.pdf.public_link
         if offer.feasibility_study_pdf is not None:
@@ -95,6 +108,7 @@ class User(Resource):
     @token_required("cloud_calculation")
     def put(self, offer_number):
         from app.modules.offer.services.pdf_generation.offer import generate_offer_pdf
+        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
 
         offer = get_offer_by_offer_number(offer_number)
         if offer is None:
@@ -109,6 +123,9 @@ class User(Resource):
             "data": data,
             "calculated": calculated
         })
+        if "loan_total" in data:
+            if data["loan_total"] is None or data["loan_total"] == "":
+                del data["loan_total"]
         offer_v2_data = {
             "datetime": datetime.datetime.now(),
             "subtotal": calculated["cloud_price"],
@@ -119,10 +136,22 @@ class User(Resource):
             "calculated": calculated,
             "items": items
         }
+        if "email" in data:
+            offer_v2_data["customer_raw"] = {
+                "company": data["address"]["company"],
+                "firstname": data["address"]["firstname"],
+                "lastname": data["address"]["lastname"],
+                "email": data["email"],
+                "phone": data["phone"],
+                "default_address": data["address"]
+            }
         item = update_item_v2(id=offer.id, data=offer_v2_data)
         generate_offer_pdf(item)
+        generate_feasibility_study_pdf(item)
         item_dict = get_one_item_v2(item.id)
         if item.pdf is not None:
             item_dict["pdf_link"] = item.pdf.public_link
+        if offer.feasibility_study_pdf is not None:
+            item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
         return {"status": "success",
                 "data": item_dict}

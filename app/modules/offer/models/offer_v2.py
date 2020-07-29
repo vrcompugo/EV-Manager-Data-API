@@ -123,6 +123,8 @@ class OfferV2(db.Model):
             .first()
         if s3_file is None:
             if self.offer_group == "pv-offer" or self.offer_group == "cloud-offer":
+                if self.offer_group == "cloud-offer" and "loan_total" not in self.data or (self.data["loan_total"] == "" and self.data["loan_total"] is None):
+                    return None
                 generate_feasibility_study_pdf(self)
                 s3_file = S3File.query\
                     .filter(S3File.model == "OfferV2FeasibilityStudy")\

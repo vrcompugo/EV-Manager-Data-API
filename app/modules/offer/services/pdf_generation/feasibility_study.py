@@ -115,6 +115,8 @@ def calculate_feasibility_study(offer: OfferV2):
         "cost_total": None,
         "cost_benefit": None
     }
+    if "loan_total" in offer.data and offer.data["loan_total"] is not None and offer.data["loan_total"] != "":
+        data["pv_offer_total"] = float(offer.data["loan_total"])
     yearly_loan_payment = (data["pv_offer_total"] * data["loan_interest_rate"] / 100) / (1 - (1 + data["loan_interest_rate"] / 100) ** -20)
     data["loan_total_interest"] = 0
     rest_loan = data["pv_offer_total"]
@@ -216,9 +218,24 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
     data = calculate_feasibility_study(offer)
     data["base_url"] = "https://api.korbacher-energiezentrum.de.ah.hbbx.de"
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
-    if False:
+    if True:
         pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0])
         if pdf:
+            pdf_file = S3File.query\
+                .filter(S3File.model == "OfferV2FeasibilityStudy")\
+                .filter(S3File.model_id == offer.id)\
+                .first()
+            file_data = {
+                "model": "OfferV2FeasibilityStudy",
+                "model_id": offer.id,
+                "content-type": 'application/pdf',
+                "file_content": pdf,
+                "filename": f"Wirtschaftlichkeitsrechnung PV-{offer.id}.pdf"
+            }
+            if pdf_file is not None:
+                update_file(pdf_file.id, file_data)
+            else:
+                add_file(file_data)
             response = make_response(pdf)
             response.headers['Content-Type'] = 'application/pdf'
             return response
@@ -228,6 +245,8 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
 
 
 def generate_feasibility_study_pdf(offer: OfferV2):
+    if offer.reseller.document_style == "bsh":
+        return generate_feasibility_study_2020_pdf(offer)
     settings = get_settings("pv-settings")
     if settings is None:
         return None

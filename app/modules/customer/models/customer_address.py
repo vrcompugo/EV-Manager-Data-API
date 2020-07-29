@@ -1,4 +1,6 @@
 from app import db
+from marshmallow_sqlalchemy import ModelSchema
+from marshmallow import fields
 
 
 class CustomerAddress(db.Model):
@@ -18,3 +20,11 @@ class CustomerAddress(db.Model):
     zip = db.Column(db.String(20))
     city = db.Column(db.String(60))
     status = db.Column(db.String(30))
+
+
+class CustomerAddressSchema(ModelSchema):
+
+    versions = fields.Constant([])
+
+    class Meta:
+        model = CustomerAddress

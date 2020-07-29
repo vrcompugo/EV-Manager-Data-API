@@ -24,6 +24,11 @@
     background: url("{{ data.base_url }}/static/feasibility_study_2020/child-running.jpg");
     background-size: cover;
   }
+  .page_address .address-customer {
+    min-height: 4em;
+    flex: 1;
+    padding-left: 7em;
+  }
 </style>
 
 
@@ -40,11 +45,11 @@
         </div>
         <div class="cable-img"></div>
       </div>
-      <div class="layout horizontal">
+      <div class="layout horizontal" style="padding-bottom: 2em;">
         <div style="display: flex; justify-content: flex-start; align-items: center;">
           <div class="arrow arrow--right">Stromerzeuger</div>
         </div>
-        <div class="address-customer" style="min-height: 10em;">
+        <div class="address-customer">
           {% if offer.address %}
             {{ offer.address | addressblock | nltobr }}
           {% endif %}
