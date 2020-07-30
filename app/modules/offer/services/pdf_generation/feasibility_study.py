@@ -245,7 +245,7 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
 
 
 def generate_feasibility_study_pdf(offer: OfferV2):
-    if offer.reseller.document_style == "bsh":
+    if offer.reseller is not None and offer.reseller.document_style == "bsh":
         return generate_feasibility_study_2020_pdf(offer)
     settings = get_settings("pv-settings")
     if settings is None:
