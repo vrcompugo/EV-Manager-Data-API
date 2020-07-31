@@ -32,7 +32,7 @@ def calculate_feasibility_study(offer: OfferV2):
             cloud_runtime = 10
         cloud_calulation = offer.calculated
         consumer = 1
-        usage = 1000
+        usage = offer.calculated["power_usage"]
         run_time = 30
         price_increase = 5.75
         if offer.reseller is not None and offer.reseller.document_style == "bsh":
@@ -225,14 +225,18 @@ def calculate_feasibility_study(offer: OfferV2):
     if insurance_cost > 4500:
         insurance_cost = 4500
     # 5.88 for remote care cost
-    data["cloud_total"] = (data["cloud_monthly_cost"] + 5.88) * 12 * int(cloud_runtime) \
-        + ((data["cloud_monthly_cost"] + 5.88) * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - int(cloud_runtime))) \
-        + insurance_cost
+    data["cloud_total"] = (data["cloud_monthly_cost"] + 5.88) * 12 * int(cloud_runtime)
+    for i in range(data["runtime"] - int(cloud_runtime)):
+        cloud_new_rate = ((data["cloud_monthly_cost"] + 5.88) * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
+        data["cloud_total"] = data["cloud_total"] + cloud_new_rate
+    data["cloud_total"] = data["cloud_total"] + insurance_cost
 
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
-        data["cloud_total"] = (data["cloud_monthly_cost"] + 1.75) * 12 * int(cloud_runtime) \
-            + ((data["cloud_monthly_cost"] + 1.75) * 12) * ((1 + data["full_cost_increase_rate"] / 100) ** (data["runtime"] - int(cloud_runtime))) \
-            + 6000
+        data["cloud_total"] = (data["cloud_monthly_cost"] + 1.75) * 12 * int(cloud_runtime)
+        for i in range(data["runtime"] - int(cloud_runtime)):
+            cloud_new_rate = ((data["cloud_monthly_cost"] + 1.75) * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
+            data["cloud_total"] = data["cloud_total"] + cloud_new_rate
+        data["cloud_total"] = data["cloud_total"] + 6000
 
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
     data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
@@ -251,7 +255,7 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
     data = calculate_feasibility_study(offer)
     data["base_url"] = "https://api.korbacher-energiezentrum.de.ah.hbbx.de"
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
-    if True:
+    if False:
         pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0])
         if pdf:
             pdf_file = S3File.query\
