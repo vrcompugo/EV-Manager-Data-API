@@ -47,7 +47,7 @@
       <small>
         Die oben genannten Stromkosten ergeben sich aus den von Ihnen zu zahlenden Grundgebühren und Strompreisen pro kWh für
         Ihren Stromverbrauch unter der Berücksichtigung einer Strompreissteigerung von {{ data.cost_increase_rate | numberformat("de", 2) }} Prozent sowie der kalkulierten Inflation
-        innerhalb der kommenden {{ data.runtime }} Jahre.
+        von {{ data.inflation_rate | numberformat("de", 2) }} Prozent innerhalb der kommenden {{ data.runtime }} Jahre.
       </small>
     </div>
     <div class="right-side">&nbsp;</div>

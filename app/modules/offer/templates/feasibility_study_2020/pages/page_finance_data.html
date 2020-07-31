@@ -57,7 +57,8 @@
           </tr>
           <tr>
             <td>Cloud-Beitrag</td>
-            <td>{{ data.cloud_monthly_cost | currencyformat }} pro Monat*</td>
+            <td>{{ data.cloud_monthly_cost | currencyformat }} pro Monat
+              {%- if data.cloud_runtime > 2 -%}*{%- endif -%}</td>
           </tr>
           <tr class="highlight">
             <td colspan="2">Vergütung</td>
@@ -68,7 +69,7 @@
           </tr>
           <tr>
             <td>EEG-Einspeisevergütung</td>
-            <td>{{ (100 * data.eeg_refund_per_kwh) | numberformat('de', 2) }} cent pro kWh**</td>
+            <td>{{ (100 * data.eeg_refund_per_kwh) | numberformat('de', 2) }} cent pro kWh*{%- if data.cloud_runtime > 2 -%}*{%- endif -%}</td>
           </tr>
           <tr>
             <td>Einspeisevergütung nach Ablauf EEG</td>
@@ -123,8 +124,12 @@
         <br>
         <br>
         <br>
-        * für {{ data.cloud_runtime }} Jahre garantiert<br>
-        ** Derzeitig gültige EEG-Vergütungszätze Stand: 02.2020<br>
+        {% if data.cloud_runtime > 2 %}
+          * für {{ data.cloud_runtime }} Jahre garantiert<br>
+          ** Derzeitig gültige EEG-Vergütungszätze Stand: 02.2020<br>
+        {% else %}
+          * Derzeitig gültige EEG-Vergütungszätze Stand: 02.2020<br>
+        {% endif %}
         <br>
         <small>
           Bezüglich des Netto- oder Bruttoausweises der vorliegenden<br>

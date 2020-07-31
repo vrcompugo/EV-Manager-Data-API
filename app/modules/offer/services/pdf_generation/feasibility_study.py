@@ -143,14 +143,14 @@ def calculate_feasibility_study(offer: OfferV2):
 
     data["total_pages"] = 17
     data["lightcloud"] = {
-        "price_today": (data["conventional_base_cost_per_year"] + data["conventional_usage_cost"]) / 12,
+        "price_today": base / 12 + cloud_calulation["conventional_price_consumer"],
         "price_tomorrow": float(cloud_calulation["cloud_price_light"]) + float(cloud_calulation["cloud_price_consumer"])
     }
     data["lightcloud"]["price_half_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** (data["cloud_runtime"] / 2)
     data["lightcloud"]["price_full_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** data["cloud_runtime"]
     data["lightcloud"]["price_runtime"] = 0
     for i in range(data["runtime"]):
-        data["lightcloud"]["price_runtime"] = data["lightcloud"]["price_runtime"] + (data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** i) * 12
+        data["lightcloud"]["price_runtime"] = data["lightcloud"]["price_runtime"] + ((cloud_calulation["conventional_price_light"]) * (1 + data["full_cost_increase_rate"] / 100) ** i) * 12
 
     if cloud_calulation["conventional_price_consumer"] > 0:
         data["consumer"] = {"price_runtime": 0}
