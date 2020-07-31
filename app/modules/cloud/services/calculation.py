@@ -262,7 +262,7 @@ def get_cloud_products(data=None, offer=None):
         + f"Kündigungsfrist: {settings['data']['cloud_settings']['notice_period']}<br>\n" \
         + f"Vertragslaufzeit: {guarantee_runtime}<br>\n" \
         + f"garantierte Zero-Laufzeit für (a): {guarantee_runtime}<br>\n" \
-        + f"Durch die Cloud abgedeckter Jahresverbrauch: {light_cloud_usage} kWh<br>\n" \
+        + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {light_cloud_usage} kWh<br>\n" \
         + "<small>PV, Speicher & Netzbezug</small><br>\n" \
         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(lightcloud_extra_price_per_kwh * 100, digits=2)} cent / kWh</small>"
     offer_data["items"].append(monthly_price_product_base(
@@ -271,19 +271,19 @@ def get_cloud_products(data=None, offer=None):
     if data["calculated"]["cloud_price_heatcloud"] > 0:
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>Wärmecloud</b><br>"
-                         + f"Durch die Cloud abgedeckter Jahresverbrauch: {data['calculated']['heater_usage']} kWh<br>\n"
+                         + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['heater_usage']} kWh<br>\n"
                          + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['heatcloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_heatcloud"])))
     if data["calculated"]["cloud_price_ecloud"] > 0:
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>eCloud</b><br>"
-                         + f"Durch die Cloud abgedeckter Jahresverbrauch: {data['calculated']['ecloud_usage']} kWh<br>\n"
+                         + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['ecloud_usage']} kWh<br>\n"
                          + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['ecloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_ecloud"])))
     if data["calculated"]["cloud_price_consumer"] > 0:
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>Consumer</b><br>"
-                         + f"Durch die Cloud abgedeckter Jahresverbrauch: {data['calculated']['consumer_usage']} kWh<br>\n"
+                         + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['consumer_usage']} kWh<br>\n"
                          + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_consumer"])))
     if data["calculated"]["cloud_price_emove"] > 0:

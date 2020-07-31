@@ -124,6 +124,14 @@ def calculate_feasibility_study(offer: OfferV2):
         "cost_total": None,
         "cost_benefit": None
     }
+    data["eeg_refund_per_kwh"] = 0.0878
+    if "pv_kwp" in cloud_calulation and cloud_calulation["pv_kwp"] > 0:
+        if cloud_calulation["pv_kwp"] <= 100:
+            data["eeg_refund_per_kwh"] = 0.0689
+        if cloud_calulation["pv_kwp"] <= 40:
+            data["eeg_refund_per_kwh"] = 0.0878
+        if cloud_calulation["pv_kwp"] <= 10:
+            data["eeg_refund_per_kwh"] = 0.0903
     print(json.dumps(cloud_calulation, indent=2))
     if offer.data is not None and "loan_total" in offer.data and offer.data["loan_total"] is not None and offer.data["loan_total"] != "":
         data["pv_offer_total"] = float(offer.data["loan_total"])
