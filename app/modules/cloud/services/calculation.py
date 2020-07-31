@@ -83,6 +83,8 @@ def calculate_cloud(data):
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_prices"][str(user["id"])]
         ))[0]["value"]
+        if data["power_usage"] <= 7000 and "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            result["cloud_price_light"] = 29
         result["conventional_price_light"] = (data["power_usage"] * settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"]) / 12
 
     if "heater_usage" in data and data["heater_usage"] != "" and data["heater_usage"] != "0" and data["heater_usage"] != 0:
