@@ -39,20 +39,22 @@
 
       <table cellspacing="0">
         <tr>
-          <td>Immobilienart</td>
-          <td>Ein- bis Zweifamilienhaus</td>
-        </tr>
-        <tr>
-          <td>Lastprofil</td>
-          <td>H0D - Privathaushalt</td>
-        </tr>
-        <tr>
           <td>Verbrauch nach Haushaltsstrom</td>
           <td><b>{{ data.usage | numberformat('de', 0) }}</b> kWh pro Jahr</td>
         </tr>
         <tr>
           <td>Größe der PV-Anlage</td>
-          <td>Paket {{ data.paket }}</td>
+          <td>
+            {% if offer.reseller.document_style == "bsh" %}
+              {% if data.cloud_calulation.pv_kwp > 0 %}
+                {{ data.cloud_calulation.pv_kwp | numberformat('de', 2) }} kWp
+              {% else %}
+                mind. {{ data.cloud_calulation.min_kwp | numberformat('de', 2) }} kWp
+              {% endif %}
+            {% else %}
+              Paket {{ data.paket }}
+            {% endif %}
+          </td>
         </tr>
         <tr>
           <td>Ertrag der PV-Anlage</td>
@@ -60,31 +62,57 @@
         </tr>
         <tr>
           <td>Degradation der PV-Anlage</td>
-          <td><b>0,15 %</b></td>
+          <td>
+            {% if offer.reseller.document_style == "bsh" %}
+              <b>0,25 %</b>
+            {% else %}
+              <b>0,15 %</b>
+            {% endif %}
+          </td>
         </tr>
         <tr>
           <td>Speichersysteme</td>
-          <td>Senec LI laut Paket</td>
+          <td>
+            {% if offer.reseller.document_style == "bsh" %}
+              Senec LI {{ data.cloud_calulation.storage_size }}
+            {% else %}
+              Senec LI laut Paket
+            {% endif %}
+            </td>
         </tr>
         <tr>
           <td>Ausrichtung der PV-Anlage</td>
           <td>{{ data.orientation_label }}</td>
         </tr>
-        <tr>
-          <td>Autarkiegrad gemäß Hersteller</td>
-          <td>ca. <b>70 %</b></td>
-        </tr>
-        <tr>
-          <td>Verwendeter Autarkiegrad</td>
-          <td><b>70 %</b></td>
-        </tr>
+        {% if offer.reseller.document_style != "bsh" %}
+          <tr>
+            <td>Autarkiegrad gemäß Hersteller</td>
+            <td>ca. <b>60 %</b></td>
+          </tr>
+          <tr>
+            <td>Verwendeter Autarkiegrad</td>
+            <td><b>60 %</b></td>
+          </tr>
+        {% endif %}
         <tr>
           <td>Inbetriebnahme der PV-Anlage</td>
-          <td>{{ data.in_use_date | dateformat }}</td>
+          <td>
+            {% if offer.reseller.document_style == "bsh" %}
+              {{ offer.datetime | dateformat }}
+            {% else %}
+              {{ data.in_use_date | dateformat }}
+            {% endif %}
+          </td>
         </tr>
         <tr>
           <td>Inbetriebnahme des Speichers</td>
-          <td>{{ data.in_use_date | dateformat }}</td>
+          <td>
+            {% if offer.reseller.document_style == "bsh" %}
+              {{ offer.datetime | dateformat }}
+            {% else %}
+              {{ data.in_use_date | dateformat }}
+            {% endif %}
+          </td>
         </tr>
       </table>
     </div>

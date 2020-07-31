@@ -92,26 +92,28 @@
       <div style="text-align: center;">
         <img style="height: 260px;" src="{{ data.base_url }}/static/feasibility_study_2020/yearly_production_graph.jpg" />
       </div>
-      <br>
-      <div style="border-right: 2px solid #B0CA0A;">
-        <table cellspacing="0" style="margin-right: 1em; width: calc(100% - 1em); ">
-          <tr>
-            <td>Größe der PV-Anlage</td>
-            <td><b>{{ data.conventional_total_cost_usage | currencyformat("de", 0) }}</b></td>
-          </tr>
-          <tr>
-            <td>Ertrag der PV-Anlage</td>
-            <td><b>{{ data.conventional_total_cost_base | currencyformat("de", 0) }}</b></td>
-          </tr>
-          <tr>
-            <td>Autarkiegrad PV + Speicher</td>
-            <td><b>0 €</b></td>
-          </tr>
-        </table>
-      </div>
-      <small>
-        *Bei Verwendung von 2 Stromzählern wird der Autarkiegrad ausschließlich auf Basis des Haushaltsstromverbrauches ermittelt.
-      </small>
+      {% if False %}
+        <br>
+        <div style="border-right: 2px solid #B0CA0A;">
+          <table cellspacing="0" style="margin-right: 1em; width: calc(100% - 1em); ">
+            <tr>
+              <td>Größe der PV-Anlage</td>
+              <td><b>{{ data.conventional_total_cost_usage | currencyformat("de", 0) }}</b></td>
+            </tr>
+            <tr>
+              <td>Ertrag der PV-Anlage</td>
+              <td><b>{{ data.conventional_total_cost_base | currencyformat("de", 0) }}</b></td>
+            </tr>
+            <tr>
+              <td>Autarkiegrad PV + Speicher</td>
+              <td><b>0 €</b></td>
+            </tr>
+          </table>
+        </div>
+        <small>
+          *Bei Verwendung von 2 Stromzählern wird der Autarkiegrad ausschließlich auf Basis des Haushaltsstromverbrauches ermittelt.
+        </small>
+      {% endif %}
     </div>
     <div class="right-side">
 
@@ -123,46 +125,50 @@
         </div>
         <div class="flex">
           <ul>
-            <li>Energieverbrauch (70 %)</li>
-            <li class="blue">C.Cloud (30 %)</li>
+            <li>Energieverbrauch (60 %)</li>
+            <li class="blue">{{ cloud_name }} (40 %)</li>
           </ul>
         </div>
       </div>
-      <br>
-      <div style="margin-left: 1em; width: calc(100% - 1em);">
-        <table cellspacing="0" class="right">
-          <tr>
-            <td>Haushaltsstromverbrauch</td>
-            <td><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
-          </tr>
-          <tr>
-            <td>Gesamtstromverbrauch</td>
-            <td><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
-          </tr>
-          <tr>
-            <td>Strompreissteigerung</td>
-            <td><b>{{ data.cost_total | currencyformat("de", 0) }}</b></td>
-          </tr>
-          <tr>
-            <td>Eigenverbrauch</td>
-            <td><b>{{ data.cost_benefit | currencyformat("de", 0) }}</b></td>
-          </tr>
-          <tr>
-            <td>C.Cloud</td>
-            <td><b>{{ (data.cost_benefit / data.runtime / 12) | currencyformat("de", 2) }}</b></td>
-          </tr>
-        </table>
-        <small>
-          Ändert sich Ihr Verbrauchsverhalten, ändert sich der Cloudpreis bei uns nicht.<br>
-          68,97 € garantiert für 12 Jahre.*
-        </small>
-      </div>
+      {% if False %}
+        <br>
+        <div style="margin-left: 1em; width: calc(100% - 1em);">
+          <table cellspacing="0" class="right">
+            <tr>
+              <td>Haushaltsstromverbrauch</td>
+              <td><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
+            </tr>
+            <tr>
+              <td>Gesamtstromverbrauch</td>
+              <td><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
+            </tr>
+            <tr>
+              <td>Strompreissteigerung</td>
+              <td><b>{{ data.cost_total | currencyformat("de", 0) }}</b></td>
+            </tr>
+            <tr>
+              <td>Eigenverbrauch</td>
+              <td><b>{{ data.cost_benefit | currencyformat("de", 0) }}</b></td>
+            </tr>
+            <tr>
+              <td>{{ cloud_name }}</td>
+              <td><b>{{ (data.cost_benefit / data.runtime / 12) | currencyformat("de", 2) }}</b></td>
+            </tr>
+          </table>
+          <small>
+            Ändert sich Ihr Verbrauchsverhalten, ändert sich der Cloudpreis bei uns nicht.<br>
+            68,97 € garantiert für 12 Jahre.*
+          </small>
+        </div>
+      {% endif %}
     </div>
 
   </div>
-  <small style="padding: 1em 50px 0 50px;">
-    * gilt für den vereinbarten Gesamtverbrauch abgedeckt durch PV und Speicher sowie Netzbezug. Bezüglich des Netto- oder Bruttoausweises der vorliegenden Angaben wird auf die Erläuterungen im Anhang verwiesen. Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt. Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
-  </small>
+  {% if False %}
+    <small style="padding: 1em 50px 0 50px;">
+      * gilt für den vereinbarten Gesamtverbrauch abgedeckt durch PV und Speicher sowie Netzbezug. Bezüglich des Netto- oder Bruttoausweises der vorliegenden Angaben wird auf die Erläuterungen im Anhang verwiesen. Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt. Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
+    </small>
+  {% endif %}
 
 </div>
 

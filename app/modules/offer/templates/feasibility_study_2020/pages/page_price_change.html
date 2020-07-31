@@ -40,6 +40,23 @@
   }
 </style>
 
+{% set heating_cost = 0 %}
+{% if data.heatcloud %}
+  {% set heating_cost = heating_cost + data.heatcloud.price_runtime %}
+{% endif %}
+{% if data.ecloud %}
+  {% set heating_cost = heating_cost + data.ecloud.price_runtime %}
+{% endif %}
+
+
+{% set total_conventional_cost = data.lightcloud.price_runtime %}
+{% set total_conventional_cost = total_conventional_cost + heating_cost %}
+{% if data.consumer %}
+  {% set total_conventional_cost = total_conventional_cost + data.consumer.price_runtime %}
+{% endif %}
+{% if data.emove %}
+  {% set total_conventional_cost = total_conventional_cost + data.emove.price_runtime %}
+{% endif %}
 
 <div class="page_price_change">
   {% include('feasibility_study_2020/elements/logos.html') %}
@@ -66,7 +83,7 @@
         <div>
           Ist-Situation bei Stromverbrauch<br>in {{ data.runtime }} Jahren
           <div class="large">
-            {{ (data.conventional_total_cost_base + data.conventional_total_cost_usage) | currencyformat("de", 0) }}
+            {{ total_conventional_cost | currencyformat("de", 0) }}
           </div>
           <div class="smaller">Stromkosten in {{ data.runtime }} Jahren</div>
         </div>
@@ -78,24 +95,30 @@
             <td colspan="2">Zusammensetzung</td>
           </tr>
           <tr>
-            <td>Stromkosten für Haushaltsstrom</td>
-            <td><b>{{ data.conventional_total_cost_usage | currencyformat("de", 0) }}</b></td>
+            <td>Kosten für Haushaltsstrom <small>inkl. Grundgebühr</small></td>
+            <td class="align-right"><b>{{ data.lightcloud.price_runtime | currencyformat("de", 0) }}</b></td>
           </tr>
-          <tr>
-            <td>Grundgebühr für Haushaltsstrom</td>
-            <td><b>{{ data.conventional_total_cost_base | currencyformat("de", 0) }}</b></td>
-          </tr>
-          <tr>
-            <td>Stromkosten für Wärmestrom</td>
-            <td><b>0 €</b></td>
-          </tr>
-          <tr>
-            <td>Grundgebühr für Wärmestrom</td>
-            <td><b>0 €</b></td>
-          </tr>
+          {% if data.consumer %}
+            <tr>
+              <td>Kosten für Extra Consumer</td>
+              <td class="align-right"><b>{{ data.consumer.price_runtime | currencyformat("de", 0) }}</b></td>
+            </tr>
+          {% endif %}
+          {% if heating_cost > 0 %}
+            <tr>
+              <td>Kosten für Wärme</td>
+              <td class="align-right"><b>{{ heating_cost | currencyformat("de", 0) }}</b></td>
+            </tr>
+          {% endif %}
+          {% if data.emove %}
+            <tr>
+              <td>Tankkosten</td>
+              <td class="align-right"><b>{{ data.emove.price_runtime | currencyformat("de", 0) }}</b></td>
+            </tr>
+          {% endif %}
           <tr class="highlight highlight--dark">
             <td>Gesamtkosten</td>
-            <td>{{ (data.conventional_total_cost_base + data.conventional_total_cost_usage) | currencyformat("de", 0) }}</td>
+            <td class="align-right">{{ total_conventional_cost | currencyformat("de", 0) }}</td>
           </tr>
         </table>
       </div>
@@ -104,7 +127,7 @@
 
       <div class="layout horizontal" style="padding-left: 1em;">
         <div style="display: flex; align-items: flex-end;">
-          <div class="bar" style="height: {{ (data.cost_total / (data.conventional_total_cost_base + data.conventional_total_cost_usage)) * 85 + 15 }}%;">
+          <div class="bar" style="height: {{ (data.cost_total / total_conventional_cost) * 85 + 15 }}%;">
             <div class="left"></div>
             <div class="right"></div>
             <div class="top">
@@ -133,7 +156,16 @@
             <td><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
           </tr>
           <tr>
-            <td>Cloud Gebühren<br><small>inkl. Remote Care | Versicherung und Rücklagen</small></td>
+            <td>
+              Cloud Gebühren<br>
+              <small>
+                {% if offer.reseller.document_style == "bsh" %}
+                  inkl. Versicherung und Rücklagen
+                {% else %}
+                  inkl. Remote Care | Versicherung und Rücklagen
+                {% endif %}
+              </small>
+            </td>
             <td><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
           </tr>
           <tr class="highlight">

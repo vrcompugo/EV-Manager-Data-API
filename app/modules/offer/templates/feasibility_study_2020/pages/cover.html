@@ -28,7 +28,11 @@
     position: relative;
     display: flex;
     justify-content: flex-end;
-    background-image: url("{{ data.base_url }}/static/feasibility_study_2020/world_in_hands.jpg");
+    {% if offer.reseller.document_style == "bsh" %}
+      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/house_with_pv_sun.jpg");
+    {% else %}
+      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/world_in_hands.jpg");
+    {% endif %}
     background-size: cover;
     border-bottom: 12px solid #1A61AC;
   }

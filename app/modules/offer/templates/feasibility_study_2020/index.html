@@ -14,14 +14,30 @@
 <body>
 
   {% set total_pages = 19 %}
-  {% if data.ecloud %}
-    {% set total_pages = total_pages + 1 %}
+
+  {% if offer.reseller.document_style == "bsh" %}
+    {% set total_pages = total_pages - 3 %}
   {% endif %}
-  {% if data.heatcloud %}
-    {% set total_pages = total_pages + 1 %}
+
+  {% if data.cloud_runtime >= 10 %}
+
+    {% if data.ecloud %}
+      {% set total_pages = total_pages + 1 %}
+    {% endif %}
+    {% if data.heatcloud %}
+      {% set total_pages = total_pages + 1 %}
+    {% endif %}
+    {% if data.emove %}
+      {% set total_pages = total_pages + 1 %}
+    {% endif %}
+
   {% endif %}
-  {% if data.emove %}
-    {% set total_pages = total_pages + 1 %}
+
+
+  {% if offer.reseller.document_style == "bsh" %}
+    {% set cloud_name = "BSH Cloud" %}
+  {% else %}
+    {% set cloud_name = "C.Cloud" %}
   {% endif %}
 
   {% set current_page = 1 %}
@@ -64,35 +80,39 @@
     {% include('feasibility_study_2020/pages/page_price_change.html') %}
   </div>
 
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% include('feasibility_study_2020/pages/page_pv_system.html') %}
-  </div>
-
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% include('feasibility_study_2020/pages/page_monthly_lightcloud.html') %}
-  </div>
-
-  {% if data.ecloud %}
+  {% if offer.reseller.document_style != "bsh" %}
     {% set current_page = current_page + 1 %}
     <div class="page">
-      {% include('feasibility_study_2020/pages/page_monthly_ecloud.html') %}
+      {% include('feasibility_study_2020/pages/page_pv_system.html') %}
     </div>
   {% endif %}
 
-  {% if data.heatcloud %}
+  {% if data.cloud_runtime >= 10 %}
     {% set current_page = current_page + 1 %}
     <div class="page">
-      {% include('feasibility_study_2020/pages/page_monthly_heatcloud.html') %}
+      {% include('feasibility_study_2020/pages/page_monthly_lightcloud.html') %}
     </div>
-  {% endif %}
 
-  {% if data.emove %}
-    {% set current_page = current_page + 1 %}
-    <div class="page">
-      {% include('feasibility_study_2020/pages/page_monthly_emove.html') %}
-    </div>
+    {% if data.ecloud %}
+      {% set current_page = current_page + 1 %}
+      <div class="page">
+        {% include('feasibility_study_2020/pages/page_monthly_ecloud.html') %}
+      </div>
+    {% endif %}
+
+    {% if data.heatcloud %}
+      {% set current_page = current_page + 1 %}
+      <div class="page">
+        {% include('feasibility_study_2020/pages/page_monthly_heatcloud.html') %}
+      </div>
+    {% endif %}
+
+    {% if data.emove %}
+      {% set current_page = current_page + 1 %}
+      <div class="page">
+        {% include('feasibility_study_2020/pages/page_monthly_emove.html') %}
+      </div>
+    {% endif %}
   {% endif %}
 
   {% set current_page = current_page + 1 %}
@@ -124,15 +144,17 @@
     {% endif %}
   </div>
 
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% include('feasibility_study_2020/pages/page_steps.html') %}
-  </div>
+  {% if offer.reseller.document_style != "bsh" %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_steps.html') %}
+    </div>
 
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% include('feasibility_study_2020/pages/page_steps_table.html') %}
-  </div>
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_steps_table.html') %}
+    </div>
+  {% endif %}
 
   {% set current_page = current_page + 1 %}
   <div class="page">

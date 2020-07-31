@@ -45,21 +45,32 @@
   </div>
 </div>
 
+{% if offer.reseller.document_style == "bsh" %}
 <div style="padding-bottom: 9em;">
-  <div style="
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 20px;
-    text-align: right;
-    padding: 0 0 0.5em;
-    color: #888888;">
-    Energie ist unsere Profession
-  </div>
+
   <div style="
     font-size: 16px;
     text-align: right;">
-    Energieberatung, Anlagenwartung, Konzeptentwicklung
+    IHRE Unabhängigkeit mit der BSH Cloud
     </div>
 </div>
+{% else %}
+  <div style="padding-bottom: 9em;">
+    <div style="
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 20px;
+      text-align: right;
+      padding: 0 0 0.5em;
+      color: #888888;">
+      Energie ist unsere Profession
+    </div>
+    <div style="
+      font-size: 16px;
+      text-align: right;">
+      Energieberatung, Anlagenwartung, Konzeptentwicklung
+      </div>
+  </div>
+{% endif %}
 
 
 <div style="padding-left: 15mm;">

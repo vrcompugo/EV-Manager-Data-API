@@ -7,7 +7,7 @@
     position: relative;
     display: flex;
     justify-content: flex-end;
-    background-image: url("{{ data.base_url }}/static/feasibility_study_2020/woman.jpg");
+    background-image: url("{{ data.base_url }}/static/feasibility_study_2020/girl_beach.jpg");
     background-size: cover;
     border-bottom: 12px solid #AEBF00;
   }
@@ -68,10 +68,17 @@
     <div class="right_side">
       &nbsp;
     </div>
-    <div class="sidenote">
-      <div class="large">SENEC-Niederlassung-Hessen</div>
-      <div>Qualität ist nicht verhandelbar.</div>
-    </div>
+    {% if offer.reseller.document_style == "bsh" %}
+      <div class="sidenote" style="font-size: 0.8em; bottom: 90px;">
+        <div class="large">SENEC-Niederlassung-NORDBAYERN</div>
+        <div>BSH GmbH &amp; Co. KG</div>
+      </div>
+    {% else %}
+      <div class="sidenote">
+        <div class="large">SENEC-Niederlassung-Hessen</div>
+        <div>Qualität ist nicht verhandelbar.</div>
+      </div>
+    {% endif %}
 
   </div>
 

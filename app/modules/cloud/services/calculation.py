@@ -27,6 +27,7 @@ def calculate_cloud(data):
         "errors": [],
         "invalid_form": False,
         "kwp_extra": 0,
+        "pv_kwp": 0,
         "min_kwp": 0,
         "min_kwp_light": 0,
         "min_kwp_heatcloud": 0,
@@ -49,10 +50,12 @@ def calculate_cloud(data):
         "consumer_usage": 0,
         "conventional_price_light": 0,
         "conventional_price_heatcloud": 0,
-        "conventional_price_ecloud": 0
+        "conventional_price_ecloud": 0,
+        "conventional_price_consumer": 0
     }
-    if "pv_kwp" in data:
+    if "pv_kwp" in data and data["pv_kwp"] is not None and data["pv_kwp"] != "":
         data["pv_kwp"] = float(data["pv_kwp"])
+        result["pv_kwp"] = data["pv_kwp"]
     else:
         data["pv_kwp"] = 0
     direction_factor = 1
@@ -72,7 +75,9 @@ def calculate_cloud(data):
         if "name" in user and user["name"].lower() == "bsh":
             if result["storage_size"] < 5:
                 result["storage_size"] = 5
-            if result["storage_size"] > 10:
+            if result["storage_size"] > 5:
+                result["storage_size"] = 7.5
+            if result["storage_size"] > 7.5:
                 result["storage_size"] = 10
         result["cloud_price_light"] = result["cloud_price_light"] + list(filter(
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
@@ -113,6 +118,7 @@ def calculate_cloud(data):
                 result["cloud_price_consumer"] = result["cloud_price_consumer"] + consumer_price[0]["value"]
         result["consumer_usage"] = consumer_usage
         result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor) / 1000
+        result["conventional_price_consumer"] = (result["consumer_usage"] * settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"]) / 12
 
     if "emove_tarif" in data:
         if data["emove_tarif"] in settings["data"]["cloud_settings"]["cloud_emove"]:
@@ -215,17 +221,17 @@ def get_cloud_products(data=None, offer=None):
     light_cloud_usage = int(data["calculated"]["power_usage"])
     lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
     cloud_label = "cCloud-Zero"
-    cloud_description = "Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Stromverbrauchen, wann immer Sie ihn brauchen."
+    cloud_description = "Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
     cloud_tarif = "cCloud-Zero"
     if "document_style" in data["data"]:
         if data["data"]["document_style"] == "bsh":
             cloud_label = "BSH-Cloud"
-            cloud_description = "Genial einfach – einfach genial<br>Stromverbrauchen, wann immer Sie ihn brauchen."
+            cloud_description = "Genial einfach – einfach genial<br>Strom verbrauchen, wann immer Sie ihn brauchen."
             cloud_tarif = "BSH-Cloud"
         if data["data"]["document_style"] == "eeg":
             cloud_label = "EEG-Cloud"
             logo = render_template("offer/logo-eeg.html")
-            cloud_description = f"<div style='float: right'>{logo}</div>Genial einfach – einfach genial<br>Stromverbrauchen, wann immer Sie ihn brauchen."
+            cloud_description = f"<div style='float: right'>{logo}</div>Genial einfach – einfach genial<br>Strom verbrauchen, wann immer Sie ihn brauchen."
             cloud_tarif = "EEG-Cloud"
     offer_data["items"] = [
         {
