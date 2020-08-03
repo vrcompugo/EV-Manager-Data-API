@@ -352,6 +352,11 @@ def get_cloud_products(data=None, offer=None):
             description=("<b>Minderverbau</b><br>"
                          + f"PV-Anlage um {numberformat(-data['calculated']['kwp_extra'])} kWp zu klein"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_extra"])))
+    if data["calculated"]["cloud_price_extra"] < 0:
+        offer_data["items"].append(monthly_price_product_base(
+            description=("<b>Mehrverbau</b><br>"
+                         + f"PV-Anlage um {numberformat(data['calculated']['kwp_extra'])} kWp größer"),
+            single_price=(0 if wish_price else data["calculated"]["cloud_price_extra"])))
     if "zero_option" in data["data"] and data["data"]["zero_option"] is True:
         offer_data["items"].append(monthly_price_product_base(
             description="<b>ZERO-Paket</b>",
