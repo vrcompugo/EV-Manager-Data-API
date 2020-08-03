@@ -224,6 +224,15 @@ def calculate_feasibility_study(offer: OfferV2):
     for n in range(data["runtime"]):
         data["conventional_total_base_cost"] = data["conventional_total_base_cost"] + data["conventional_total_base_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
 
+    data["conventional_total_cost_base"] = 0
+    data["conventional_total_cost_usage"] = 0
+    for n in range(data["runtime"]):
+        data["conventional_total_cost_base"] = data["conventional_total_cost_base"] + base_base
+        data["conventional_total_cost_usage"] = data["conventional_total_cost_usage"] + base_usage
+        base = base * (1 + data["full_cost_increase_rate"] / 100)
+        base_base = base_base * (1 + data["full_cost_increase_rate"] / 100)
+        base_usage = base_usage * (1 + data["full_cost_increase_rate"] / 100)
+
     data["conventional_total_cost"] = data["lightcloud"]["price_runtime"]
     if "consumer" in data:
         data["conventional_total_cost"] = data["conventional_total_cost"] + data["consumer"]["price_runtime"]
