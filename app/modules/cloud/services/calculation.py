@@ -39,10 +39,15 @@ def calculate_cloud(data):
         "cloud_price": 0,
         "cloud_price_incl_refund": 0,
         "cloud_price_light": 0,
+        "cloud_price_light_incl_refund": 0,
         "cloud_price_heatcloud": 0,
+        "cloud_price_heatcloud_incl_refund": 0,
         "cloud_price_ecloud": 0,
+        "cloud_price_ecloud_incl_refund": 0,
         "cloud_price_emove": 0,
+        "cloud_price_emove_incl_refund": 0,
         "cloud_price_consumer": 0,
+        "cloud_price_consumer_incl_refund": 0,
         "user_one_time_cost": 0,
         "power_usage": 0,
         "heater_usage": 0,
@@ -185,20 +190,33 @@ def calculate_cloud(data):
 
     if data["pv_kwp"] > 0:
         result["kwp_extra"] = data["pv_kwp"] - result["min_kwp"]
+        max_kwp = (result["min_kwp_light"]
+                    + result["min_kwp_heatcloud"]
+                    + result["min_kwp_ecloud"]
+                    + result["min_kwp_consumer"])
+        extra_kwh_ratio = 1 - (data["pv_kwp"] - result["min_kwp_emove"]) / max_kwp
         if result["kwp_extra"] > 0:
             result["cloud_price_extra"] = -1 * result["kwp_extra"] * settings["data"]["cloud_settings"]["kwp_to_refund_factor"]
+            result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
+            result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
+            result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
+            result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
         if result["kwp_extra"] < 0:
-            max_kwp = (result["min_kwp_light"]
-                       + result["min_kwp_heatcloud"]
-                       + result["min_kwp_ecloud"]
-                       + result["min_kwp_consumer"])
-            extra_kwh_ratio = 1 - (data["pv_kwp"] - result["min_kwp_emove"]) / max_kwp
+            result["cloud_price_extra_light"] = ((result["min_kwp_light"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
+            result["cloud_price_extra_heatcloud"] = ((result["min_kwp_heatcloud"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
+            result["cloud_price_extra_ecloud"] = ((result["min_kwp_ecloud"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
+            result["cloud_price_extra_consumer"] = ((result["min_kwp_consumer"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
             result["cloud_price_extra"] = (
-                ((result["min_kwp_light"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
-                + ((result["min_kwp_heatcloud"] / max_kwp) * result["heater_usage"] * extra_kwh_ratio * result["heatcloud_extra_price_per_kwh"]) / 12
-                + ((result["min_kwp_ecloud"] / max_kwp) * result["ecloud_usage"] * extra_kwh_ratio * result["ecloud_extra_price_per_kwh"]) / 12
-                + ((result["min_kwp_consumer"] / max_kwp) * result["consumer_usage"] * extra_kwh_ratio * result["consumercloud_extra_price_per_kwh"]) / 12
+                result["cloud_price_extra_light"]
+                + result["cloud_price_extra_heatcloud"]
+                + result["cloud_price_extra_ecloud"]
+                + result["cloud_price_extra_consumer"]
             )
+        result["cloud_price_light_incl_refund"] = result["cloud_price_light"] + result["cloud_price_extra_light"]
+        result["cloud_price_heatcloud_incl_refund"] = result["cloud_price_heatcloud"] + result["cloud_price_extra_heatcloud"]
+        result["cloud_price_ecloud_incl_refund"] = result["cloud_price_ecloud"] + result["cloud_price_extra_ecloud"]
+        result["cloud_price_consumer_incl_refund"] = result["cloud_price_consumer"] + result["cloud_price_extra_consumer"]
+        result["cloud_price_emove_incl_refund"] = result["cloud_price_emove"]
 
     result["cloud_price"] = (result["cloud_price_light"]
                              + result["cloud_price_heatcloud"]

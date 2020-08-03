@@ -167,7 +167,7 @@ def calculate_feasibility_study(offer: OfferV2):
     data["total_pages"] = 17
     data["lightcloud"] = {
         "price_today": base / 12 + cloud_calulation["conventional_price_consumer"],
-        "price_tomorrow": float(cloud_calulation["cloud_price_light"]) + float(cloud_calulation["cloud_price_consumer"])
+        "price_tomorrow": float(cloud_calulation["cloud_price_light_incl_refund"]) + float(cloud_calulation["cloud_price_consumer_incl_refund"])
     }
     data["lightcloud"]["price_half_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** (data["cloud_runtime"] / 2)
     data["lightcloud"]["price_full_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** data["cloud_runtime"]
@@ -184,7 +184,7 @@ def calculate_feasibility_study(offer: OfferV2):
         data["total_pages"] = data["total_pages"] + 1
         data["ecloud"] = {
             "price_today": (cloud_calulation["ecloud_usage"] * 0.0598) / 12,
-            "price_tomorrow": cloud_calulation["cloud_price_ecloud"]
+            "price_tomorrow": cloud_calulation["cloud_price_ecloud_incl_refund"]
         }
         base = base + data["ecloud"]["price_today"] * 12
         data["ecloud"]["price_half_time"] = data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** (data["cloud_runtime"] / 2)
@@ -196,7 +196,7 @@ def calculate_feasibility_study(offer: OfferV2):
         data["total_pages"] = data["total_pages"] + 1
         data["heatcloud"] = {
             "price_today": (cloud_calulation["heater_usage"] * 0.23) / 12,
-            "price_tomorrow": cloud_calulation["cloud_price_heatcloud"]
+            "price_tomorrow": cloud_calulation["cloud_price_heatcloud_incl_refund"]
         }
         base = base + data["heatcloud"]["price_today"] * 12
         data["heatcloud"]["price_half_time"] = data["heatcloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** (data["cloud_runtime"] / 2)
@@ -286,7 +286,7 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
     data = calculate_feasibility_study(offer)
     data["base_url"] = "https://api.korbacher-energiezentrum.de.ah.hbbx.de"
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
-    if True:
+    if False:
         pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0])
         if pdf:
             pdf_file = S3File.query\
