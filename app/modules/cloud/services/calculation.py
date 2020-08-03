@@ -67,8 +67,17 @@ def calculate_cloud(data):
     if "power_usage" in data and data["power_usage"] != "" and data["power_usage"] != "0" and data["power_usage"] != 0:
         data["power_usage"] = int(data["power_usage"])
         power_to_kwp_factor = settings["data"]["cloud_settings"]["power_to_kwp_factor"]
-        if data["power_usage"] <= 7000 and "price_guarantee" in data and data["price_guarantee"] == "2_years":
-            power_to_kwp_factor = 1.62
+        if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            if 0 < data["power_usage"] <= 5000:
+                power_to_kwp_factor = 1.59
+            if 5000 < data["power_usage"] <= 7000:
+                power_to_kwp_factor = 1.62
+            if 7000 < data["power_usage"] <= 9000:
+                power_to_kwp_factor = 1.68
+            if 9000 < data["power_usage"] <= 14000:
+                power_to_kwp_factor = 1.69
+            if 14000 < data["power_usage"] <= 20000:
+                power_to_kwp_factor = 1.75
         result["power_usage"] = data["power_usage"]
         result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor / 1000
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
@@ -83,8 +92,20 @@ def calculate_cloud(data):
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_prices"][str(user["id"])]
         ))[0]["value"]
-        if data["power_usage"] <= 7000 and "price_guarantee" in data and data["price_guarantee"] == "2_years":
-            result["cloud_price_light"] = 29
+        if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            if 0 < data["power_usage"] <= 5000:
+                result["cloud_price_light"] = 29
+            if 5000 < data["power_usage"] <= 7000:
+                result["cloud_price_light"] = 29
+            if 7000 < data["power_usage"] <= 9000:
+                result["cloud_price_light"] = 39
+            if 9000 < data["power_usage"] <= 12000:
+                result["cloud_price_light"] = 49
+            if 12000 < data["power_usage"] <= 14000:
+                result["cloud_price_light"] = 69
+            if 14000 < data["power_usage"] <= 20000:
+                result["cloud_price_light"] = 99
+
         result["conventional_price_light"] = (data["power_usage"] * settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"]) / 12
 
     if "heater_usage" in data and data["heater_usage"] != "" and data["heater_usage"] != "0" and data["heater_usage"] != 0:
