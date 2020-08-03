@@ -104,7 +104,13 @@ def calculate_cloud(data):
     if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0:
         data["ecloud_usage"] = int(data["ecloud_usage"])
         result["ecloud_usage"] = data["ecloud_usage"]
-        result["cloud_price_ecloud"] = settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]
+        if type(settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]) is list:
+            result["cloud_price_ecloud"] = list(filter(
+                lambda item: item['from'] <= data["ecloud_usage"] and data["ecloud_usage"] <= item['to'],
+                settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]
+            ))[0]["value"]
+        else:
+            result["cloud_price_ecloud"] = settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]
         result["min_kwp_ecloud"] = data["ecloud_usage"] / settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"]
         result["conventional_price_ecloud"] = (data["ecloud_usage"] * settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"]) / 12
 
@@ -122,10 +128,19 @@ def calculate_cloud(data):
         result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor) / 1000
         result["conventional_price_consumer"] = (result["consumer_usage"] * settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"]) / 12
 
+    result["conventional_price_emove"] = 0
     if "emove_tarif" in data:
         if data["emove_tarif"] in settings["data"]["cloud_settings"]["cloud_emove"]:
             result["min_kwp_emove"] = settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["kwp"]
             result["cloud_price_emove"] = settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["price"]
+            if data["emove_tarif"] == "emove.drive I":
+                result["conventional_price_emove"] = 8000 / 100 * 7 * 1.19 / 12
+            if data["emove_tarif"] == "emove.drive II":
+                result["conventional_price_emove"] = 12000 / 100 * 7 * 1.19 / 12
+            if data["emove_tarif"] == "emove.drive III":
+                result["conventional_price_emove"] = 20000 / 100 * 7 * 1.19 / 12
+            if data["emove_tarif"] == "emove.drive ALL":
+                result["conventional_price_emove"] = 25000 / 100 * 7 * 1.19 / 12
 
     if "price_guarantee" in data:
         if str(user["id"]) in settings["data"]["cloud_settings"]["cloud_guarantee"]:
@@ -172,7 +187,8 @@ def calculate_cloud(data):
 
     result["conventional_price"] = (result["conventional_price_light"]
                                     + result["conventional_price_heatcloud"]
-                                    + result["conventional_price_ecloud"])
+                                    + result["conventional_price_ecloud"]
+                                    + result["conventional_price_emove"])
 
     result["max_kwp"] = result["min_kwp"] + result["kwp_extra"]
     result["cloud_price_incl_refund"] = result["cloud_price"] + result["cloud_price_extra"]
@@ -195,12 +211,14 @@ def get_cloud_products(data=None, offer=None):
     pv_production = (
         "<b>PV Erzeugung</b><br>\n"
         + f"PV-Anlage mit mindestens: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
+        + f"Speicher-Anlage mit mindestens: {numberformat(float(data['calculated']['storage_size']), digits=2)}kWh<br>\n"
     )
     if "pv_kwp" in data['data'] and data['data']["pv_kwp"] > 0:
         pv_production = (
             "<b>PV Erzeugung</b><br>\n"
             + f"PV-Anlage mindestens zu verbauen: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
             + f"PV-Anlage wird verbaut: {numberformat(float(data['data']['pv_kwp']), digits=2)}kWp<br>\n"
+            + f"Speicher-Anlage mit mindestens: {numberformat(float(data['calculated']['storage_size']), digits=2)}kWh<br>\n"
         )
     if offer is not None:
         pv_production = (
@@ -318,7 +336,7 @@ def get_cloud_products(data=None, offer=None):
             description="<b>ZERO-Paket</b>",
             single_price=-cloud_price))
     offer_data["items"].append(monthly_price_product_base(
-        description="<b>Cashback</b><br>Wird weniger Strom verbraucht als bei (a) vereinbart,<br>So erhälten Sie 10 Cent inkl. MwSt als Energiespar-Bonus von uns zurück.<br>Die ersten 250 kWh bleiben davon ausgenommen.",
+        description="<b>Cashback</b><br>Wird weniger Strom verbraucht als bei (a) vereinbart,<br>so erhalten Sie 10 Cent inkl. MwSt als Energiespar-Bonus von uns zurück.<br>Die ersten 250 kWh bleiben davon ausgenommen.",
         single_price=0))
 
     return offer_data["items"]

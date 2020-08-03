@@ -26,6 +26,8 @@ def calculate_feasibility_study(offer: OfferV2):
             "north": 650
         }
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
+    price_increase_heat = 2
+    price_increase_emove = 2.5
     if offer.offer_group == "cloud-offer":
         cloud_runtime = 2
         if offer.data["price_guarantee"] == "10_years":
@@ -109,8 +111,12 @@ def calculate_feasibility_study(offer: OfferV2):
         "conventional_base_cost_per_year": settings["data"]["wi_settings"]["conventional_base_cost_per_year"],
         "conventional_base_cost_per_kwh": settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"],
         "cost_increase_rate": price_increase,
+        "cost_increase_rate_heat": price_increase_heat,
+        "cost_increase_rate_emove": price_increase_emove,
         "inflation_rate": inflation_rate,
         "full_cost_increase_rate": price_increase + inflation_rate,
+        "full_cost_increase_rate_heat": price_increase_heat + inflation_rate,
+        "full_cost_increase_rate_emove": price_increase_emove + inflation_rate,
         "conventional_total_cost": None,
         "consumer_count": consumer,
         "cloud_monthly_cost": cloud_total,
@@ -172,11 +178,11 @@ def calculate_feasibility_study(offer: OfferV2):
             "price_tomorrow": cloud_calulation["cloud_price_ecloud"]
         }
         base = base + data["ecloud"]["price_today"] * 12
-        data["ecloud"]["price_half_time"] = data["ecloud"]["price_today"] * (1 + 4.8 / 100) ** (data["cloud_runtime"] / 2)
-        data["ecloud"]["price_full_time"] = data["ecloud"]["price_today"] * (1 + 4.8 / 100) ** data["cloud_runtime"]
+        data["ecloud"]["price_half_time"] = data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** (data["cloud_runtime"] / 2)
+        data["ecloud"]["price_full_time"] = data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** data["cloud_runtime"]
         data["ecloud"]["price_runtime"] = 0
         for i in range(data["runtime"]):
-            data["ecloud"]["price_runtime"] = data["ecloud"]["price_runtime"] + (data["ecloud"]["price_today"] * (1 + 4.8 / 100) ** i) * 12
+            data["ecloud"]["price_runtime"] = data["ecloud"]["price_runtime"] + (data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** i) * 12
     if cloud_calulation["cloud_price_heatcloud"] > 0:
         data["total_pages"] = data["total_pages"] + 1
         data["heatcloud"] = {
@@ -184,11 +190,11 @@ def calculate_feasibility_study(offer: OfferV2):
             "price_tomorrow": cloud_calulation["cloud_price_heatcloud"]
         }
         base = base + data["heatcloud"]["price_today"] * 12
-        data["heatcloud"]["price_half_time"] = data["heatcloud"]["price_today"] * (1 + 4.8 / 100) ** (data["cloud_runtime"] / 2)
-        data["heatcloud"]["price_full_time"] = data["heatcloud"]["price_today"] * (1 + 4.8 / 100) ** data["cloud_runtime"]
+        data["heatcloud"]["price_half_time"] = data["heatcloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** (data["cloud_runtime"] / 2)
+        data["heatcloud"]["price_full_time"] = data["heatcloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** data["cloud_runtime"]
         data["heatcloud"]["price_runtime"] = 0
         for i in range(data["runtime"]):
-            data["heatcloud"]["price_runtime"] = data["heatcloud"]["price_runtime"] + (data["heatcloud"]["price_today"] * (1 + 4.8 / 100) ** i) * 12
+            data["heatcloud"]["price_runtime"] = data["heatcloud"]["price_runtime"] + (data["heatcloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** i) * 12
     if cloud_calulation["cloud_price_emove"] > 0:
         data["total_pages"] = data["total_pages"] + 1
         data["emove"] = {
@@ -204,11 +210,11 @@ def calculate_feasibility_study(offer: OfferV2):
         if emove_tarif == "emove.drive ALL":
             data["emove"]["price_today"] = 25000 / 100 * 7 * 1.19 / 12
         base = base + data["emove"]["price_today"] * 12
-        data["emove"]["price_half_time"] = data["emove"]["price_today"] * (1 + 3.95 / 100) ** (data["cloud_runtime"] / 2)
-        data["emove"]["price_full_time"] = data["emove"]["price_today"] * (1 + 3.95 / 100) ** data["cloud_runtime"]
+        data["emove"]["price_half_time"] = data["emove"]["price_today"] * (1 + data["full_cost_increase_rate_emove"] / 100) ** (data["cloud_runtime"] / 2)
+        data["emove"]["price_full_time"] = data["emove"]["price_today"] * (1 + data["full_cost_increase_rate_emove"] / 100) ** data["cloud_runtime"]
         data["emove"]["price_runtime"] = 0
         for i in range(data["runtime"]):
-            data["emove"]["price_runtime"] = data["emove"]["price_runtime"] + (data["emove"]["price_today"] * (1 + 3.95 / 100) ** i) * 12
+            data["emove"]["price_runtime"] = data["emove"]["price_runtime"] + (data["emove"]["price_today"] * (1 + data["full_cost_increase_rate_emove"] / 100) ** i) * 12
 
     data["conventional_total_usage_cost"] = data["conventional_usage_cost"]
     for n in range(data["runtime"]):
@@ -218,16 +224,15 @@ def calculate_feasibility_study(offer: OfferV2):
     for n in range(data["runtime"]):
         data["conventional_total_base_cost"] = data["conventional_total_base_cost"] + data["conventional_total_base_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
 
-    data["conventional_total_cost"] = 0
-    data["conventional_total_cost_base"] = 0
-    data["conventional_total_cost_usage"] = 0
-    for n in range(data["runtime"]):
-        data["conventional_total_cost"] = data["conventional_total_cost"] + base
-        data["conventional_total_cost_base"] = data["conventional_total_cost_base"] + base_base
-        data["conventional_total_cost_usage"] = data["conventional_total_cost_usage"] + base_usage
-        base = base * (1 + data["full_cost_increase_rate"] / 100)
-        base_base = base_base * (1 + data["full_cost_increase_rate"] / 100)
-        base_usage = base_usage * (1 + data["full_cost_increase_rate"] / 100)
+    data["conventional_total_cost"] = data["lightcloud"]["price_runtime"]
+    if "consumer" in data:
+        data["conventional_total_cost"] = data["conventional_total_cost"] + data["consumer"]["price_runtime"]
+    if "heatcloud" in data:
+        data["conventional_total_cost"] = data["conventional_total_cost"] + data["heatcloud"]["price_runtime"]
+    if "ecloud" in data:
+        data["conventional_total_cost"] = data["conventional_total_cost"] + data["ecloud"]["price_runtime"]
+    if "emove" in data:
+        data["conventional_total_cost"] = data["conventional_total_cost"] + data["emove"]["price_runtime"]
 
     insurance_cost = data["loan_total"] * 0.08
     if insurance_cost > 4500:
@@ -248,10 +253,10 @@ def calculate_feasibility_study(offer: OfferV2):
 
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
     data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
-    max_cost = (data["conventional_total_cost_base"] + data["conventional_total_cost_usage"])
+    max_cost = data["conventional_total_cost"]
     if data["cost_total"] > max_cost:
         max_cost = data["cost_total"]
-    data["cost_conventional_rate"] = (data["conventional_total_cost_base"] + data["conventional_total_cost_usage"]) / max_cost
+    data["cost_conventional_rate"] = data["conventional_total_cost"] / max_cost
     data["cost_cloud_rate"] = data["cost_total"] / max_cost
     return data
 

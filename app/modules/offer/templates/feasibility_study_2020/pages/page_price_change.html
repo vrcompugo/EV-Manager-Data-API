@@ -122,6 +122,15 @@
           </tr>
         </table>
       </div>
+      <small style="padding: 2em 1em; display: block;">
+        Die oben geannten Energiekosten ergeben sich aus den von Ihnen zu zahlenden Grundgebühren und ihren angegeben Energiekosten,
+        unter Berücksichtigung einer Preissteigerung
+        bei Strom von {{ data.cost_increase_rate | numberformat("de", 2) }}% sowie wenn angeben,
+        bei Wärmekosten von {{ data.cost_increase_rate_heat | numberformat("de", 2) }}% und
+        bei Tankkosten von {{ data.cost_increase_rate_emove | numberformat("de", 2) }}%.
+        Berücksichtigt wurde eine Inflation von {{ data.inflation_rate | numberformat("de", 2) }}% jeweils pro Jahr
+        innerhalb der kommenden {{ data.runtime }} Jahre.
+      </small>
     </div>
     <div class="right-side">
 
@@ -137,7 +146,7 @@
           </div>
         </div>
         <div>
-          SENEC-Lösung<br>
+          Unsere Lösung<br>
           in {{ data.runtime }} Jahren
           <div class="large">
             {{ data.cost_total | currencyformat("de", 0) }}
