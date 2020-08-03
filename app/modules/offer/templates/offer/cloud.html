@@ -128,13 +128,11 @@
     </table>
     <br>
     <small>
-      Sollten Sie Förderungen in Anspruch nehmen, die die Anlagenleistung weiter als 70% reduzieren:
-      {% if offer.reseller.document_style == "bsh" -%}
-        So
-      {% else %}
-        z.B. NRW Progres, so
+      Sollten Sie Förderungen in Anspruch nehmen, die die Anlagenleistung weiter als 70% reduzieren,
+      {% if offer.reseller.document_style != "bsh" -%}
+        z.B. NRW Progres,
       {% endif %}
-       erhöht sich die monatliche Grundgebühr der Cloud um 10,- Euro !<br>
+      so erhöht sich die monatliche Grundgebühr der Cloud um 10,- Euro !<br>
       <br>
       Die oben beschrieben Werte beziehen Sich immer auf ein vollständiges Kalenderjahr (12 Monate).<br>
       Beginnt die Cloud nicht zum 1.1. eines Jahres, so werden die Werte anteilsmässig berechnet.<br>
@@ -145,7 +143,7 @@
     <div style="page-break-after: always;"></div>
 
     <h2>Verbindliche Bestellung</h2>
-    <p>Diese Ausarbeitung ist geistiges Eigentum des Unternehmens. Die Unterlagen d&uuml;rfen gem&auml;&szlig; &sect;&sect; 1,2 und 11 des UrhG und &sect; 823 BGB ohne Genehmigung des Unternehmens weder zur Ausschreibung benutzt, noch Dritten zur Einsicht &uuml;berlassen oder in sonstiger Weise inhaltlich mitgeteilt werden. Es gelten unsere allgemeinen Gesch&Atilde;&curren;ftsbedingungen. Gerichtsstand ist Korbach.</p>
+    <p>Diese Ausarbeitung ist geistiges Eigentum des Unternehmens. Die Unterlagen d&uuml;rfen gem&auml;&szlig; &sect;&sect; 1,2 und 11 des UrhG und &sect; 823 BGB ohne Genehmigung des Unternehmens weder zur Ausschreibung benutzt, noch Dritten zur Einsicht &uuml;berlassen oder in sonstiger Weise inhaltlich mitgeteilt werden. Es gelten unsere allgemeinen Gesch&auml;ftsbedingungen. Gerichtsstand ist Korbach.</p>
     <p>
       {% if offer.reseller.document_style in ["bsh", "eeg"] %}
         Das Angebot ist ab Erstellung 2 Wochen g&uuml;ltig.

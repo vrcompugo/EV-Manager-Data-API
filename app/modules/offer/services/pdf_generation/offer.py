@@ -17,7 +17,7 @@ def generate_offer_pdf(offer: OfferV2):
     content = render_template("offer/index.html", offer=offer, items=offer.items, offer_number_prefix=offer_number_prefix)
     content_footer = render_template("offer/footer.html", offer=offer, offer_number_prefix=offer_number_prefix)
 
-    pdf = generate_pdf(content, content_footer=content_footer)
+    pdf = generate_pdf(content, content_footer=content_footer, margins=["1.3", "0.3", "1.6", "0.3"])
     if pdf is not None:
         pdf_file = S3File.query\
             .filter(S3File.model == "OfferV2")\

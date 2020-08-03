@@ -14,6 +14,7 @@ def generate_cloud_pdf(offer: OfferV2):
 
     content = render_template("offer/cloud.html", offer=offer, items=items, offer_number_prefix="C-")
     content_footer = render_template("offer/footer.html", offer=offer, offer_number_prefix="C-")
+
     pdf = generate_pdf(content, content_footer=content_footer)
     if pdf is not None:
         pdf_file = S3File.query\

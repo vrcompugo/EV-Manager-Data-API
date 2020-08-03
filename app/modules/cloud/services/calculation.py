@@ -231,15 +231,15 @@ def get_cloud_products(data=None, offer=None):
     wish_price = False
     pv_production = (
         "<b>PV Erzeugung</b><br>\n"
-        + f"PV-Anlage mit mindestens: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
-        + f"Speicher-Anlage mit mindestens: {numberformat(float(data['calculated']['storage_size']), digits=2)}kWh<br>\n"
+        + f"PV-Anlage mit mindestens: {numberformat(float(data['calculated']['min_kwp']), digits=2)} kWp<br>\n"
+        + f"Speicher-Anlage mit mindestens: {numberformat(float(data['calculated']['storage_size']), digits=2)} kWh<br>\n"
     )
     if "pv_kwp" in data['data'] and data['data']["pv_kwp"] > 0:
         pv_production = (
             "<b>PV Erzeugung</b><br>\n"
-            + f"PV-Anlage mindestens zu verbauen: {numberformat(float(data['calculated']['min_kwp']), digits=2)}kWp<br>\n"
-            + f"PV-Anlage wird verbaut: {numberformat(float(data['data']['pv_kwp']), digits=2)}kWp<br>\n"
-            + f"Speicher-Anlage mit mindestens: {numberformat(float(data['calculated']['storage_size']), digits=2)}kWh<br>\n"
+            + f"PV-Anlage mindestens zu verbauen: {numberformat(float(data['calculated']['min_kwp']), digits=2)} kWp<br>\n"
+            + f"PV-Anlage wird verbaut: {numberformat(float(data['data']['pv_kwp']), digits=2)} kWp<br>\n"
+            + f"Speicher-Anlage mit mindestens: {numberformat(float(data['calculated']['storage_size']), digits=2)} kWh<br>\n"
         )
     if offer is not None:
         pv_production = (
@@ -303,7 +303,7 @@ def get_cloud_products(data=None, offer=None):
         + f"garantierte Zero-Laufzeit für (a): {guarantee_runtime}<br>\n" \
         + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {light_cloud_usage} kWh<br>\n" \
         + "<small>PV, Speicher & Netzbezug</small><br>\n" \
-        + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(lightcloud_extra_price_per_kwh * 100, digits=2)} cent / kWh</small>"
+        + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(lightcloud_extra_price_per_kwh * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"
     offer_data["items"].append(monthly_price_product_base(
         description=pv_production,
         single_price=0))
@@ -311,19 +311,19 @@ def get_cloud_products(data=None, offer=None):
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>Wärmecloud</b><br>"
                          + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['heater_usage']} kWh<br>\n"
-                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['heatcloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
+                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['heatcloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_heatcloud"])))
     if data["calculated"]["cloud_price_ecloud"] > 0:
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>eCloud</b><br>"
-                         + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['ecloud_usage']} kWh<br>\n"
-                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['ecloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
+                         + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['ecloud_usage']} kWh Gas<br>\n"
+                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Gaspreisentwicklung derzeit {numberformat(data['calculated']['ecloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_ecloud"])))
     if data["calculated"]["cloud_price_consumer"] > 0:
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>Consumer</b><br>"
                          + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['consumer_usage']} kWh<br>\n"
-                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)} cent / kWh</small>"),
+                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_consumer"])))
     if data["calculated"]["cloud_price_emove"] > 0:
         emove_description = ("<b>eMove</b><br>"
@@ -357,8 +357,20 @@ def get_cloud_products(data=None, offer=None):
             description="<b>ZERO-Paket</b>",
             single_price=-cloud_price))
     offer_data["items"].append(monthly_price_product_base(
-        description="<b>Cashback</b><br>Wird weniger Strom verbraucht als bei (a) vereinbart,<br>so erhalten Sie 10 Cent inkl. MwSt als Energiespar-Bonus von uns zurück.<br>Die ersten 250 kWh bleiben davon ausgenommen.",
+        description=(
+            "<b>Cashback</b><br>"
+            + "Wird weniger Strom verbraucht als bei (a) vereinbart,<br>"
+            + "so erhalten Sie 10 Cent inkl. MwSt als Energiespar-Bonus von uns zurück.<br>"
+            + "Die ersten 250 kWh bleiben davon ausgenommen."),
         single_price=0))
+    if data["calculated"]["cloud_price_ecloud"] > 0:
+        offer_data["items"].append(monthly_price_product_base(
+            description=(
+                "<b>Cashback eCloud</b><br>"
+                + "Wird weniger Gas verbraucht als bei (a) vereinbart,<br>"
+                + "so erhalten Sie 4 Cent inkl. MwSt als Energiespar-Bonus von uns zurück.<br>"
+                + "Die ersten 250 kWh bleiben davon ausgenommen."),
+            single_price=0))
 
     return offer_data["items"]
 
