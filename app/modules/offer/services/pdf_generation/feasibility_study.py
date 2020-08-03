@@ -44,6 +44,15 @@ def calculate_feasibility_study(offer: OfferV2):
         orientation = "west"
         orientation_label = "West/Ost"
         pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "north":
+            orientation = offer.data["roof_direction"]
+            orientation_label = "Nord"
+            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "south":
+            orientation = offer.data["roof_direction"]
+            orientation_label = "Süd"
+            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
+
         cloud_total = cloud_calulation["cloud_price_incl_refund"]
         if "emove_tarif" in offer.data:
             emove_tarif = offer.data["emove_tarif"]
