@@ -23,7 +23,6 @@ def generate_pdf(content, output_path=None, content_footer=None, content_header=
         data["marginLeft"] = (None, margins[3])
     if content_footer is not None:
         data["footer.html"] = StringIO(content_footer)
-    print(margins)
     gotenberg_url = os.getenv('GOTENBERG_URL') or "http://gotenberg:3000"
 
     result = requests.post(gotenberg_url + "/convert/html", files=data)
