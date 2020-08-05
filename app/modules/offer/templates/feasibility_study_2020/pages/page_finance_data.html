@@ -104,22 +104,29 @@
           <tr class="highlight">
             <td colspan="2">Finanzierung</td>
           </tr>
-          <tr>
-            <td>Kreditsumme</td>
-            <td>{{ data.pv_offer_total | currencyformat }}</td>
-          </tr>
-          <tr>
-            <td>Laufzeit der Finanzierung</td>
-            <td>20 Jahre</td>
-          </tr>
-          <tr>
-            <td>Soll-Zinssatzinssatz (Beispiel)</td>
-            <td>{{ data.loan_interest_rate | percentformat(2) }} pro Jahr</td>
-          </tr>
-          <tr>
-            <td>Gesamtinvestition</td>
-            <td>{{ data.loan_total | currencyformat }}</td>
-          </tr>
+          {% if data.loan_interest_rate > 0 %}
+            <tr>
+              <td>Kreditsumme</td>
+              <td>{{ data.pv_offer_total | currencyformat }}</td>
+            </tr>
+            <tr>
+              <td>Laufzeit der Finanzierung</td>
+              <td>20 Jahre</td>
+            </tr>
+            <tr>
+              <td>Soll-Zinssatzinssatz (Beispiel)</td>
+              <td>{{ data.loan_interest_rate | percentformat(2) }} pro Jahr</td>
+            </tr>
+            <tr>
+              <td>Gesamtinvestition</td>
+              <td>{{ data.loan_total | currencyformat }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td>Gesamtinvestition</td>
+              <td>{{ data.loan_total | currencyformat }}</td>
+            </tr>
+          {% endif %}
         </table>
         <br>
         <br>

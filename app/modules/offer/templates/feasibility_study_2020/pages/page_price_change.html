@@ -161,19 +161,31 @@
             <td colspan="2">Zusammensetzung</td>
           </tr>
           <tr>
-            <td>Investitionskosten inkl. Zinsen</td>
+            <td>
+              Investitionskosten
+              {% if data.loan_interest_rate > 0 %}
+                <small>inkl. Zinsen</small>
+              {% endif %}
+            </td>
             <td><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
           </tr>
           <tr>
             <td>
-              Cloud Gebühren<br>
-              <small>
-                {% if offer.reseller.document_style == "bsh" %}
-                  inkl. Versicherung und Rücklagen
-                {% else %}
-                  inkl. Remote Care | Versicherung und Rücklagen
+              Cloud Gebühren
+              {% if offer.reseller.document_style == "bsh" %}
+                inkl. <br>
+                - Wartung <small>(110 €/Jahr)<br></small>
+                - Versicherung <small>(85 €/Jahr)<br></small>
+                - Reparaturrücklagen <small>(7% der Anschaffungskosten)</small>
+                {% if data.eeg_direct_usage_cost > 0 %}
+                <br>- EEG Umlage
                 {% endif %}
-              </small>
+              {% else %}
+                <br>
+                <small>
+                    inkl. Remote Care | Versicherung und Rücklagen
+                </small>
+              {% endif %}
             </td>
             <td><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
           </tr>
@@ -190,14 +202,6 @@
             <td><b>{{ (data.cost_benefit / data.runtime / 12) | currencyformat("de", 2) }}</b></td>
           </tr>
         </table>
-        <br>
-        <small>
-          Bezüglich des Netto- oder Bruttoausweises der vorliegenden<br>
-          Angaben wird auf die Erläuterungen im Anhang verwiesen.<br>
-          <br>
-          Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt.<br>
-          Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
-        </small>
       </div>
     </div>
   </div>

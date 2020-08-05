@@ -21,13 +21,14 @@ def calculate_feasibility_study(offer: OfferV2):
         return None
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
         settings["data"]["wi_settings"]["pv_efficiancy"] = {
-            "south": 975,
-            "west_east": 839,
+            "south": 1000,
+            "west_east": 860,
             "north": 650
         }
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
     price_increase_heat = 2
     price_increase_emove = 2.5
+    investment_type = "financing"
     if offer.offer_group == "cloud-offer":
         cloud_runtime = 2
         if offer.data["price_guarantee"] == "10_years":
@@ -40,6 +41,12 @@ def calculate_feasibility_study(offer: OfferV2):
         if offer.reseller is not None and offer.reseller.document_style == "bsh":
             price_increase = 3.5
         inflation_rate = 2.5
+        if "price_increase_rate" in offer.data and offer.data["price_increase_rate"] != "":
+            price_increase = float(offer.data["price_increase_rate"])
+        if "inflation_rate" in offer.data and offer.data["inflation_rate"] != "":
+            inflation_rate = float(offer.data["inflation_rate"])
+        if "investment_type" in offer.data and offer.data["investment_type"] != "":
+            investment_type = offer.data["investment_type"]
         packet = 50
         orientation = "west"
         orientation_label = "West/Ost"
@@ -116,6 +123,7 @@ def calculate_feasibility_study(offer: OfferV2):
         "pv_efficiancy": pv_efficiancy,
         "orientation": orientation,
         "orientation_label": orientation_label,
+        "investment_type": investment_type,
         "in_use_date": in_use_date,
         "conventional_base_cost_per_year": settings["data"]["wi_settings"]["conventional_base_cost_per_year"],
         "conventional_base_cost_per_kwh": settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"],
@@ -139,6 +147,8 @@ def calculate_feasibility_study(offer: OfferV2):
         "cost_total": None,
         "cost_benefit": None
     }
+    if data["investment_type"] == "cash":
+        data["loan_interest_rate"] = 0
     data["eeg_refund_per_kwh"] = 0.0878
     if "pv_kwp" in cloud_calulation and cloud_calulation["pv_kwp"] > 0:
         if cloud_calulation["pv_kwp"] <= 100:
@@ -150,7 +160,9 @@ def calculate_feasibility_study(offer: OfferV2):
     print(json.dumps(cloud_calulation, indent=2))
     if offer.data is not None and "loan_total" in offer.data and offer.data["loan_total"] is not None and offer.data["loan_total"] != "":
         data["pv_offer_total"] = float(offer.data["loan_total"])
-    yearly_loan_payment = (data["pv_offer_total"] * data["loan_interest_rate"] / 100) / (1 - (1 + data["loan_interest_rate"] / 100) ** -20)
+    yearly_loan_payment = data["pv_offer_total"] / 20
+    if data["loan_interest_rate"] > 0:
+        yearly_loan_payment = (data["pv_offer_total"] * data["loan_interest_rate"] / 100) / (1 - (1 + data["loan_interest_rate"] / 100) ** -20)
     data["loan_total_interest"] = 0
     rest_loan = data["pv_offer_total"]
     for n in range(20):
@@ -263,12 +275,15 @@ def calculate_feasibility_study(offer: OfferV2):
     data["cloud_total"] = data["cloud_total"] + insurance_cost
 
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
-        data["cloud_total"] = (data["cloud_monthly_cost"] + 1.75) * 12 * int(cloud_runtime)
+        insurance_cost = data["loan_total"] * 0.07
+        data["cloud_total"] = ((data["cloud_monthly_cost"] * 12) + 110 + 85) * int(cloud_runtime)
         for i in range(data["runtime"] - int(cloud_runtime)):
-            cloud_new_rate = ((data["cloud_monthly_cost"] + 1.75) * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
+            cloud_new_rate = ((data["cloud_monthly_cost"] * 12) + 110 + 85) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
             data["cloud_total"] = data["cloud_total"] + cloud_new_rate
-        data["cloud_total"] = data["cloud_total"] + 6000
-
+    data["eeg_direct_usage_cost"] = 0
+    if "pv_kwp" in data["cloud_calulation"] and data["cloud_calulation"]["pv_kwp"] > 10:
+        data["eeg_direct_usage_cost"] = cloud_calulation["power_usage"] * 0.6 * (0.06756 / 2) * data["runtime"]
+        data["cloud_total"] = data["cloud_total"] + data["eeg_direct_usage_cost"]
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
     data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
     max_cost = data["conventional_total_cost"]
