@@ -196,12 +196,18 @@ def calculate_cloud(data):
                          + result["min_kwp_consumer"]
                          + result["min_kwp_emove"])
 
+    result["cloud_price_light_incl_refund"] = result["cloud_price_light"]
+    result["cloud_price_heatcloud_incl_refund"] = result["cloud_price_heatcloud"]
+    result["cloud_price_ecloud_incl_refund"] = result["cloud_price_ecloud"]
+    result["cloud_price_consumer_incl_refund"] = result["cloud_price_consumer"]
+    result["cloud_price_emove_incl_refund"] = result["cloud_price_emove"]
     if data["pv_kwp"] > 0:
         result["kwp_extra"] = data["pv_kwp"] - result["min_kwp"]
-        max_kwp = (result["min_kwp_light"]
-                    + result["min_kwp_heatcloud"]
-                    + result["min_kwp_ecloud"]
-                    + result["min_kwp_consumer"])
+        max_kwp = (
+            result["min_kwp_light"]
+            + result["min_kwp_heatcloud"]
+            + result["min_kwp_ecloud"]
+            + result["min_kwp_consumer"])
         extra_kwh_ratio = 1 - (data["pv_kwp"] - result["min_kwp_emove"]) / max_kwp
         if result["kwp_extra"] > 0:
             result["cloud_price_extra"] = -1 * result["kwp_extra"] * settings["data"]["cloud_settings"]["kwp_to_refund_factor"]
@@ -224,7 +230,6 @@ def calculate_cloud(data):
         result["cloud_price_heatcloud_incl_refund"] = result["cloud_price_heatcloud"] + result["cloud_price_extra_heatcloud"]
         result["cloud_price_ecloud_incl_refund"] = result["cloud_price_ecloud"] + result["cloud_price_extra_ecloud"]
         result["cloud_price_consumer_incl_refund"] = result["cloud_price_consumer"] + result["cloud_price_extra_consumer"]
-        result["cloud_price_emove_incl_refund"] = result["cloud_price_emove"]
 
     result["cloud_price"] = (result["cloud_price_light"]
                              + result["cloud_price_heatcloud"]
