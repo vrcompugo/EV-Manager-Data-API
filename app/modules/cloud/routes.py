@@ -60,18 +60,19 @@ class Items(Resource):
             "status": "created",
             "data": data,
             "calculated": calculated,
-            "items": items
+            "items": items,
+            "customer_raw": {}
         }
         if "email" in data:
-            offer_v2_data["customer_raw"] = {
-                "firstname": data["address"]["firstname"],
-                "lastname": data["address"]["lastname"],
-                "email": data["email"],
-                "phone": data["phone"],
-                "default_address": data["address"]
-            }
+            offer_v2_data["customer_raw"]["email"] = data["email"]
+        if "phone" in data:
+            offer_v2_data["customer_raw"]["phone"] = data["phone"]
+        if "address" in data and "lastname" in data["address"]:
+            offer_v2_data["customer_raw"]["firstname"] = data["address"]["firstname"]
+            offer_v2_data["customer_raw"]["lastname"] = data["address"]["lastname"]
+            offer_v2_data["customer_raw"]["default_address"] = data["address"]
             if "company" in data["address"]:
-                offer_v2_data["company"] = data["address"]["company"]
+                offer_v2_data["customer_raw"]["company"] = data["address"]["company"]
         if reseller is not None:
             offer_v2_data["reseller_id"] = reseller.id
         item = add_item_v2(data=offer_v2_data)
@@ -137,18 +138,19 @@ class User(Resource):
             "total": calculated["cloud_price"],
             "data": data,
             "calculated": calculated,
-            "items": items
+            "items": items,
+            "customer_raw": {}
         }
         if "email" in data:
-            offer_v2_data["customer_raw"] = {
-                "firstname": data["address"]["firstname"],
-                "lastname": data["address"]["lastname"],
-                "email": data["email"],
-                "phone": data["phone"],
-                "default_address": data["address"]
-            }
+            offer_v2_data["customer_raw"]["email"] = data["email"]
+        if "phone" in data:
+            offer_v2_data["customer_raw"]["phone"] = data["phone"]
+        if "address" in data and "lastname" in data["address"]:
+            offer_v2_data["customer_raw"]["firstname"] = data["address"]["firstname"]
+            offer_v2_data["customer_raw"]["lastname"] = data["address"]["lastname"]
+            offer_v2_data["customer_raw"]["default_address"] = data["address"]
             if "company" in data["address"]:
-                offer_v2_data["company"] = data["address"]["company"]
+                offer_v2_data["customer_raw"]["company"] = data["address"]["company"]
         item = update_item_v2(id=offer.id, data=offer_v2_data)
         generate_offer_pdf(item)
         generate_feasibility_study_pdf(item)
