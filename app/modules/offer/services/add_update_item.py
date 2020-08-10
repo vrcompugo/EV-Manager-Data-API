@@ -27,7 +27,7 @@ def update_item(id, data):
 
 
 def add_item_v2(data):
-    if "customer_raw" in data:
+    if "customer_raw" in data and "firstname" in data:
         data["customer_raw"]["UPDATE_IF_EXISTS"] = True
         customer = add_customer(data["customer_raw"])
         if customer is not None:
@@ -55,12 +55,13 @@ def add_item_v2(data):
 
 
 def update_item_v2(id, data):
-    if "customer_raw" in data:
+    if "customer_raw" in data and "firstname" in data:
         data["customer_raw"]["UPDATE_IF_EXISTS"] = True
         customer = add_customer(data["customer_raw"])
         if customer is not None:
             data["customer_id"] = customer.id
-            data["address_id"] = customer.default_address.id
+            if customer.default_address is not None:
+                data["address_id"] = customer.default_address.id
     item = db.session.query(OfferV2).get(id)
     if item is None:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
