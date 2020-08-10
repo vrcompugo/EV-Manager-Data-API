@@ -32,7 +32,8 @@ def add_item_v2(data):
         customer = add_customer(data["customer_raw"])
         if customer is not None:
             data["customer_id"] = customer.id
-            data["address_id"] = customer.default_address.id
+            if customer.default_address is not None:
+                data["address_id"] = customer.default_address.id
     new_item = OfferV2()
     new_item = set_attr_by_dict(new_item, data, ["id", "items", "customer_raw"])
     if "items" in data:
