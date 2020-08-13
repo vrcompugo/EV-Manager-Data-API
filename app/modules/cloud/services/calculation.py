@@ -70,7 +70,7 @@ def calculate_cloud(data):
             direction_factor_kwp = 1.30
             direction_factor_production = 0.65
         if data["roof_direction"] == "west_east":
-            direction_factor_kwp = 1.15
+            direction_factor_kwp = 1.05
             direction_factor_production = 0.8
     if "power_usage" in data and data["power_usage"] != "" and data["power_usage"] != "0" and data["power_usage"] != 0:
         data["power_usage"] = int(data["power_usage"])
