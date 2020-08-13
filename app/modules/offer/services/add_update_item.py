@@ -27,7 +27,7 @@ def update_item(id, data):
 
 
 def add_item_v2(data):
-    if "customer_raw" in data and "firstname" in data:
+    if "customer_raw" in data and "email" in data["customer_raw"] and data["customer_raw"]["email"] != "":
         data["customer_raw"]["UPDATE_IF_EXISTS"] = True
         customer = add_customer(data["customer_raw"])
         if customer is not None:
@@ -55,7 +55,7 @@ def add_item_v2(data):
 
 
 def update_item_v2(id, data):
-    if "customer_raw" in data and "firstname" in data:
+    if "customer_raw" in data and "email" in data["customer_raw"] and data["customer_raw"]["email"] != "":
         data["customer_raw"]["UPDATE_IF_EXISTS"] = True
         customer = add_customer(data["customer_raw"])
         if customer is not None:
