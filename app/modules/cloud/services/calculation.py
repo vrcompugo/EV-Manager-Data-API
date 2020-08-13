@@ -76,11 +76,11 @@ def calculate_cloud(data):
         data["power_usage"] = int(data["power_usage"])
         power_to_kwp_factor = settings["data"]["cloud_settings"]["power_to_kwp_factor"]
         if 0 < data["power_usage"] <= 7000:
-            power_to_kwp_factor = 1.7
+            power_to_kwp_factor = 1.6
         if 7000 < data["power_usage"] <= 25000:
-            power_to_kwp_factor = 1.88
+            power_to_kwp_factor = 1.78
         if 25000 < data["power_usage"]:
-            power_to_kwp_factor = 1.99
+            power_to_kwp_factor = 1.89
         if "price_guarantee" in data and data["price_guarantee"] == "2_years":
             if 0 < data["power_usage"] <= 7000:
                 power_to_kwp_factor = 1.4
