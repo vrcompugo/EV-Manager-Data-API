@@ -19,12 +19,11 @@ def calculate_feasibility_study(offer: OfferV2):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
-    if offer.reseller is not None and offer.reseller.document_style == "bsh":
-        settings["data"]["wi_settings"]["pv_efficiancy"] = {
-            "south": 1000,
-            "west_east": 860,
-            "north": 650
-        }
+    settings["data"]["wi_settings"]["pv_efficiancy"] = {
+        "south": 960,
+        "west_east": 960 * 0.8,
+        "north": 960 * 0.65
+    }
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
     price_increase_heat = 2
     price_increase_emove = 2.5

@@ -63,28 +63,33 @@ def calculate_cloud(data):
         result["pv_kwp"] = data["pv_kwp"]
     else:
         data["pv_kwp"] = 0
-    direction_factor = 1
+    direction_factor_kwp = 1
+    direction_factor_production = 1
     if "roof_direction" in data:
         if data["roof_direction"] == "north":
-            direction_factor = 1.15
-        if data["roof_direction"] == "south":
-            direction_factor = 0.9
+            direction_factor_kwp = 1.30
+            direction_factor_production = 0.65
+        if data["roof_direction"] == "west_east":
+            direction_factor_kwp = 1.15
+            direction_factor_production = 0.8
     if "power_usage" in data and data["power_usage"] != "" and data["power_usage"] != "0" and data["power_usage"] != 0:
         data["power_usage"] = int(data["power_usage"])
         power_to_kwp_factor = settings["data"]["cloud_settings"]["power_to_kwp_factor"]
+        if 0 < data["power_usage"] <= 7000:
+            power_to_kwp_factor = 1.7
+        if 7000 < data["power_usage"] <= 25000:
+            power_to_kwp_factor = 1.88
+        if 25000 < data["power_usage"]:
+            power_to_kwp_factor = 1.99
         if "price_guarantee" in data and data["price_guarantee"] == "2_years":
-            if 0 < data["power_usage"] <= 5000:
-                power_to_kwp_factor = 1.59
-            if 5000 < data["power_usage"] <= 7000:
-                power_to_kwp_factor = 1.62
-            if 7000 < data["power_usage"] <= 9000:
-                power_to_kwp_factor = 1.68
-            if 9000 < data["power_usage"] <= 14000:
-                power_to_kwp_factor = 1.69
-            if 14000 < data["power_usage"] <= 20000:
-                power_to_kwp_factor = 1.75
+            if 0 < data["power_usage"] <= 7000:
+                power_to_kwp_factor = 1.4
+            if 7000 < data["power_usage"] <= 25000:
+                power_to_kwp_factor = 1.55
+            if 25000 < data["power_usage"]:
+                power_to_kwp_factor = 1.87
         result["power_usage"] = data["power_usage"]
-        result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor / 1000
+        result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor_kwp / 1000
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
         if "name" in user and user["name"].lower() == "bsh":
             if 0 <= data["power_usage"] <= 3999:
@@ -132,7 +137,7 @@ def calculate_cloud(data):
             lambda item: item['from'] <= data["heater_usage"] and data["heater_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_heater_prices"][str(user["id"])]
         ))[0]["value"]
-        result["min_kwp_heatcloud"] = data["heater_usage"] * heater_to_kwp_factor * direction_factor / 1000
+        result["min_kwp_heatcloud"] = data["heater_usage"] * heater_to_kwp_factor * direction_factor_kwp / 1000
         result["conventional_price_heatcloud"] = (data["heater_usage"] * settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"]) / 12
 
     if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0:
@@ -159,7 +164,7 @@ def calculate_cloud(data):
             if len(consumer_price) > 0:
                 result["cloud_price_consumer"] = result["cloud_price_consumer"] + consumer_price[0]["value"]
         result["consumer_usage"] = consumer_usage
-        result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor) / 1000
+        result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor_kwp) / 1000
         result["conventional_price_consumer"] = (result["consumer_usage"] * settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"]) / 12
 
     result["conventional_price_emove"] = 0
