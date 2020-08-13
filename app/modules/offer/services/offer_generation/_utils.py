@@ -40,7 +40,7 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
     if packet_number is None:
         packet_number = 0
         if survey is not None and "pv_usage" in survey.data and survey.data["pv_usage"] != "" and int(survey.data["pv_usage"]) > 0:
-            packet_number = math.ceil(survey.data["pv_usage"] / 500) * 5
+            packet_number = math.ceil(int(survey.data["pv_usage"]) / 500) * 5
     product = None
     if survey is not None:
         product = Product.query\
