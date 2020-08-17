@@ -26,11 +26,11 @@ class Items(Resource):
     def post(self):
         """ Stores new offer """
         data = request.json
-        calucalted = calculate_cloud(data)
+        calculated = calculate_cloud(data)
         if calculated is None:
             raise ApiException("error-calculating", "Error Calculating", 500)
         return {"status": "success",
-                "data": calucalted}
+                "data": calculated}
 
 
 @api.route('/offer')
