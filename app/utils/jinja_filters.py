@@ -61,8 +61,7 @@ def addressblock(address):
     if address.company is not None and address.company != "":
         text = text + address.company + "\n"
     if address.lastname is not None and address.lastname != "":
-        salutation = "Frau" if address.salutation == "ms" else "Herr"
-        text = text + f"{salutation} {address.firstname} {address.lastname}\n"
+        text = text + f"{address.firstname} {address.lastname}\n"
     text = text + f"{address.street} {address.street_nb}\n"
     text = text + f"{address.zip} {address.city}\n"
     return text
