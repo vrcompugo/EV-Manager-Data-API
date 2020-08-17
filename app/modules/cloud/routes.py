@@ -27,6 +27,8 @@ class Items(Resource):
         """ Stores new offer """
         data = request.json
         calucalted = calculate_cloud(data)
+        if calculated is None:
+            raise ApiException("error-calculating", "Error Calculating", 500)
         return {"status": "success",
                 "data": calucalted}
 
@@ -43,6 +45,8 @@ class Items(Resource):
         if reseller is not None:
             data["document_style"] = reseller.document_style
         calculated = calculate_cloud(data)
+        if calculated is None:
+            raise ApiException("error-calculating", "Error Calculating", 500)
         items = get_cloud_products(data={"calculated": calculated, "data": data})
         offer_v2_data = {
             "reseller_id": None,
@@ -123,6 +127,8 @@ class User(Resource):
         if reseller is not None:
             data["document_style"] = reseller.document_style
         calculated = calculate_cloud(data)
+        if calculated is None:
+            raise ApiException("error-calculating", "Error Calculating", 500)
         items = get_cloud_products(data={
             "data": data,
             "calculated": calculated

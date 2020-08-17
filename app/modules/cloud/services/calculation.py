@@ -63,6 +63,8 @@ def calculate_cloud(data):
         result["pv_kwp"] = data["pv_kwp"]
     else:
         data["pv_kwp"] = 0
+    if data["pv_kwp"] > 99:
+        return None
     direction_factor_kwp = 1
     direction_factor_production = 1
     if "roof_direction" in data:
