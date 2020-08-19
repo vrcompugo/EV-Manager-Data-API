@@ -218,7 +218,7 @@ def calculate_cloud(data):
             + result["min_kwp_ecloud"]
             + result["min_kwp_consumer"])
         extra_kwh_ratio = 1 - (data["pv_kwp"] - result["min_kwp_emove"]) / max_kwp
-        if result["kwp_extra"] > 0:
+        if result["kwp_extra"] >= 0:
             result["cloud_price_extra"] = -1 * result["kwp_extra"] * settings["data"]["cloud_settings"]["kwp_to_refund_factor"]
             result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
