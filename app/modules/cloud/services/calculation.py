@@ -444,7 +444,7 @@ def cloud_offer_calculation_by_pv_offer(offer: OfferV2):
         data["emove_tarif"] = offer.survey.data["cloud_emove"]
     if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
         for drain in offer.survey.data["extra_drains"]:
-            if "usage" in drain and drain["usage"] != "":
+            if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                 data["consumers"].append(drain)
     if "pv_options" in offer.survey.data:
         for optional_product in offer.survey.data["pv_options"]:
@@ -484,7 +484,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
         data["emove_tarif"] = offer.survey.data["cloud_emove"]
     if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
         for drain in offer.survey.data["extra_drains"]:
-            if "usage" in drain and drain["usage"] != "":
+            if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                 data["consumers"].append(drain)
     if "pv_options" not in offer.survey.data:
         offer.survey.data["pv_options"] = []

@@ -136,5 +136,6 @@ def add_optional_item_to_offer(survey: Survey, offer_data, optional_product):
         optional_product["product_link"],
         optional_product["product_folder"],
         quantity,
-        include_always
+        include_always,
+        packet_number
     )

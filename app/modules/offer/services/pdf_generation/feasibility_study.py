@@ -78,6 +78,7 @@ def calculate_feasibility_study(offer: OfferV2):
         cloud_total = cloud_calulation["cloud_price_incl_refund"]
         if cloud_zero:
             cloud_total = cloud_total - cloud_calulation["cloud_price_light"]
+            cloud_calulation["cloud_price_light_incl_refund"] = cloud_calulation["cloud_price_light_incl_refund"] - cloud_calulation["cloud_price_light"]
             cloud_calulation["cloud_price_light"] = 0
         consumer = 1
         if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
