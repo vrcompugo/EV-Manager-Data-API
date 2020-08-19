@@ -377,9 +377,10 @@ def filter_export_input_ecloud(data, order: Order):
 def run_export(local_id=None, remote_id=None):
     if local_id is not None:
         link = find_association("Order", local_id=local_id)
+        order = Order.query.get(local_id)
     if remote_id is not None:
         link = find_association("Order", remote_id=remote_id)
-    order = Order.query.get(link.local_id)
+        order = Order.query.get(link.local_id)
     post_data = filter_export_input_all(order)
     consumer_data_base = json.loads(json.dumps(post_data))
     post_data = filter_export_input_cloud(post_data, order)
