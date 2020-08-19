@@ -1035,17 +1035,32 @@ def convert_data_to_post_data(data, data_type):
         online_field = field.upper()
         if field.lower() in config[data_type]["fields"]:
             online_field = config[data_type]["fields"][field.lower()]
-        if type(data[field]) is list:
-            for i in range(len(data[field])):
-                if type(data[field][i]) is dict:
-                    for field2 in data[field][i].keys():
-                        if type(data[field][i][field2]) is list:
-                            for i2 in range(len(data[field][i][field2])):
-                                post_data[f"fields[{online_field}][{i}][{field2}][{i2}]"] = data[field][i][field2][i2]
-                        else:
-                            post_data[f"fields[{online_field}][{i}][{field2}]"] = data[field][i][field2]
-                else:
-                    post_data[f"fields[{online_field}][{i}]"] = data[field][i]
+        if type(data[field]) is bool:
+            post_data[f"fields[{online_field}]"] = int(data[field])
         else:
-            post_data[f"fields[{online_field}]"] = data[field]
+            if type(data[field]) is list:
+                for i in range(len(data[field])):
+                    if type(data[field][i]) is dict:
+                        for field2 in data[field][i].keys():
+                            if type(data[field][i][field2]) is list:
+                                for i2 in range(len(data[field][i][field2])):
+                                    post_data[f"fields[{online_field}][{i}][{field2}][{i2}]"] = data[field][i][field2][i2]
+                            else:
+                                post_data[f"fields[{online_field}][{i}][{field2}]"] = data[field][i][field2]
+                    else:
+                        post_data[f"fields[{online_field}][{i}]"] = data[field][i]
+            else:
+                post_data[f"fields[{online_field}]"] = convert_list_value(field, data[field], config)
+    if data_type == "deal":
+        post_data["id"] = post_data["fields[ID]"]
     return post_data
+
+
+def convert_list_value(field, value, config=None):
+    if config is None:
+        config = get_settings("external/bitrix24")
+    if field.lower() in config["select_lists"]:
+        inv_map = {v: k for k, v in config["select_lists"][field.lower()].items()}
+        if value in inv_map:
+            return inv_map[value]
+    return value

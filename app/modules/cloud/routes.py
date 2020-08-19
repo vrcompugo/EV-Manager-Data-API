@@ -177,39 +177,50 @@ class OfferUpload(Resource):
     def post(self, offer_number):
         from app.modules.importer.sources.bitrix24.drive import add_file
 
+        fileinfos = [
+            {
+                "key": "signed_offer_pdf",
+                "label": "Unterschriebenes Angebot"
+            },
+            {
+                "key": "refund_transfer_pdf",
+                "label": "Unterschriebene Abtrettungserklärung"
+            },
+            {
+                "key": "sepa_form",
+                "label": "Unterschriebene SEPA-Formular"
+            },
+            {
+                "key": "old_power_invoice",
+                "label": "Alte Stromabrechnung"
+            },
+            {
+                "key": "old_gas_invoice",
+                "label": "Alte Gas-Abrechnung"
+            }
+        ]
         allowed_file_list = [".pdf", ".jpg", "jpeg", ".png"]
-        signed_offer_pdf = request.files['signed_offer_pdf']
-        refund_transfer_pdf = request.files['refund_transfer_pdf']
-        if signed_offer_pdf.filename[-4:].lower() not in allowed_file_list:
-            raise ApiException("upload-failed", "upload failed", 415)
-        if refund_transfer_pdf.filename[-4:].lower() not in allowed_file_list:
-            raise ApiException("upload-failed", "upload failed", 415)
-        file_ending_signed_offer = signed_offer_pdf.filename[-4:].lower()
-        file_ending_refund_transfer = refund_transfer_pdf.filename[-4:].lower()
-        if file_ending_signed_offer == "jpeg":
-            file_ending_signed_offer = "." + file_ending_signed_offer
-        if file_ending_refund_transfer == "jpeg":
-            file_ending_refund_transfer = "." + file_ending_refund_transfer
 
-        signed_offer_pdf_id = add_file({
-            "foldername": f"Angebotsdateien {offer_number}",
-            "filename": f"Unterschriebenes Angebot{file_ending_signed_offer}",
-            "file_content": signed_offer_pdf.read()
-        })
-        refund_transfer_pdf_id = add_file({
-            "foldername": f"Angebotsdateien {offer_number}",
-            "filename": f"Unterschriebene Abtrettungserklärung{file_ending_refund_transfer}",
-            "file_content": refund_transfer_pdf.read()
-        })
-        if signed_offer_pdf_id is None:
-            raise ApiException("upload-failed", "upload failed", 418)
-        if refund_transfer_pdf_id is None:
-            raise ApiException("upload-failed", "upload failed", 418)
+        result_data = {}
+        for fileinfo in fileinfos:
+            if fileinfo["key"] not in request.files:
+                continue
+            file = request.files[fileinfo["key"]]
+            if file.filename[-4:].lower() not in allowed_file_list:
+                raise ApiException("upload-failed", "upload failed", 415)
+            file_ending = file.filename[-4:].lower()
+            if file_ending == "jpeg":
+                file_ending = "." + file_ending
+            file_id = add_file({
+                "foldername": f"Angebotsdateien {offer_number}",
+                "filename": f"{fileinfo['label']}{file_ending}",
+                "file_content": file.read()
+            })
+            if file_id is None:
+                raise ApiException("upload-failed", "upload failed", 418)
+            result_data[f"{fileinfo['key']}_id"] = int(file_id)
         return {"status": "success",
-                "data": {
-                    "signed_offer_pdf_id": signed_offer_pdf_id,
-                    "refund_transfer_pdf_id": refund_transfer_pdf_id
-                }}
+                "data": result_data}
 
 
 @api.route('/order')
@@ -232,6 +243,11 @@ class OrderUpload(Resource):
         offer_v2_data["data"]["offer_number"] = data["offer_number"]
         offer_v2_data["data"]["signed_offer_pdf_id"] = data["signed_offer_pdf_id"]
         offer_v2_data["data"]["refund_transfer_pdf_id"] = data["refund_transfer_pdf_id"]
+        offer_v2_data["data"]["sepa_form_id"] = data["sepa_form_id"]
+        offer_v2_data["data"]["old_power_invoice_id"] = data["old_power_invoice_id"]
+        if "old_gas_invoice_id" in data:
+            offer_v2_data["data"]["old_gas_invoice_id"] = data["old_gas_invoice_id"]
+        offer_v2_data["is_sent"] = True
         offer = update_item_v2(id=offer.id, data=offer_v2_data)
         order = Order.query.filter(Order.offer_id == offer.id).first()
         if order is not None:

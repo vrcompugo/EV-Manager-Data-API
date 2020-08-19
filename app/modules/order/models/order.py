@@ -52,6 +52,12 @@ class Order(db.Model):
         return " ".join(data)
 
     @hybrid_property
+    def contract_number(self):
+        customer_counter = 300000 + self.id
+        customer_number_prefix = "C" + self.datetime.strftime("%y%m")
+        return f"{customer_number_prefix}{customer_counter}"
+
+    @hybrid_property
     def search_query(self):
         return db.session.query(Order)
 

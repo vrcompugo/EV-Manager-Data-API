@@ -62,6 +62,14 @@ def get_settings(section=None):
                 "category": {
                     "15": "Cloud Verträge"
                 },
+                "emove_tarif": {
+                    "2436": "",
+                    "2428": "emove Tarif Hybrid",
+                    "2430": "emove.drive I",
+                    "2432": "emove.drive II",
+                    "2434": "emove.drive II",
+                    "2446": "emove.drive ALL",
+                },
                 "status": {
                     "C15:NEW": "new"
                 },
@@ -82,9 +90,19 @@ def get_settings(section=None):
                     "street_nb": "UF_CRM_5DD4F51D4CA3E",
                     "city": "UF_CRM_5DD4F51D57898",
                     "zip": "UF_CRM_5DD4F51D603E2",
-                    "counter_number": "UF_CRM_1585821761",
-                    "power_usage": "UF_CRM_1585822072",
-                    "cloud_files": "UF_CRM_1572966728920"
+                    "offer_number": "UF_CRM_1596703818172",
+                    "power_meter_number": "UF_CRM_1585821761",
+                    "usage": "UF_CRM_1585822072",
+                    "power_usage": "UF_CRM_1597757913754",
+                    "heater_usage": "UF_CRM_1597757931782",
+                    "heatcloud_power_meter_number": "UF_CRM_1597757955687",
+                    "price_guarantee": "UF_CRM_1597758014166",
+                    "emove_tarif": "UF_CRM_1594062176",
+                    "cloud_files": "UF_CRM_1572966728920",
+                    "contract_number": "UF_CRM_1596704551167",
+                    "has_consumer": "UF_CRM_1597755071841",
+                    "is_consumer": "UF_CRM_1597755099494",
+                    "has_ecloud": "UF_CRM_1597755087885"
                 }
             }
         }

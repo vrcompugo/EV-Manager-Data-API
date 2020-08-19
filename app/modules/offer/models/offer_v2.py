@@ -25,6 +25,7 @@ class OfferV2(db.Model):
     lead = db.relationship("Lead")
     survey_id = db.Column(db.Integer, db.ForeignKey("survey.id"))
     survey = db.relationship("Survey")
+    is_sent = db.Column(db.Boolean)
     offer_group = db.Column(db.String(20))
     number = db.Column(db.String(40))
     datetime = db.Column(db.DateTime)

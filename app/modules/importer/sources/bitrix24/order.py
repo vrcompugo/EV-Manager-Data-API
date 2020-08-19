@@ -253,6 +253,14 @@ def run_offer_pdf_export(local_id=None, remote_id=None, public_link=None):
 
 
 def filter_export_input(order: Order):
+    data = filter_export_input_all(order)
+    data = filter_export_input_cloud(data, order)
+    return convert_data_to_post_data(data, "deal")
+
+
+def filter_export_input_all(order: Order):
+    from .customer import run_export as run_customer_export
+
     if order.category != "Cloud Verträge":
         return None
     config = get_settings("external/bitrix24")
@@ -262,42 +270,108 @@ def filter_export_input(order: Order):
         "STAGE_ID": convert_field_value_to_remote("status", order.__dict__),
         "CURRENCY_ID": "EUR",
         "OPPORTUNITY": float(order.value_net),
-        # "COMPANY_ID": "0",
-        # "CONTACT_ID": "34392",
         "BEGINDATE": str(order.datetime),
         "DATE_CREATE": str(order.datetime),
         "OPENED": "Y",
         "CLOSED": "N",
         "CATEGORY_ID": convert_field_value_to_remote("category", order.__dict__),
         "SOURCE_ID": convert_field_value_to_remote("contact_source", order.__dict__),
-        "cloud_files": []
+        "contract_number": order.contract_number
     }
-    if order.category == "Cloud Verträge":
-        data["TITLE"] = f"{data['TITLE']} | Cloud"
-        for field in ["street", "street_nb", "city", "zip"]:
-            data[field.upper()] = order.data["address"][field]
-        for field in ["counter_number", "power_usage"]:
+
+    customer_link = find_association("Customer", local_id=order.customer_id)
+    if customer_link is None:
+        run_customer_export(local_id=order.customer_id)
+        customer_link = find_association("Customer", local_id=order.customer_id)
+    if customer_link is not None:
+        data['CONTACT_ID'] = customer_link.remote_id
+    customer_company_link = find_association("CustomerCompany", local_id=order.customer_id)
+    if customer_company_link is not None:
+        data['COMPANY_ID'] = customer_company_link.remote_id
+    return data
+
+
+def filter_export_input_cloud(data, order: Order, consumer_index=None):
+    if order.category != "Cloud Verträge":
+        return data
+    data["has_consumer"] = False
+    data["is_consumer"] = False
+    data["has_ecloud"] = False
+    if consumer_index is None:
+        if "consumers" in order.data and len(order.data["consumers"]) > 0:
+            data["has_consumer"] = True
+        if "ecloud_usage" in order.data and order.data["ecloud_usage"] != "" and order.data["ecloud_usage"] is not None and int(order.data["ecloud_usage"]) > 0:
+            data["has_ecloud"] = True
+        data["emove_tarif"] = None
+        data["cloud_files"] = []
+        data["TITLE"] = f"{order.contract_number} {order.label} | Cloud {order.contact_source}"
+        for field in ["company", "firstname", "lastname", "street", "street_nb", "city", "zip"]:
+            if field in order.data["address"]:
+                data[field.upper()] = order.data["address"][field]
+        for field in ["power_meter_number", "power_usage", "heatcloud_power_meter_number", "heater_usage",
+                      "emove_tarif", "price_guarantee", "offer_number"]:
             if field in order.data:
-                data[field.upper()] = order.data[field]
-        if "signed_offer_pdf_id" in order.data:
-            file = get_file(order.data["signed_offer_pdf_id"])
-            r = requests.get(file["DOWNLOAD_URL"])
-            data["cloud_files"].append({
-                "fileData": [
-                    file["NAME"],
-                    base64.encodestring(r.content).decode("utf-8")
-                ]
-            })
-        if "refund_transfer_pdf_id" in order.data:
-            file = get_file(order.data["refund_transfer_pdf_id"])
-            r = requests.get(file["DOWNLOAD_URL"])
-            data["cloud_files"].append({
-                "fileData": [
-                    file["NAME"],
-                    base64.encodestring(r.content).decode("utf-8")
-                ]
-            })
-    return convert_data_to_post_data(data, "deal")
+                if field == "power_usage":
+                    data["USAGE"] = order.data[field]
+                if field == "heater_usage" and "USAGE" in data:
+                    data["USAGE"] = data["USAGE"] + order.data[field]
+                if field == "price_guarantee":
+                    if order.data[field] is not None and order.data[field] != "":
+                        data[field.upper()] = int(order.data[field].replace("_years", ""))
+                else:
+                    data[field.upper()] = order.data[field]
+
+        for file_key in ["signed_offer_pdf_id", "refund_transfer_pdf_id", "sepa_form_id",
+                         "old_power_invoice_id", "old_gas_invoice_id"]:
+            if file_key in order.data:
+                file = get_file(order.data[file_key])
+                r = requests.get(file["DOWNLOAD_URL"])
+                data["cloud_files"].append({
+                    "fileData": [
+                        file["NAME"],
+                        base64.encodestring(r.content).decode("utf-8")
+                    ]
+                })
+    else:
+        consumer = order.data["consumers"][consumer_index]
+        consumer_data = data
+        consumer_data["TITLE"] = f"{order.contract_number}c{consumer_index + 1} {order.label} | Cloud {order.contact_source}"
+        consumer_data["contract_number"] = f"{order.contract_number}c{consumer_index + 1}"
+        consumer_data["has_consumer"] = False
+        consumer_data["is_consumer"] = True
+        for field in ["company", "firstname", "lastname", "street", "street_nb", "city", "zip"]:
+            if field in consumer["address"]:
+                consumer_data[field.upper()] = consumer["address"][field]
+        for field in ["power_meter_number", "usage"]:
+            if field in consumer:
+                if field == "usage":
+                    consumer_data["POWER_USAGE"] = consumer[field]
+                consumer_data[field.upper()] = consumer[field]
+        consumer_data["offer_number".upper()] = order.data["offer_number"]
+        return consumer_data
+    return data
+
+
+def filter_export_input_ecloud(data, order: Order):
+    if order.category != "Cloud Verträge":
+        return data
+    data["has_consumer"] = False
+    data["is_consumer"] = False
+    data["has_ecloud"] = False
+    data["TITLE"] = f"{order.contract_number}E {order.label} | Cloud {order.contact_source}"
+    data["contract_number"] = f"{order.contract_number}E"
+    data["has_consumer"] = False
+    data["is_consumer"] = False
+    data["CATEGORY_ID"] = 140
+    data["STAGE_ID"] = "C140:NEW"
+    for field in ["company", "firstname", "lastname", "street", "street_nb", "city", "zip"]:
+        if field in order.data["address"]:
+            data[field.upper()] = order.data["address"][field]
+    data["power_meter_number".upper()] = order.data["power_meter_number"]
+    data["usage".upper()] = order.data["ecloud_usage"]
+    data["power_usage".upper()] = 0
+    data["offer_number".upper()] = order.data["offer_number"]
+    return data
 
 
 def run_export(local_id=None, remote_id=None):
@@ -305,17 +379,37 @@ def run_export(local_id=None, remote_id=None):
         link = find_association("Order", local_id=local_id)
     if remote_id is not None:
         link = find_association("Order", remote_id=remote_id)
-
-    if link is None and local_id is not None:
+    order = Order.query.get(link.local_id)
+    post_data = filter_export_input_all(order)
+    consumer_data_base = json.loads(json.dumps(post_data))
+    post_data = filter_export_input_cloud(post_data, order)
+    if link is None:
         print("run export order new")
-        order = Order.query.get(local_id)
-        post_data = filter_export_input(order)
-        response = post("crm.deal.add", post_data)
+        response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
         if "result" in response:
             associate_item("Order", local_id=local_id, remote_id=response["result"])
-    if link is not None:
+    else:
         print("run export order update", link.remote_id)
-        order = Order.query.get(link.local_id)
-        post_data = filter_export_input(order)
         post_data["id"] = link.remote_id
-        response = post("crm.deal.update", post_data)
+        response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
+    if "consumers" in order.data:
+        for i, consumer in enumerate(order.data["consumers"]):
+            link = find_association(f"OrderC{i}", local_id=local_id)
+            post_data = filter_export_input_cloud(consumer_data_base, order, consumer_index=i)
+            if link is None:
+                response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
+                if "result" in response:
+                    associate_item(f"OrderC{i}", local_id=local_id, remote_id=response["result"])
+            else:
+                post_data["id"] = link.remote_id
+                response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
+    if "ecloud_usage" in order.data and order.data["ecloud_usage"] != "" and order.data["ecloud_usage"] is not None and int(order.data["ecloud_usage"]) > 0:
+        link = find_association("OrderECloud", local_id=local_id)
+        post_data = filter_export_input_ecloud(consumer_data_base, order)
+        if link is None:
+            response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
+            if "result" in response:
+                associate_item("OrderECloud", local_id=local_id, remote_id=response["result"])
+        else:
+            post_data["id"] = link.remote_id
+            response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
