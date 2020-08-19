@@ -1052,7 +1052,8 @@ def convert_data_to_post_data(data, data_type):
             else:
                 post_data[f"fields[{online_field}]"] = convert_list_value(field, data[field], config)
     if data_type == "deal":
-        post_data["id"] = post_data["fields[ID]"]
+        if "fields[ID]" in post_data
+            post_data["id"] = post_data["fields[ID]"]
     return post_data
 
 
