@@ -112,6 +112,8 @@ def calculate_cloud(data):
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_prices"][str(user["id"])]
         ))[0]["value"]
+        if "name" in user and user["name"].lower() == "bsh":
+            result["cloud_price_light"] = data["power_usage"] * 0.36 / 10 / 12
         if "price_guarantee" in data and data["price_guarantee"] == "2_years":
             if 0 < data["power_usage"] <= 5000:
                 result["cloud_price_light"] = 29
