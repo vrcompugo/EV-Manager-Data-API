@@ -22,12 +22,14 @@ def calculate_feasibility_study(offer: OfferV2):
     settings["data"]["wi_settings"]["pv_efficiancy"] = {
         "south": 960,
         "west_east": 960 * 0.8,
+        "south_west_east": 960 * 0.92,
         "north": 960 * 0.65
     }
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
         settings["data"]["wi_settings"]["pv_efficiancy"] = {
             "south": 1000,
             "west_east": 860,
+            "south_west_east": 920,
             "north": 650
         }
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
@@ -63,6 +65,10 @@ def calculate_feasibility_study(offer: OfferV2):
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "south":
             orientation = offer.data["roof_direction"]
             orientation_label = "Süd"
+            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "south_west_east":
+            orientation = offer.data["roof_direction"]
+            orientation_label = "Süd Ost/Süd West"
             pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
 
         cloud_total = cloud_calulation["cloud_price_incl_refund"]
