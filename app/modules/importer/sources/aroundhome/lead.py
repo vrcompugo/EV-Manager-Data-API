@@ -114,6 +114,9 @@ def run_cron_import():
 
     if leads is not None:
         for lead in leads:
+            link = find_association("Lead", remote_id=lead["lead_id"])
+            if link is not None:
+                continue
             if lead["offer_contact"]["email"] == "":
                 lead["offer_contact_org"] = lead["offer_contact"]
                 lead["offer_contact"] = lead["installation_contact"]
@@ -124,6 +127,7 @@ def run_cron_import():
                     print(json.dumps(data, indent=2))
                     item = add_item(data)
                     lead_reseller_auto_assignment(item)
+                    associate_item("Lead", remote_id=lead["lead_id"], local_id=item.id)
                 except Exception as e:
                     error_handler()
             else:
