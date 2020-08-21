@@ -103,8 +103,12 @@ def run_cron_import():
         return None
     import_time = datetime.now()
     if "data" in config and "last_lead_import_time" in config["data"]:
+        print(config["data"]["last_lead_import_time"])
+        last_import = datetime.strptime(config["data"]["last_lead_import_time"], "%Y-%m-%d %H:%M:%S.%f")
+        print(last_import)
+        print(datetime.timestamp(last_import))
         leads = get("/v201609/leads", parameters={
-            "from_datetime": str(config["data"]["last_lead_import_time"]),
+            "from_timestamp": datetime.timestamp(last_import),
             "per_page": 10000
         })
     else:
