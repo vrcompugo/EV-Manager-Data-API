@@ -61,7 +61,7 @@ def filter_customer_import_input(item_data):
         "customer_number": None,
         "lead_number": None,
         "company": "",
-        "salutation": "mr" if item_data["offer_contact"]["salutation"] == "Mr." else "ms",
+        "salutation": "ms" if item_data["offer_contact"]["salutation"] == "Frau" else "mr",
         "title": "",
         "firstname": item_data["offer_contact"]["first_name"],
         "lastname": item_data["offer_contact"]["last_name"],
@@ -71,7 +71,7 @@ def filter_customer_import_input(item_data):
         "email_status": None,
         "default_address": {
             "company": "",
-            "salutation": "mr" if item_data["offer_contact"]["salutation"] == "Mr." else "ms",
+            "salutation": "ms" if item_data["offer_contact"]["salutation"] == "Frau" else "mr",
             "title": "",
             "firstname": item_data["offer_contact"]["first_name"],
             "lastname": item_data["offer_contact"]["last_name"],
