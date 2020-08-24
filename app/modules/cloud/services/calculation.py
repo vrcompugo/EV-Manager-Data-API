@@ -109,6 +109,9 @@ def calculate_cloud(data):
                 result["storage_size"] = 5
             if result["storage_size"] > 30:
                 result["storage_size"] = 30
+            if "min_storage_size_overwrite" in data and data["min_storage_size_overwrite"] != "":
+                if int(data["min_storage_size_overwrite"]) > result["storage_size"]:
+                    result["storage_size"] = data["min_storage_size_overwrite"]
 
         result["cloud_price_light"] = result["cloud_price_light"] + list(filter(
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
