@@ -16,3 +16,4 @@ from app.modules.email.models import *
 from app.modules.order.models.order import Order, OrderSchema
 from app.modules.commission.models.commission import Commission, CommissionSchema
 from app.modules.calendar.models.calendar_event import CalendarEvent, CalendarEventSchema
+from app.modules.eeg.models import EEGRefundRate

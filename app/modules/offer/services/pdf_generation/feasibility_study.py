@@ -8,7 +8,7 @@ import dateutil
 
 from app.modules.settings.settings_services import get_one_item as get_settings
 from app.modules.file.file_services import add_item as add_file, update_item as update_file
-from app.models import OfferV2, S3File
+from app.models import OfferV2, S3File, EEGRefundRate
 from app.utils.gotenberg import generate_pdf as gotenberg_pdf
 from app.modules.cloud.services.calculation import cloud_offer_calculation_by_pv_offer
 
@@ -161,14 +161,25 @@ def calculate_feasibility_study(offer: OfferV2):
     }
     if data["investment_type"] == "cash":
         data["loan_interest_rate"] = 0
-    data["eeg_refund_per_kwh"] = 0.0878
+    data["eeg_refund_per_kwh"] = 0.0808
     if "pv_kwp" in cloud_calulation and cloud_calulation["pv_kwp"] > 0:
-        if cloud_calulation["pv_kwp"] <= 100:
-            data["eeg_refund_per_kwh"] = 0.0689
-        if cloud_calulation["pv_kwp"] <= 40:
-            data["eeg_refund_per_kwh"] = 0.0878
-        if cloud_calulation["pv_kwp"] <= 10:
-            data["eeg_refund_per_kwh"] = 0.0903
+        refund_rate = EEGRefundRate.query\
+            .filter(EEGRefundRate.month == offer.datetime.month)\
+            .filter(EEGRefundRate.year == offer.datetime.year)\
+            .filter(EEGRefundRate.min_kwp < cloud_calulation["pv_kwp"])\
+            .filter(EEGRefundRate.max_kwp >= cloud_calulation["pv_kwp"])\
+            .order_by(EEGRefundRate.value.asc())\
+            .first()
+        if refund_rate is not None:
+            data["eeg_refund_per_kwh"] = refund_rate.value
+    if refund_rate is not None:
+        refund_rate = EEGRefundRate.query\
+            .filter(EEGRefundRate.month == offer.datetime.month)\
+            .filter(EEGRefundRate.year == offer.datetime.year)\
+            .order_by(EEGRefundRate.value.asc())\
+            .first()
+
+
     if offer.data is not None and "loan_total" in offer.data and offer.data["loan_total"] is not None and offer.data["loan_total"] != "":
         data["pv_offer_total"] = float(offer.data["loan_total"])
     yearly_loan_payment = data["pv_offer_total"] / 20
