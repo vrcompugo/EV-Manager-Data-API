@@ -173,13 +173,25 @@ def calculate_feasibility_study(offer: OfferV2):
             .first()
         if refund_rate is not None:
             data["eeg_refund_per_kwh"] = refund_rate.value
-    if refund_rate is not None:
-        print(json.dumps(cloud_calulation, indent=2))
-        refund_rate = EEGRefundRate.query\
-            .filter(EEGRefundRate.month == offer.datetime.month)\
-            .filter(EEGRefundRate.year == offer.datetime.year)\
-            .order_by(EEGRefundRate.value.asc())\
-            .first()
+    if refund_rate is None:
+        if "min_kwp" in cloud_calulation and cloud_calulation["min_kwp"] > 0:
+            refund_rate = EEGRefundRate.query\
+                .filter(EEGRefundRate.month == offer.datetime.month)\
+                .filter(EEGRefundRate.year == offer.datetime.year)\
+                .filter(EEGRefundRate.min_kwp < cloud_calulation["min_kwp"])\
+                .filter(EEGRefundRate.max_kwp >= cloud_calulation["min_kwp"])\
+                .order_by(EEGRefundRate.value.asc())\
+                .first()
+            if refund_rate is not None:
+                data["eeg_refund_per_kwh"] = refund_rate.value
+        else:
+            refund_rate = EEGRefundRate.query\
+                .filter(EEGRefundRate.month == offer.datetime.month)\
+                .filter(EEGRefundRate.year == offer.datetime.year)\
+                .order_by(EEGRefundRate.value.asc())\
+                .first()
+            if refund_rate is not None:
+                data["eeg_refund_per_kwh"] = refund_rate.value
 
     if offer.data is not None and "loan_total" in offer.data and offer.data["loan_total"] is not None and offer.data["loan_total"] != "":
         data["pv_offer_total"] = float(offer.data["loan_total"])
