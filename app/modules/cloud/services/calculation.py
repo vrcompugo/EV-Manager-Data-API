@@ -261,6 +261,7 @@ def calculate_cloud(data):
                              + result["cloud_price_emove"])
 
     result["conventional_price"] = (result["conventional_price_light"]
+                                    + result["conventional_price_consumer"]
                                     + result["conventional_price_heatcloud"]
                                     + result["conventional_price_ecloud"]
                                     + result["conventional_price_emove"])
