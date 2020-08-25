@@ -39,7 +39,14 @@
 
       <table cellspacing="0">
         <tr>
-          <td>Verbrauch nach Haushaltsstrom</td>
+          <td>
+            Verbrauch nach Haushaltsstrom
+            {% if offer.reseller.document_style != "bsh" %}
+              {% if data.consumer %}
+                (inkl. Consumer)
+              {% endif %}
+            {% endif %}
+          </td>
           <td><b>{{ data.usage | numberformat('de', 0) }}</b> kWh pro Jahr</td>
         </tr>
         <tr>

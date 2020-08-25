@@ -132,8 +132,12 @@ def calculate_cloud(data):
                 result["cloud_price_light"] = 99
             if "name" in user and user["name"].lower() == "bsh":
                 result["cloud_price_light"] = data["power_usage"] * 0.37 / 10 / 12
-
-        result["conventional_price_light"] = (data["power_usage"] * settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"]) / 12
+        result["conventional_price_light"] = (
+            (
+                settings["data"]["wi_settings"]["conventional_base_cost_per_year"]
+                + data["power_usage"] * settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"]
+            ) / 12
+        )
 
     if "heater_usage" in data and data["heater_usage"] != "" and data["heater_usage"] != "0" and data["heater_usage"] != 0:
         data["heater_usage"] = int(data["heater_usage"])
@@ -174,7 +178,12 @@ def calculate_cloud(data):
                 result["cloud_price_consumer"] = result["cloud_price_consumer"] + consumer_price[0]["value"]
         result["consumer_usage"] = consumer_usage
         result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor_kwp) / 1000
-        result["conventional_price_consumer"] = (result["consumer_usage"] * settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"]) / 12
+        result["conventional_price_consumer"] = (
+            (
+                settings["data"]["wi_settings"]["conventional_base_cost_per_year"] * len(data["consumers"])
+                + result["consumer_usage"] * settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"]
+            ) / 12
+        )
 
     result["conventional_price_emove"] = 0
     if "emove_tarif" in data:

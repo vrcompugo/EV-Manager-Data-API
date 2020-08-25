@@ -37,10 +37,22 @@
   <div class="flex layout horizontal">
     <div class="left-side">
       <div class="headline">
-        Keine hohen Stromkosten mehr
+        {% if offer.reseller.document_style == "bsh" %}
+          Keine hohen Stromkosten mehr
+        {% else %}
+          Keine hohen Energiekosten mehr
+        {% endif %}
       </div>
 
-      <div class="sub-headline">Das geben Sie in den nächsten {{ data.runtime }} Jahren für Strom aus:</div>
+      <div class="sub-headline">
+        Das geben Sie in den nächsten {{ data.runtime }} Jahren für
+        {% if offer.reseller.document_style == "bsh" %}
+          Strom
+        {% else %}
+          Energie
+        {% endif %}
+        aus:
+      </div>
 
       <div class="extra-large">{{ data.conventional_total_cost | currencyformat("de", 0) }}</div>
 

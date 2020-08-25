@@ -77,7 +77,15 @@
   <div class="flex layout horizontal">
     <div class="left-side">
       <div class="headline">
-        100 % stromautark<br>mit SENEC-Speicher & {{ cloud_name }}<br>jederzeit und überall
+
+        {% if offer.reseller.document_style == "bsh" %}
+          100 % stromautark<br>
+        {% else %}
+          100 % energieautark<br>
+        {% endif %}
+
+        mit SENEC-Speicher & {{ cloud_name }}<br>
+        jederzeit und überall
       </div>
 
       <div class="sub-headline">So funktioniert der SENEC-Batteriespeicher und die Cloud</div>

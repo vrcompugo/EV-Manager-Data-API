@@ -81,7 +81,8 @@
           </div>
         </div>
         <div>
-          Ist-Situation bei Stromverbrauch<br>in {{ data.runtime }} Jahren
+          <b></b>Ist-Situation bei {% if offer.reseller.document_style == "bsh" %}Stromverbrauch{% else %}Energieverbrauch{% endif %}<br>
+          in {{ data.runtime }} Jahren</b>
           <div class="large">
             {{ total_conventional_cost | currencyformat("de", 0) }}
           </div>
@@ -146,12 +147,18 @@
           </div>
         </div>
         <div>
-          Unsere Lösung<br>
-          in {{ data.runtime }} Jahren
+          <b>Unsere Lösung<br>
+          in {{ data.runtime }} Jahren</b>
           <div class="large">
             {{ data.cost_total | currencyformat("de", 0) }}
           </div>
-          <div class="smaller">Investition + laufende Ausgaben - Einnahmen aus EEG</div>
+          <div class="smaller">
+            {% if offer.reseller.document_style == "bsh" %}
+              Investition + laufende Ausgaben - Einnahmen aus EEG
+            {% else %}
+              Investition, laufende Ausgaben und Verrechnung aus EEG
+            {% endif %}
+          </div>
         </div>
       </div>
       <br>
@@ -167,7 +174,7 @@
                 <small>inkl. Zinsen</small>
               {% endif %}
             </td>
-            <td><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
+            <td class="align-right"><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
           </tr>
           <tr>
             <td>
@@ -187,19 +194,19 @@
                 </small>
               {% endif %}
             </td>
-            <td><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
+            <td class="align-right"><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
           </tr>
           <tr class="highlight">
             <td>Gesamtkosten</td>
-            <td><b>{{ data.cost_total | currencyformat("de", 0) }}</b></td>
+            <td class="align-right"><b>{{ data.cost_total | currencyformat("de", 0) }}</b></td>
           </tr>
           <tr>
             <td>Vorteil über {{ data.runtime }} Jahre</td>
-            <td><b>{{ data.cost_benefit | currencyformat("de", 0) }}</b></td>
+            <td class="align-right"><b>{{ data.cost_benefit | currencyformat("de", 0) }}</b></td>
           </tr>
           <tr>
             <td>Durchschnittlicher monatlicher Vorteil</td>
-            <td><b>{{ (data.cost_benefit / data.runtime / 12) | currencyformat("de", 2) }}</b></td>
+            <td class="align-right"><b>{{ (data.cost_benefit / data.runtime / 12) | currencyformat("de", 0) }}</b></td>
           </tr>
         </table>
       </div>

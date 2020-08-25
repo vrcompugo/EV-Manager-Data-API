@@ -37,12 +37,12 @@
             <td colspan="2">Bisher</td>
           </tr>
           <tr>
-            <td>Grundgebühr Haushaltsstrom (Brutto)</td>
+            <td>Grundgebühr Haushaltsstrom (Brutto) je&nbsp;Zähler</td>
             <td><b>{{ data.conventional_base_cost_per_year | currencyformat }}</b> pro Jahr</td>
           </tr>
           <tr>
             <td>Zähler 1 Strompreis (Brutto)</td>
-            <td><b>{{ (100 * data.conventional_base_cost_per_kwh) | numberformat('de', 2) }}</b> cent pro kWh</td>
+            <td><b>{{ (100 * data.conventional_base_cost_per_kwh) | numberformat('de', 2) }}</b>&nbsp;cent&nbsp;pro&nbsp;kWh</td>
           </tr>
           <tr>
             <td>Strompreissteigerung</td>

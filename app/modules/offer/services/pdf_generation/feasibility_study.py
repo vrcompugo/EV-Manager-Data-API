@@ -213,7 +213,7 @@ def calculate_feasibility_study(offer: OfferV2):
 
     data["total_pages"] = 17
     data["lightcloud"] = {
-        "price_today": base / 12 + cloud_calulation["conventional_price_consumer"],
+        "price_today": cloud_calulation["conventional_price_light"] + cloud_calulation["conventional_price_consumer"],
         "price_tomorrow": float(cloud_calulation["cloud_price_light_incl_refund"]) + float(cloud_calulation["cloud_price_consumer_incl_refund"])
     }
     data["lightcloud"]["price_half_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** (data["cloud_runtime"] / 2)

@@ -7,7 +7,11 @@
     position: relative;
     display: flex;
     justify-content: flex-end;
-    background-image: url("{{ data.base_url }}/static/feasibility_study_2020/girl_beach.jpg");
+    {% if offer.reseller.document_style == "bsh" %}
+      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/girl_beach.jpg");
+    {% else %}
+      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/woman.jpg");
+    {% endif %}
     background-size: cover;
     border-bottom: 12px solid #AEBF00;
   }
