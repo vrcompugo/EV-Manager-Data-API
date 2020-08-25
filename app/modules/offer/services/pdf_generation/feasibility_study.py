@@ -162,6 +162,7 @@ def calculate_feasibility_study(offer: OfferV2):
     if data["investment_type"] == "cash":
         data["loan_interest_rate"] = 0
     data["eeg_refund_per_kwh"] = 0.0808
+    refund_rate = None
     if "pv_kwp" in cloud_calulation and cloud_calulation["pv_kwp"] > 0:
         refund_rate = EEGRefundRate.query\
             .filter(EEGRefundRate.month == offer.datetime.month)\
@@ -173,12 +174,12 @@ def calculate_feasibility_study(offer: OfferV2):
         if refund_rate is not None:
             data["eeg_refund_per_kwh"] = refund_rate.value
     if refund_rate is not None:
+        print(json.dumps(cloud_calulation, indent=2))
         refund_rate = EEGRefundRate.query\
             .filter(EEGRefundRate.month == offer.datetime.month)\
             .filter(EEGRefundRate.year == offer.datetime.year)\
             .order_by(EEGRefundRate.value.asc())\
             .first()
-
 
     if offer.data is not None and "loan_total" in offer.data and offer.data["loan_total"] is not None and offer.data["loan_total"] != "":
         data["pv_offer_total"] = float(offer.data["loan_total"])
