@@ -66,3 +66,13 @@ def commission_calulation(order: Order):
 
 def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(Order, OrderSchema, tree, sort, offset, limit, fields)
+
+
+def generate_contract_number(order: Order):
+    if order.category != "Cloud Verträge":
+        return None
+    if order.contract_number is not None or order.contract_number == "":
+        return order.contract_number
+    customer_counter = 300000 + order.id
+    customer_number_prefix = "C" + order.datetime.strftime("%y%m")
+    return f"{customer_number_prefix}{customer_counter}"

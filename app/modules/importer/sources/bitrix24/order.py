@@ -34,6 +34,7 @@ CATEGORY_TYPES = {
 
 
 def filter_import_input(item_data):
+    config = get_settings("external/bitrix24")
     response = post("crm.dealcategory.get", {"ID": item_data["CATEGORY_ID"]})
     category = ""
     if "result" in response and "NAME" in response["result"]:
@@ -44,12 +45,20 @@ def filter_import_input(item_data):
 
     street = item_data["UF_CRM_1572962429"] if "UF_CRM_1572962429" in item_data else None
     street = street if street != "siehe Kundenanschrift" else None
+    if street is None or street == "":
+        street = item_data["UF_CRM_5DD4F51D40C8D"] if "UF_CRM_5DD4F51D40C8D" in item_data else None
     street_nb = item_data["UF_CRM_1572962442"] if "UF_CRM_1572962442" in item_data else None
     street_nb = street_nb if street_nb != "siehe Kundenanschrift" else None
+    if street_nb is None or street_nb == "":
+        street_nb = item_data["UF_CRM_5DD4F51D4CA3E"] if "UF_CRM_5DD4F51D4CA3E" in item_data else None
     zip_code = item_data["UF_CRM_1572962458"] if "UF_CRM_1572962458" in item_data else None
     zip_code = zip_code if zip_code != "siehe Kundenanschrift" else None
+    if zip_code is None or zip_code == "":
+        zip_code = item_data["UF_CRM_5DD4F51D603E2"] if "UF_CRM_5DD4F51D603E2" in item_data else None
     city = item_data["UF_CRM_1572962413"] if "UF_CRM_1572962413" in item_data else None
     city = city if city != "siehe Kundenanschrift" else None
+    if city is None or city == "":
+        city = item_data["UF_CRM_5DD4F51D57898"] if "UF_CRM_5DD4F51D57898" in item_data else None
     data = {
         "datetime": item_data["DATE_CREATE"],
         "label": item_data["TITLE"],
@@ -66,10 +75,12 @@ def filter_import_input(item_data):
         "city": city,
         "commissions": None,
         "commission_value_net": 0,
-        "data": {}
+        "data": item_data
     }
     if "UF_CRM_1587030744" in item_data:
         data["data"]["usage_without_pv"] = convert_field_value_from_remote("UF_CRM_1587030744", item_data)
+    if config["deal"]["fields"]["contract_number"] in item_data:
+        data["contract_number"] = item_data[config["deal"]["fields"]["contract_number"]]
     if "UF_CRM_1587030804" in item_data:
         data["data"]["pv_size"] = convert_field_value_from_remote("UF_CRM_1587030804", item_data)
     if "UF_CRM_1587121259" in item_data:
@@ -414,3 +425,26 @@ def run_export(local_id=None, remote_id=None):
         else:
             post_data["id"] = link.remote_id
             response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
+
+
+def run_export_fields(local_id=None, remote_id=None, fields=[]):
+    if local_id is not None:
+        link = find_association("Order", local_id=local_id)
+        order = Order.query.get(local_id)
+    if remote_id is not None:
+        link = find_association("Order", remote_id=remote_id)
+        order = Order.query.get(link.local_id)
+    if link is None:
+        return None
+
+    config = get_settings("external/bitrix24")
+    post_data = {}
+    for field in fields:
+        if hasattr(order, field):
+            post_data[field] = getattr(order, field)
+    if len(post_data) > 0:
+        post_data["id"] = link.remote_id
+        response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
+        if "result" in response:
+            return order
+    return None

@@ -20,6 +20,7 @@ class Order(db.Model):
     reseller = db.relationship("Reseller")
     offer_id = db.Column(db.Integer, db.ForeignKey("offer_v2.id"))
     offer = db.relationship("OfferV2")
+    contract_number = db.Column(db.String(120))
     category = db.Column(db.String(80))
     type = db.Column(db.String(60))
     street = db.Column(db.String(90))
@@ -50,12 +51,6 @@ class Order(db.Model):
         if self.city is not None:
             data.append(self.city)
         return " ".join(data)
-
-    @hybrid_property
-    def contract_number(self):
-        customer_counter = 300000 + self.id
-        customer_number_prefix = "C" + self.datetime.strftime("%y%m")
-        return f"{customer_number_prefix}{customer_counter}"
 
     @hybrid_property
     def search_query(self):

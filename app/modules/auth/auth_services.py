@@ -9,7 +9,7 @@ from flask import request
 def encode_auth_token(user_id):
     try:
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=300),
             'iat': datetime.datetime.utcnow(),
             'sub': user_id
         }
@@ -62,11 +62,12 @@ def revalidate_user():
         raise ApiException("invalid_credentials", "Invalid Credentials. Please log in again.", 401)
 
 
-def get_logged_in_user(new_request=None):
+def get_logged_in_user(new_request=None, auth_token=None):
     # get the auth token
     if new_request is None:
         new_request = request
-    auth_token = new_request.headers.get('Authorization')
+    if auth_token is None:
+        auth_token = new_request.headers.get('Authorization')
     if auth_token:
         auth_token = auth_token.replace("Bearer ", "")
         if auth_token is not None and auth_token != "":

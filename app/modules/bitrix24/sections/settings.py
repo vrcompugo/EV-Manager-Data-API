@@ -16,7 +16,7 @@ def register_routes(api: Blueprint):
             return "Forbidden"
         encoded_jwt = jwt.encode(
             payload={
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=3000),
                 'iat': datetime.datetime.utcnow(),
                 'sub': auth_info["user2"].id
             },
