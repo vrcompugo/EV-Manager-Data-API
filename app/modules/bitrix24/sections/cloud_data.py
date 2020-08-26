@@ -1,4 +1,5 @@
 import jwt
+import json
 import datetime
 from flask import Blueprint, render_template, request, make_response
 
@@ -15,6 +16,9 @@ def register_routes(api: Blueprint):
 
     @api.route("/cloud_data/", methods=["GET", "POST"])
     def cloud_data_iframe():
+        from app.modules.importer.sources.bitrix24._association import find_association
+        from app.modules.importer.sources.bitrix24.order import run_import as order_import
+
         auth_info = get_bitrix_auth_info(request)
         if "user2" not in auth_info:
             return "Forbidden"
@@ -26,12 +30,17 @@ def register_routes(api: Blueprint):
             },
             key=key,
             algorithm='HS256')
-        if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
-            order_id = json.loads(request.form.get("PLACEMENT_OPTIONS"))["ID"]
-            order_import(remote_id=order_id)
-            order_link = find_association("Order", remote_id=order_id)
-            if order_link is None:
-                return "Order not found"
+        if request.form.get("PLACEMENT") != "CRM_DEAL_DETAIL_TAB":
+            return "Kein Placement"
+        order_id = json.loads(request.form.get("PLACEMENT_OPTIONS"))["ID"]
+        order = order_import(remote_id=order_id)
+        if order is None:
+            return "Import fehlgeschlagen"
+        if order.category != "Cloud Verträge":
+            return "Nur Cloud Verträge"
+        order_link = find_association("Order", remote_id=order_id)
+        if order_link is None:
+            return "Order not found"
         return render_template("cloud_data/iframe.html", encoded_jwt=encoded_jwt.decode(), order_id=order_link.local_id)
 
     @api.route("/cloud_data/generate_contract_number/<order_id>", methods=["POST"])
