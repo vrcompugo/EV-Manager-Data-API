@@ -67,3 +67,7 @@ def register_routes(api: Blueprint):
             return response
 
         return '{"status": "success"}'
+
+    @api.route("/cloud_data/install/", methods=["POST"])
+    def cloud_data_installer():
+        return render_template("cloud_data/install.html")
