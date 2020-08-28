@@ -103,12 +103,14 @@ def calculate_cloud(data):
                 result["storage_size"] = 7.5
             if 7 < data["pv_kwp"] < 7:
                 result["storage_size"] = 10
+        result["min_storage_size"] = result["storage_size"]
         if "name" in user and user["name"].lower() == "bsh":
             result["storage_size"] = math.ceil(data["power_usage"] / 2500) * 2.5
             if result["storage_size"] < 5:
                 result["storage_size"] = 5
             if result["storage_size"] > 30:
                 result["storage_size"] = 30
+            result["min_storage_size"] = result["storage_size"]
             if "min_storage_size_overwrite" in data and data["min_storage_size_overwrite"] != "":
                 if int(data["min_storage_size_overwrite"]) > result["storage_size"]:
                     result["storage_size"] = data["min_storage_size_overwrite"]
