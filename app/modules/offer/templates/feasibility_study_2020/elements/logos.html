@@ -34,12 +34,23 @@
   .logos .bsh-logo img {
     height: 100px;
   }
+  .logos .mitte-logo {
+    padding-top: 20px;
+    padding-bottom: 0;
+  }
+  .logos .mitte-logo img {
+    height: 90px;
+  }
 </style>
 
 <div class="logos layout horizontal">
   {% if offer.reseller.document_style == "bsh" %}
     <div class="kez bsh-logo flex">
       <img class="" src="{{ data.base_url }}/static/feasibility_study_2020/bsh-logo.jpg" />
+    </div>
+  {% elif offer.reseller.document_style == "mitte" %}
+    <div class="kez mitte-logo flex">
+      <img src="{{ data.base_url }}/static/feasibility_study_2020/mitte-logo.jpg" />
     </div>
   {% else %}
     <div class="kez flex">

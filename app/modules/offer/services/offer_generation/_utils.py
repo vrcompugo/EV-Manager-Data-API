@@ -42,6 +42,7 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
         if survey is not None and "pv_usage" in survey.data and survey.data["pv_usage"] != "" and int(survey.data["pv_usage"]) > 0:
             packet_number = math.ceil(int(survey.data["pv_usage"]) / 500) * 5
     product = None
+    price_markup_faktor = 1
     if survey is not None:
         product = Product.query\
             .filter(Product.name == product_name)\
@@ -49,6 +50,8 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
             .filter(Product.packet_range_start <= packet_number)\
             .filter(Product.packet_range_end >= packet_number)\
             .first()
+        if survey.reseller is not None and survey.reseller.document_style == "mitte":
+            price_markup_faktor = 1.15
     if product is None:
         product = Product.query\
             .filter(Product.name == product_name)\
@@ -58,14 +61,14 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
         print("Product not found: {}".format(product_name))
         return offer_data
     tax_rate = 16
-    single_price = round(float(product.price_net) * (1 + tax_rate / 100), 4)
-    single_price_net = float(product.price_net)
+    single_price = round(float(product.price_net) * (1 + tax_rate / 100) * price_markup_faktor, 4)
+    single_price_net = float(product.price_net) * price_markup_faktor
     single_tax_amount = single_price - single_price_net
     quantity_unit = product.pack_unit
     if offer_data["offer_group"] == "heater-offer-con" and product_name.find("AIO Paket") == -1:
-        single_price = single_price / 1000 * 7.9
-        single_price_net = single_price_net / 1000 * 7.9
-        single_tax_amount = single_tax_amount / 1000 * 7.9
+        single_price = single_price / 1000 * 7.9 * price_markup_faktor
+        single_price_net = single_price_net / 1000 * 7.9 * price_markup_faktor
+        single_tax_amount = single_tax_amount / 1000 * 7.9 * price_markup_faktor
         quantity_unit = "mtl."
     item_data = {
         "product_id": product.id,
