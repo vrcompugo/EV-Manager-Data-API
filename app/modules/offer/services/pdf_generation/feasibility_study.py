@@ -138,7 +138,7 @@ def calculate_feasibility_study(offer: OfferV2):
         "investment_type": investment_type,
         "in_use_date": in_use_date,
         "conventional_base_cost_per_year": settings["data"]["wi_settings"]["conventional_base_cost_per_year"],
-        "conventional_base_cost_per_kwh": settings["data"]["wi_settings"]["conventional_base_cost_per_kwh"],
+        "conventional_base_cost_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
         "cost_increase_rate": price_increase,
         "cost_increase_rate_heat": price_increase_heat,
         "cost_increase_rate_emove": price_increase_emove,
@@ -159,6 +159,7 @@ def calculate_feasibility_study(offer: OfferV2):
         "cost_total": None,
         "cost_benefit": None
     }
+    data["conventional_base_cost_per_kwh"] = cloud_calulation["lightcloud_extra_price_per_kwh"]
     if data["investment_type"] == "cash":
         data["loan_interest_rate"] = 0
     data["eeg_refund_per_kwh"] = 0.0808
