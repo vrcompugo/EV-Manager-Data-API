@@ -111,6 +111,10 @@ def calculate_cloud(data):
         result["min_storage_size"] = result["storage_size"]
         if "name" in user and user["name"].lower() == "bsh":
             result["storage_size"] = math.ceil(data["power_usage"] / 2500) * 2.5
+            if 7501 <= data["power_usage"] <= 11500:
+                result["storage_size"] = 10
+            if 11500 < data["power_usage"]:
+                result["storage_size"] = math.ceil(data["power_usage"] / 5000) * 5
             if result["storage_size"] < 5:
                 result["storage_size"] = 5
             if result["storage_size"] > 30:
