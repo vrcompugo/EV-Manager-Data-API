@@ -33,7 +33,7 @@ def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(Settings, SettingsSchema, tree, sort, offset, limit, fields)
 
 
-def get_one_item(section, fields = None, options = None):
+def get_one_item(section, fields=None, options=None):
     if fields is None:
         fields = "_default_"
     query = Settings.query
@@ -98,6 +98,8 @@ def get_settings(section=None):
                     "heatcloud_power_meter_number": "UF_CRM_1597757955687",
                     "price_guarantee": "UF_CRM_1597758014166",
                     "emove_tarif": "UF_CRM_1594062176",
+                    "cloud_configuration_file": "UF_CRM_1596704122354",
+                    "cloud_configuration_file_link": "UF_CRM_1598964158",
                     "cloud_files": "UF_CRM_1572966728920",
                     "contract_number": "UF_CRM_1596704551167",
                     "has_consumer": "UF_CRM_1597755071841",

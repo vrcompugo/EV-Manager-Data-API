@@ -323,9 +323,9 @@ def filter_export_input_cloud(data, order: Order, consumer_index=None):
                       "emove_tarif", "price_guarantee", "offer_number"]:
             if field in order.data:
                 if field == "power_usage":
-                    data["USAGE"] = order.data[field]
+                    data["USAGE"] = int(order.data[field])
                 if field == "heater_usage" and "USAGE" in data:
-                    data["USAGE"] = data["USAGE"] + order.data[field]
+                    data["USAGE"] = int(data["USAGE"]) + int(order.data[field])
                 if field == "price_guarantee":
                     if order.data[field] is not None and order.data[field] != "":
                         data[field.upper()] = int(order.data[field].replace("_years", ""))
@@ -343,6 +343,15 @@ def filter_export_input_cloud(data, order: Order, consumer_index=None):
                         base64.encodestring(r.content).decode("utf-8")
                     ]
                 })
+        if order.offer is not None and order.offer.pdf is not None:
+            r = order.offer.pdf.get_file()
+            if r is not None:
+                content = r.read()
+                data["cloud_configuration_file"] = [
+                    "Cloud Konfiguration.pdf",
+                    base64.encodestring(content).decode("utf-8")
+                ]
+            data["cloud_configuration_file_link"] = order.offer.pdf.longterm_public_link
     else:
         consumer = order.data["consumers"][consumer_index]
         consumer_data = data

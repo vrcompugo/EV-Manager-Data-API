@@ -1050,6 +1050,13 @@ def convert_data_to_post_data(data, data_type):
                                 post_data[f"fields[{online_field}][{i}][{field2}]"] = data[field][i][field2]
                     else:
                         post_data[f"fields[{online_field}][{i}]"] = data[field][i]
+            elif type(data[field]) is dict:
+                for key in data[field].keys():
+                    if type(data[field][key]) is list:
+                        for i in range(len(data[field][key])):
+                            post_data[f"fields[{online_field}][{key}][{i}]"] = convert_list_value(field, data[field][key][i], config)
+                    else:
+                        post_data[f"fields[{online_field}][{key}]"] = convert_list_value(field, data[field][key], config)
             else:
                 post_data[f"fields[{online_field}]"] = convert_list_value(field, data[field], config)
     if data_type == "deal":

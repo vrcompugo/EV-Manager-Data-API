@@ -3,6 +3,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 import uuid
+import base64
 from ..minio import get_file_public, make_public
 
 from app import db
@@ -24,6 +25,12 @@ class S3File(db.Model):
     @hybrid_property
     def public_link(self):
         return get_file_public(str(self.uuid), self.filename, 30)
+
+    @hybrid_property
+    def longterm_public_link(self, days=90):
+        from ..file_services import encode_file_token
+        token = base64.b64encode(encode_file_token(self.id, days=days)).decode('utf-8')
+        return f"https://api.korbacher-energiezentrum.de/files/view/{token}"
 
     def make_public(self):
         return make_public(str(self.uuid), self.filename)

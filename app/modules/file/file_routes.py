@@ -1,12 +1,13 @@
-from flask import request
+from flask import request, make_response
 from flask_restplus import Resource, reqparse
 from flask_restplus import Namespace, fields
 import werkzeug
+import base64
 from luqum.parser import parser
 
 from app.decorators import token_required, api_response
 
-from .file_services import sync_item, update_item, get_items, get_one_item
+from .file_services import sync_item, update_item, get_items, get_one_item, decode_file_token, S3File
 
 
 api = Namespace('File')
@@ -46,7 +47,7 @@ class Items(Resource):
         }
         item = sync_item(data=data)
         item_dict = get_one_item(id=item.id)
-        return {"status":"success",
+        return {"status": "success",
                 "data": item_dict}
 
 
@@ -54,7 +55,7 @@ class Items(Resource):
 class User(Resource):
     @api_response
     @api.doc(params={
-        "fields": {"type":"string", "default": "_default_"},
+        "fields": {"type": "string", "default": "_default_"},
     })
     @token_required("show_project")
     def get(self, id):
@@ -65,8 +66,10 @@ class User(Resource):
         if not item_dict:
             api.abort(404)
         else:
-            return {"status":"success",
-                "data": item_dict}
+            return {
+                "status": "success",
+                "data": item_dict
+            }
 
     @api.response(201, 'User successfully updated.')
     @api.doc('update project')
@@ -76,3 +79,22 @@ class User(Resource):
         """Update User """
         data = request.json
         return update_item(id, data=data)
+
+
+@api.route("/view/<token>")
+class ViewFile(Resource):
+    def get(self, token):
+        token = base64.b64decode(token.encode('utf-8'))
+        try:
+            data = decode_file_token(token)
+            file = S3File.query.get(data["id"])
+            if file is None:
+                return "not found"
+        except Exception as e:
+            return "not found"
+        content = file.get_file().read()
+        response = make_response(content)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = \
+            'inline; filename=%s' % file.filename
+        return response

@@ -1,5 +1,6 @@
 import datetime
 import uuid
+import jwt
 
 from app import db
 from app.exceptions import ApiException
@@ -8,6 +9,9 @@ from app.utils.set_attr_by_dict import set_attr_by_dict
 
 from .models.s3_file import S3File, S3FileSchema
 from .minio import put_file
+
+
+key = "0u9cQU8YNmUSAgIuq7MaBKh7YpE4z1ZO"
 
 
 def add_item(data):
@@ -52,3 +56,23 @@ def get_items(tree, sort, offset, limit, fields):
 
 def get_one_item(id, fields=None):
     return get_one_item_by_model(S3File, S3FileSchema, id, fields)
+
+
+def encode_file_token(id, days=90):
+    try:
+        payload = {
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=days),
+            'iat': datetime.datetime.utcnow(),
+            'id': id
+        }
+        return jwt.encode(
+            payload,
+            key,
+            algorithm='HS256'
+        )
+    except Exception as e:
+        return e
+
+
+def decode_file_token(token):
+    return jwt.decode(token, key)
