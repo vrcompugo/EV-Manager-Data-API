@@ -58,9 +58,10 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
         if int(packet_number) >= 300:
             total_usage = int(survey.data["pv_usage"])
             if "extra_drains" in survey.data:
-                for drain in survey.data["extra_drains"]:
-                    if "usage" in drain and drain["usage"] != "":
-                        total_usage = total_usage + int(drain["usage"])
+                if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+                    for drain in survey.data["extra_drains"]:
+                        if "usage" in drain and drain["usage"] != "":
+                            total_usage = total_usage + int(drain["usage"])
             quantity = 9 + math.ceil((total_usage - 30000) / 5000)
             if quantity > 27:
                 quantity = 27
