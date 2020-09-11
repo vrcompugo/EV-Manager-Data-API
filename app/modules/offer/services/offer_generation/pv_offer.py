@@ -58,7 +58,7 @@ def pv_offer_by_survey(survey: Survey, old_data=None):
         if int(packet_number) >= 300:
             total_usage = int(survey.data["pv_usage"])
             if "extra_drains" in survey.data:
-                if "has_extra_drains" in offer.survey.data and offer.survey.data["has_extra_drains"]:
+                if "has_extra_drains" in survey.data and survey.data["has_extra_drains"]:
                     for drain in survey.data["extra_drains"]:
                         if "usage" in drain and drain["usage"] != "":
                             total_usage = total_usage + int(drain["usage"])
