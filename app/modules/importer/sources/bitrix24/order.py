@@ -324,7 +324,7 @@ def filter_export_input_cloud(data, order: Order, consumer_index=None):
             if field in order.data:
                 if field == "power_usage":
                     data["USAGE"] = int(order.data[field])
-                if field == "heater_usage" and "USAGE" in data:
+                if field == "heater_usage" and "USAGE" in data and order.data[field] != "":
                     data["USAGE"] = int(data["USAGE"]) + int(order.data[field])
                 if field == "price_guarantee":
                     if order.data[field] is not None and order.data[field] != "":
