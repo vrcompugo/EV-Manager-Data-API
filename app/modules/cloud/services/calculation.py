@@ -58,10 +58,6 @@ def calculate_cloud(data):
         "conventional_price_ecloud": 0,
         "conventional_price_consumer": 0
     }
-    if "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] != "":
-        result["lightcloud_extra_price_per_kwh"] = float(data["conventional_power_cost_per_kwh"]) / 100
-        result["heatcloud_extra_price_per_kwh"] = result["lightcloud_extra_price_per_kwh"]
-        result["consumercloud_extra_price_per_kwh"] = result["lightcloud_extra_price_per_kwh"]
 
     if "pv_kwp" in data and data["pv_kwp"] is not None and data["pv_kwp"] != "":
         data["pv_kwp"] = float(data["pv_kwp"])
@@ -149,6 +145,14 @@ def calculate_cloud(data):
                 + data["power_usage"] * result["lightcloud_extra_price_per_kwh"]
             ) / 12
         )
+        if "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] != "":
+            data["conventional_power_cost_per_kwh"] = int(data["conventional_power_cost_per_kwh"])
+            result["conventional_price_light"] = (
+                (
+                    settings["data"]["wi_settings"]["conventional_base_cost_per_year"]
+                    + data["power_usage"] * data["conventional_power_cost_per_kwh"] / 100
+                ) / 12
+            )
 
     if "heater_usage" in data and data["heater_usage"] != "" and data["heater_usage"] != "0" and data["heater_usage"] != 0:
         data["heater_usage"] = int(data["heater_usage"])
@@ -195,6 +199,13 @@ def calculate_cloud(data):
                 + result["consumer_usage"] * result["consumercloud_extra_price_per_kwh"]
             ) / 12
         )
+        if "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] != "":
+            result["conventional_price_consumer"] = (
+                (
+                    settings["data"]["wi_settings"]["conventional_base_cost_per_year"] * len(data["consumers"])
+                    + result["consumer_usage"] * data["conventional_power_cost_per_kwh"] / 100
+                ) / 12
+            )
 
     result["conventional_price_emove"] = 0
     if "emove_tarif" in data:

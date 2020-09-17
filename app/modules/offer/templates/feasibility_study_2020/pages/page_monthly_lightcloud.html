@@ -60,15 +60,15 @@
       </div>
       <br>
     <div class="graph-line graph--green" style="--max-value: {{ data.lightcloud.price_full_time }}">
-        <div class="column" style="--value: {{ data.price_tomorrow }}">
+        <div class="column" style="--value: {{ data.lightcloud.price_tomorrow }}">
           <div class="bar label-above"><span>{{ data.lightcloud.price_tomorrow | currencyformat }}</span></div>
           <div class="label">Heute</div>
         </div>
-        <div class="column" style="--value: {{ data.price_tomorrow }}">
+        <div class="column" style="--value: {{ data.lightcloud.price_tomorrow }}">
           <div class="bar label-above"><span>{{ data.lightcloud.price_tomorrow | currencyformat }}</span></div>
           <div class="label">In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren</div>
         </div>
-      <div class="column" style="--value: {{ data.price_tomorrow }}">
+      <div class="column" style="--value: {{ data.lightcloud.price_tomorrow }}">
           <div class="bar label-above"><span>{{ data.lightcloud.price_tomorrow | currencyformat }}</span></div>
           <div class="label">In {{ data.cloud_runtime | numberformat("de", 0) }} Jahren</div>
         </div>
