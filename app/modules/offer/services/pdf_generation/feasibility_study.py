@@ -221,6 +221,9 @@ def calculate_feasibility_study(offer: OfferV2):
     }
     data["lightcloud"]["price_half_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** (data["cloud_runtime"] / 2)
     data["lightcloud"]["price_full_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** data["cloud_runtime"]
+    data["lightcloud"]["max_value"] = data["lightcloud"]["price_full_time"]
+    if data["lightcloud"]["price_tomorrow"] < 0:
+        data["lightcloud"]["max_value"] = data["lightcloud"]["max_value"] - data["lightcloud"]["price_tomorrow"]
     data["lightcloud"]["price_runtime"] = 0
     for i in range(data["runtime"]):
         data["lightcloud"]["price_runtime"] = data["lightcloud"]["price_runtime"] + ((cloud_calulation["conventional_price_light"]) * (1 + data["full_cost_increase_rate"] / 100) ** i) * 12
@@ -242,6 +245,9 @@ def calculate_feasibility_study(offer: OfferV2):
         data["ecloud"]["price_runtime"] = 0
         for i in range(data["runtime"]):
             data["ecloud"]["price_runtime"] = data["ecloud"]["price_runtime"] + (data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** i) * 12
+        data["ecloud"]["max_value"] = data["ecloud"]["price_full_time"]
+        if data["ecloud"]["price_tomorrow"] < 0:
+            data["ecloud"]["max_value"] = data["ecloud"]["max_value"] - data["ecloud"]["price_tomorrow"]
     if cloud_calulation["cloud_price_heatcloud"] > 0:
         data["total_pages"] = data["total_pages"] + 1
         data["heatcloud"] = {
@@ -254,6 +260,9 @@ def calculate_feasibility_study(offer: OfferV2):
         data["heatcloud"]["price_runtime"] = 0
         for i in range(data["runtime"]):
             data["heatcloud"]["price_runtime"] = data["heatcloud"]["price_runtime"] + (data["heatcloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** i) * 12
+        data["heatcloud"]["max_value"] = data["heatcloud"]["price_full_time"]
+        if data["heatcloud"]["price_tomorrow"] < 0:
+            data["heatcloud"]["max_value"] = data["heatcloud"]["max_value"] - data["heatcloud"]["price_tomorrow"]
     if cloud_calulation["cloud_price_emove"] > 0:
         data["total_pages"] = data["total_pages"] + 1
         data["emove"] = {
@@ -274,7 +283,9 @@ def calculate_feasibility_study(offer: OfferV2):
         data["emove"]["price_runtime"] = 0
         for i in range(data["runtime"]):
             data["emove"]["price_runtime"] = data["emove"]["price_runtime"] + (data["emove"]["price_today"] * (1 + data["full_cost_increase_rate_emove"] / 100) ** i) * 12
-
+        data["emove"]["max_value"] = data["emove"]["price_full_time"]
+        if data["emove"]["price_tomorrow"] < 0:
+            data["emove"]["max_value"] = data["emove"]["max_value"] - data["emove"]["price_tomorrow"]
     data["conventional_total_usage_cost"] = data["conventional_usage_cost"]
     for n in range(data["runtime"]):
         data["conventional_total_usage_cost"] = data["conventional_total_usage_cost"] + data["conventional_total_usage_cost"] * ((1 + data["full_cost_increase_rate"] / 100) ** data["runtime"])
@@ -339,7 +350,7 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
     data = calculate_feasibility_study(offer)
     data["base_url"] = "https://api.korbacher-energiezentrum.de.ah.hbbx.de"
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
-    if True:
+    if False:
         pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0])
         if pdf:
             pdf_file = S3File.query\

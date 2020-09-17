@@ -1,12 +1,19 @@
 <style>
-
+  .graph-warpper {
+    height: 210px;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 20px;
+  }
+  .graph-warpper.top {
+    align-items: flex-start;
+  }
   .graph-line {
-    --graph-height: var(--full-height, 240px);
-    --graph-label-height: var(--label-height, 3em);
+    --graph-height: var(--full-height, 220px);
+    --graph-label-height: var(--label-height, 1.3em);
     --graph-bar-height: calc(var(--graph-height) - var(--graph-label-height));
     display: flex;
     flex-direction: row;
-    height: var(--graph-height);
   }
   .graph-line .column {
     flex: 1;
@@ -16,9 +23,9 @@
   }
   .graph-line .column .label {
     border-top: 3px solid #D2D1D1;
-    height: var(--graph-label-height);
     text-align: center;
-    padding-top: 0.2em;
+    padding: 0.2em;
+    z-index: 10;
   }
   .graph-line .column .bar {
     --percent: calc(var(--value) / var(--max-value));
@@ -34,6 +41,20 @@
     font-size: 1.1em;
     color: #ffffff;
   }
+  .graph-line .column.negative {
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+  }
+  .graph-line .column.negative .label {
+    border-top: none;
+    border-bottom: 3px solid #D2D1D1;
+    height: auto;
+    z-index: 100;
+  }
+  .graph-line .column.negative .bar.label-above span {
+    transform: translate(5px, 1.5em);
+  }
+
   .graph-line .column .bar.label-above {
     align-items: flex-start;
     color: #5D5C5C;
