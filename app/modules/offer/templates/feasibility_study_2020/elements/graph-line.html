@@ -51,8 +51,20 @@
     height: auto;
     z-index: 100;
   }
+  .graph-line .column.negative .bar.label-above {
+    align-items: flex-end;
+  }
   .graph-line .column.negative .bar.label-above span {
-    transform: translate(5px, 1.5em);
+    transform: translate(5px, -0.3em);
+  }
+  .negative .graph-line {
+    margin-bottom: 0.6em;
+  }
+  .negative .graph-line.move-label-up {
+    margin-bottom: 0.7em;
+  }
+  .negative .graph-line.move-label-up .column.negative .bar.label-above span {
+    transform: translate(5px, 1.3em);
   }
 
   .graph-line .column .bar.label-above {
