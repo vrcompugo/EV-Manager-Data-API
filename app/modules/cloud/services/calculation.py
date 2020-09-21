@@ -259,10 +259,11 @@ def calculate_cloud(data):
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
         if result["kwp_extra"] < 0:
-            result["cloud_price_extra_light"] = ((result["min_kwp_light"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
-            result["cloud_price_extra_heatcloud"] = ((result["min_kwp_heatcloud"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
-            result["cloud_price_extra_ecloud"] = ((result["min_kwp_ecloud"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
-            result["cloud_price_extra_consumer"] = ((result["min_kwp_consumer"] / max_kwp) * result["power_usage"] * extra_kwh_ratio * result["lightcloud_extra_price_per_kwh"]) / 12
+            result["cloud_price_extra"] = -1 * result["kwp_extra"] * 12
+            result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
+            result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
+            result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
+            result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra"] = (
                 result["cloud_price_extra_light"]
                 + result["cloud_price_extra_heatcloud"]
