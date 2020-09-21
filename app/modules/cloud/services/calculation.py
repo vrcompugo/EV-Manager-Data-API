@@ -143,7 +143,7 @@ def calculate_cloud(data):
                 + data["power_usage"] * result["lightcloud_extra_price_per_kwh"]
             ) / 12
         )
-        if "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
+        if data is not None and "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
             data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
             result["conventional_price_light"] = (
                 (
