@@ -160,8 +160,8 @@ def calculate_feasibility_study(offer: OfferV2):
         "cost_benefit": None
     }
     data["conventional_base_cost_per_kwh"] = cloud_calulation["lightcloud_extra_price_per_kwh"]
-    if "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] != "":
-        data["conventional_base_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
+    if "conventional_power_cost_per_kwh" in offer.data and offer.data["conventional_power_cost_per_kwh"] != "":
+        data["conventional_base_cost_per_kwh"] = float(offer.data["conventional_power_cost_per_kwh"]) / 100
     if data["investment_type"] == "cash":
         data["loan_interest_rate"] = 0
     data["eeg_refund_per_kwh"] = 0.0808
