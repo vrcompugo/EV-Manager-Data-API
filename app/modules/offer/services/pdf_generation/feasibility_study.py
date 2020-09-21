@@ -348,7 +348,7 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
     if settings is None:
         return None
     data = calculate_feasibility_study(offer)
-    data["base_url"] = "https://api.korbacher-energiezentrum.de.ah.hbbx.de"
+    data["base_url"] = "https://api.korbacher-energiezentrum.de"
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
     if True:
         pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0])
