@@ -144,7 +144,7 @@ def calculate_cloud(data):
             ) / 12
         )
         if "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] != "":
-            data["conventional_power_cost_per_kwh"] = int(data["conventional_power_cost_per_kwh"])
+            data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
             result["conventional_price_light"] = (
                 (
                     settings["data"]["wi_settings"]["conventional_base_cost_per_year"]
