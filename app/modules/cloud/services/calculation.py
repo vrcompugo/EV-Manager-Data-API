@@ -221,7 +221,6 @@ def calculate_cloud(data):
 
     if "price_guarantee" in data:
         if str(user["id"]) in settings["data"]["cloud_settings"]["cloud_guarantee"]:
-            print(data["price_guarantee"])
             if data["price_guarantee"] in settings["data"]["cloud_settings"]["cloud_guarantee"][str(user["id"])]:
                 result["user_one_time_cost"] = result["user_one_time_cost"] + settings["data"]["cloud_settings"]["cloud_guarantee"][str(user["id"])][data["price_guarantee"]]["price"]
 
@@ -259,7 +258,10 @@ def calculate_cloud(data):
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
         if result["kwp_extra"] < 0:
-            result["cloud_price_extra"] = -1 * result["kwp_extra"] * 12
+
+            result["cloud_price_extra"] = -1 * result["kwp_extra"] * 10.97
+            if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+                result["cloud_price_extra"] = -1 * result["kwp_extra"] * 8.49
             result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
