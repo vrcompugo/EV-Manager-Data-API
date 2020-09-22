@@ -258,7 +258,8 @@ def calculate_cloud(data):
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
         if result["kwp_extra"] < 0:
-
+            result["invalid_form"] = True
+            result["errors"].append("Cloud mit Minderverbrauch aktuell nicht möglich")
             result["cloud_price_extra"] = -1 * result["kwp_extra"] * 10.97
             if "price_guarantee" in data and data["price_guarantee"] == "2_years":
                 result["cloud_price_extra"] = -1 * result["kwp_extra"] * 8.49
