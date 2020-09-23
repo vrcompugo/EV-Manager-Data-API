@@ -59,6 +59,8 @@ def calculate_cloud(data):
         "conventional_price_consumer": 0
     }
 
+    if "name" in user and user["name"].lower() == "bsh":
+        settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 2405
     if "pv_kwp" in data and data["pv_kwp"] is not None and data["pv_kwp"] != "":
         data["pv_kwp"] = float(data["pv_kwp"])
         result["pv_kwp"] = data["pv_kwp"]
@@ -206,18 +208,23 @@ def calculate_cloud(data):
             )
 
     result["conventional_price_emove"] = 0
+    result["emove_usage"] = 0
     if "emove_tarif" in data:
         if data["emove_tarif"] in settings["data"]["cloud_settings"]["cloud_emove"]:
             result["min_kwp_emove"] = settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["kwp"]
             result["cloud_price_emove"] = settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["price"]
             if data["emove_tarif"] == "emove.drive I":
                 result["conventional_price_emove"] = 8000 / 100 * 7 * 1.19 / 12
+                result["emove_usage"] = 1500
             if data["emove_tarif"] == "emove.drive II":
                 result["conventional_price_emove"] = 12000 / 100 * 7 * 1.19 / 12
+                result["emove_usage"] = 2000
             if data["emove_tarif"] == "emove.drive III":
                 result["conventional_price_emove"] = 20000 / 100 * 7 * 1.19 / 12
+                result["emove_usage"] = 5000
             if data["emove_tarif"] == "emove.drive ALL":
                 result["conventional_price_emove"] = 25000 / 100 * 7 * 1.19 / 12
+                result["emove_usage"] = 8500
 
     if "price_guarantee" in data:
         if str(user["id"]) in settings["data"]["cloud_settings"]["cloud_guarantee"]:
@@ -258,8 +265,6 @@ def calculate_cloud(data):
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
         if result["kwp_extra"] < 0:
-            result["invalid_form"] = True
-            result["errors"].append("Cloud mit Minderverbrauch aktuell nicht möglich")
             result["cloud_price_extra"] = -1 * result["kwp_extra"] * 10.97
             if "price_guarantee" in data and data["price_guarantee"] == "2_years":
                 result["cloud_price_extra"] = -1 * result["kwp_extra"] * 8.49
@@ -267,11 +272,47 @@ def calculate_cloud(data):
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
+            result["cloud_price_extra_emove"] = 0
+            if "name" in user and user["name"].lower() == "bsh":
+                max_shared_kwp = result["min_kwp_light"] + result["min_kwp_heatcloud"] + result["min_kwp_emove"]
+                if data["pv_kwp"] < max_shared_kwp:
+                    rest_kwp = max_shared_kwp - data["pv_kwp"]
+                    rest_kwp_light = result["min_kwp_light"] / max_shared_kwp * rest_kwp
+                    rest_kwp_heatcloud = result["min_kwp_heatcloud"] / max_shared_kwp * rest_kwp
+                    rest_kwp_emove = result["min_kwp_emove"] / max_shared_kwp * rest_kwp
+                    result["cloud_price_extra_light"] = ((rest_kwp_light / result["min_kwp_light"]) * result["power_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
+                    result["cloud_price_extra_heatcloud"] = 0
+                    if result["min_kwp_heatcloud"] > 0:
+                        result["cloud_price_extra_heatcloud"] = ((rest_kwp_heatcloud / result["min_kwp_heatcloud"]) * result["heater_usage"] * result["heatcloud_extra_price_per_kwh"]) / 12
+                    result["cloud_price_extra_emove"] = 0
+                    if result["min_kwp_emove"] > 0:
+                        result["cloud_price_extra_emove"] = ((rest_kwp_emove / result["min_kwp_emove"]) * result["emove_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
+                    rest_kwp = 0
+                else:
+                    result["cloud_price_extra_light"] = 0
+                    result["cloud_price_extra_heatcloud"] = 0
+                    result["cloud_price_extra_emove"] = 0
+                    rest_kwp = data["pv_kwp"] - max_shared_kwp
+                if rest_kwp >= result["min_kwp_ecloud"]:
+                    result["cloud_price_extra_ecloud"] = 0
+                    rest_kwp = rest_kwp - result["min_kwp_ecloud"]
+                else:
+                    result["cloud_price_extra_ecloud"] = ((1 - rest_kwp / result["min_kwp_ecloud"]) * result["ecloud_usage"] * result["ecloud_extra_price_per_kwh"]) / 12
+                    rest_kwp = 0
+
+                if rest_kwp >= result["min_kwp_consumer"]:
+                    result["cloud_price_extra_consumer"] = 0
+                    rest_kwp = rest_kwp - result["min_kwp_consumer"]
+                else:
+                    result["cloud_price_extra_consumer"] = ((1 - rest_kwp / result["min_kwp_consumer"]) * result["consumer_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
+                    rest_kwp = 0
+
             result["cloud_price_extra"] = (
                 result["cloud_price_extra_light"]
                 + result["cloud_price_extra_heatcloud"]
                 + result["cloud_price_extra_ecloud"]
                 + result["cloud_price_extra_consumer"]
+                + result["cloud_price_extra_emove"]
             )
         result["cloud_price_light_incl_refund"] = result["cloud_price_light"] + result["cloud_price_extra_light"]
         result["cloud_price_heatcloud_incl_refund"] = result["cloud_price_heatcloud"] + result["cloud_price_extra_heatcloud"]

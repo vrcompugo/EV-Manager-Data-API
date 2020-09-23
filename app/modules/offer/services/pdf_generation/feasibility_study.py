@@ -249,6 +249,7 @@ def calculate_feasibility_study(offer: OfferV2):
         if data["ecloud"]["price_tomorrow"] < 0:
             data["ecloud"]["max_value"] = data["ecloud"]["max_value"] - data["ecloud"]["price_tomorrow"]
     if cloud_calulation["cloud_price_heatcloud"] > 0:
+        data["consumer_count"] = data["consumer_count"] + 1
         data["total_pages"] = data["total_pages"] + 1
         data["heatcloud"] = {
             "price_today": (cloud_calulation["heater_usage"] * 0.23) / 12,
