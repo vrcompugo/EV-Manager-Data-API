@@ -20,7 +20,11 @@
     padding-right: 2.4em;
   }
 </style>
-
+{% if data.ecloud.price_tomorrow / data.ecloud.max_value < 0.60 %}
+  {% set label_above = "label-above" %}
+{% else %}
+  {% set label_above = "" %}
+{% endif %}
 
 <div class="page_monthly_ecloud">
   {% include('feasibility_study_2020/elements/logos.html') %}
@@ -45,7 +49,13 @@
           </div>
           <div class="column" style="--value: {{ data.ecloud.price_half_time }}">
             <div class="bar"><span>{{ data.ecloud.price_half_time | currencyformat }}</div>
-            <div class="label">In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren</div>
+            <div class="label">
+              {% if data.cloud_runtime == 2 %}
+                Nächstes Jahr
+              {% else %}
+                In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren
+              {% endif %}
+            </div>
           </div>
           <div class="column" style="--value: {{ data.ecloud.price_full_time }}">
             <div class="bar"><span>{{ data.ecloud.price_full_time | currencyformat }}</div>
@@ -64,15 +74,21 @@
       <div class="graph-warpper {% if data.ecloud.price_tomorrow < 0 %}negative{% endif %}">
         <div class="flex graph-line graph--green {% if data.ecloud.price_tomorrow / data.ecloud.max_value > -0.17 %}move-label-up{% endif %}" style="--max-value: {{ data.ecloud.max_value }}">
           <div class="column {% if data.ecloud.price_tomorrow < 0 %}negative{% endif %}" style="--value: {{ data.ecloud.price_tomorrow | abs }}">
-            <div class="bar label-above"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
+            <div class="bar {{ label_above }}"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
             <div class="label">Heute</div>
           </div>
           <div class="column {% if data.ecloud.price_tomorrow < 0 %}negative{% endif %}" style="--value: {{ data.ecloud.price_tomorrow | abs }}">
-            <div class="bar label-above"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
-            <div class="label">In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren</div>
+            <div class="bar {{ label_above }}"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
+            <div class="label">
+              {% if data.cloud_runtime == 2 %}
+                Nächstes Jahr
+              {% else %}
+                In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren
+              {% endif %}
+            </div>
           </div>
           <div class="column {% if data.ecloud.price_tomorrow < 0 %}negative{% endif %}" style="--value: {{ data.ecloud.price_tomorrow | abs }}">
-            <div class="bar label-above"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
+            <div class="bar {{ label_above }}"><span>{{ data.ecloud.price_tomorrow | currencyformat }}</span></div>
             <div class="label">In {{ data.cloud_runtime | numberformat("de", 0) }} Jahren</div>
           </div>
         </div>
@@ -87,7 +103,13 @@
         <td></td>
         <td class="align-center"><b>Heute</b><br>ohne Cloud</td>
         <td class="align-center"><b>Morgen</b><br>mit Cloud</td>
-        <td class="align-center"><b>In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren</b><br>mit Cloud</td>
+        <td class="align-center"><b>
+          {% if data.cloud_runtime == 2 %}
+            Nächstes Jahr
+          {% else %}
+            In {{ (data.cloud_runtime / 2) | numberformat("de", 0) }} Jahren
+          {% endif %}
+        </b><br>mit Cloud</td>
         <td class="align-center"><b>In {{ data.cloud_runtime | numberformat("de", 0) }} Jahren</b><br>mit Cloud</td>
       </tr>
       <tr>
