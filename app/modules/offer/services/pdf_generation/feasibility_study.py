@@ -321,6 +321,8 @@ def calculate_feasibility_study(offer: OfferV2):
     data["cloud_total"] = (data["cloud_monthly_cost"] + 5.88) * 12 * int(cloud_runtime)
     for i in range(data["runtime"] - int(cloud_runtime)):
         cloud_new_rate = ((data["cloud_monthly_cost"] + 5.88) * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
+        if cloud_new_rate < 0:
+            cloud_new_rate = -cloud_new_rate + 2 * (data["cloud_monthly_cost"] * 12)
         data["cloud_total"] = data["cloud_total"] + cloud_new_rate
 
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
