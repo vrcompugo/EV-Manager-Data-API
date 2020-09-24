@@ -322,14 +322,19 @@ def calculate_feasibility_study(offer: OfferV2):
     for i in range(data["runtime"] - int(cloud_runtime)):
         cloud_new_rate = ((data["cloud_monthly_cost"] + 5.88) * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
         data["cloud_total"] = data["cloud_total"] + cloud_new_rate
-    data["cloud_total"] = data["cloud_total"] + insurance_cost
 
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
         insurance_cost = data["loan_total"] * 0.07
         data["cloud_total"] = ((data["cloud_monthly_cost"] * 12) + 110 + 85) * int(cloud_runtime)
         for i in range(data["runtime"] - int(cloud_runtime)):
-            cloud_new_rate = ((data["cloud_monthly_cost"] * 12) + 110 + 85) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
+            cloud_new_rate = (data["cloud_monthly_cost"] * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
+            if cloud_new_rate < 0:
+                cloud_new_rate = -cloud_new_rate + 2 * (data["cloud_monthly_cost"] * 12)
+            cloud_new_rate = cloud_new_rate + 110 + 85
             data["cloud_total"] = data["cloud_total"] + cloud_new_rate
+
+    data["cloud_total"] = data["cloud_total"] + insurance_cost
+
     data["eeg_direct_usage_cost"] = 0
     if "pv_kwp" in data["cloud_calulation"] and data["cloud_calulation"]["pv_kwp"] > 10:
         data["eeg_direct_usage_cost"] = cloud_calulation["power_usage"] * 0.6 * (0.06756 / 2) * data["runtime"]
