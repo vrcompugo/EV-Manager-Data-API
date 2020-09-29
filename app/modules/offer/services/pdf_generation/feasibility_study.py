@@ -43,6 +43,8 @@ def calculate_feasibility_study(offer: OfferV2):
         cloud_calulation = offer.calculated
         consumer = 1
         usage = offer.calculated["power_usage"]
+        heatcloud_usage = offer.calculated["heater_usage"]
+        ecloud_usage = offer.calculated["ecloud_usage"]
         run_time = 30
         price_increase = 5.75
         if offer.reseller is not None and offer.reseller.document_style == "bsh":
@@ -114,6 +116,8 @@ def calculate_feasibility_study(offer: OfferV2):
             for drain in offer.survey.data["extra_drains"]:
                 if "usage" in drain and drain["usage"] != "" and int(drain["usage"]) > 0:
                     usage = usage + float(drain["usage"])
+        heatcloud_usage = 0
+        ecloud_usage = 0
         run_time = 30
         if "run_time" in offer.survey.data:
             run_time = int(offer.survey.data["run_time"])
@@ -130,6 +134,9 @@ def calculate_feasibility_study(offer: OfferV2):
         "cloud_runtime": cloud_runtime,
         "runtime": run_time,
         "cloud_zero": cloud_zero,
+        "usage": usage,
+        "heatcloud_usage": heatcloud_usage,
+        "ecloud_usage": ecloud_usage,
         "usage": usage,
         "paket": packet,
         "pv_efficiancy": pv_efficiancy,

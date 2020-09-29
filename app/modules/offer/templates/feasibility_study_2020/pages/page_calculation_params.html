@@ -49,6 +49,22 @@
           </td>
           <td><b>{{ data.usage | numberformat('de', 0) }}</b> kWh pro Jahr</td>
         </tr>
+        {% if data.heatcloud_usage > 0 %}
+          <tr>
+            <td>
+              Verbrauch nach Wärmestrom
+            </td>
+            <td><b>{{ data.heatcloud_usage | numberformat('de', 0) }}</b> kWh pro Jahr</td>
+          </tr>
+        {% endif %}
+        {% if data.heatcloud_usage > 0 %}
+          <tr>
+            <td>
+              Verbrauch nach Gas
+            </td>
+            <td><b>{{ data.ecloud_usage | numberformat('de', 0) }}</b> kWh pro Jahr</td>
+          </tr>
+        {% endif %}
         <tr>
           <td>Größe der PV-Anlage</td>
           <td>
