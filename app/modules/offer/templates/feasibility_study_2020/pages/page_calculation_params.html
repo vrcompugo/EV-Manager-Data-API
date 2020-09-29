@@ -40,7 +40,7 @@
       <table cellspacing="0">
         <tr>
           <td>
-            Verbrauch nach Haushaltsstrom
+            Verbrauch Haushaltsstrom
             {% if offer.reseller.document_style != "bsh" %}
               {% if data.consumer %}
                 (inkl. Consumer)
@@ -52,7 +52,7 @@
         {% if data.heatcloud_usage > 0 %}
           <tr>
             <td>
-              Verbrauch nach Wärmestrom
+              Verbrauch Wärmestrom
             </td>
             <td><b>{{ data.heatcloud_usage | numberformat('de', 0) }}</b> kWh pro Jahr</td>
           </tr>
@@ -60,7 +60,7 @@
         {% if data.ecloud_usage > 0 %}
           <tr>
             <td>
-              Verbrauch nach Gas
+              Verbrauch Gas
             </td>
             <td><b>{{ data.ecloud_usage | numberformat('de', 0) }}</b> kWh pro Jahr</td>
           </tr>

@@ -1,7 +1,9 @@
 import pprint
+import time
 from verify_email import verify_email
 
 from app.models import Customer
+from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 from app.modules.customer.services.customer_services import add_item, update_item
 
 from ._connector import post, get
@@ -126,12 +128,46 @@ def run_import(remote_id=None, local_id=None):
                     customer = add_item(data)
                     associate_item(model="Customer", local_id=customer.id, remote_id=remote_id)
                 else:
-                    del data["number"]
+                    if "number" in data:
+                        del data["number"]
                     customer = update_item(customer_link.local_id, data)
                 return customer
             else:
                 print("data is not customer import: ", response["result"])
     return None
+
+
+def run_cron_import():
+    print("bitrix24 customer import")
+    config = get_config_item("importer/bitrix24")
+    post_data = {
+        "ORDER[DATE_MODIFY]": "DESC"
+    }
+    if config is not None and "data" in config and "last_customer_import" in config["data"]:
+        post_data["FILTER[>DATE_MODIFY]"] = config["data"]["last_customer_import"]
+    response = {"next": 0}
+    while "next" in response:
+        post_data["start"] = response["next"]
+        response = post("crm.contact.list", post_data)
+        if "result" not in response:
+            print("list", response)
+            break
+        for customer_data in response["result"]:
+            print("import: ", customer_data["ID"])
+            try:
+                run_import(remote_id=customer_data["ID"])
+            except Exception as e:
+                error_handler()
+            try:
+                db.session.commit()
+            except Exception as e:
+                pass
+            time.sleep(0.5)
+        time.sleep(5)
+    config = get_config_item("importer/bitrix24")
+    if config is not None and "data" in config:
+        config["data"]["last_customer_import"] = str(datetime.now())
+    update_config_item("importer/bitrix24", config)
 
 
 def run_customer_lead_import(lead_item_data):

@@ -139,20 +139,10 @@ def calculate_cloud(data):
                 result["cloud_price_light"] = 99
             if "name" in user and user["name"].lower() == "bsh":
                 result["cloud_price_light"] = data["power_usage"] * 0.37 / 10 / 12
-        result["conventional_price_light"] = (
-            (
-                settings["data"]["wi_settings"]["conventional_base_cost_per_year"]
-                + data["power_usage"] * result["lightcloud_extra_price_per_kwh"]
-            ) / 12
-        )
+        result["conventional_price_light"] = (data["power_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
         if data is not None and "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
             data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
-            result["conventional_price_light"] = (
-                (
-                    settings["data"]["wi_settings"]["conventional_base_cost_per_year"]
-                    + data["power_usage"] * data["conventional_power_cost_per_kwh"] / 100
-                ) / 12
-            )
+            result["conventional_price_light"] = (data["power_usage"] * data["conventional_power_cost_per_kwh"] / 100) / 12
 
     if "heater_usage" in data and data["heater_usage"] != "" and data["heater_usage"] != "0" and data["heater_usage"] != 0:
         data["heater_usage"] = int(data["heater_usage"])

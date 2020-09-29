@@ -96,19 +96,23 @@
             <td colspan="2">Zusammensetzung</td>
           </tr>
           <tr>
-            <td>Kosten für Haushaltsstrom <small>inkl. Grundgebühr</small></td>
+            <td>Kosten für Haushaltsstrom <small>(brutto)</small></td>
             <td class="align-right"><b>{{ data.lightcloud.price_runtime | currencyformat("de", 0) }}</b></td>
           </tr>
           {% if data.consumer %}
             <tr>
-              <td>Kosten für Extra Consumer</td>
+              <td>Kosten für Extra Consumer <small>(brutto)</small></td>
               <td class="align-right"><b>{{ data.consumer.price_runtime | currencyformat("de", 0) }}</b></td>
             </tr>
           {% endif %}
           {% if heating_cost > 0 %}
             <tr>
-              <td>Kosten für Wärme</td>
-              <td class="align-right"><b>{{ heating_cost | currencyformat("de", 0) }}</b></td>
+              <td>Kosten für Wärme <small>(brutto)</small></td>
+              <td class="align-right"><b>{{ data.heatcloud.price_runtime | currencyformat("de", 0) }}</b></td>
+            </tr>
+            <tr>
+              <td>Kosten für Gas <small>(brutto)</small></td>
+              <td class="align-right"><b>{{ data.ecloud.price_runtime | currencyformat("de", 0) }}</b></td>
             </tr>
           {% endif %}
           {% if data.emove %}

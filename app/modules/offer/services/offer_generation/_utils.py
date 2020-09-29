@@ -50,7 +50,7 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
             .filter(Product.packet_range_start <= packet_number)\
             .filter(Product.packet_range_end >= packet_number)\
             .first()
-        if survey.reseller is not None and survey.reseller.document_style == "mitte":
+        if survey.reseller is not None and survey.reseller.document_style == "mitte" and product_name.find("Technik & Service Paket") == -1:
             price_markup_faktor = 1.15
     if product is None:
         product = Product.query\

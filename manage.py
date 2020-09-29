@@ -54,9 +54,21 @@ def lead_comment_test():
 
 
 @manager.command
-def cron_import_tasks():
-    from commands.cron_import_tasks import cron_import_tasks
-    cron_import_tasks()
+def cron_export_etermin_customers():
+    from commands.cron_export_etermin_customers import cron_export_etermin_customers
+    cron_export_etermin_customers()
+
+
+@manager.command
+def cron_import_etermin_events():
+    from commands.cron_import_etermin_events import cron_import_etermin_events
+    cron_import_etermin_events()
+
+
+@manager.command
+def cron_import_bitrix_customers():
+    from commands.cron_import_bitrix_customers import cron_import_bitrix_customers
+    cron_import_bitrix_customers()
 
 
 @manager.option("-l", "--local_id", dest='local_id', default=None)

@@ -10,6 +10,12 @@ def cron():
     except Exception as e:
         error_handler()
 
+    from .sources.bitrix24.customer import run_cron_import
+    try:
+        run_cron_import()
+    except Exception as e:
+        error_handler()
+
     from .sources.bitrix24.lead import run_cron_import
     try:
         run_cron_import()
@@ -58,8 +64,8 @@ def cron():
     except Exception as e:
         error_handler()
 
-    from .sources.bitrix24.task import run_cron_import
+    from .sources.etermin.customer import run_cron_export
     try:
-        run_cron_import()
+        run_cron_export()
     except Exception as e:
         error_handler()

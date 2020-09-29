@@ -36,6 +36,10 @@ def import_by_source_module(source, model, remote_id=None, local_id=None):
         from .sources.wattfox import run_import_by_model
         run_import_by_model(model=model, remote_id=remote_id, local_id=local_id)
 
+    if source == "etermin":
+        from .sources.etermin import run_import_by_model
+        run_import_by_model(model=model, remote_id=remote_id, local_id=local_id)
+
     return None
 
 
