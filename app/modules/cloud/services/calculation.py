@@ -167,6 +167,9 @@ def calculate_cloud(data):
         ))[0]["value"]
         result["min_kwp_heatcloud"] = data["heater_usage"] * heater_to_kwp_factor * direction_factor_kwp / 1000
         result["conventional_price_heatcloud"] = (data["heater_usage"] * settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"]) / 12
+        if data is not None and "conventional_heat_cost_per_kwh" in data and data["conventional_heat_cost_per_kwh"] is not None and data["conventional_heat_cost_per_kwh"] != "":
+            data["conventional_heat_cost_per_kwh"] = float(data["conventional_heat_cost_per_kwh"])
+            result["conventional_price_heatcloud"] = (data["heater_usage"] * data["conventional_heat_cost_per_kwh"] / 100) / 12
 
     if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0:
         data["ecloud_usage"] = int(data["ecloud_usage"])
@@ -179,8 +182,11 @@ def calculate_cloud(data):
         else:
             result["cloud_price_ecloud"] = settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]
         result["min_kwp_ecloud"] = data["ecloud_usage"] / settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"]
+        settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"]
         result["conventional_price_ecloud"] = (data["ecloud_usage"] * settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"]) / 12
-
+        if data is not None and "conventional_gas_cost_per_kwh" in data and data["conventional_gas_cost_per_kwh"] is not None and data["conventional_gas_cost_per_kwh"] != "":
+            data["conventional_gas_cost_per_kwh"] = float(data["conventional_gas_cost_per_kwh"])
+            result["conventional_price_ecloud"] = (data["ecloud_usage"] * data["conventional_gas_cost_per_kwh"] / 100) / 12
     if "consumers" in data:
         consumer_usage = 0
         for consumer in data["consumers"]:

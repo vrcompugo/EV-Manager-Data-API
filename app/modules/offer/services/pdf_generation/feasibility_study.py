@@ -146,6 +146,8 @@ def calculate_feasibility_study(offer: OfferV2):
         "in_use_date": in_use_date,
         "conventional_base_cost_per_year": settings["data"]["wi_settings"]["conventional_base_cost_per_year"],
         "conventional_base_cost_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
+        "conventional_gas_cost_per_kwh": 0.0598,
+        "conventional_heat_cost_per_kwh": 0.23,
         "cost_increase_rate": price_increase,
         "cost_increase_rate_heat": price_increase_heat,
         "cost_increase_rate_emove": price_increase_emove,
@@ -169,6 +171,10 @@ def calculate_feasibility_study(offer: OfferV2):
     data["conventional_base_cost_per_kwh"] = cloud_calulation["lightcloud_extra_price_per_kwh"]
     if offer.data is not None and "conventional_power_cost_per_kwh" in offer.data and offer.data["conventional_power_cost_per_kwh"] is not None and offer.data["conventional_power_cost_per_kwh"] != "":
         data["conventional_base_cost_per_kwh"] = float(offer.data["conventional_power_cost_per_kwh"]) / 100
+    if offer.data is not None and "conventional_gas_cost_per_kwh" in offer.data and offer.data["conventional_gas_cost_per_kwh"] is not None and offer.data["conventional_gas_cost_per_kwh"] != "":
+        data["conventional_gas_cost_per_kwh"] = float(offer.data["conventional_gas_cost_per_kwh"]) / 100
+    if offer.data is not None and "conventional_heat_cost_per_kwh" in offer.data and offer.data["conventional_heat_cost_per_kwh"] is not None and offer.data["conventional_heat_cost_per_kwh"] != "":
+        data["conventional_heat_cost_per_kwh"] = float(offer.data["conventional_heat_cost_per_kwh"]) / 100
     if data["investment_type"] == "cash":
         data["loan_interest_rate"] = 0
     data["eeg_refund_per_kwh"] = 0.0808
@@ -243,7 +249,7 @@ def calculate_feasibility_study(offer: OfferV2):
     if cloud_calulation["cloud_price_ecloud"] > 0:
         data["total_pages"] = data["total_pages"] + 1
         data["ecloud"] = {
-            "price_today": (cloud_calulation["ecloud_usage"] * 0.0598) / 12,
+            "price_today": (cloud_calulation["ecloud_usage"] * data["conventional_gas_cost_per_kwh"]) / 12,
             "price_tomorrow": cloud_calulation["cloud_price_ecloud_incl_refund"]
         }
         base = base + data["ecloud"]["price_today"] * 12
@@ -259,7 +265,7 @@ def calculate_feasibility_study(offer: OfferV2):
         data["consumer_count"] = data["consumer_count"] + 1
         data["total_pages"] = data["total_pages"] + 1
         data["heatcloud"] = {
-            "price_today": (cloud_calulation["heater_usage"] * 0.23) / 12,
+            "price_today": (cloud_calulation["heater_usage"] * data["conventional_heat_cost_per_kwh"]) / 12,
             "price_tomorrow": cloud_calulation["cloud_price_heatcloud_incl_refund"]
         }
         base = base + data["heatcloud"]["price_today"] * 12

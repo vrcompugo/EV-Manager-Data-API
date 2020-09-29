@@ -37,13 +37,21 @@
             <td colspan="2">Bisher</td>
           </tr>
           <tr>
-            <td>Grundgebühr Haushaltsstrom (Brutto) je&nbsp;Zähler</td>
-            <td><b>{{ data.conventional_base_cost_per_year | currencyformat }}</b> pro Jahr</td>
-          </tr>
-          <tr>
-            <td>Zähler 1 Strompreis (Brutto)</td>
+            <td>Effektiver Strompreis<br>(Brutto inkl. Grundgebühr)</td>
             <td><b>{{ (100 * data.conventional_base_cost_per_kwh) | numberformat('de', 2) }}</b>&nbsp;cent&nbsp;pro&nbsp;kWh</td>
           </tr>
+          {% if data.heatcloud_usage > 0 %}
+            <tr>
+              <td>Effektiver Wärmestrompreis<br>(Brutto inkl. Grundgebühr)</td>
+              <td><b>{{ (100 * data.conventional_heat_cost_per_kwh) | numberformat('de', 2) }}</b>&nbsp;cent&nbsp;pro&nbsp;kWh</td>
+            </tr>
+          {% endif %}
+          {% if data.ecloud_usage > 0 %}
+            <tr>
+              <td>Effektiver Gaspreis<br>(Brutto inkl. Grundgebühr)</td>
+              <td><b>{{ (100 * data.conventional_gas_cost_per_kwh) | numberformat('de', 2) }}</b>&nbsp;cent&nbsp;pro&nbsp;kWh</td>
+            </tr>
+          {% endif %}
           <tr>
             <td>Strompreissteigerung</td>
             <td><b>{{ data.cost_increase_rate | percentformat(2) }}</b> pro Jahr</td>
