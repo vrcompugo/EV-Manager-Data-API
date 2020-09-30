@@ -52,12 +52,6 @@ def cron():
     except Exception as e:
         error_handler()
 
-    from .sources.bitrix24.user import run_import
-    try:
-        run_import()
-    except Exception as e:
-        error_handler()
-
     from .sources.bitrix24.user import run_cron_import
     try:
         run_cron_import()

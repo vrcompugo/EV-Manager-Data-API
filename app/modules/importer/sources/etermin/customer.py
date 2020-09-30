@@ -22,10 +22,12 @@ def filter_export_input(customer: Customer):
         "loginid": customer.email,
         "Phone": customer.phone,
         "Salutation": "Frau" if customer.salutation == "ms" else "Herr",
-        "Street": f"{customer.default_address.street} {customer.default_address.street_nb}",
-        "ZIP": customer.default_address.zip,
-        "City": customer.default_address.city
     }
+    if customer.default_address is not None:
+        data["Street"] = f"{customer.default_address.street} {customer.default_address.street_nb}",
+        data["ZIP"] = customer.default_address.zip,
+        data["City"] = customer.default_address.city
+
     if customer.company is not None and customer.company != "":
         data["LastName"] = customer.company
         data["FirstName"] = ""
