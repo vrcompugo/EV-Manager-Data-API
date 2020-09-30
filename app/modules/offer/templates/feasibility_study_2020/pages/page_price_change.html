@@ -105,11 +105,13 @@
               <td class="align-right"><b>{{ data.consumer.price_runtime | currencyformat("de", 0) }}</b></td>
             </tr>
           {% endif %}
-          {% if heating_cost > 0 %}
+          {% if data.heatcloud %}
             <tr>
               <td>Kosten für Wärme <small>(brutto)</small></td>
               <td class="align-right"><b>{{ data.heatcloud.price_runtime | currencyformat("de", 0) }}</b></td>
             </tr>
+          {% endif %}
+          {% if data.ecloud %}
             <tr>
               <td>Kosten für Gas <small>(brutto)</small></td>
               <td class="align-right"><b>{{ data.ecloud.price_runtime | currencyformat("de", 0) }}</b></td>
