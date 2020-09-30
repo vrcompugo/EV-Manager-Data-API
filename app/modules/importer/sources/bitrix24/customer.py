@@ -1,5 +1,6 @@
 import pprint
 import time
+import datetime
 from verify_email import verify_email
 
 from app.models import Customer
@@ -146,6 +147,7 @@ def run_cron_import():
     if config is not None and "data" in config and "last_customer_import" in config["data"]:
         post_data["FILTER[>DATE_MODIFY]"] = config["data"]["last_customer_import"]
     response = {"next": 0}
+    last_customer_import = str(datetime.datetime.now())
     while "next" in response:
         post_data["start"] = response["next"]
         response = post("crm.contact.list", post_data)
@@ -166,7 +168,7 @@ def run_cron_import():
         time.sleep(5)
     config = get_config_item("importer/bitrix24")
     if config is not None and "data" in config:
-        config["data"]["last_customer_import"] = str(datetime.now())
+        config["data"]["last_customer_import"] = last_customer_import
     update_config_item("importer/bitrix24", config)
 
 
