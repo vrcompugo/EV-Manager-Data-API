@@ -54,7 +54,7 @@ def filter_import_input(item_data):
         else:
             customer_id = customer_accociation.local_id
             customer = Customer.query.get(customer_accociation.local_id)
-    if customer.default_address.street == "false":
+    if customer.default_address is not None and customer.default_address.street == "false":
         customer.default_address.street = item_data["UF_CRM_5DD4020221169"]
         customer.default_address.street_nb = item_data["UF_CRM_5DD402022E300"]
         customer.default_address.zip = item_data["UF_CRM_5DD4020242167"]
