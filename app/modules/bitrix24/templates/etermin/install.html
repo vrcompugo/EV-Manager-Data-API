@@ -31,6 +31,32 @@
           );
         }
       );
+      BX24.callMethod(
+        "placement.unbind",
+        {
+          "PLACEMENT": "CRM_CONTACT_DETAIL_TAB",
+          "HANDLER": "https://api.korbacher-energiezentrum.de.ah.hbbx.de/bitrix24/etermin",
+        },
+        function(result) {
+          BX24.callMethod(
+            "placement.bind",
+            {
+              "PLACEMENT": "CRM_CONTACT_DETAIL_TAB",
+              "TITLE": "eTermin (dev)",
+              "HANDLER": "https://api.korbacher-energiezentrum.de.ah.hbbx.de/bitrix24/etermin",
+            },
+            function(result) {
+              if (result.error()){
+                console.error(result.error());
+              }else{
+                console.dir(result.data());
+                BX24.installFinish();
+              }
+              console.log(BX24.placement.info());
+            }
+          );
+        }
+      );
     });
   </script>
 </body>
