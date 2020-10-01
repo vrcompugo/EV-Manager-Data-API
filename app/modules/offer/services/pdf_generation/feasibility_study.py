@@ -30,7 +30,7 @@ def calculate_feasibility_study(offer: OfferV2):
             "south": 1000,
             "west_east": 860,
             "south_west_east": 920,
-            "north": 650
+            "north": 750
         }
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
     price_increase_heat = 2
@@ -62,7 +62,7 @@ def calculate_feasibility_study(offer: OfferV2):
         pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "north":
             orientation = offer.data["roof_direction"]
-            orientation_label = "Nord"
+            orientation_label = "Nord/Süd 50/50"
             pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "south":
             orientation = offer.data["roof_direction"]

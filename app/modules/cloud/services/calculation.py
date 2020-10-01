@@ -90,6 +90,9 @@ def calculate_cloud(data):
         if 25000 < data["power_usage"]:
             power_to_kwp_factor = 1.89
         if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            if data["roof_direction"] == "north":
+                direction_factor_kwp = 1.35
+                direction_factor_production = 0.65
             if 0 < data["power_usage"] <= 7000:
                 power_to_kwp_factor = 1.4
             if 7000 < data["power_usage"] <= 25000:
