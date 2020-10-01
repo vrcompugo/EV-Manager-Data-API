@@ -24,7 +24,7 @@ def register_routes(api: Blueprint):
             algorithm='HS256')
         return render_template("etermin/iframe.html", encoded_jwt=encoded_jwt.decode())
 
-    @api.route("/install", methods=["GET", "POST"])
+    @api.route("/etermin/install", methods=["GET", "POST"])
     def etermin_install():
         auth_info = get_bitrix_auth_info(request)
         if "user2" not in auth_info:
