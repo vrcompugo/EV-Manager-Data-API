@@ -45,7 +45,6 @@ def register_routes(api: Blueprint):
             algorithm='HS256')
         return render_template("etermin/install.html", encoded_jwt=encoded_jwt.decode())
 
-
     @api.route("/etermin/events/<contact_id>", methods=["GET", "POST"])
     def etermin_events(contact_id):
         auth_info = get_logged_in_user()
