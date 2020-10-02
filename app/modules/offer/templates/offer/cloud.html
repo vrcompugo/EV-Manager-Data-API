@@ -86,7 +86,11 @@
       <tbody>
         {% set index = {'index': 1} %}
         {% set total = {'total': 0} %}
+        {% set zero_paket = 0 %}
         {% for item in items %}
+          {% if item.description == "<b>ZERO-Paket</b>" %}
+            {% set zero_paket = 1 %}
+          {% endif %}
           <tr>
             <td class="border-right">{{ index.index }}</td>
             <td class="border-right">
@@ -136,8 +140,12 @@
       <br>
       Die oben beschrieben Werte beziehen Sich immer auf ein vollständiges Kalenderjahr (12 Monate).<br>
       Beginnt die Cloud nicht zum 1.1. eines Jahres, so werden die Werte anteilsmässig berechnet.<br>
-      <b>Beispiel:</b> 4000 kWh  Jahresverbrauch - der Vertrag beginnt zu. 1.6 eines Jahres so kann 2000 kWh bis zum 31.12 (Abrechnungsdatum) genutzt werden.
-
+      <b>Beispiel:</b> 4000 kWh  Jahresverbrauch - der Vertrag beginnt zu. 1.6 eines Jahres so kann 2000 kWh bis zum 31.12 (Abrechnungsdatum) genutzt werden.<br>
+      {% if zero_paket == 1 %}
+        <br>
+        <br>
+        Bei ausgewähltem Cloud.ZERO Paket - gilt der Minus Betrag solange die Cloud besteht, Maximal jedoch bis Ende der aktuellen EEG Vergütung (bis zu 20Jahre)
+      {% endif %}
     </small>
 
     <div style="page-break-after: always;"></div>
