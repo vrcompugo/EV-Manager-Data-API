@@ -107,7 +107,7 @@ def calculate_cloud(data):
             if 25000 < data["power_usage"]:
                 power_to_kwp_factor = 1.87
         if "name" in user and user["name"].lower() in ["aev", "eeg"]:
-            power_to_kwp_factor = 1.18
+            power_to_kwp_factor = power_to_kwp_factor * 1.34
         result["power_usage"] = data["power_usage"]
         result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor_kwp / 1000
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
