@@ -19,6 +19,7 @@ def calculate_feasibility_study(offer: OfferV2):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
+    pv_efficiancy = None
     settings["data"]["wi_settings"]["pv_efficiancy"] = {
         "south": 960,
         "west_east": 960 * 0.8,
@@ -32,6 +33,8 @@ def calculate_feasibility_study(offer: OfferV2):
             "south_west_east": 920,
             "north": 750
         }
+        if "pv_efficiancy" in offer.data and offer.data["pv_efficiancy"] is not None and offer.data["pv_efficiancy"] != "":
+            pv_efficiancy = int(1150 * int(offer.data["pv_efficiancy"]) / 1150)
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
     price_increase_heat = 2
     price_increase_emove = 2.5
@@ -46,6 +49,8 @@ def calculate_feasibility_study(offer: OfferV2):
         heatcloud_usage = offer.calculated["heater_usage"]
         ecloud_usage = offer.calculated["ecloud_usage"]
         run_time = 30
+        if "runtime" in offer.data and offer.data["runtime"] is not None and offer.data["runtime"] != "":
+            run_time = int(offer.data["runtime"])
         price_increase = 5.75
         if offer.reseller is not None and offer.reseller.document_style == "bsh":
             price_increase = 3.5
@@ -57,21 +62,28 @@ def calculate_feasibility_study(offer: OfferV2):
         if "investment_type" in offer.data and offer.data["investment_type"] != "":
             investment_type = offer.data["investment_type"]
         packet = 50
-        orientation = "west"
+        if pv_efficiancy is None:
+            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
+            if "roof_direction" in offer.data and offer.data["roof_direction"] == "north":
+                pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
+            if "roof_direction" in offer.data and offer.data["roof_direction"] == "south":
+                pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
+            if "roof_direction" in offer.data and offer.data["roof_direction"] == "south_west_east":
+                pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
+        orientation = offer.data["roof_direction"]
         orientation_label = "West/Ost"
-        pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "north":
-            orientation = offer.data["roof_direction"]
-            orientation_label = "Nord/Süd 50/50"
-            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
-        if "roof_direction" in offer.data and offer.data["roof_direction"] == "south":
-            orientation = offer.data["roof_direction"]
-            orientation_label = "Süd"
-            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
+            orientation_label = "Nord"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "north_west_east":
+            orientation_label = "Nord West/Nord Ost"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "north_south":
+            orientation_label = "Nord/Süd"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "west_east":
+            orientation_label = "West/Ost"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "south_west_east":
-            orientation = offer.data["roof_direction"]
-            orientation_label = "Süd Ost/Süd West"
-            pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
+            orientation_label = "Süd West/Süd Ost"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "south":
+            orientation_label = "Süd"
 
         cloud_total = cloud_calulation["cloud_price_incl_refund"]
         if "emove_tarif" in offer.data:
@@ -339,7 +351,7 @@ def calculate_feasibility_study(offer: OfferV2):
         data["cloud_total"] = data["cloud_total"] + cloud_new_rate
 
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
-        insurance_cost = data["loan_total"] * 0.07
+        insurance_cost = data["loan_total"] * 0.10
         data["cloud_total"] = ((data["cloud_monthly_cost"] * 12) + 110 + 85) * int(cloud_runtime)
         for i in range(data["runtime"] - int(cloud_runtime)):
             cloud_new_rate = (data["cloud_monthly_cost"] * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)

@@ -58,9 +58,11 @@ def calculate_cloud(data):
         "conventional_price_ecloud": 0,
         "conventional_price_consumer": 0
     }
-
+    pv_efficiancy_faktor = None
     if "name" in user and user["name"].lower() == "bsh":
         settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 2405
+        if "pv_efficiancy" in data and data["pv_efficiancy"] is not None and data["pv_efficiancy"] != "":
+            pv_efficiancy_faktor = int(data["pv_efficiancy"]) / 950
     if "pv_kwp" in data and data["pv_kwp"] is not None and data["pv_kwp"] != "":
         data["pv_kwp"] = float(data["pv_kwp"])
         result["pv_kwp"] = data["pv_kwp"]
@@ -68,18 +70,26 @@ def calculate_cloud(data):
         data["pv_kwp"] = 0
     if data["pv_kwp"] > 99:
         return None
-    direction_factor_kwp = 1
-    direction_factor_production = 1
-    if "roof_direction" in data:
-        if data["roof_direction"] == "north":
-            direction_factor_kwp = 1.30
-            direction_factor_production = 0.65
-        if data["roof_direction"] == "west_east":
-            direction_factor_kwp = 1.05
-            direction_factor_production = 0.8
-        if data["roof_direction"] == "south_west_east":
-            direction_factor_kwp = 1.02
-            direction_factor_production = 0.92
+    if pv_efficiancy_faktor is None:
+        direction_factor_kwp = 1
+        direction_factor_production = 1
+        if "roof_direction" in data:
+            if data["roof_direction"] == "north":
+                direction_factor_kwp = 1.30
+                direction_factor_production = 0.65
+            if data["roof_direction"] == "west_east":
+                direction_factor_kwp = 1.05
+                direction_factor_production = 0.8
+            if data["roof_direction"] == "south_west_east":
+                direction_factor_kwp = 1.02
+                direction_factor_production = 0.92
+            if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+                if data["roof_direction"] == "north":
+                    direction_factor_kwp = 1.35
+                    direction_factor_production = 0.65
+    else:
+        direction_factor_kwp = 1 / pv_efficiancy_faktor
+        direction_factor_production = pv_efficiancy_faktor
     if "power_usage" in data and data["power_usage"] != "" and data["power_usage"] != "0" and data["power_usage"] != 0:
         data["power_usage"] = int(data["power_usage"])
         power_to_kwp_factor = settings["data"]["cloud_settings"]["power_to_kwp_factor"]
@@ -90,15 +100,14 @@ def calculate_cloud(data):
         if 25000 < data["power_usage"]:
             power_to_kwp_factor = 1.89
         if "price_guarantee" in data and data["price_guarantee"] == "2_years":
-            if data["roof_direction"] == "north":
-                direction_factor_kwp = 1.35
-                direction_factor_production = 0.65
             if 0 < data["power_usage"] <= 7000:
                 power_to_kwp_factor = 1.4
             if 7000 < data["power_usage"] <= 25000:
                 power_to_kwp_factor = 1.55
             if 25000 < data["power_usage"]:
                 power_to_kwp_factor = 1.87
+        if "name" in user and user["name"].lower() in ["aev", "eeg"]:
+            power_to_kwp_factor = 1.18
         result["power_usage"] = data["power_usage"]
         result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor_kwp / 1000
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
@@ -141,7 +150,7 @@ def calculate_cloud(data):
             if 14000 < data["power_usage"] <= 20000:
                 result["cloud_price_light"] = 99
             if "name" in user and user["name"].lower() == "bsh":
-                result["cloud_price_light"] = data["power_usage"] * 0.37 / 10 / 12
+                result["cloud_price_light"] = data["power_usage"] * 0.4434 / 10 / 12
         result["conventional_price_light"] = (data["power_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
         if data is not None and "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
             data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
@@ -258,7 +267,10 @@ def calculate_cloud(data):
             + result["min_kwp_consumer"])
         extra_kwh_ratio = 1 - (data["pv_kwp"] - result["min_kwp_emove"]) / max_kwp
         if result["kwp_extra"] >= 0:
-            result["cloud_price_extra"] = -1 * result["kwp_extra"] * settings["data"]["cloud_settings"]["kwp_to_refund_factor"]
+            result["cloud_price_extra"] = -1 * result["kwp_extra"] * 8.33
+            if data["pv_kwp"] >= 10:
+                small_extra = 10 - (data["pv_kwp"] - result["kwp_extra"])
+                result["cloud_price_extra"] = -(small_extra * 8.33 + (result["kwp_extra"] - small_extra) * 6.666666667)
             result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
