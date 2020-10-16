@@ -39,6 +39,8 @@ class Items(Resource):
     @api_response
     @token_required("cloud_calculation")
     def post(self):
+        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
+
         data = request.json
         user = get_logged_in_user()
         reseller = Reseller.query.filter(Reseller.user_id == user["id"]).first()
@@ -84,6 +86,7 @@ class Items(Resource):
         if item.pdf is not None:
             item_dict["pdf_link"] = item.pdf.public_link
         if "create_all_pdfs" in data and data["create_all_pdfs"] is True:
+            generate_feasibility_study_pdf(item)
             if item.feasibility_study_pdf is not None:
                 item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
         return {"status": "success",
