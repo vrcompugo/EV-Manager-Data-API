@@ -83,6 +83,9 @@ class Items(Resource):
         item_dict = get_one_item_v2(item.id)
         if item.pdf is not None:
             item_dict["pdf_link"] = item.pdf.public_link
+        if "create_all_pdfs" in data and data["create_all_pdfs"] is True:
+            if item.feasibility_study_pdf is not None:
+                item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
         return {"status": "success",
                 "data": item_dict}
 
