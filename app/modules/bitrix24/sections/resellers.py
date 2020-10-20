@@ -17,7 +17,7 @@ def register_routes(api: Blueprint):
         auth_info = get_bitrix_auth_info(request)
         if auth_info["user"] is None:
             return "not authenticated"
-        if auth_info["user"].id in [1, 12]:
+        if auth_info["user"].id in [1, 12, 47]:
             resellers = db.session.query(Reseller).filter(Reseller.active.is_(True)).order_by(Reseller.name).all()
             return render_template("resellers/list.html", resellers=resellers, auth_info=auth_info)
         else:
@@ -27,7 +27,7 @@ def register_routes(api: Blueprint):
     @api.route("/resellers/<id>", methods=["GET", "POST"])
     def reseller(id):
         auth_info = get_bitrix_auth_info(request)
-        if auth_info["user"].id in [1, 12]:
+        if auth_info["user"].id in [1, 12, 47]:
             reseller = db.session.query(Reseller).get(id)
             data = {}
             if "sales_center" in request.form:
