@@ -7,6 +7,54 @@ import string
 from ._connector import get, post
 
 
+def get_folder(id):
+    payload = {
+        "id": id,
+        "start": 0
+    }
+    result = []
+    while payload["start"] is not None:
+        data = post("disk.folder.getchildren", payload)
+        if "result" in data:
+            payload["start"] = data["next"] if "next" in data else None
+            result = result + data["result"]
+        else:
+            print("error:", data)
+            payload["start"] = None
+            return None
+    return result
+
+
+def create_folder_path(parent_folder_id, path):
+    parts = path.split("/")
+    children = get_folder(parent_folder_id)
+    for part in parts:
+        existing_child = next((item for item in children if item["NAME"] == str(part)), None)
+        if existing_child is not None:
+            parent_folder_id = existing_child["ID"]
+            children = get_folder(existing_child["ID"])
+        else:
+            result = add_subfolder(parent_folder_id, part)
+            if result is not None and "ID" in result and result["ID"] > 0:
+                parent_folder_id = int(result["ID"])
+                children = get_folder(parent_folder_id)
+            else:
+                break
+    return parent_folder_id
+
+
+def add_subfolder(parent_id, subfolder_name):
+    data = post("disk.folder.addsubfolder", {
+        "id": parent_id,
+        "data[NAME]": subfolder_name
+    })
+    if "result" in data:
+        return data["result"]
+    else:
+        print("error:", data)
+    return None
+
+
 def get_file(id):
     data = post("disk.file.get", {
         "id": id
@@ -19,27 +67,7 @@ def get_file(id):
 
 
 def add_file(data):
-    folders = post("disk.folder.getchildren", {
-        "id": 374738
-    })
-    file_folder_id = None
-    for folder in folders["result"]:
-        if 'customer_id' in data and folder["NAME"] == f"Kunde {data['customer_id']}":
-            file_folder_id = folder["ID"]
-            break
-        if 'foldername' in data and folder["NAME"] == data["foldername"]:
-            file_folder_id = folder["ID"]
-            break
-
-    if file_folder_id is None:
-        if 'foldername' not in data and 'customer_id' in data:
-            data['foldername'] = f"Kunde {data['customer_id']}"
-        response = post("disk.folder.addsubfolder", {
-            "id": 374738,
-            "data[NAME]": data['foldername']
-        })
-        if "result" in response:
-            file_folder_id = response["result"]["ID"]
+    file_folder_id = create_folder_path(374738, f"Kunde {data['customer_id']}")
 
     if file_folder_id is None:
         return None
