@@ -67,7 +67,9 @@ def get_file(id):
 
 
 def add_file(data):
-    file_folder_id = create_folder_path(374738, f"Kunde {data['customer_id']}")
+    if 'foldername' not in data and 'customer_id' in data:
+        data['foldername'] = f"Kunde {data['customer_id']}"
+    file_folder_id = create_folder_path(374738, data['foldername'])
 
     if file_folder_id is None:
         return None
