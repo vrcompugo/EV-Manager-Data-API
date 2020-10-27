@@ -350,14 +350,24 @@ def calculate_feasibility_study(offer: OfferV2):
             cloud_new_rate = -cloud_new_rate + 2 * (data["cloud_monthly_cost"] * 12)
         data["cloud_total"] = data["cloud_total"] + cloud_new_rate
 
+    data["maintainance_cost_yearly"] = 110
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
         insurance_cost = data["loan_total"] * 0.10
-        data["cloud_total"] = ((data["cloud_monthly_cost"] * 12) + 110 + 85) * int(cloud_runtime)
+        if "pv_kwp" in cloud_calulation:
+            if 15 < cloud_calulation["pv_kwp"] <= 30:
+                data["maintainance_cost_yearly"] = int(7.5 * cloud_calulation["pv_kwp"])
+            if 30 < cloud_calulation["pv_kwp"] <= 50:
+                data["maintainance_cost_yearly"] = int(6.5 * cloud_calulation["pv_kwp"])
+            if 50 < cloud_calulation["pv_kwp"] <= 200:
+                data["maintainance_cost_yearly"] = int(5.5 * cloud_calulation["pv_kwp"])
+            if 200 < cloud_calulation["pv_kwp"]:
+                data["maintainance_cost_yearly"] = int(4.5 * cloud_calulation["pv_kwp"])
+        data["cloud_total"] = ((data["cloud_monthly_cost"] * 12) + data["maintainance_cost_yearly"] + 85) * int(cloud_runtime)
         for i in range(data["runtime"] - int(cloud_runtime)):
             cloud_new_rate = (data["cloud_monthly_cost"] * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
             if cloud_new_rate < 0:
                 cloud_new_rate = -cloud_new_rate + 2 * (data["cloud_monthly_cost"] * 12)
-            cloud_new_rate = cloud_new_rate + 110 + 85
+            cloud_new_rate = cloud_new_rate + data["maintainance_cost_yearly"] + 85
             data["cloud_total"] = data["cloud_total"] + cloud_new_rate
 
     data["cloud_total"] = data["cloud_total"] + insurance_cost
