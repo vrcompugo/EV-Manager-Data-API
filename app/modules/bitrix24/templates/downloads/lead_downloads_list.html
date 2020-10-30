@@ -2,7 +2,7 @@
 <h3>Angebote &amp; Zusatz</h3>
 
 {% for history in histories %}
-  <b>{{ history.datetime | dateformat }}</b><br>
+  <b>{{ history.datetime | datetimeformat }}</b><br>
   {% if history.data.pdf_summary_link %}
     <a href="{{ history.data.pdf_summary_link }}" target="_blank">Energiekonzept</a><br>
   {% endif %}
