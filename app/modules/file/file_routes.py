@@ -88,17 +88,17 @@ class User(Resource):
 @api.route("/view/<token>")
 class ViewFile(Resource):
     def get(self, token):
-        #try:
-        data = decode_jwt(token)
-        file = get_file(data["file_id"])
-        r = requests.get(file["DOWNLOAD_URL"])
-        response = make_response(r.content)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = \
-            'inline; filename=%s' % file["NAME"]
-        return response
-        #except Exception as e:
-        #    pass
+        try:
+            data = decode_jwt(token)
+            file = get_file(data["file_id"])
+            r = requests.get(file["DOWNLOAD_URL"])
+            response = make_response(r.content)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = \
+                'inline; filename=%s' % file["NAME"]
+            return response
+        except Exception as e:
+            pass
 
         token = base64.b64decode(token.encode('utf-8'))
         try:
