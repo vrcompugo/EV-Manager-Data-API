@@ -162,7 +162,7 @@ def calculate_products(data):
             )
         if "tax_consult" in data["data"]["extra_options"]:
             add_direct_product(
-                label="Steuerliche Beratung durch Partnerunternehmen",
+                label="Steuerliche Beratung durch Steuerkanzlei (Partnerunternehmen)",
                 category="Optionen PV Anlage",
                 quantity=1,
                 products=data["products"]

@@ -71,7 +71,7 @@ def register_routes(api: Blueprint):
                         attachment["public_link"] = "#"
                     else:
                         attachment["public_link"] = s3_file.public_link
-        histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_link.remote_id).all()
+        histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_link.remote_id).order_by(QuoteHistory.datetime.desc()).all()
         return render_template("downloads/lead_downloads_list.html", offers=offers, lead_comments=lead_comments, histories=histories)
 
     @api.route("/downloads/install/", methods=["POST"])
