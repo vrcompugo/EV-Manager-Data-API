@@ -9,7 +9,7 @@
         "placement.bind",
         {
           "PLACEMENT": "CRM_LEAD_DETAIL_TAB",
-          "TITLE": "Aufnahmebogen{% if env in ['dev', 'staging'] %} ({{ env }}){% else %} (beta){% endif %}",
+          "TITLE": "EOS{% if env in ['dev', 'staging'] %} ({{ env }}){% else %} (beta){% endif %}",
           "HANDLER": "https://{{ domain }}/quote_calculator",
         },
         function(result) {
