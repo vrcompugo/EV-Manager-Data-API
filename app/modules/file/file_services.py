@@ -23,7 +23,7 @@ def add_item(data):
     new_item.uploaded = datetime.datetime.now()
     if 'prepend_path' not in data:
         data['prepend_path'] = ""
-    folder_id = create_folder_path(442866, f"{data['prepend_path']}{new_item.uuid}")
+    folder_id = create_folder_path(446126, f"{data['prepend_path']}{new_item.uuid}")
     bitrix_file_id = add_file(folder_id, data)
     if bitrix_file_id is None:
         raise ApiException("upload-failed", "file upload failed", 500)
@@ -41,7 +41,7 @@ def update_item(id, data):
         item = set_attr_by_dict(item, data, ["id", "file"])
         if 'prepend_path' not in data:
             data['prepend_path'] = ""
-        folder_id = create_folder_path(442866, f"{data['prepend_path']}{item.uuid}")
+        folder_id = create_folder_path(446126, f"{data['prepend_path']}{item.uuid}")
         bitrix_file_id = add_file(folder_id, data)
         if bitrix_file_id is None:
             raise ApiException("upload-failed", "file upload failed", 500)

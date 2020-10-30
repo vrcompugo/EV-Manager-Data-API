@@ -1,15 +1,20 @@
 import datetime
 import os
+import sys
 
 from app import db
 from flask import request
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.auth import get_auth_info
-
 from .models.settings import Settings
 
 
-def get_settings(section=None, domain_raw=None):
+def get_full_section_name(section, domain_raw=None):
+    from app.modules.auth.auth_services import get_logged_in_user
+
+    if domain_raw is None:
+        if sys.stdin.isatty():
+            domain_raw = "keso.bitrix24.de"
     if domain_raw is None:
         domain_raw = ""
         auth_info = get_auth_info()
@@ -22,7 +27,19 @@ def get_settings(section=None, domain_raw=None):
                 domain_raw = request.form.get('auth[domain]')
             if hasattr(request, "bitrix_domain") and request.bitrix_domain is not None:
                 domain_raw = request.bitrix_domain
-    if f"{domain_raw}/{section}" == "keso.bitrix24.de/general":
+    if domain_raw is None:
+        user = get_logged_in_user()
+        if user is not None and "id" in user and user["id"] > 0:
+            domain_raw = "keso.bitrix24.de"
+    return f"{domain_raw}/{section}"
+
+
+def get_settings(section=None, domain_raw=None):
+    full_section = get_full_section_name(section, domain_raw)
+    settings_object = db.session.query(Settings).filter(Settings.section == full_section).first()
+    if settings_object is not None:
+        return settings_object.data
+    if full_section == "keso.bitrix24.de/general":
         if os.getenv('ENVIRONMENT') == "dev":
             return {
                 "base_url": "https://api.korbacher-energiezentrum.de.ah.hbbx.de/"
@@ -34,7 +51,7 @@ def get_settings(section=None, domain_raw=None):
         return {
             "base_url": "https://api.korbacher-energiezentrum.de/"
         }
-    if f"{domain_raw}/{section}" == "keso.bitrix24.de/offer/datasheet_pdf":
+    if full_section == "keso.bitrix24.de/offer/datasheet_pdf":
         data = {
             "financing_file_id": 769,
             "senec_340wp": 435,
@@ -44,12 +61,12 @@ def get_settings(section=None, domain_raw=None):
             "symo": 433
         }
         return data
-    if f"{domain_raw}/{section}" == "keso.bitrix24.de/offer/summary_pdf":
+    if full_section == "keso.bitrix24.de/offer/summary_pdf":
         data = {
             "backside_file_id": 493
         }
         return data
-    if f"{domain_raw}/{section}" == "keso.bitrix24.de/external/bitrix24":
+    if full_section == "keso.bitrix24.de/external/bitrix24":
         data = {
             "url": "https://keso.bitrix24.de/rest/106/yyd10rau6od3jlan/",
             "taxrate": 19,

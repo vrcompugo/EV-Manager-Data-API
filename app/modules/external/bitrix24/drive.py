@@ -53,7 +53,7 @@ def get_folder(id):
             payload["start"] = data["next"] if "next" in data else None
             result = result + data["result"]
         else:
-            print("error:", data)
+            print("error3:", data)
             payload["start"] = None
             return None
     return result

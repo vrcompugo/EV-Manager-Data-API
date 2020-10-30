@@ -24,7 +24,7 @@ def post(url, post_data=None, files=None, domain=None):
                 return post(url, post_data, files)
             return data
         except Exception as e:
-            print("error", response.text)
+            print("error1", response.text)
     return {}
 
 
