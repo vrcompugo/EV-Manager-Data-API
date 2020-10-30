@@ -26,7 +26,7 @@ class S3File(db.Model):
 
     @hybrid_property
     def public_link(self):
-        if self.bitrix_file_id > 0:
+        if self.bitrix_file_id is not None and self.bitrix_file_id > 0:
             return get_public_link(self.bitrix_file_id, 300)
         return get_file_public(str(self.uuid), self.filename, 30)
 
@@ -34,18 +34,18 @@ class S3File(db.Model):
     def longterm_public_link(self, days=90):
         from ..file_services import encode_file_token
 
-        if self.bitrix_file_id > 0:
+        if self.bitrix_file_id is not None and self.bitrix_file_id > 0:
             return get_public_link(self.bitrix_file_id, days * 24 * 60)
         token = base64.b64encode(encode_file_token(self.id, days=days)).decode('utf-8')
         return f"https://api.korbacher-energiezentrum.de/files/view/{token}"
 
     def make_public(self):
-        if self.bitrix_file_id > 0:
+        if self.bitrix_file_id is not None and self.bitrix_file_id > 0:
             return get_public_link(self.bitrix_file_id, 3 * 31 * 24 * 60)
         return make_public(str(self.uuid), self.filename)
 
     def get_file(self):
-        if self.bitrix_file_id > 0:
+        if self.bitrix_file_id is not None and self.bitrix_file_id > 0:
             return get_file_content(self.bitrix_file_id)
         return get_file(str(self.uuid), self.filename)
 
