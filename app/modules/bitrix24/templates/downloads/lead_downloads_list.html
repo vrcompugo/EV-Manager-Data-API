@@ -1,6 +1,23 @@
 
 <h3>Angebote &amp; Zusatz</h3>
 
+{% for history in histories %}
+  <b>{{ history.datetime | dateformat }}</b><br>
+  {% if history.data.pdf_summary_link %}
+    <a href="{{ history.data.pdf_summary_link }}" target="_blank">Energiekonzept</a><br>
+  {% endif %}
+  {% if history.data.pdf_quote_summary_link %}
+    <a href="{{ history.data.pdf_quote_summary_link }}" target="_blank">Angebote</a><br>
+  {% endif %}
+  {% if history.data.pdf_contract_summary_link %}
+    <a href="{{ history.data.pdf_contract_summary_link }}" target="_blank">Vertragsunterlagen</a><br>
+  {% endif %}
+  {% if history.data.pdf_datasheets_link %}
+    <a href="{{ history.data.pdf_datasheets_link }}" target="_blank">Datenblätter</a><br>
+  {% endif %}
+{% endfor %}
+
+
 {% for offer in offers %}
   <b>{{ offer.datetime | dateformat }}</b><br>
   {% if offer.pdf %}

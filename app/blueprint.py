@@ -98,3 +98,11 @@ api.add_namespace(pv_system_ns, path='/pv_system')
 api.add_namespace(task_ns, path='/tasks')
 api.add_namespace(settings_ns, path='/settings')
 api.add_namespace(auth_ns, path='/auth')
+
+
+def register_blueprints(app):
+    from app.modules.bitrix24.bitrix24_routes import bitrix24_bp
+    from app.modules.quote_calculator.routes import blueprint as quote_calculator_bp
+    app.register_blueprint(blueprint)
+    app.register_blueprint(bitrix24_bp, url_prefix="/bitrix24")
+    app.register_blueprint(quote_calculator_bp, url_prefix="/quote_calculator")

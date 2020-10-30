@@ -3,7 +3,7 @@ import json
 import pprint
 import datetime
 
-from app.models import Lead, OfferV2, LeadComment, S3File, Order
+from app.models import Lead, OfferV2, LeadComment, S3File, Order, QuoteHistory
 
 from ..utils import get_bitrix_auth_info
 
@@ -71,7 +71,8 @@ def register_routes(api: Blueprint):
                         attachment["public_link"] = "#"
                     else:
                         attachment["public_link"] = s3_file.public_link
-        return render_template("downloads/lead_downloads_list.html", offers=offers, lead_comments=lead_comments)
+        histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_link.remote_id).all()
+        return render_template("downloads/lead_downloads_list.html", offers=offers, lead_comments=lead_comments, histories=histories)
 
     @api.route("/downloads/install/", methods=["POST"])
     def installer():

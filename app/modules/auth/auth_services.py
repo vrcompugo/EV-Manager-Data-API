@@ -63,7 +63,26 @@ def revalidate_user():
 
 
 def get_logged_in_user(new_request=None, auth_token=None):
+    from app.modules.auth import get_auth_info
+    from app.modules.importer.sources.bitrix24._association import find_association
     # get the auth token
+    bitrix_auth = get_auth_info()
+    if bitrix_auth is not None and "user" in bitrix_auth and bitrix_auth["user"] is not None:
+        user_link = find_association("User", remote_id=bitrix_auth["user"]["id"])
+        if user_link is not None:
+            user = User.query.filter(User.id == user_link.local_id).first()
+            if user is not None:
+                permission_data = get_user_permission_data(user)
+                return {
+                    'id': user.id,
+                    'user_id': user.id,
+                    'email': user.email,
+                    'name': user.name,
+                    'roles': permission_data["roles"],
+                    'role_ids': permission_data["role_ids"],
+                    'permissions': permission_data["permissions"],
+                    'registered_on': str(user.registered_on)
+                }
     if new_request is None:
         new_request = request
     if auth_token is None:

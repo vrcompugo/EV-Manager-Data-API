@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Markup
 
 
@@ -11,6 +12,11 @@ def apply_filters(app):
     app.jinja_env.filters['numberformat'] = numberformat
     app.jinja_env.filters['currencyformat'] = currencyformat
     app.jinja_env.filters['percentformat'] = percentformat
+    app.jinja_env.filters['nl2br'] = nl2br
+
+
+def nl2br(value):
+    return textfilter(value).replace("\n", "<br>\n")
 
 
 def textfilter(value):
@@ -26,12 +32,18 @@ def boolformat(value):
 
 
 def dateformat(value, format='%d.%m.%Y'):
-    if value is None:
+    if value is None or value == "":
         return ""
+    if type(value) == str:
+        value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
     return value.strftime(format)
 
 
 def datetimeformat(value, format='%d.%m.%Y %H:%M'):
+    if value is None or value == "":
+        return ""
+    if type(value) == str:
+        value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
     return value.strftime(format)
 
 
@@ -39,9 +51,14 @@ def numberformat(value, format='de', digits=2):
     if value is None:
         return ""
     value = float(value)
-    baseformat = '{:,.' + str(digits) + 'f}'
+    if digits is None:
+        if round(value) == value:
+            return str(round(value)).replace(",", "X").replace(".", ",").replace("X", ".")
+        return str(value).replace(",", "X").replace(".", ",").replace("X", ".")
+    else:
+        baseformat = '{:,.' + str(digits) + 'f}'
     if(format == "de"):
-        return baseformat.format(float(value)).replace(",", "X").replace(".", ",").replace("X", ".")
+        return baseformat.format(value).replace(",", "X").replace(".", ",").replace("X", ".")
     return str(value)
 
 

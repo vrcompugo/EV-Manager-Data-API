@@ -3,9 +3,12 @@ from flask_restplus import Resource, reqparse
 from flask_restplus import Namespace, fields
 import werkzeug
 import base64
+import requests
 from luqum.parser import parser
 
 from app.decorators import token_required, api_response
+from app.modules.auth.jwt_parser import decode_jwt
+from app.modules.external.bitrix24.drive import get_file
 
 from .file_services import sync_item, update_item, get_items, get_one_item, decode_file_token, S3File
 
@@ -84,6 +87,19 @@ class User(Resource):
 @api.route("/view/<token>")
 class ViewFile(Resource):
     def get(self, token):
+        try:
+            data = decode_jwt(token)
+            request.bitrix_domain = data["domain"]
+            file = get_file(data["file_id"])
+            r = requests.get(file["DOWNLOAD_URL"])
+            response = make_response(r.content)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = \
+                'inline; filename=%s' % file["NAME"]
+            return response
+        except Exception as e:
+            pass
+
         token = base64.b64decode(token.encode('utf-8'))
         try:
             data = decode_file_token(token)

@@ -5,13 +5,10 @@ from flask_script import Manager, prompt_bool
 import sqlalchemy as sa
 
 from app import create_app, db
-from app.blueprint import blueprint
-from app.modules.bitrix24.bitrix24_routes import bitrix24_bp
+from app.blueprint import register_blueprints
 
 app = create_app(os.getenv('ENVIRONMENT') or 'dev')
-app.register_blueprint(blueprint)
-app.register_blueprint(bitrix24_bp, url_prefix="/bitrix24")
-
+register_blueprints(app)
 
 app.app_context().push()
 

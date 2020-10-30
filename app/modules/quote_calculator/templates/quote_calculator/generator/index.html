@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PV-Angebot</title>
+  {% include('quote_calculator/generator/style.html') %}
+  {% include('quote_calculator/generator/elements/table.html') %}
+</head>
+<body>
+
+  {% include('quote_calculator/generator/head.html') %}
+  {% if data.contact %}
+    {% if data.contact.salutation == "ms" %}
+      Sehr geehrte Frau {{ data.contact.last_name }},<br>
+    {% else %}
+      Sehr geehrter Herr {{ data.contact.last_name }},<br>
+    {% endif%}
+    <br>
+  {% endif%}
+  {% if data.foreword %}
+    <div class="foreword">
+      {% if data.foreword_type == "html" %}
+        {{ data.foreword | safe }}
+      {% else %}
+        {{ data.foreword | nl2br }}
+      {% endif%}
+    </div>
+  {% endif %}
+  <br>
+  <table cellspacing="0" class="table table-condensed" style="width: 100%;">
+    <thead>
+      <tr>
+        <th class="table--th">Pos.</th>
+        <th class="table--th">Anzahl</th>
+        <th class="table--th">Einheit</th>
+        <th class="table--th">Bezeichnung</th>
+        {% if not data.data.only_show_total_price %}
+          <th class="table--th">Einzelpreis</th>
+          <th class="table--th">Gesamtpreis</th>
+        {% endif%}
+      </tr>
+    </thead>
+    <tbody>
+      {% set index = {'index': 1, 'unused': 0} %}
+      {% for item in data.products %}
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="align-right align-top empty-on-split">{{ item.quantity | numberformat("de", digits=None) }}</td>
+          <td class="border-right align-top empty-on-split">{{ item.quantity_unit }}</td>
+          <td class="border-right align-top description">
+            <div>
+              <b>{{ item.NAME }}</b><br>
+              {% if item.DESCRIPTION_TYPE == "html" %}
+                {{ item.DESCRIPTION | safe }}
+              {% else %}
+                {{ item.DESCRIPTION | nl2br }}
+              {% endif%}
+            </div>
+          </td>
+          {% if not data.data.only_show_total_price %}
+            <td class="border-right align-right align-top empty-on-split">{{ item.PRICE | currencyformat }}</td>
+            <td class="border-right align-right align-top empty-on-split">{{ item.total_price | currencyformat }}</td>
+          {% endif%}
+        </tr>
+        {% if index.update({"index": index.index + 1 }) %} {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <table>
+    <tbody>
+      <tr>
+        <td class="align-right" width="80%">Zwischensumme netto:</td>
+        <td class="align-right" width="30%" style="white-space: nowrap;">{{ data.subtotal_net | currencyformat }}</td>
+      </tr>
+      <tr>
+        <td class="align-right" style="font-size: 0.8em;">Mehrwertsteuer {{ data.tax_rate | percentformat }} auf {{ data.total_net | currencyformat }}</td>
+        <td class="align-right" style="white-space: nowrap;font-size: 0.8em;">{{ data.total_tax | currencyformat }}</td>
+      </tr>
+      <tr class="foot-line">
+        <td class="align-right" style="font-size: 1.2em; font-weight: bold;" >Zu zahlender Betrag</td>
+        <td class="align-right" style="white-space: nowrap;font-size: 1.2em; font-weight: bold;">{{ data.total | currencyformat }}</td>
+      </tr>
+    </tbody>
+  </table>
+  {% if data.data.special_conditions_pv_quote %}
+    <div>
+      {{ data.data.special_conditions_pv_quote }}
+    </div>
+  {% endif%}
+
+  {% if data.appendix %}
+    <div class="appendix">
+      {% if data.appendix_type == "html" %}
+        {{ data.appendix | safe }}
+      {% else %}
+        {{ data.appendix | nl2br }}
+      {% endif%}
+    </div>
+  {% endif %}
+
+</body>
+</html>
+
+

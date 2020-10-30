@@ -3,6 +3,17 @@ import os
 from io import StringIO
 
 
+def gotenberg_pdf(content, output_path=None, content_footer=None, content_header=None, landscape=False, margins=[], wait_delay="0.1"):
+    return generate_pdf(
+        content,
+        output_path=output_path,
+        content_footer=content_footer,
+        content_header=content_header,
+        landscape=landscape,
+        margins=margins,
+        wait_delay=wait_delay)
+
+
 def generate_pdf(content, output_path=None, content_footer=None, content_header=None, landscape=False, margins=[], wait_delay="0.1"):
     data = {
         "index.html": StringIO(content),

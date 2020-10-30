@@ -9,6 +9,7 @@ from app.utils.set_attr_by_dict import set_attr_by_dict
 
 from .models.s3_file import S3File, S3FileSchema
 from .minio import put_file
+from app.modules.external.bitrix24.drive import add_file, create_folder_path
 
 
 key = "0u9cQU8YNmUSAgIuq7MaBKh7YpE4z1ZO"
@@ -20,9 +21,15 @@ def add_item(data):
     if "uuid" not in data or data["uuid"] is None or len(data["uuid"]) < 10:
         new_item.uuid = str(uuid.uuid4())
     new_item.uploaded = datetime.datetime.now()
+    if 'prepend_path' not in data:
+        data['prepend_path'] = ""
+    folder_id = create_folder_path(442866, f"{data['prepend_path']}{new_item.uuid}")
+    bitrix_file_id = add_file(folder_id, data)
+    if bitrix_file_id is None:
+        raise ApiException("upload-failed", "file upload failed", 500)
+    new_item.bitrix_file_id = bitrix_file_id
     db.session.add(new_item)
     db.session.commit()
-    put_file(str(new_item.uuid), new_item.filename, data)
 
     return new_item
 
@@ -30,10 +37,15 @@ def add_item(data):
 def update_item(id, data):
     item = db.session.query(S3File).get(id)
     if item is not None:
-        if "uuid" not in data or data["uuid"] is None or len(data["uuid"]) < 10:
-            item.uuid = str(uuid.uuid4())
+        item.uuid = str(uuid.uuid4())
         item = set_attr_by_dict(item, data, ["id", "file"])
-        put_file(str(item.uuid), item.filename, data)
+        if 'prepend_path' not in data:
+            data['prepend_path'] = ""
+        folder_id = create_folder_path(442866, f"{data['prepend_path']}{item.uuid}")
+        bitrix_file_id = add_file(folder_id, data)
+        if bitrix_file_id is None:
+            raise ApiException("upload-failed", "file upload failed", 500)
+        item.bitrix_file_id = bitrix_file_id
         db.session.commit()
         return item
     else:

@@ -10,3 +10,4 @@ __pycache__
 venv
 devspace.yaml
 .DS_Store
+products-cache.json

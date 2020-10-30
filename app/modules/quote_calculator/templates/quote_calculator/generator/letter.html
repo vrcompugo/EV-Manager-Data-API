@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PV-Angebot</title>
+  {% include('quote_calculator/generator/style.html') %}
+  {% include('quote_calculator/generator/elements/table.html') %}
+</head>
+<body>
+
+  {% include('quote_calculator/generator/head.html') %}
+  {% if data.contact %}
+    {% if data.contact.salutation == "ms" %}
+      Sehr geehrte Frau {{ data.contact.last_name }},<br>
+    {% else %}
+      Sehr geehrter Herr {{ data.contact.last_name }},<br>
+    {% endif%}
+    <br>
+  {% endif%}
+  <div class="letter-text">
+    {% if data.letter_text_type == "html" %}
+      {{ data.letter_text | safe }}
+    {% else %}
+      {{ data.letter_text | nl2br }}
+    {% endif%}
+  </div>
+
+</body>
+</html>
+
+

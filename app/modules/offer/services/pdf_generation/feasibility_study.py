@@ -43,6 +43,8 @@ def calculate_feasibility_study(offer: OfferV2):
         cloud_runtime = 2
         if offer.data["price_guarantee"] == "10_years":
             cloud_runtime = 10
+        if offer.data["price_guarantee"] == "12_years":
+            cloud_runtime = 12
         cloud_calulation = offer.calculated
         consumer = 1
         usage = offer.calculated["power_usage"]
@@ -223,6 +225,8 @@ def calculate_feasibility_study(offer: OfferV2):
 
     if offer.data is not None and "loan_total" in offer.data and offer.data["loan_total"] is not None and offer.data["loan_total"] != "":
         data["pv_offer_total"] = float(offer.data["loan_total"])
+    if offer.data is not None and "total_net" in offer.data and offer.data["total_net"] is not None and offer.data["total_net"] != "":
+        data["pv_offer_total"] = float(offer.data["total_net"])
     yearly_loan_payment = data["pv_offer_total"] / 20
     if data["loan_interest_rate"] > 0:
         yearly_loan_payment = (data["pv_offer_total"] * data["loan_interest_rate"] / 100) / (1 - (1 + data["loan_interest_rate"] / 100) ** -20)
@@ -394,7 +398,7 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
     data["base_url"] = "https://api.korbacher-energiezentrum.de"
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
     if True:
-        pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0])
+        pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0], wait_delay="1")
         if pdf:
             pdf_file = S3File.query\
                 .filter(S3File.model == "OfferV2FeasibilityStudy")\
@@ -403,6 +407,7 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2):
             file_data = {
                 "model": "OfferV2FeasibilityStudy",
                 "model_id": offer.id,
+                "prepend_path": f"Angebot {offer.id}/",
                 "content-type": 'application/pdf',
                 "file_content": pdf,
                 "filename": f"Wirtschaftlichkeitsrechnung PV-{offer.id}.pdf"
@@ -466,6 +471,7 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         file_data = {
             "model": "OfferV2FeasibilityStudy",
             "model_id": offer.id,
+            "prepend_path": f"Angebot {offer.id}/",
             "content-type": 'application/pdf',
             "file": pdf,
             "filename": f"Wirtschaftlichkeitsrechnung PV-{offer.id}.pdf"

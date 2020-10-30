@@ -26,6 +26,7 @@ def generate_offer_pdf(offer: OfferV2):
         file_data = {
             "model": "OfferV2",
             "model_id": offer.id,
+            "prepend_path": f"Angebot {offer.id}/",
             "content-type": 'application/pdf',
             "file_content": pdf,
             "filename": f"Angebot {offer_number_prefix}{offer.id}.pdf"

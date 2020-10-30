@@ -1,4 +1,5 @@
 import math
+from functools import reduce
 from flask import render_template
 
 from app.models import OfferV2
@@ -18,7 +19,9 @@ def calculate_cloud(data):
         user = get_logged_in_user()
     except Exception as e:
         pass
-
+    user_id_for_prices = user["id"]
+    if user_id_for_prices not in [113, 119, 120, 121, 123]:
+        user_id_for_prices = 1
     result = {
         "lightcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
         "heatcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"],
@@ -74,19 +77,29 @@ def calculate_cloud(data):
         direction_factor_kwp = 1
         direction_factor_production = 1
         if "roof_direction" in data:
-            if data["roof_direction"] == "north":
-                direction_factor_kwp = 1.30
-                direction_factor_production = 0.65
-            if data["roof_direction"] == "west_east":
-                direction_factor_kwp = 1.05
-                direction_factor_production = 0.8
-            if data["roof_direction"] == "south_west_east":
-                direction_factor_kwp = 1.02
-                direction_factor_production = 0.92
+            direction_factor_kwp, direction_factor_production = factors_by_direction(data["roof_direction"])
             if "price_guarantee" in data and data["price_guarantee"] == "2_years":
                 if data["roof_direction"] == "north":
                     direction_factor_kwp = 1.35
                     direction_factor_production = 0.65
+
+        if "roofs" in data and data["roofs"] is not None:
+            total_roof_space = 0
+            for roof in data["roofs"]:
+                if "sqm" in roof and roof["sqm"] is not None and roof["sqm"] != "":
+                    total_roof_space = total_roof_space + float(roof["sqm"])
+            if total_roof_space == 0:
+                direction_factor_kwp, direction_factor_production = factors_by_direction("west_east")
+                if len(data["roofs"]) > 0 and "direction" in data["roofs"][0]:
+                    direction_factor_kwp, direction_factor_production = factors_by_direction(data["roofs"][0]["direction"])
+            else:
+                direction_factor_kwp = 0
+                direction_factor_production = 0
+                for roof in data["roofs"]:
+                    if "sqm" in roof and roof["sqm"] is not None and roof["sqm"] != "":
+                        x, y = factors_by_direction(roof["direction"])
+                        direction_factor_kwp = direction_factor_kwp + (float(roof["sqm"]) / total_roof_space) * x
+                        direction_factor_production = direction_factor_kwp + (float(roof["sqm"]) / total_roof_space) * y
     else:
         direction_factor_kwp = 1 / pv_efficiancy_faktor
         direction_factor_production = pv_efficiancy_faktor
@@ -134,7 +147,7 @@ def calculate_cloud(data):
 
         result["cloud_price_light"] = result["cloud_price_light"] + list(filter(
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
-            settings["data"]["cloud_settings"]["cloud_user_prices"][str(user["id"])]
+            settings["data"]["cloud_settings"]["cloud_user_prices"][str(user_id_for_prices)]
         ))[0]["value"]
         if "price_guarantee" in data and data["price_guarantee"] == "2_years":
             if 0 < data["power_usage"] <= 5000:
@@ -165,7 +178,7 @@ def calculate_cloud(data):
         ))[0]["value"]
         result["cloud_price_heatcloud"] = list(filter(
             lambda item: item['from'] <= data["heater_usage"] and data["heater_usage"] <= item['to'],
-            settings["data"]["cloud_settings"]["cloud_user_heater_prices"][str(user["id"])]
+            settings["data"]["cloud_settings"]["cloud_user_heater_prices"][str(user_id_for_prices)]
         ))[0]["value"]
         result["min_kwp_heatcloud"] = data["heater_usage"] * heater_to_kwp_factor * direction_factor_kwp / 1000
         result["conventional_price_heatcloud"] = (data["heater_usage"] * settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"]) / 12
@@ -176,13 +189,13 @@ def calculate_cloud(data):
     if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0:
         data["ecloud_usage"] = int(data["ecloud_usage"])
         result["ecloud_usage"] = data["ecloud_usage"]
-        if type(settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]) is list:
+        if type(settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user_id_for_prices)]) is list:
             result["cloud_price_ecloud"] = list(filter(
                 lambda item: item['from'] <= data["ecloud_usage"] and data["ecloud_usage"] <= item['to'],
-                settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]
+                settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user_id_for_prices)]
             ))[0]["value"]
         else:
-            result["cloud_price_ecloud"] = settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user["id"])]
+            result["cloud_price_ecloud"] = settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user_id_for_prices)]
         result["min_kwp_ecloud"] = data["ecloud_usage"] / settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"]
         settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"]
         result["conventional_price_ecloud"] = (data["ecloud_usage"] * settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"]) / 12
@@ -195,7 +208,7 @@ def calculate_cloud(data):
             consumer_usage = consumer_usage + int(consumer["usage"])
             consumer_price = list(filter(
                 lambda item: item['from'] <= int(consumer["usage"]) and int(consumer["usage"]) <= item['to'],
-                settings["data"]["cloud_settings"]["cloud_user_consumer_prices"][str(user["id"])]
+                settings["data"]["cloud_settings"]["cloud_user_consumer_prices"][str(user_id_for_prices)]
             ))
             if len(consumer_price) > 0:
                 result["cloud_price_consumer"] = result["cloud_price_consumer"] + consumer_price[0]["value"]
@@ -235,9 +248,9 @@ def calculate_cloud(data):
                 result["emove_usage"] = 8500
 
     if "price_guarantee" in data:
-        if str(user["id"]) in settings["data"]["cloud_settings"]["cloud_guarantee"]:
-            if data["price_guarantee"] in settings["data"]["cloud_settings"]["cloud_guarantee"][str(user["id"])]:
-                result["user_one_time_cost"] = result["user_one_time_cost"] + settings["data"]["cloud_settings"]["cloud_guarantee"][str(user["id"])][data["price_guarantee"]]["price"]
+        if str(user_id_for_prices) in settings["data"]["cloud_settings"]["cloud_guarantee"]:
+            if data["price_guarantee"] in settings["data"]["cloud_settings"]["cloud_guarantee"][str(user_id_for_prices)]:
+                result["user_one_time_cost"] = result["user_one_time_cost"] + settings["data"]["cloud_settings"]["cloud_guarantee"][str(user_id_for_prices)][data["price_guarantee"]]["price"]
 
     if result["power_usage"] <= 0:
         result["invalid_form"] = True
@@ -351,6 +364,21 @@ def calculate_cloud(data):
             result["user_one_time_cost"] = result["user_one_time_cost"] + (result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])) * 24
 
     return result
+
+
+def factors_by_direction(direction):
+    direction_factor_kwp = 1
+    direction_factor_production = 1
+    if direction == "north":
+        direction_factor_kwp = 1.30
+        direction_factor_production = 0.65
+    if direction == "west_east":
+        direction_factor_kwp = 1.05
+        direction_factor_production = 0.8
+    if direction == "south_west_east":
+        direction_factor_kwp = 1.02
+        direction_factor_production = 0.92
+    return direction_factor_kwp, direction_factor_production
 
 
 def get_cloud_products(data=None, offer=None):
