@@ -352,7 +352,7 @@ def calculate_feasibility_study(offer: OfferV2):
 
     data["maintainance_cost_yearly"] = 110
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
-        insurance_cost = data["loan_total"] * 0.10
+        insurance_cost = data["pv_offer_total"] * 0.10
         if "pv_kwp" in cloud_calulation:
             if 15 < cloud_calulation["pv_kwp"] <= 30:
                 data["maintainance_cost_yearly"] = int(7.5 * cloud_calulation["pv_kwp"])
