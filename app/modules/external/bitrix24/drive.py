@@ -63,7 +63,10 @@ def create_folder_path(parent_folder_id, path):
     parts = path.split("/")
     children = get_folder(parent_folder_id)
     for part in parts:
-        existing_child = next((item for item in children if item["NAME"] == str(part)), None)
+        if children is None:
+            existing_child = None
+        else:
+            existing_child = next((item for item in children if item["NAME"] == str(part)), None)
         if existing_child is not None:
             parent_folder_id = existing_child["ID"]
             children = get_folder(existing_child["ID"])
