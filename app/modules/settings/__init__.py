@@ -5,32 +5,13 @@ import sys
 from app import db
 from flask import request
 from app.utils.set_attr_by_dict import set_attr_by_dict
-from app.modules.auth import get_auth_info
+from app.modules.auth import get_auth_info, get_logged_in_user
 from .models.settings import Settings
 
 
 def get_full_section_name(section, domain_raw=None):
-    from app.modules.auth.auth_services import get_logged_in_user
 
-    if domain_raw is None:
-        if sys.stdin.isatty():
-            domain_raw = "keso.bitrix24.de"
-    if domain_raw is None:
-        domain_raw = ""
-        auth_info = get_auth_info()
-        if "domain_raw" in auth_info:
-            domain_raw = auth_info["domain_raw"]
-        if request is not None:
-            if request.args.get("DOMAIN") is not None:
-                domain_raw = request.args.get('DOMAIN')
-            if request.form.get("auth[domain]") is not None:
-                domain_raw = request.form.get('auth[domain]')
-            if hasattr(request, "bitrix_domain") and request.bitrix_domain is not None:
-                domain_raw = request.bitrix_domain
-    if domain_raw is None:
-        user = get_logged_in_user()
-        if user is not None and "id" in user and user["id"] > 0:
-            domain_raw = "keso.bitrix24.de"
+    domain_raw = "keso.bitrix24.de"
     return f"{domain_raw}/{section}"
 
 

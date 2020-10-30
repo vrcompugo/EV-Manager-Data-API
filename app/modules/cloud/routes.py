@@ -169,8 +169,9 @@ class User(Resource):
         item_dict = get_one_item_v2(item.id)
         if item.pdf is not None:
             item_dict["pdf_link"] = item.pdf.public_link
-        if offer.feasibility_study_pdf is not None:
-            item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
+            print(item.pdf)
+        if item.feasibility_study_pdf is not None:
+            item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
         return {"status": "success",
                 "data": item_dict}
 

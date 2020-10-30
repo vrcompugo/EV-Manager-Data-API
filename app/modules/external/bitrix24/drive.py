@@ -127,12 +127,9 @@ def add_file(folder_id, data):
 
 
 def get_public_link(id, expire_minutes=86400):
-    auth_info = get_auth_info()
     config = get_settings(section="general")
-    if auth_info is not None and auth_info["domain_raw"] is not None:
-        token_data = encode_jwt({"file_id": id, "domain": auth_info["domain_raw"]}, expire_minutes)
-        return f"{config['base_url']}files/view/{token_data['token']}"
-    return None
+    token_data = encode_jwt({"file_id": id}, expire_minutes)
+    return f"{config['base_url']}files/view/{token_data['token']}"
 
 
 def get_random_string(length):
