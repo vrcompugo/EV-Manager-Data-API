@@ -4,6 +4,8 @@ from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 import uuid
 import base64
+from io import StringIO, BytesIO
+
 from ..minio import get_file_public, make_public
 
 from app import db
@@ -46,7 +48,7 @@ class S3File(db.Model):
 
     def get_file(self):
         if self.bitrix_file_id is not None and self.bitrix_file_id > 0:
-            return get_file_content(self.bitrix_file_id)
+            return BytesIO(get_file_content(self.bitrix_file_id))
         return get_file(str(self.uuid), self.filename)
 
 
