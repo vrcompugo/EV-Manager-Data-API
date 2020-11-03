@@ -390,53 +390,60 @@ def calculate_feasibility_study(offer: OfferV2):
     return data
 
 
-def generate_feasibility_study_2020_pdf(offer: OfferV2):
+def generate_feasibility_study_2020_pdf(offer: OfferV2, return_string=False):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
     data = calculate_feasibility_study(offer)
     data["base_url"] = "https://api.korbacher-energiezentrum.de"
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
-    if True:
-        pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0], wait_delay="1")
-        if pdf:
-            pdf_file = S3File.query\
-                .filter(S3File.model == "OfferV2FeasibilityStudy")\
-                .filter(S3File.model_id == offer.id)\
-                .first()
-            file_data = {
-                "model": "OfferV2FeasibilityStudy",
-                "model_id": offer.id,
-                "prepend_path": f"Angebot {offer.id}/",
-                "content-type": 'application/pdf',
-                "file_content": pdf,
-                "filename": f"Wirtschaftlichkeitsrechnung PV-{offer.id}.pdf"
-            }
-            if pdf_file is not None:
-                update_file(pdf_file.id, file_data)
-            else:
-                add_file(file_data)
-            response = make_response(pdf)
-            response.headers['Content-Type'] = 'application/pdf'
-            return response
-    response = make_response(content)
+    if return_string:
+        response = make_response(content)
+        response.headers['Content-Type'] = 'text/html'
+        return response
+    pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0], wait_delay="2")
+    if pdf:
+        pdf_file = S3File.query\
+            .filter(S3File.model == "OfferV2FeasibilityStudy")\
+            .filter(S3File.model_id == offer.id)\
+            .first()
+        file_data = {
+            "model": "OfferV2FeasibilityStudy",
+            "model_id": offer.id,
+            "prepend_path": f"Angebot {offer.id}/",
+            "content-type": 'application/pdf',
+            "file_content": pdf,
+            "filename": f"Wirtschaftlichkeitsrechnung PV-{offer.id}.pdf"
+        }
+        if pdf_file is not None:
+            update_file(pdf_file.id, file_data)
+        else:
+            add_file(file_data)
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        return response
+    response = make_response("pdf generation failed")
     response.headers['Content-Type'] = 'text/html'
     return response
 
 
-def generate_feasibility_study_pdf(offer: OfferV2):
-    return generate_feasibility_study_2020_pdf(offer)
+def generate_feasibility_study_pdf(offer: OfferV2, return_string=False):
+    return generate_feasibility_study_2020_pdf(offer, return_string=return_string)
     settings = get_settings("pv-settings")
     if settings is None:
         return None
     data = calculate_feasibility_study(offer)
 
     content = render_template("feasibility_study/overlay.html", offer=offer, data=data, settings=settings)
+    if return_string:
+        response = make_response(content)
+        response.headers['Content-Type'] = 'text/html'
+        return response
     config = pdfkit.configuration(wkhtmltopdf="./wkhtmltopdf")
     overlay_binary = pdfkit.from_string(content, configuration=config, output_path=False, options={
         'disable-smart-shrinking': ''
     })
-    if True and overlay_binary is not None:
+    if overlay_binary is not None:
         pdf = BytesIO()
         output = PdfFileWriter()
         base_study_pdf = PdfFileReader(open("app/modules/offer/static/feasibility_study.pdf", 'rb'))
@@ -484,6 +491,3 @@ def generate_feasibility_study_pdf(offer: OfferV2):
         response = make_response(pdf.read())
         response.headers['Content-Type'] = 'application/pdf'
         return response
-    response = make_response(content)
-    response.headers['Content-Type'] = 'text/html'
-    return response

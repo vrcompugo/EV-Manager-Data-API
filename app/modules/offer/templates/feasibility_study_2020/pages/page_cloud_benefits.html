@@ -1,0 +1,92 @@
+<style>
+  .page_cloud_benefits {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_cloud_benefits h2 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 30px;
+    padding: 0 120px;
+  }
+  .page_cloud_benefits .step__number::before {
+    left: 3em
+  }
+  .page_cloud_benefits .step__label {
+    padding-left: 2.5em;
+  }
+  .page_cloud_benefits .step__label2 {
+    padding-left: 3em;
+  }
+  .page_cloud_benefits .green-bar {
+    color: #B0CA0A;
+    text-align: center;
+    border-top: 2px solid #B0CA0A;
+    border-bottom: 2px solid #B0CA0A;
+    font-size: 40px;
+    font-weight: bold;
+    padding: 0.1em 0;
+  }
+  .page_cloud_benefits .with-icon {
+    padding: 0 1em 0 60px;
+    margin: 0 0 1em 60px;
+    background: no-repeat left center;
+    background-size: 40px;
+  }
+  .page_cloud_benefits .footnote {
+    display: inline-block;
+    padding: 0 10px 0 120px;
+  }
+  .page_cloud_benefits .left-side {
+    flex: 10;
+    padding-left: 50px;
+  }
+  .page_cloud_benefits .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/solar_sonne.jpg");
+    background-size: cover;
+  }
+
+</style>
+
+
+<div class="page_cloud_benefits">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="step" style="margin-left: -50px;">
+    <div class="step__number"><span>&nbsp;</span></div>
+    <div class="step__label">Ihre Energiezunkunft mit Senec</div>
+    <div class="step__label2">... Ihre Lösung, um noch heute in die Zukunft zu starten</div>
+  </div>
+  <h2>Ihre Vorteile</h2>
+  <div class="layout horizontal">
+    <div class="left-side">
+      <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/haus_icon.jpg');">
+        <b>100% Unabhängigkeit für Ihr Zuhause</b><br>
+        Der individuelle Stromvertrag zu Ihrer Photovoltaikanlage und Senec Speicher versorgt Sie rundum  mit Energie aus der ConnectCloud.
+      </div>
+      <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/vorteile_icon.jpg');">
+        <b>Vorteile Ihrer Investition</b><br>
+        Sobald Sie in Ihr eigenes, sauberes und selbstgemachtes Energiesystem investieren, profitieren Sie davon. Nach {{ data.runtime }} Jahren können Sie mit einem Vorteil von bis zu {{ data.cost_benefit | currencyformat("de", 0) }} rechnen.
+      </div>
+      <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/geld_icon.jpg');">
+        <b>Verdienen Sie Geld mit der ConnectCloud</b><br>
+        Zusätzlich wird Ihre SenecBatterie im Rahmen der ConnectCloud Teil des virtuellenKraftwerks. Die digital vernetzten Speicher helfen dabei, das Stromnetz zu stabilisieren. Deshalb haben wir das Cashback-Programm ins Leben gerufen. Mit dem intelligenten System, können Sie Ihren überschüssigen Strom auch anderweitig Nutzen, z.B. in Ihrem Ferienhaus oder an einem von 30.000 offiziellen Ladesäulen.
+      </div>
+      <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/erde_icon.jpg');">
+        <b>Schließen Sie sich der Energie Revolution an</b><br>
+        Erreichen Sie das Ziel einer sauberen und bezahlbaren Energie für alle, zusammen mit der ConnectCloud - der sichersten Stromcloud Deutschlands.
+      </div>
+
+      <small class="footnote">
+        <sup>1</sup> inkl. gesetzl. Ust. von 19 %<br>
+        <sup>2</sup> Unter Annahme der Regelbesteuereung mit einer Ust. von 19%<br>
+        * Minderverbrauch in Kilowattstunden vom vereinbarten Gesamtverbrauch/vereinbarte Freistrommenge bis maximal 10.000 kWh
+      </small>
+    </div>
+    <div class="right-side">&nbsp;</div>
+  </div>
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

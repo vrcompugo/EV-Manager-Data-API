@@ -280,7 +280,6 @@ def generate_summary_pdf(lead_id, data):
     add_pdf_by_drive_id(merger, data["pdf_letter_file_id"])
     if "pdf_wi_file_id" in data and data["pdf_wi_file_id"] > 0:
         add_pdf_by_drive_id(merger, data["pdf_wi_file_id"])
-    merger.append("app/modules/quote_calculator/templates/quote_calculator/generator/cloud_wi.pdf")
     merger.write(output_file)
     merger.close()
     output_file.seek(0)

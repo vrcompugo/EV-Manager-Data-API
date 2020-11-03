@@ -1,0 +1,138 @@
+<style>
+  .page_cloud_interplay2 {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_cloud_interplay2 h2 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 30px;
+    padding: 0 120px;
+  }
+  .page_cloud_interplay2 .step__number::before {
+    left: 3em
+  }
+  .page_cloud_interplay2 .step__label {
+    padding-left: 2.5em;
+  }
+  .page_cloud_interplay2 .step__label2 {
+    padding-left: 3em;
+  }
+  .page_cloud_interplay2 .with-icon {
+    padding: 0 1em 0 60px;
+    margin: 0 0 1em 60px;
+    background: no-repeat left center;
+    background-size: 40px;
+  }
+  .page_cloud_interplay2 .footnote {
+    display: inline-block;
+    padding: 20px 10px 0 98px;
+  }
+  .page_cloud_interplay2 .left-side {
+    flex: 10;
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+  .page_cloud_interplay2 .right-side {
+    flex: 1 0 20%;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/maedchen.jpg");
+    background-size: cover;
+  }
+  .page_cloud_interplay2 .number-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 1.2em;
+  }
+  .page_cloud_interplay2 .number-list .number {
+    margin: 0 1em;
+    background-color: #B0CA0A;
+    color: #ffffff;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2em;
+    height: 2em;
+    font-size: 1.5em;
+  }
+  .page_cloud_interplay2 .number-list .text {
+    flex: 1;
+  }
+  .page_cloud_interplay2 .diagram {
+    margin: 0 70px 0 100px;
+    flex: 0 9 400px;
+  }
+  .page_cloud_interplay2 .diagram img {
+    width: 100%;
+    height: auto;
+  }
+  .page_cloud_interplay2 .text {
+    flex: 1;
+    padding-right: 80px;
+  }
+  .page_cloud_interplay2 .image-text-combo {
+    padding-bottom: 30px;
+  }
+  .page_cloud_interplay2 .dot {
+    background-color: grey;
+    border-radius: 100%;
+    width: 1.5em;
+    height: 1.5em;
+    margin: 0.3em 1em 0.3em 0;
+  }
+  .page_cloud_interplay2 .layout.horizontal.center {
+    align-items: center;
+  }
+
+</style>
+
+
+<div class="page_cloud_interplay2">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="step" style="margin-left: -50px;">
+    <div class="step__number"><span>&nbsp;</span></div>
+    <div class="step__label">Das innovative Zusammenspiel zwischen unseren Produkten</div>
+    <div class="step__label2">... sehen Sie, was es für Ihre Stromversorgung bedeutet</div>
+  </div>
+  <br>
+  <br>
+  <div class="layout horizontal image-text-combo">
+    <div class="diagram">
+      <img src="{{ data.base_url }}/static/feasibility_study_2020/diagram_1.jpg" />
+    </div>
+    <div class="text">
+      <b>Ihre Photovoltaik-Produktion</b><br>
+      Sie entscheiden sich für eine Photovoltaikanlage:Ihr Haus wird zu einem Kraftwerk. Tagsüber produziertes für Sie eigenen Solarstrom
+      <div class="layout horizontal center">
+        <div class="dot" style="background-color: #afc91c;">&nbsp;</div>
+        <div class="dot-text">Photovoltaik-Produktion</div>
+      </div>
+    </div>
+  </div>
+  <div class="layout horizontal">
+    <div class="diagram">
+      <img src="{{ data.base_url }}/static/feasibility_study_2020/diagram_2.jpg" />
+    </div>
+    <div class="text">
+      <b>Ihr Eigenverbrauch</b><br>
+      Vergleichen Sie Ihre Stromproduktion mit IhrerVerbrauchskurve: Ihr selbst erzeugter Solarstrom kannnur einen kleinen Teil Ihres Stromverbrauchs decken - diesen nennt man Photovoltaik-Eigenverbrauch
+      <div class="layout horizontal center">
+        <div class="dot" style="background-color: #afc91c;">&nbsp;</div>
+        <div class="dot-text">Photovoltaik-Produktion</div>
+      </div>
+      <div class="layout horizontal center">
+        <div class="dot" style="background-color: #aecc55;">&nbsp;</div>
+        <div class="dot-text">Photovoltaik-Eigenverbrauch</div>
+      </div>
+      <div class="layout horizontal center">
+        <div class="dot" style="background-color: #3d59a2;">&nbsp;</div>
+        <div class="dot-text">Stromverbrauch</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

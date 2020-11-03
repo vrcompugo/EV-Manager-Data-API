@@ -1,0 +1,85 @@
+<style>
+  .page_cloud_new_products {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_cloud_new_products h2 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 30px;
+    padding: 0 120px;
+  }
+  .page_cloud_new_products .step__number::before {
+    left: 3em
+  }
+  .page_cloud_new_products .step__label {
+    padding-left: 2.5em;
+  }
+  .page_cloud_new_products .step__label2 {
+    padding-left: 3em;
+  }
+  .page_cloud_new_products .green-bar {
+    color: #B0CA0A;
+    text-align: center;
+    border-top: 2px solid #B0CA0A;
+    border-bottom: 2px solid #B0CA0A;
+    font-size: 40px;
+    font-weight: bold;
+    padding: 0.1em 0;
+  }
+  .page_cloud_new_products .with-icon {
+    padding: 0 1em 0 60px;
+    margin: 0 0 1em 60px;
+    background: no-repeat left center;
+    background-size: 40px;
+  }
+  .page_cloud_new_products .footnote {
+    padding: 0 120px;
+  }
+
+</style>
+
+
+<div class="page_cloud_new_products">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="step" style="margin-left: -50px;">
+    <div class="step__number"><span>&nbsp;</span></div>
+    <div class="step__label">Ihre Energiezunkunft mit Senec</div>
+    <div class="step__label2">... Ihre Lösung, um noch heute in die Zukunft zu starten</div>
+  </div>
+
+  {% if data.cloud_calulation.ecloud_usage > 0 %}
+  <div class="layout horizontal">
+    <div class="flex">
+      <h2>Freistrommenge</h2>
+      <div class="green-bar">{{ (data.cloud_calulation.power_usage + data.cloud_calulation.heater_usage + data.cloud_calulation.consumer_usage) | numberformat(digits=0) }} kWh/Jahr</div>
+    </div>
+    <div class="flex">
+      <h2>Wärmeenergiemenge</h2>
+      <div class="green-bar">{{ data.cloud_calulation.ecloud_usage | numberformat(digits=0) }} kWh/Jahr</div>
+    </div>
+  </div>
+  {% else %}
+    <h2>Freistrommenge - verfügbar für Ihren Gesamtverbrauch</h2>
+    <div class="green-bar">{{ (data.cloud_calulation.power_usage + data.cloud_calulation.heater_usage + data.cloud_calulation.consumer_usage) | numberformat(digits=0) }} kWh/Jahr</div>
+  {% endif %}
+  <h2>Ihre neuen Produkte</h2>
+  <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/solar_icon.jpg');">
+    <b>Ihre Photovoltaikanlage</b><br>
+    Mit der Kraft der Sonne produziert Ihre ausgewählte PV Anlage genau den Strom, den Sie für eine 100% Unabhängigkeit benötigen und das 365 Tage im Jahr - 24 Stunden am Tag.Und nur bei uns: Das Verbrauchsverhalten bleibt hiervon unberührt.
+  </div>
+  <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/speicher_icon.jpg');">
+    <b>Ihr Senec Speicher</b><br>
+    Damit Sie sauberen und selbst produzierten Strom nutzen können, auch wenn die Sonne nicht scheint, speichert Ihre SenecBatterie den überschüssigen Strom. Mit dem neu entwickelten KMS - Kapazität Management System ist es möglich den Speicher je nach Be- und Entladevorgängen sowie Ihres Nutzungsverhaltens mehrmals zu be- und entladen und die Speicherpazität dadurch zu verdreifachen.
+  </div>
+  <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/vertrag_icon.jpg');">
+    <b>Ihre Cloud</b><br>
+    Sie schicken überschüssige Solarenergie in die Connect Cloud und im Gegenzug erhalten Sie eine Freistrommenge* von {{ (data.cloud_calulation.power_usage + data.cloud_calulation.heater_usage + data.cloud_calulation.consumer_usage) | numberformat(digits=0) }} kWh/Jahr.
+  </div>
+
+  <small class="footnote">*Freistrommenge = Gesamtverbrauch bestehend aus Eigenverbrauch, Speichernutzen und aus der virtuellen Cloud.</small>
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

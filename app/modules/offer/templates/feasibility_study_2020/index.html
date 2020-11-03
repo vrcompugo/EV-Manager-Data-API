@@ -110,6 +110,38 @@
     </div>
   {% endif %}
 
+  {% if offer.reseller.document_style != "bsh" %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_cloud_config.html') %}
+    </div>
+
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_cloud_new_products.html') %}
+    </div>
+
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_cloud_benefits.html') %}
+    </div>
+
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_cloud_interplay.html') %}
+    </div>
+
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_cloud_interplay2.html') %}
+    </div>
+
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_cloud_interplay3.html') %}
+    </div>
+  {% endif %}
+
   {% set current_page = current_page + 1 %}
   <div class="page">
     {% include('feasibility_study_2020/pages/page_solution_by_senec.html') %}
