@@ -137,7 +137,7 @@ def calculate_products(data):
             products=data["products"]
         )
         add_direct_product(
-            label="Überspannungschutz AC",
+            label="Überspannungschutz",
             category="Elektrik",
             quantity=1,
             products=data["products"]
