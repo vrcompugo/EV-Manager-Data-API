@@ -48,7 +48,8 @@ def generate_letter_pdf(lead_id, data, return_string=False):
             "quote_calculator/generator/letter.html",
             base_url=config_general["base_url"],
             lead_id=lead_id,
-            data=data
+            data=data,
+            heading=" "
         )
         data["datetime"] = str(data["datetime"])
         if return_string:
