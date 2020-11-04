@@ -43,6 +43,8 @@ def quote_calculator_defaults(lead_id):
         history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
         if history is not None:
             data = history.data
+            if "financing_rate" not in data["data"]:
+                data["data"]["financing_rate"] = 3.79
         else:
             post_data = None
             try:
@@ -172,20 +174,22 @@ def quote_calculator_cloud_pdfs(lead_id):
     folder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
     calculated = history.data["calculated"]
     data = history.data["data"]
+    data["total_net"] = history.data["total_net"]
+    data["tax_rate"] = history.data["tax_rate"]
     items = get_cloud_products(data={"calculated": history.data["calculated"], "data": history.data["data"]})
     offer_v2_data = {
         "reseller_id": None,
         "offer_group": "cloud-offer",
         "datetime": datetime.datetime.now(),
         "currency": "eur",
-        "tax_rate": 16,
+        "tax_rate": data["tax_rate"],
         "lead_id": lead_id,
         "subtotal": calculated["cloud_price"],
-        "subtotal_net": calculated["cloud_price"] / 1.16,
+        "subtotal_net": calculated["cloud_price"] / (1 + data["tax_rate"] / 100),
         "shipping_cost": 0,
         "shipping_cost_net": 0,
         "discount_total": 0,
-        "total_tax": calculated["cloud_price"] * 0.16,
+        "total_tax": calculated["cloud_price"] * (data["tax_rate"] / 100),
         "total": calculated["cloud_price"],
         "status": "created",
         "data": data,

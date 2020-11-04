@@ -68,14 +68,10 @@
         <tr>
           <td>Größe der PV-Anlage</td>
           <td>
-            {% if offer.reseller.document_style == "bsh" %}
-              {% if data.cloud_calulation.pv_kwp > 0 %}
-                {{ data.cloud_calulation.pv_kwp | numberformat('de', 2) }} kWp
-              {% else %}
-                mind. {{ data.cloud_calulation.min_kwp | numberformat('de', 2) }} kWp
-              {% endif %}
+            {% if data.cloud_calulation.pv_kwp > 0 %}
+              {{ data.cloud_calulation.pv_kwp | numberformat('de', 2) }} kWp
             {% else %}
-              Paket {{ data.paket }}
+              mind. {{ data.cloud_calulation.min_kwp | numberformat('de', 2) }} kWp
             {% endif %}
           </td>
         </tr>

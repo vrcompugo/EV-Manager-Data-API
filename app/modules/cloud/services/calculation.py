@@ -61,6 +61,11 @@ def calculate_cloud(data):
         "conventional_price_ecloud": 0,
         "conventional_price_consumer": 0
     }
+    if data is not None and "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
+        data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
+    else:
+        data["conventional_power_cost_per_kwh"] = 31
+    result["conventional_power_cost_per_kwh"] = data["conventional_power_cost_per_kwh"]
     pv_efficiancy_faktor = None
     if "name" in user and user["name"].lower() == "bsh":
         settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 2405
@@ -165,9 +170,8 @@ def calculate_cloud(data):
             if "name" in user and user["name"].lower() == "bsh":
                 result["cloud_price_light"] = data["power_usage"] * 0.4434 / 10 / 12
         result["conventional_price_light"] = (data["power_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
-        if data is not None and "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
-            data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
-            result["conventional_price_light"] = (data["power_usage"] * data["conventional_power_cost_per_kwh"] / 100) / 12
+
+        result["conventional_price_light"] = (data["power_usage"] * data["conventional_power_cost_per_kwh"] / 100) / 12
 
     if "heater_usage" in data and data["heater_usage"] != "" and data["heater_usage"] != "0" and data["heater_usage"] != 0:
         data["heater_usage"] = int(data["heater_usage"])

@@ -180,7 +180,7 @@ class OfferPDF3(Resource):
             db.subqueryload("address")
         ).get(id)
         data = {}
-        return generate_feasibility_study_pdf(offer, return_string=False)
+        return generate_feasibility_study_pdf(offer, return_string=True)
         if offer.pdf is not None:
             data["pdf"] = {
                 "public_link": offer.pdf.public_link,

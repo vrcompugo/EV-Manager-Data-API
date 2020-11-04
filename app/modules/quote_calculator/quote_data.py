@@ -45,6 +45,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
             "emove_tarif": "none",
             "price_increase_rate": 5.75,
             "inflation_rate": 2.5,
+            "financing_rate": 3.79,
             "module_type": default_module_type,
             "investment_type": "financing",
             "price_guarantee": "12_years",

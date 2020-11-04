@@ -21,10 +21,11 @@ def calculate_feasibility_study(offer: OfferV2):
         return None
     pv_efficiancy = None
     settings["data"]["wi_settings"]["pv_efficiancy"] = {
-        "south": 960,
-        "west_east": 960 * 0.8,
-        "south_west_east": 960 * 0.92,
-        "north": 960 * 0.65
+        "south": 915,
+        "west_east": 825,
+        "north_west_east": 620,
+        "south_west_east": 850,
+        "north": 560
     }
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
         settings["data"]["wi_settings"]["pv_efficiancy"] = {
@@ -39,6 +40,8 @@ def calculate_feasibility_study(offer: OfferV2):
     price_increase_heat = 2
     price_increase_emove = 2.5
     investment_type = "financing"
+    loan_interest_rate = None
+    pv_offer_total = float(offer.total - offer.total_tax)
     if offer.offer_group == "cloud-offer":
         cloud_runtime = 2
         if offer.data["price_guarantee"] == "10_years":
@@ -63,6 +66,8 @@ def calculate_feasibility_study(offer: OfferV2):
             inflation_rate = float(offer.data["inflation_rate"])
         if "investment_type" in offer.data and offer.data["investment_type"] != "":
             investment_type = offer.data["investment_type"]
+        if "financing_rate" in offer.data and offer.data["financing_rate"] != "":
+            loan_interest_rate = float(offer.data["financing_rate"])
         packet = 50
         if pv_efficiancy is None:
             pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"]["west_east"]
@@ -86,6 +91,20 @@ def calculate_feasibility_study(offer: OfferV2):
             orientation_label = "Süd West/Süd Ost"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "south":
             orientation_label = "Süd"
+        if "roofs" in offer.data:
+            orientation_labels = []
+            pv_efficiancy = 0
+            count_modules = 0
+            for roof in offer.data["roofs"]:
+                count_modules = count_modules + int(roof["pv_count_modules"])
+            for roof in offer.data["roofs"]:
+                roof_label, roof_efficiancy = roof_direction_values(roof["direction"], settings["data"]["wi_settings"]["pv_efficiancy"])
+                roof_percent = int(roof["pv_count_modules"]) / count_modules
+                orientation_labels.append(f"{int(roof_percent * 100)}% {roof_label}")
+                pv_efficiancy = int(pv_efficiancy + roof_efficiancy * roof_percent)
+            orientation_label = ", ".join(orientation_labels)
+        if "extra_options" in offer.data and "solaredge" in offer.data["extra_options"]:
+            pv_efficiancy = int(pv_efficiancy * 1.06)
 
         cloud_total = cloud_calulation["cloud_price_incl_refund"]
         if "emove_tarif" in offer.data:
@@ -174,7 +193,7 @@ def calculate_feasibility_study(offer: OfferV2):
         "cloud_monthly_cost": cloud_total,
         "eeg_refund_per_kwh": float(settings["data"]["wi_settings"]["eeg_refund_per_kwh"]),
         "refund_per_kwh": settings["data"]["wi_settings"]["refund_per_kwh"],
-        "pv_offer_total": float(offer.total - offer.total_tax),
+        "pv_offer_total": pv_offer_total,
         "loan_interest_rate": settings["data"]["wi_settings"]["loan_interest_rate"],
         "cloud_calulation": cloud_calulation,
         "loan_total": None,
@@ -182,7 +201,9 @@ def calculate_feasibility_study(offer: OfferV2):
         "cost_total": None,
         "cost_benefit": None
     }
-    data["conventional_base_cost_per_kwh"] = cloud_calulation["lightcloud_extra_price_per_kwh"]
+    if loan_interest_rate is not None:
+        data["loan_interest_rate"] = loan_interest_rate
+    data["conventional_base_cost_per_kwh"] = cloud_calulation["conventional_power_cost_per_kwh"] * 100
     if offer.data is not None and "conventional_power_cost_per_kwh" in offer.data and offer.data["conventional_power_cost_per_kwh"] is not None and offer.data["conventional_power_cost_per_kwh"] != "":
         data["conventional_base_cost_per_kwh"] = float(offer.data["conventional_power_cost_per_kwh"]) / 100
     if offer.data is not None and "conventional_gas_cost_per_kwh" in offer.data and offer.data["conventional_gas_cost_per_kwh"] is not None and offer.data["conventional_gas_cost_per_kwh"] != "":
@@ -491,3 +512,20 @@ def generate_feasibility_study_pdf(offer: OfferV2, return_string=False):
         response = make_response(pdf.read())
         response.headers['Content-Type'] = 'application/pdf'
         return response
+
+
+def roof_direction_values(direction, settings):
+    orientation_label = "West/Ost"
+    if direction == "north":
+        orientation_label = "Nord"
+    if direction == "north_west_east":
+        orientation_label = "Nord West/Nord Ost"
+    if direction == "north_south":
+        orientation_label = "Nord/Süd"
+    if direction == "west_east":
+        orientation_label = "West/Ost"
+    if direction == "south_west_east":
+        orientation_label = "Süd West/Süd Ost"
+    if direction == "south":
+        orientation_label = "Süd"
+    return orientation_label, settings[direction]
