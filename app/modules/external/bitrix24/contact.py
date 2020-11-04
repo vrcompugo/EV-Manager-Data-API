@@ -14,7 +14,7 @@ def convert_config_values(data_raw):
     for local_field, external_field in config["contact"]["fields"].items():
         if external_field in data:
             data[local_field] = data[external_field]
-    if data["salutation"] == "47":
+    if "salutation" in data and data["salutation"] == "47":
         data["salutation"] = "ms"
     else:
         data["salutation"] = "mr"
