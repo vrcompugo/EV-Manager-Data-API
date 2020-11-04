@@ -56,6 +56,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
             }],
             "consumers": [],
             "extra_options": [],
+            "extra_options_zero": [],
             "reconstruction_extra_options": [],
             "heating_quote_extra_options": [],
             "extra_offers": [],
@@ -106,6 +107,10 @@ def calculate_quote(lead_id, data=None, create_quote=False):
 def calculate_products(data):
 
     config = get_settings(section="external/bitrix24")
+    if "extra_options" not in data["data"]:
+        data["data"]["extra_options"] = []
+    if "extra_options_zero" not in data["data"]:
+        data["data"]["extra_options_zero"] = []
     data["products"] = []
     kwp = 0
     if "pv_kwp" in data["data"] and data["data"]["pv_kwp"] is not None:
@@ -154,83 +159,107 @@ def calculate_products(data):
             quantity=kwp,
             products=data["products"]
         )
-        if "extra_options" in data["data"] and "technik_service_packet" in data["data"]["extra_options"]:
+        if "technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]:
+            quantity = 0
+            if "technik_service_packet" in data["data"]["extra_options"]:
+                quantity = 1
             add_direct_product(
                 label="Service, Technik & Garantie Paket",
                 category="Extra Pakete",
-                quantity=1,
+                quantity=quantity,
                 products=data["products"]
             )
-        if "tax_consult" in data["data"]["extra_options"]:
+        if "tax_consult" in data["data"]["extra_options"] or "tax_consult" in data["data"]["extra_options_zero"]:
+            quantity = 0
+            if "tax_consult" in data["data"]["extra_options"]:
+                quantity = 1
             add_direct_product(
                 label="Steuerliche Beratung durch Steuerkanzlei (Partnerunternehmen)",
                 category="Optionen PV Anlage",
-                quantity=1,
+                quantity=quantity,
                 products=data["products"]
             )
-        if "emove.zoe" in data["data"]["extra_options"]:
+        if "emove.zoe" in data["data"]["extra_options"] or "emove.zoe" in data["data"]["extra_options_zero"]:
+            quantity = 0
+            if "emove.zoe" in data["data"]["extra_options"]:
+                quantity = 1
             add_direct_product(
                 label="e.move.ZOE",
                 category="Extra Pakete",
-                quantity=1,
+                quantity=quantity,
                 products=data["products"]
             )
-        if "wwwp" in data["data"]["extra_options"] and "extra_options_wwwp_variant" in data["data"]:
+        if ("wwwp" in data["data"]["extra_options"] or "wwwp" in data["data"]["extra_options_zero"]) and "extra_options_wwwp_variant" in data["data"]:
+            quantity = 0
+            if "wwwp" in data["data"]["extra_options"]:
+                quantity = 1
             if data["data"]["extra_options_wwwp_variant"] == "ecoSTAR taglio 100":
                 add_direct_product(
                     label="Wärmepumpe (100 l) 100",
                     category="Brauchwasserwärmepumpe",
-                    quantity=1,
+                    quantity=quantity,
                     products=data["products"]
                 )
             if data["data"]["extra_options_wwwp_variant"] == "ecoSTAR taglio 180":
                 add_direct_product(
                     label="Standard Warmwasserwärmepumpe (ca. 180 l)",
                     category="Brauchwasserwärmepumpe",
-                    quantity=1,
+                    quantity=quantity,
                     products=data["products"]
                 )
             if data["data"]["extra_options_wwwp_variant"] == "ecoSTAR 310 compact":
                 add_direct_product(
                     label="Standard Warmwasserwärmepumpe (ca. 200 l)",
                     category="Brauchwasserwärmepumpe",
-                    quantity=1,
+                    quantity=quantity,
                     products=data["products"]
                 )
-        if "solaredge" in data["data"]["extra_options"]:
+        if "solaredge" in data["data"]["extra_options"] or "solaredge" in data["data"]["extra_options_zero"]:
+            quantity = 0
+            if "solaredge" in data["data"]["extra_options"]:
+                quantity = kwp
             add_direct_product(
                 label="Solar EDGE",
                 category="Extra Pakete",
-                quantity=kwp,
+                quantity=quantity,
                 products=data["products"]
             )
-        if "new_power_closet" in data["data"]["extra_options"]:
+        if "new_power_closet" in data["data"]["extra_options"] or "new_power_closet" in data["data"]["extra_options_zero"]:
+            quantity = 0
+            if "new_power_closet" in data["data"]["extra_options"]:
+                quantity = 1
             add_direct_product(
                 label="Neuer Zählerschrank",
                 category="Extra Pakete",
-                quantity=1,
+                quantity=quantity,
                 products=data["products"]
             )
-        if "emergency_power_box" in data["data"]["extra_options"]:
+        if "emergency_power_box" in data["data"]["extra_options"] or "emergency_power_box" in data["data"]["extra_options_zero"]:
+            quantity = 0
+            if "emergency_power_box" in data["data"]["extra_options"]:
+                quantity = 1
             if storage_product["NAME"].find("V3") > 0:
                 add_direct_product(
                     label="SENEC Back up Power Pro",
                     category="Extra Pakete",
-                    quantity=1,
+                    quantity=quantity,
                     products=data["products"]
                 )
             else:
                 add_direct_product(
                     label="SENEC Back up Power",
                     category="Extra Pakete",
-                    quantity=1,
+                    quantity=quantity,
                     products=data["products"]
                 )
-        if "wallbox" in data["data"]["extra_options"]:
+        if "wallbox" in data["data"]["extra_options"] or "wallbox" in data["data"]["extra_options_zero"]:
             if "extra_options_wallbox_count" not in data["data"] or data["data"]["extra_options_wallbox_count"] is None or data["data"]["extra_options_wallbox_count"] == "":
                 data["data"]["extra_options_wallbox_count"] = 1
             else:
                 data["data"]["extra_options_wallbox_count"] = int(data["data"]["extra_options_wallbox_count"])
+            quantity = 0
+            if "wallbox" in data["data"]["extra_options"]:
+                quantity = data["data"]["extra_options_wallbox_count"]
             if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "22kW":
                 add_direct_product(
                     label="Wallbox SENEC 22kW",
