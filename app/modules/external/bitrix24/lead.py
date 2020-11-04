@@ -20,7 +20,19 @@ def convert_config_values(data_raw):
     for local_field, external_field in config["lead"]["fields"].items():
         if external_field in data:
             data[local_field] = data[external_field]
-
+    data["company"] = data["company_title"]
+    data["contact"] = {
+        "company": data["company_title"],
+        "name": data["first_name"],
+        "first_name": data["first_name"],
+        "last_name": data["last_name"],
+        "firstname": data["first_name"],
+        "lastname": data["last_name"],
+        "street": data["street"],
+        "street_nb": data["street_nb"],
+        "zip": data["zip"],
+        "city": data["city"],
+    }
     return data
 
 

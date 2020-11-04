@@ -9,6 +9,7 @@ def apply_filters(app):
     app.jinja_env.filters['dateformat'] = dateformat
     app.jinja_env.filters['datetimeformat'] = datetimeformat
     app.jinja_env.filters['addressblock'] = addressblock
+    app.jinja_env.filters['addressblock2'] = addressblock2
     app.jinja_env.filters['numberformat'] = numberformat
     app.jinja_env.filters['currencyformat'] = currencyformat
     app.jinja_env.filters['percentformat'] = percentformat
@@ -71,6 +72,17 @@ def currencyformat(value, format='de', digits=2):
 
 def percentformat(value, format='de', digits=0):
     return numberformat(value, format, digits=digits) + "%"
+
+
+def addressblock2(address):
+    text = ""
+    if address["company"] is not None and address["company"] != "":
+        text = text + address["company"] + "\n"
+    if address["lastname"] is not None and address["lastname"] != "":
+        text = text + f"{address['firstname']} {address['lastname']}\n"
+    text = text + f"{address['street']} {address['street_nb']}\n"
+    text = text + f"{address['zip']} {address['city']}\n"
+    return text
 
 
 def addressblock(address):

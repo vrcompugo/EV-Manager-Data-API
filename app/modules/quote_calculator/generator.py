@@ -20,6 +20,36 @@ from app.utils.jinja_filters import currencyformat, numberformat
 from app.utils.pdf_form_filler import update_form_values, get_form_fields
 
 
+def generate_cover_pdf(lead_id, data, return_string=False):
+    config = get_settings(section="offer/pdf")
+    config_general = get_settings(section="general")
+    if data is not None:
+        if "datetime" not in data:
+            data["datetime"] = datetime.datetime.now()
+
+        letter_text = get_product("Anschreiben Angebot", "Texte")
+        if letter_text is not None:
+            data["letter_text"] = letter_text["DESCRIPTION"]
+            data["letter_text_type"] = letter_text["DESCRIPTION_TYPE"]
+
+        content = render_template(
+            "quote_calculator/generator/cover.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data,
+            heading=" "
+        )
+        data["datetime"] = str(data["datetime"])
+        if return_string:
+            return content
+        pdf = gotenberg_pdf(
+            content,
+            landscape=True,
+            margins=["0", "0", "0", "0"])
+        return pdf
+    return None
+
+
 def generate_letter_pdf(lead_id, data, return_string=False):
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
@@ -262,22 +292,7 @@ def generate_summary_pdf(lead_id, data):
     customer_name = ""
     if "contact" in data:
         customer_name = data["contact"]["name"] + " " + data["contact"]["last_name"]
-    if "assigned_by_id" not in data or not os.path.exists(f"app/modules/quote_calculator/templates/quote_calculator/generator/frontpage/{data['assigned_by_id']}.pdf"):
-        with open("app/modules/quote_calculator/templates/quote_calculator/generator/frontpage/default.pdf", 'rb') as fh:
-            frontpage_file = io.BytesIO()
-            update_form_values(fh, frontpage_file, {
-                'Name': customer_name
-            })
-            frontpage_file.seek(0)
-            merger.append(frontpage_file)
-    else:
-        with open(f"app/modules/quote_calculator/templates/quote_calculator/generator/frontpage/{data['assigned_by_id']}.pdf", 'rb') as fh:
-            frontpage_file = io.BytesIO()
-            update_form_values(fh, frontpage_file, {
-                'Name': customer_name
-            })
-            frontpage_file.seek(0)
-            merger.append(frontpage_file)
+    add_pdf_by_drive_id(merger, data["pdf_cover_file_id"])
     add_pdf_by_drive_id(merger, data["pdf_letter_file_id"])
     if "pdf_wi_file_id" in data and data["pdf_wi_file_id"] > 0:
         add_pdf_by_drive_id(merger, data["pdf_wi_file_id"])

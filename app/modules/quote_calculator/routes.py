@@ -17,7 +17,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote
-from .generator import generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
+from .generator import generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -176,6 +176,8 @@ def quote_calculator_cloud_pdfs(lead_id):
     folder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
     calculated = history.data["calculated"]
     data = history.data["data"]
+    if "contact" in history.data:
+        data["address"] = history.data["contact"]
     data["total_net"] = history.data["total_net"]
     data["tax_rate"] = history.data["tax_rate"]
     items = get_cloud_products(data={"calculated": history.data["calculated"], "data": history.data["data"]})
@@ -199,10 +201,8 @@ def quote_calculator_cloud_pdfs(lead_id):
         "items": items,
         "customer_raw": {}
     }
-    if "email" in data:
-        offer_v2_data["customer_raw"]["email"] = data["email"]
-    if "phone" in data:
-        offer_v2_data["customer_raw"]["phone"] = data["phone"]
+    if "email" in lead and len(lead["email"])>0:
+        offer_v2_data["customer_raw"]["email"] = lead["email"][0]["VALUE"]
     if "address" in data and "lastname" in data["address"]:
         offer_v2_data["customer_raw"]["firstname"] = data["address"]["firstname"]
         offer_v2_data["customer_raw"]["lastname"] = data["address"]["lastname"]
@@ -352,12 +352,33 @@ def quote_calculator_datasheets_pdf(lead_id):
         mimetype='application/json')
 
 
-@blueprint.route("/<lead_id>/summary_pdf", methods=['PUT'])
+@blueprint.route("/<lead_id>/summary_pdf", methods=['PUT', 'GET'])
 def quote_calculator_summary_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
+
+    pdf_letter = generate_cover_pdf(lead_id, data)
+    if request.method == "GET":
+        return Response(
+            pdf_letter,
+            status=200,
+            mimetype='application/pdf')
+    if pdf_letter is None:
+        return Response(
+            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_letter"}',
+            status=404,
+            mimetype='application/json')
+    data["pdf_cover_file_id"] = add_file(folder_id=subfolder_id, data={
+        "file_content": pdf_letter,
+        "filename": "Deckblatt.pdf"
+    })
+    if data["pdf_cover_file_id"] is None or data["pdf_cover_file_id"] <= 0:
+        return Response(
+            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
+            status=404,
+            mimetype='application/json')
 
     pdf_letter = generate_letter_pdf(lead_id, data)
     if pdf_letter is None:

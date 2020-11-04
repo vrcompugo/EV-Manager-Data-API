@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PV-Angebot</title>
+  {% include('quote_calculator/generator/style.html') %}
+  {% include('quote_calculator/generator/elements/table.html') %}
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    .page_cover {
+      height: 100vh;
+    }
+
+    .page_cover .left_side {
+      flex: 1 0 70%;
+      position: relative;
+      display: flex;
+      justify-content: flex-end;
+        background-image: url("{{ base_url }}static/feasibility_study_2020/world_in_hands.jpg");
+      background-size: cover;
+      border-bottom: 12px solid #1A61AC;
+    }
+    .page_cover .left_side::after {
+      position: absolute;
+      content: " ";
+      left: -10%;
+      bottom: -40px;
+      height: 40px;
+      width: 120%;
+      /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100;Neutral+Density */
+      background: -moz-radial-gradient(center, ellipse contain,  rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+      background: -webkit-radial-gradient(center, ellipse contain,  rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+      background: radial-gradient(ellipse farthest-side at center top,  rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    }
+
+    .page_cover .heading {
+      background-color: rgba(155,155,155,0.5);
+      margin-top: 430px;
+      padding: 1.5em 4.5em;
+      color: #ffffff;
+      position: relative;
+        /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffffff+0,b0ca0a+53&0.3+0,0.3+54 */
+      background: -moz-linear-gradient(left,  rgba(155,155,155,0.5) 0%, rgba(136,155,10,0.7) 53%, rgba(136,155,10,0.7) 54%); /* FF3.6-15 */
+      background: -webkit-linear-gradient(left,  rgba(155,155,155,0.5) 0%,rgba(136,155,10,0.7) 53%,rgba(136,155,10,0.7) 54%); /* Chrome10-25,Safari5.1-6 */
+      background: linear-gradient(to right,  rgba(155,155,155,0.5) 0%,rgba(136,155,10,0.7) 53%,rgba(136,155,10,0.7) 54%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dffffff', endColorstr='#4db0ca0a',GradientType=1 ); /* IE6-9 */
+
+    }
+    .page_cover .heading::after {
+      position: absolute;
+      content: " ";
+      left: -10%;
+      bottom: -40px;
+      height: 40px;
+      width: 120%;
+      /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100;Neutral+Density */
+      background: -moz-radial-gradient(center, ellipse contain,  rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+      background: -webkit-radial-gradient(center, ellipse contain,  rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+      background: radial-gradient(ellipse farthest-side at center top,  rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    }
+    .page_cover .heading .large {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 40px;
+    }
+    .page_cover .heading .small {
+      font-size: 25px;
+      font-weight: 300;
+    }
+    .page_cover .right_side {
+      flex: 1 0 30%;
+      text-align: center;
+      padding-top: 50px;
+    }
+    .page_cover .right_side img {
+      width: 70%;
+    }
+    .page_cover .background-heading {
+      position: absolute;
+      text-transform: uppercase;
+      left: 0;
+      width: 100%;
+      color: rgba(255,255,255,0.7);
+      font-size: 7em;
+      text-align: center;
+      top: 1em;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page_cover">
+    <div class="layout horizontal">
+
+      <div class="left_side">
+        <div class="background-heading">
+          Energie-<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Konzept
+        </div>
+        <div class="heading">
+          <div class="large">365 Tage im Jahr</div>
+          <div class="small">
+            eigenen Strom nutzen und unabhängig<br>
+            von steigenden Energiekosten werden.
+          </div>
+        </div>
+      </div>
+      <div class="right_side">
+        <div>
+          <img src="{{ base_url }}static/feasibility_study_2020/kez-logo.jpg" />
+        </div>
+        <div>
+          <br>
+          <br>
+          <br>
+          <br>
+          Marken vom korbacher-energieZentrum:
+        </div>
+        <div>
+          <img src="{{ base_url }}static/feasibility_study_2020/logo-rhein-main.JPG" />
+        </div>
+        <div>
+          <img src="{{ base_url }}static/feasibility_study_2020/logo-rheinland.JPG" />
+        </div>
+
+      </div>
+
+    </div>
+
+    <div style="padding-left: 120px; font-size: 2em; padding-top: 50px;">
+      Individuelles Energiekonzept für:<br>
+      {% if data.contact %}
+        {{ data.contact.firstname }} {{ data.contact.lastname }}
+      {% endif %}
+    </div>
+
+  </div>
+
+</body>
+</html>
+
+
