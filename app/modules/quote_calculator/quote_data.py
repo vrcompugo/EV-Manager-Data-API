@@ -212,7 +212,7 @@ def calculate_products(data):
                 products=data["products"]
             )
         if "emergency_power_box" in data["data"]["extra_options"]:
-            if "extra_options_emergency_power_box_variant" in data["data"] and data["data"]["extra_options_emergency_power_box_variant"] == "pro":
+            if storage_product["NAME"].find("V3") > 0:
                 add_direct_product(
                     label="SENEC Back up Power Pro",
                     category="Extra Pakete",
