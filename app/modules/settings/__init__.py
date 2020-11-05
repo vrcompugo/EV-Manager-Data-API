@@ -91,6 +91,7 @@ def get_settings(section=None, domain_raw=None):
                     "Heizung - Solarthermie": 240,
                     "Erneuerbare Energie - Dach": 194,
                     "Brennstoffzelle": 298,
+                    "online WP (Neu)": 306,
                     "Texte": 304,
                 }
             },
