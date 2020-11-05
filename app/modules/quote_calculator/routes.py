@@ -17,7 +17,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote
-from .generator import generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
+from .generator import generate_bluegen_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -282,6 +282,36 @@ def quote_calculator_heating_pdf(lead_id):
         "filename": "Heizung-Angebot.pdf"
     })
     if data["pdf_heating_file_id"] is None or data["pdf_heating_file_id"] <= 0:
+        return Response(
+            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
+            status=404,
+            mimetype='application/json')
+    history.data = data
+    db.session.commit()
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("/<lead_id>/bluegen_pdf", methods=['PUT'])
+def quote_calculator_bluegen_pdf(lead_id):
+    lead = get_lead(lead_id)
+    history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    data = json.loads(json.dumps(history.data))
+
+    subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
+    pdf_bluegen = generate_bluegen_pdf(lead_id, data)
+    if pdf_bluegen is None:
+        return Response(
+            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_pv"}',
+            status=404,
+            mimetype='application/json')
+    data["pdf_bluegen_file_id"] = add_file(folder_id=subfolder_id, data={
+        "file_content": pdf_bluegen,
+        "filename": "Heizung-Angebot.pdf"
+    })
+    if data["pdf_bluegen_file_id"] is None or data["pdf_bluegen_file_id"] <= 0:
         return Response(
             '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
             status=404,

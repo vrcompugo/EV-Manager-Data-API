@@ -14,6 +14,7 @@ from .conditional_products.pvmodule import add_product as add_product_pv_module
 from .conditional_products.storage import add_product as add_product_storage
 
 from .heating_quote import get_heating_calculation, get_heating_products
+from .bluegen_quote import get_bluegen_calculation, get_bluegen_products
 from .roof_reconstruction_quote import get_roof_reconstruction_calculation, get_roof_reconstruction_products
 
 
@@ -83,6 +84,10 @@ def calculate_quote(lead_id, data=None, create_quote=False):
             "calculated": {},
             "products": []
         },
+        "bluegen_quote": {
+            "calculated": {},
+            "products": []
+        },
         "products": [],
         "contact": lead_data["contact"]
     }
@@ -102,6 +107,9 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         if "has_heating_quote" in data and data["has_heating_quote"]:
             return_data["heating_quote"]["calculated"] = get_heating_calculation(return_data)
             return_data = get_heating_products(return_data)
+        if "has_bluegen_quote" in data and data["has_bluegen_quote"]:
+            return_data["bluegen_quote"]["calculated"] = get_bluegen_calculation(return_data)
+            return_data = get_bluegen_products(return_data)
 
     return return_data
 

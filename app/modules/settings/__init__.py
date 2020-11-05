@@ -90,6 +90,7 @@ def get_settings(section=None, domain_raw=None):
                     "Heizung - Optionen für Heizung online": 302,
                     "Heizung - Solarthermie": 240,
                     "Erneuerbare Energie - Dach": 194,
+                    "Brennstoffzelle": 298,
                     "Texte": 304,
                 }
             },

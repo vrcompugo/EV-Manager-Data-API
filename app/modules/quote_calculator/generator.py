@@ -228,6 +228,42 @@ def generate_heating_pdf(lead_id, data, return_string=False):
     return None
 
 
+def generate_bluegen_pdf(lead_id, data, return_string=False):
+    config = get_settings(section="offer/pdf")
+    config_general = get_settings(section="general")
+    if data is not None:
+        if "datetime" not in data:
+            data["datetime"] = datetime.datetime.now()
+        header_content = render_template(
+            "quote_calculator/generator/header.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data
+        )
+        footer_content = render_template(
+            "quote_calculator/generator/footer.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data
+        )
+        content = render_template(
+            "quote_calculator/generator/bluegen.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data
+        )
+        data["datetime"] = str(data["datetime"])
+        if return_string:
+            return content
+        pdf = gotenberg_pdf(
+            content,
+            content_header=header_content,
+            content_footer=footer_content,
+            landscape=False)
+        return pdf
+    return None
+
+
 def generate_datasheet_pdf(lead_id, data):
     config = get_settings(section="offer/datasheet_pdf")
     output_file = io.BytesIO()
@@ -276,6 +312,8 @@ def generate_datasheet_pdf(lead_id, data):
         add_pdf_by_drive_id(merger, 436214)
         if "reconstruction_roof_type" not in data["data"] or data["data"]["reconstruction_roof_type"] != "flat":
             add_pdf_by_drive_id(merger, 436212)
+    if "has_bluegen_quote" in data["data"] and data["data"]["has_bluegen_quote"]:
+        add_pdf_by_drive_id(merger, 459672)
 
     merger.write(output_file)
     merger.close()
@@ -296,6 +334,8 @@ def generate_summary_pdf(lead_id, data):
     add_pdf_by_drive_id(merger, data["pdf_letter_file_id"])
     if "pdf_wi_file_id" in data and data["pdf_wi_file_id"] > 0:
         add_pdf_by_drive_id(merger, data["pdf_wi_file_id"])
+    if "pdf_bluegen_file_id" in data and data["pdf_bluegen_file_id"] > 0:
+        add_pdf_by_drive_id(merger, 459782)
     merger.write(output_file)
     merger.close()
     output_file.seek(0)
@@ -316,6 +356,8 @@ def generate_quote_summary_pdf(lead_id, data):
         add_pdf_by_drive_id(merger, data["pdf_heating_file_id"])
     if "pdf_roof_file_id" in data and data["pdf_roof_file_id"] > 0:
         add_pdf_by_drive_id(merger, data["pdf_roof_file_id"])
+    if "pdf_bluegen_file_id" in data and data["pdf_bluegen_file_id"] > 0:
+        add_pdf_by_drive_id(merger, data["pdf_bluegen_file_id"])
 
     merger.write(output_file)
     merger.close()
