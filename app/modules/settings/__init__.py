@@ -119,8 +119,8 @@ def get_settings(section=None, domain_raw=None):
             },
             "contact": {
                 "fields": {
-                    "salutation": "HONORIFIC",
-                    "first_name": "NAME",
+                    "salutation": "honorific",
+                    "first_name": "name",
                     "street": "UF_CRM_1572950758",
                     "street_nb": "UF_CRM_1572950777",
                     "zip": "UF_CRM_1572963458",

@@ -31,8 +31,29 @@ def convert_config_values(data_raw):
         "street": data["street"],
         "street_nb": data["street_nb"],
         "zip": data["zip"],
-        "city": data["city"],
+        "city": data["city"]
     }
+    if "contact_id" in data and data["contact_id"] is not None and data["contact_id"] is not False and data["contact_id"] != "" and int(data["contact_id"]) > 0:
+        contact_data = get_contact(data["contact_id"])
+        if contact_data is not None:
+            data["email"] = contact_data["email"]
+            data["contact"] = {
+                "name": contact_data["first_name"],
+                "first_name": contact_data["first_name"],
+                "last_name": contact_data["last_name"],
+                "firstname": contact_data["first_name"],
+                "lastname": contact_data["last_name"],
+                "street": contact_data["street"],
+                "street_nb": contact_data["street_nb"],
+                "zip": contact_data["zip"],
+                "city": contact_data["city"]
+            }
+            data["name"] = contact_data["first_name"]
+            data["first_name"] = contact_data["first_name"]
+            data["last_name"] = contact_data["last_name"]
+            data["firstname"] = contact_data["first_name"]
+            data["lastname"] = contact_data["last_name"]
+
     return data
 
 

@@ -116,6 +116,8 @@ def quote_calculator_update(lead_id):
         lead["unique_identifier"] = lead_id
 
     data = calculate_quote(lead_id, post_data)
+    if "contact" in lead:
+        data["contact"] = lead["contact"]
     if "upload_folder_id_roof" not in data["data"]:
         data["data"]["upload_folder_id_roof"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Dachbilder")
         data["data"]["upload_link_roof"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Dachbilder"
@@ -178,6 +180,8 @@ def quote_calculator_cloud_pdfs(lead_id):
     data = history.data["data"]
     if "contact" in history.data:
         data["address"] = history.data["contact"]
+    if "contact" in lead:
+        data["address"] = lead["contact"]
     data["total_net"] = history.data["total_net"]
     data["tax_rate"] = history.data["tax_rate"]
     items = get_cloud_products(data={"calculated": history.data["calculated"], "data": history.data["data"]})
