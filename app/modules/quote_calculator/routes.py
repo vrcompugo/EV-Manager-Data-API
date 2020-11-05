@@ -205,7 +205,7 @@ def quote_calculator_cloud_pdfs(lead_id):
         "items": items,
         "customer_raw": {}
     }
-    if "email" in lead and len(lead["email"])>0:
+    if "email" in lead and len(lead["email"]) > 0:
         offer_v2_data["customer_raw"]["email"] = lead["email"][0]["VALUE"]
     if "address" in data and "lastname" in data["address"]:
         offer_v2_data["customer_raw"]["firstname"] = data["address"]["firstname"]
