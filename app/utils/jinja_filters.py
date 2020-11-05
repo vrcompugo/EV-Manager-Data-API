@@ -76,12 +76,14 @@ def percentformat(value, format='de', digits=0):
 
 def addressblock2(address):
     text = ""
-    if address["company"] is not None and address["company"] != "":
+    if "company" in address and address["company"] is not None and address["company"] != "":
         text = text + address["company"] + "\n"
-    if address["lastname"] is not None and address["lastname"] != "":
+    if "lastname" in address and address["lastname"] is not None and address["lastname"] != "":
         text = text + f"{address['firstname']} {address['lastname']}\n"
-    text = text + f"{address['street']} {address['street_nb']}\n"
-    text = text + f"{address['zip']} {address['city']}\n"
+    if "street" in address:
+        text = text + f"{address['street']} {address['street_nb']}\n"
+    if "zip" in address:
+        text = text + f"{address['zip']} {address['city']}\n"
     return text
 
 
