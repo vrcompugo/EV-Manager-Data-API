@@ -143,6 +143,10 @@ def quote_calculator_update(lead_id):
         data=data
     )
     db.session.add(history)
+    db.session.flush()
+    history_data = json.loads(json.dumps(history.data))
+    history_data["number"] = f"AG-{lead_id}/{history.id}"
+    history.data = history_data
     db.session.commit()
     update_lead(lead_id, {
         "unique_identifier": str(lead_id),
