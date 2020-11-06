@@ -422,7 +422,7 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2, return_string=False):
         response = make_response(content)
         response.headers['Content-Type'] = 'text/html'
         return response
-    pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0], wait_delay="2")
+    pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0], wait_delay="0.2")
     if pdf:
         pdf_file = S3File.query\
             .filter(S3File.model == "OfferV2FeasibilityStudy")\
