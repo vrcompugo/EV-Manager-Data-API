@@ -21,10 +21,14 @@ def add_item(data):
     if "uuid" not in data or data["uuid"] is None or len(data["uuid"]) < 10:
         new_item.uuid = str(uuid.uuid4())
     new_item.uploaded = datetime.datetime.now()
-    if 'prepend_path' not in data:
-        data['prepend_path'] = ""
     print("add file1")
-    folder_id = create_folder_path(446126, f"{data['prepend_path']}{new_item.uuid}")
+    if 'folder_id' in data:
+        folder_id = data['folder_id']
+    else:
+        if 'prepend_path' not in data:
+            folder_id = create_folder_path(446126, f"{new_item.uuid}")
+        else:
+            folder_id = create_folder_path(446126, f"{data['prepend_path']}")
     print("add file2")
     bitrix_file_id = add_file(folder_id, data)
     print("add file3")
@@ -42,10 +46,14 @@ def update_item(id, data):
     if item is not None:
         item.uuid = str(uuid.uuid4())
         item = set_attr_by_dict(item, data, ["id", "file"])
-        if 'prepend_path' not in data:
-            data['prepend_path'] = ""
         print("update file")
-        folder_id = create_folder_path(446126, f"{data['prepend_path']}{item.uuid}")
+        if 'folder_id' in data:
+            folder_id = data['folder_id']
+        else:
+            if 'prepend_path' not in data:
+                folder_id = create_folder_path(446126, f"{item.uuid}")
+            else:
+                folder_id = create_folder_path(446126, f"{data['prepend_path']}")
         print("update file2")
         bitrix_file_id = add_file(folder_id, data)
         print("update file3")

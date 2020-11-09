@@ -10,6 +10,8 @@ from app.modules.auth.jwt_parser import encode_jwt
 
 from ._connector import get, post
 
+FOLDER_CACHE = {}
+
 
 def get_file(id):
     data = post("disk.file.get", {
@@ -60,7 +62,11 @@ def get_folder(id):
 
 
 def create_folder_path(parent_folder_id, path):
+    path = path.strip("/")
+    if path in FOLDER_CACHE:
+        return FOLDER_CACHE[path]
     parts = path.split("/")
+    original_parent_folder_id = parent_folder_id
     children = get_folder(parent_folder_id)
     for part in parts:
         if children is None:
@@ -77,6 +83,8 @@ def create_folder_path(parent_folder_id, path):
                 children = get_folder(parent_folder_id)
             else:
                 break
+    if original_parent_folder_id != parent_folder_id:
+        FOLDER_CACHE[path] = parent_folder_id
     return parent_folder_id
 
 
