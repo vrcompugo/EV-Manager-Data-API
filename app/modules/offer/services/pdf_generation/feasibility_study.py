@@ -1,6 +1,8 @@
 
 import pdfkit
 import json
+import subprocess
+import tempfile
 from flask import render_template, request, make_response
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from io import StringIO, BytesIO
@@ -418,11 +420,31 @@ def generate_feasibility_study_2020_pdf(offer: OfferV2, return_string=False):
     data = calculate_feasibility_study(offer)
     data["base_url"] = "https://api.korbacher-energiezentrum.de"
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
+    pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0], wait_delay="0.2")
+    temp_pdf_file_output = tempfile.NamedTemporaryFile()
+    temp_pdf_file_input = tempfile.NamedTemporaryFile()
+    temp_pdf_file_input.write(pdf)
+    process = subprocess.Popen([
+        'gs',
+        '-sDEVICE=pdfwrite',
+        '-dCompatibilityLevel=1.4',
+        '-dPDFSETTINGS=/prepress',
+        '-dNOPAUSE',
+        '-dQUIET',
+        '-dBATCH',
+        f'-sOutputFile={temp_pdf_file_output.name}',
+        temp_pdf_file_input.name],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    temp_pdf_file_input.close()
+    temp_pdf_file_output.seek(0)
+    pdf = temp_pdf_file_output.read()
+    temp_pdf_file_output.close()
     if return_string:
         response = make_response(content)
         response.headers['Content-Type'] = 'text/html'
         return response
-    pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0], wait_delay="0.2")
     if pdf:
         pdf_file = S3File.query\
             .filter(S3File.model == "OfferV2FeasibilityStudy")\

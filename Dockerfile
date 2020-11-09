@@ -1,4 +1,4 @@
-FROM python:3.7-stretch
+FROM python:3.7-buster
 
 RUN groupadd -g 999 appuser && \
     useradd -r -u 999 -g appuser -m appuser
@@ -16,6 +16,8 @@ RUN mkdir /usr/src/app/tmp
 RUN chmod 777 /usr/src/app/tmp
 RUN chmod 777 /usr/src/app/wkhtmltopdf
 RUN chown -R appuser.appuser /usr/src/app
+
+RUN apt-get update && apt-cache search ghostscript && apt-get install -y ghostscript
 
 USER appuser
 
