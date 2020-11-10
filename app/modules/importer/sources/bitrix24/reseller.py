@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from app import db
 from app.models import Reseller
+from app.modules.external.bitrix24.department import get_department
 from app.modules.reseller.services.reseller_services import update_item, add_item
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 
@@ -15,10 +16,9 @@ from .customer import run_export as run_customer_export
 def filter_import_data(item_data):
     bitrix_department = []
     for department_id in item_data["UF_DEPARTMENT"]:
-        department = post("department.get", {"id": department_id})
-        time.sleep(0.3)
-        if "result" in department and len(department["result"]) > 0:
-            bitrix_department.append(department["result"][0]["NAME"])
+        department = get_department(department_id)
+        if department is not None:
+            bitrix_department.append(department["NAME"])
     group_id = None
     if "efi-Strom (Cloud)" in bitrix_department:
         group_id = 1

@@ -5,6 +5,7 @@ import string
 
 from app import db
 from app.models import User
+from app.modules.external.bitrix24.department import get_department
 from app.modules.user.user_services import add_item, update_item
 
 from ._connector import post, get
@@ -14,10 +15,9 @@ from ._association import find_association, associate_item
 def filter_import_data(item_data):
     bitrix_department = []
     for department_id in item_data["UF_DEPARTMENT"]:
-        department = post("department.get", {"id": department_id})
-        time.sleep(0.3)
-        if "result" in department and len(department["result"]) > 0:
-            bitrix_department.append(department["result"][0]["NAME"])
+        department = get_department(department_id)
+        if department is not None:
+            bitrix_department.append(department["NAME"])
     role_id = 3
     if "Innendienst" in bitrix_department:
         role_id = 5
