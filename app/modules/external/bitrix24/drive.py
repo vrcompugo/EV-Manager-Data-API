@@ -66,15 +66,6 @@ def create_folder_path(parent_folder_id, path):
     if path in FOLDER_CACHE:
         return FOLDER_CACHE[path]
     parts = path.split("/")
-    current_path = ""
-    new_parts = []
-    for part in parts:
-        current_path = current_path + "/" + part
-        current_path = current_path.strip("/")
-        if current_path in FOLDER_CACHE:
-            parent_folder_id = FOLDER_CACHE[current_path]
-        else:
-            new_parts.append(part)
     original_parent_folder_id = parent_folder_id
     children = get_folder(parent_folder_id)
     current_path = ""
