@@ -10,7 +10,7 @@ DEPARTMENT_CACHE = {}
 def get_department(id):
     if id in DEPARTMENT_CACHE:
         return DEPARTMENT_CACHE[id]
-    data = post("crm.department.get", {
+    data = post("department.get", {
         "ID": id
     })
     if "result" in data:
