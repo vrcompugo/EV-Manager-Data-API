@@ -13,8 +13,8 @@ def get_department(id):
     data = post("department.get", {
         "ID": id
     })
-    if "result" in data:
-        DEPARTMENT_CACHE[id] = data["result"]
+    if "result" in data and len(data["result"]) > 0:
+        DEPARTMENT_CACHE[id] = data["result"][0]
         return DEPARTMENT_CACHE[id]
     else:
         print("error:", data)
