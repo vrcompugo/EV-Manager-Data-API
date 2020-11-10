@@ -11,6 +11,7 @@ from app.modules.auth.jwt_parser import decode_jwt, encode_jwt
 from app.modules.external.bitrix24.lead import get_lead, update_lead
 from app.modules.external.bitrix24.drive import get_file, add_file, get_public_link, create_folder_path
 from app.modules.external.bitrix24.products import reload_products
+from app.modules.external.bitrix24.contact import add_contact
 from app.modules.settings import get_settings
 from app.modules.cloud.services.calculation import get_cloud_products
 from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item_v2
@@ -111,7 +112,10 @@ def quote_calculator_update(lead_id):
             status=404,
             mimetype='application/json')
 
+    contact_id = None
     lead = get_lead(lead_id)
+    if lead["contact_id"] is None or lead["contact_id"] is False or lead["contact_id"] == "" or int(lead["contact_id"]) == 0:
+        contact_id = add_contact(lead["contact"])
     if "unique_identifier" not in lead or lead["unique_identifier"] is None or lead["unique_identifier"] != "":
         lead["unique_identifier"] = lead_id
 
@@ -148,14 +152,17 @@ def quote_calculator_update(lead_id):
     history_data["number"] = f"AG-{lead_id}/{history.id}"
     history.data = history_data
     db.session.commit()
-    update_lead(lead_id, {
+    update_data = {
         "unique_identifier": str(lead_id),
         "upload_link_roof": data["data"]["upload_link_roof"],
         "upload_link_electric": data["data"]["upload_link_electric"],
         "upload_link_heating": data["data"]["upload_link_heating"],
         "upload_link_invoices": data["data"]["upload_link_invoices"],
         "upload_link_contract": data["data"]["upload_link_contract"]
-    })
+    }
+    if contact_id is not None:
+        update_data["contact_id"] = contact_id
+    update_lead(lead_id, update_data)
 
     return {"status": "success", "data": data}
 
