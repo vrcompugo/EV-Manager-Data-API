@@ -92,9 +92,6 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "contact": lead_data["contact"]
     }
 
-    if "contact_id" in lead_data and lead_data["contact_id"] is not None and int(lead_data["contact_id"]):
-        return_data["contact"] = get_contact(lead_data["contact_id"])
-
     if data is not None:
         return_data["data"] = data
         if "has_pv_quote" in data and data["has_pv_quote"]:
