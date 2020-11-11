@@ -28,7 +28,7 @@ def run_export(local_id=None):
     })
     response = post("crm.lead.update", {
         "ID": lead_link.remote_id,
-        "fields[UF_CRM_1572968349][0]": "https://keso.bitrix24.de/rest/106/yyd10rau6od3jlan/download/?token=disk%7CaWQ9MzI2OTIyJl89UEtLUEJockNqbmgzRVpkcTJlVGM2QnNaaUVpOXlXc1E%3D%7CImRvd25sb2FkfGRpc2t8YVdROU16STJPVEl5Smw4OVVFdExVRUpvY2tOcWJtZ3pSVnBrY1RKbFZHTTJRbk5hYVVWcE9YbFhjMUU9fDEwNnx5eWQxMHJhdTZvZDNqbGFuIg%3D%3D.RqkXLEtpiFKYRdfSrQrT7tHyXo0frMlDd3tP4l8Yhko%3D"
+        "fields[UF_CRM_1572968349][0]": "https://keso.bitrix24.de/rest/106/v38b9iovomrydti2/download/?token=disk%7CaWQ9MzI2OTIyJl89UEtLUEJockNqbmgzRVpkcTJlVGM2QnNaaUVpOXlXc1E%3D%7CImRvd25sb2FkfGRpc2t8YVdROU16STJPVEl5Smw4OVVFdExVRUpvY2tOcWJtZ3pSVnBrY1RKbFZHTTJRbk5hYVVWcE9YbFhjMUU9fDEwNnx5eWQxMHJhdTZvZDNqbGFuIg%3D%3D.RqkXLEtpiFKYRdfSrQrT7tHyXo0frMlDd3tP4l8Yhko%3D"
     })
     print(json.dumps(response, indent=2))
     response = post("crm.lead.get", {
