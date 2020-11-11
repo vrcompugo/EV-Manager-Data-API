@@ -56,10 +56,6 @@ def register_routes(api: Blueprint):
         if lead is None or lead_link is None:
             return "Lead not found"
 
-        response = post("crm.quote.list", post_data={
-            "filter[LEAD_ID]": lead_link.remote_id,
-            "order[id]": "desc"
-        })
         offers = OfferV2.query.filter(OfferV2.lead_id == lead.id).order_by(OfferV2.datetime.desc()).all()
 
         lead_comments = LeadComment.query.filter(LeadComment.lead_id == lead.id).order_by(LeadComment.datetime.desc()).all()
