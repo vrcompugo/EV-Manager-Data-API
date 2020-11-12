@@ -11,25 +11,16 @@
 
   {% include('quote_calculator/generator/head2.html') %}
   <div class="letter-text" style="margin-top: -7em;">
-    <h2>Angebot/Leistungsverzeichnis</h2>
-    {% if data.contact %}
-      {% if data.contact.salutation == "ms" %}
-        Sehr geehrte Frau {{ data.contact.last_name }},<br>
-      {% else %}
-        Sehr geehrter Herr {{ data.contact.last_name }},<br>
-      {% endif%}
-      <br>
-    {% endif%}
-    Ihr individuelles Energiekonzept<br>
+    <h2>Ihr individuelles Energiekonzept</h2>
     <br>
     {% if data.contact %}
       {% if data.contact.salutation == "ms" %}
         Sehr geehrte Frau {{ data.contact.last_name }},<br>
       {% else %}
         Sehr geehrter Herr {{ data.contact.last_name }},<br>
-      {% endif%},
+      {% endif%}
     {% else %}
-      Sehr geehrte Damen und Herren,
+      Sehr geehrte Damen und Herren,<br>
     {% endif%}
     wir freuen uns über Ihr Interesse an unseren Produkten.<br>
     <br>
