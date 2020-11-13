@@ -569,9 +569,9 @@ def roof_direction_values(direction, settings):
     if direction == "north_south":
         orientation_label = "Nord/Süd"
     if direction == "west":
-        orientation_label = "West/Ost"
+        orientation_label = "West"
     if direction == "east":
-        orientation_label = "West/Ost"
+        orientation_label = "Ost"
     if direction == "west_east":
         orientation_label = "West/Ost"
     if direction == "south_west":
