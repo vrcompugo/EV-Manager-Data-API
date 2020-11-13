@@ -32,9 +32,15 @@ def calculate_feasibility_study(offer: OfferV2):
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
         settings["data"]["wi_settings"]["pv_efficiancy"] = {
             "south": 1000,
+            "west": 860,
+            "east": 860,
             "west_east": 860,
+            "south_west": 920,
+            "south_east": 920,
             "south_west_east": 920,
-            "north": 750
+            "north": 750,
+            "north_west": 800,
+            "north_east": 800
         }
         if "pv_efficiancy" in offer.data and offer.data["pv_efficiancy"] is not None and offer.data["pv_efficiancy"] != "":
             pv_efficiancy = int(1150 * int(offer.data["pv_efficiancy"]) / 1150)
@@ -83,12 +89,24 @@ def calculate_feasibility_study(offer: OfferV2):
         orientation_label = "West/Ost"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "north":
             orientation_label = "Nord"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "north_west":
+            orientation_label = "Nord West"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "north_east":
+            orientation_label = "Nord Ost"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "north_west_east":
             orientation_label = "Nord West/Nord Ost"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "north_south":
             orientation_label = "Nord/Süd"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "west_east":
             orientation_label = "West/Ost"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "west":
+            orientation_label = "West"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "east":
+            orientation_label = "Ost"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "south_west":
+            orientation_label = "Süd West"
+        if "roof_direction" in offer.data and offer.data["roof_direction"] == "south_east":
+            orientation_label = "Süd Ost"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "south_west_east":
             orientation_label = "Süd West/Süd Ost"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "south":
@@ -540,12 +558,24 @@ def roof_direction_values(direction, settings):
     orientation_label = "West/Ost"
     if direction == "north":
         orientation_label = "Nord"
+    if direction == "north_west":
+        orientation_label = "Nord West"
+    if direction == "north_east":
+        orientation_label = "Nord Ost"
     if direction == "north_west_east":
         orientation_label = "Nord West/Nord Ost"
     if direction == "north_south":
         orientation_label = "Nord/Süd"
+    if direction == "west":
+        orientation_label = "West/Ost"
+    if direction == "east":
+        orientation_label = "West/Ost"
     if direction == "west_east":
         orientation_label = "West/Ost"
+    if direction == "south_west":
+        orientation_label = "Süd West"
+    if direction == "south_east":
+        orientation_label = "Süd Ost"
     if direction == "south_west_east":
         orientation_label = "Süd West/Süd Ost"
     if direction == "south":
