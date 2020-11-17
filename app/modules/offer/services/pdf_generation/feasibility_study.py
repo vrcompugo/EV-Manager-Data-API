@@ -121,6 +121,8 @@ def calculate_feasibility_study(offer: OfferV2):
                 roof_label, roof_efficiancy = roof_direction_values(roof["direction"], settings["data"]["wi_settings"]["pv_efficiancy"])
                 if offer is not None and offer.reseller is not None and offer.reseller.document_style == "bsh" and roof.get("pv_efficiancy", "") != "":
                     roof_efficiancy = int(roof.get("pv_efficiancy", 600))
+                if "pv_count_modules" not in roof or roof["pv_count_modules"] == "":
+                    roof["pv_count_modules"] = 0
                 roof_percent = int(roof["pv_count_modules"]) / count_modules
                 orientation_labels.append(f"{int(roof_percent * 100)}% {roof_label}")
                 pv_efficiancy = int(pv_efficiancy + roof_efficiancy * roof_percent)
