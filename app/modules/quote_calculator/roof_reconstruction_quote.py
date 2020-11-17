@@ -48,7 +48,7 @@ def get_roof_reconstruction_products(data):
     data["roof_reconstruction_quote"]["subtotal_net"] = 0
     for product in data["roof_reconstruction_quote"]["products"]:
         if product["PRICE"] is not None:
-            if "reseller" in data and "document_style" in data["reseller"] and data["reseller"]["document_style"] == "mitte":
+            if "reseller" in data and "document_style" in data["reseller"] and data["reseller"]["document_style"] is not None and data["reseller"]["document_style"] == "mitte":
                 product["PRICE"] = float(product["PRICE"]) * 1.19
             product["total_price"] = float(product["PRICE"]) * float(product["quantity"])
             data["roof_reconstruction_quote"]["subtotal_net"] = data["roof_reconstruction_quote"]["subtotal_net"] + product["total_price"]
