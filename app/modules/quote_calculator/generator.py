@@ -10,7 +10,7 @@ from PyPDF2 import PdfFileMerger
 
 from app.modules.settings import get_settings
 from app.modules.external.bitrix24.user import get_user
-from app.modules.external.bitrix24.drive import get_file_content
+from app.modules.external.bitrix24.drive import get_file_content, get_file_content_cached
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.products import get_list as get_product_list, get_product
 from app.modules.external.bitrix24._field_values import convert_field_euro_from_remote
@@ -272,48 +272,48 @@ def generate_datasheet_pdf(lead_id, data):
     # PV
     if "has_pv_quote" in data["data"] and data["data"]["has_pv_quote"]:
         if "emergency_power_box" in data["data"]["extra_options"]:
-            add_pdf_by_drive_id(merger, 438048)
+            add_pdf_by_drive_id(merger, 438048, cached=True)
         if "wwwp" in data["data"]["extra_options"]:
-            add_pdf_by_drive_id(merger, 436218)
-        add_pdf_by_drive_id(merger, 436174)  # senec wallbox
+            add_pdf_by_drive_id(merger, 436218, cached=True)
+        add_pdf_by_drive_id(merger, 436174, cached=True)  # senec wallbox
 
         if "products" in data:
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 280 Watt") == 0), None)
             if pv_module is not None:
-                add_pdf_by_drive_id(merger, 436126)
+                add_pdf_by_drive_id(merger, 436126, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 320 Watt") == 0), None)
             if pv_module is not None:
-                add_pdf_by_drive_id(merger, 436124)
+                add_pdf_by_drive_id(merger, 436124, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 400 Watt") == 0), None)
             if pv_module is not None:
                 pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 400 Watt Black") == 0), None)
                 if pv_module is not None:
-                    add_pdf_by_drive_id(merger, 436158)
+                    add_pdf_by_drive_id(merger, 436158, cached=True)
                 else:
-                    add_pdf_by_drive_id(merger, 436128)
+                    add_pdf_by_drive_id(merger, 436128, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].find("Senec V2.1") == 0), None)
             if pv_module is not None:
-                add_pdf_by_drive_id(merger, 443354)
+                add_pdf_by_drive_id(merger, 443354, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].find("Senec V3") == 0), None)
             if pv_module is not None:
-                add_pdf_by_drive_id(merger, 436116)
-        add_pdf_by_drive_id(merger, 436112)  # zebra_zertifgikat
-        add_pdf_by_drive_id(merger, 436106)  # Testsieger Garantiebedingunegn
-        add_pdf_by_drive_id(merger, 436102)  # Kapazitätsversprechen
+                add_pdf_by_drive_id(merger, 436116, cached=True)
+        add_pdf_by_drive_id(merger, 436112, cached=True)  # zebra_zertifgikat
+        add_pdf_by_drive_id(merger, 436106, cached=True)  # Testsieger Garantiebedingunegn
+        add_pdf_by_drive_id(merger, 436102, cached=True)  # Kapazitätsversprechen
         if "tax_consult" in data["data"]["extra_options"]:
-            add_pdf_by_drive_id(merger, 436100)
+            add_pdf_by_drive_id(merger, 436100, cached=True)
 
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
             # add_pdf_by_drive_id(merger, 436226)  # password protected watterkote
-            add_pdf_by_drive_id(merger, 436222)
+            add_pdf_by_drive_id(merger, 436222, cached=True)
     if "has_roof_reconstruction_quote" in data["data"] and data["data"]["has_roof_reconstruction_quote"]:
-        add_pdf_by_drive_id(merger, 436216)
-        add_pdf_by_drive_id(merger, 436214)
+        add_pdf_by_drive_id(merger, 436216, cached=True)
+        add_pdf_by_drive_id(merger, 436214, cached=True)
         if "reconstruction_roof_type" not in data["data"] or data["data"]["reconstruction_roof_type"] != "flat":
-            add_pdf_by_drive_id(merger, 436212)
+            add_pdf_by_drive_id(merger, 436212, cached=True)
     if "has_bluegen_quote" in data["data"] and data["data"]["has_bluegen_quote"]:
-        add_pdf_by_drive_id(merger, 459672)
+        add_pdf_by_drive_id(merger, 459672, cached=True)
 
     merger.write(output_file)
     merger.close()
@@ -335,7 +335,7 @@ def generate_summary_pdf(lead_id, data):
     if "pdf_wi_file_id" in data and data["pdf_wi_file_id"] > 0:
         add_pdf_by_drive_id(merger, data["pdf_wi_file_id"])
     if "pdf_bluegen_file_id" in data and data["pdf_bluegen_file_id"] > 0:
-        add_pdf_by_drive_id(merger, 459782)
+        add_pdf_by_drive_id(merger, 459782, cached=True)
     merger.write(output_file)
     merger.close()
     output_file.seek(0)
@@ -373,9 +373,9 @@ def generate_contract_summary_pdf(lead_id, data):
 
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
-            add_pdf_by_drive_id(merger, 443348)
-    add_pdf_by_drive_id(merger, 443352)  # Verkaufsunterlagen
-    add_pdf_by_drive_id(merger, 443350)  # Contractigvertrag
+            add_pdf_by_drive_id(merger, 443348, cached=True)
+    add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
+    add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
 
     merger.write(output_file)
     merger.close()
@@ -384,8 +384,11 @@ def generate_contract_summary_pdf(lead_id, data):
     return pdf_content
 
 
-def add_pdf_by_drive_id(merger, drive_id):
-    pdf = get_file_content(drive_id)
+def add_pdf_by_drive_id(merger, drive_id, cached=False):
+    if cached:
+        pdf = get_file_content_cached(drive_id)
+    else:
+        pdf = get_file_content(drive_id)
     pdf_file = io.BytesIO(pdf)
     pdf_file.seek(0)
     merger.append(pdf_file)

@@ -1,4 +1,6 @@
 import json
+import time
+import os
 import base64
 import random
 import requests
@@ -29,7 +31,28 @@ def get_file_content(id):
     if file_data is None:
         print("error: cant get file for content")
     result = requests.get(file_data["DOWNLOAD_URL"])
+    if result.content[:1] == b'{' or result.content[:1] == b'[':
+        try:
+            print("file content: error", result.content[:1])
+            data = result.json()
+            if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
+                time.sleep(3)
+                print("FILE CONtent QUERY_LIMIT_EXCEEDED")
+                # return get_file_content(id)
+        except Exception as e:
+            pass
     return result.content
+
+
+def get_file_content_cached(id):
+    if os.path.exists(f"/tmp/bitrix-filecache-{id}"):
+        with open(f"/tmp/bitrix-filecache-{id}", "rb") as fh:
+            content = fh.read()
+        return content
+    content = get_file_content(id)
+    with open(f"/tmp/bitrix-filecache-{id}", "wb") as fh:
+        fh.write(content)
+    return content
 
 
 def get_attached_file(id):
