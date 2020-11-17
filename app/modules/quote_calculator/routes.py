@@ -165,6 +165,7 @@ def quote_calculator_update(lead_id):
 def quote_calculator_cloud_pdfs(lead_id):
     from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
     from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
+    from app.modules.importer.sources.bitrix24._association import find_association
 
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -179,6 +180,7 @@ def quote_calculator_cloud_pdfs(lead_id):
             status=404,
             mimetype='application/json')
     lead = get_lead(lead_id)
+    lead_link = find_association("Lead", remote_id=lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     folder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
     calculated = history.data["calculated"]
@@ -196,7 +198,7 @@ def quote_calculator_cloud_pdfs(lead_id):
         "datetime": datetime.datetime.now(),
         "currency": "eur",
         "tax_rate": data["tax_rate"],
-        "lead_id": lead_id,
+        "lead_id": None,
         "subtotal": calculated["cloud_price"],
         "subtotal_net": calculated["cloud_price"] / (1 + data["tax_rate"] / 100),
         "shipping_cost": 0,
@@ -210,6 +212,8 @@ def quote_calculator_cloud_pdfs(lead_id):
         "items": items,
         "customer_raw": {}
     }
+    if lead_link is not None:
+        offer_v2_data["lead_id"] = lead_link.local_id
     if "email" in lead and len(lead["email"]) > 0:
         offer_v2_data["customer_raw"]["email"] = lead["email"][0]["VALUE"]
     if "address" in data and "lastname" in data["address"]:
