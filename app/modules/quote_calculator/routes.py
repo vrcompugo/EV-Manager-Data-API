@@ -181,6 +181,9 @@ def quote_calculator_cloud_pdfs(lead_id):
             mimetype='application/json')
     lead = get_lead(lead_id)
     lead_link = find_association("Lead", remote_id=lead_id)
+    reseller_link = None
+    if "assigned_by_id" in lead and lead["assigned_by_id"] is not None and lead["assigned_by_id"] != "":
+        reseller_link = find_association("Reseller", remote_id=lead["assigned_by_id"])
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     folder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
     calculated = history.data["calculated"]
@@ -212,6 +215,8 @@ def quote_calculator_cloud_pdfs(lead_id):
         "items": items,
         "customer_raw": {}
     }
+    if reseller_link is not None:
+        offer_v2_data["reseller_id"] = reseller_link.local_id
     if lead_link is not None:
         offer_v2_data["lead_id"] = lead_link.local_id
     if "email" in lead and len(lead["email"]) > 0:

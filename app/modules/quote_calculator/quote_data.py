@@ -3,7 +3,9 @@ import re
 import datetime
 import traceback
 
+from app.modules.reseller.models.reseller import Reseller, ResellerSchema
 from app.modules.cloud.services.calculation import calculate_cloud as get_cloud_calculation
+from app.modules.importer.sources.bitrix24._association import find_association
 from app.modules.external.bitrix24.lead import get_lead
 from app.modules.external.bitrix24.products import get_list as get_product_list, get_product
 from app.modules.external.bitrix24.contact import get_contact
@@ -91,7 +93,11 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "products": [],
         "contact": lead_data["contact"]
     }
-
+    reseller_link = find_association("Reseller", remote_id=lead_data["assigned_by_id"])
+    if reseller_link is not None:
+        schema = ResellerSchema()
+        reseller = Reseller.query.get(reseller_link.local_id)
+        return_data["reseller"] = schema.dump(reseller, many=False)
     if data is not None:
         return_data["data"] = data
         if "has_pv_quote" in data and data["has_pv_quote"]:
@@ -306,6 +312,8 @@ def calculate_products(data):
     data["subtotal_net"] = 0
     for product in data["products"]:
         if product["PRICE"] is not None:
+            if "reseller" in data and "document_style" in data["reseller"]:
+                product["PRICE"] = float(product["PRICE"]) * 1.15
             product["total_price"] = float(product["PRICE"]) * float(product["quantity"])
             data["subtotal_net"] = data["subtotal_net"] + product["total_price"]
         else:

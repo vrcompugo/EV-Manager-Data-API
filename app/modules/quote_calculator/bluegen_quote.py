@@ -43,6 +43,8 @@ def get_bluegen_products(data):
     data["bluegen_quote"]["subtotal_net"] = 0
     for product in data["bluegen_quote"]["products"]:
         if product["PRICE"] is not None:
+            if "reseller" in data and "document_style" in data["reseller"]:
+                product["PRICE"] = float(product["PRICE"]) * 1.15
             product["total_price"] = float(product["PRICE"]) * float(product["quantity"])
             data["bluegen_quote"]["subtotal_net"] = data["bluegen_quote"]["subtotal_net"] + product["total_price"]
         else:
