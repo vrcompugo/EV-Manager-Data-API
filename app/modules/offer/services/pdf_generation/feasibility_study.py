@@ -116,6 +116,8 @@ def calculate_feasibility_study(offer: OfferV2):
             pv_efficiancy = 0
             count_modules = 0
             for roof in offer.data["roofs"]:
+                if "pv_count_modules" not in roof or roof["pv_count_modules"] == "":
+                    roof["pv_count_modules"] = 0
                 count_modules = count_modules + int(roof["pv_count_modules"])
             for roof in offer.data["roofs"]:
                 roof_label, roof_efficiancy = roof_direction_values(roof["direction"], settings["data"]["wi_settings"]["pv_efficiancy"])
