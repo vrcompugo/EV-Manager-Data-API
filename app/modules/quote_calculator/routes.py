@@ -57,7 +57,7 @@ def quote_calculator_defaults(lead_id):
             data = calculate_quote(lead_id, post_data)
 
         lead = get_lead(lead_id)
-        if "unique_identifier" not in lead or lead["unique_identifier"] is None or lead["unique_identifier"] != "":
+        if "unique_identifier" not in lead or lead["unique_identifier"] is None or lead["unique_identifier"] == "":
             lead["unique_identifier"] = lead_id
         if "upload_link_roof" not in data["data"] or data["data"]["upload_link_roof"].find(f"Vorgang {lead['unique_identifier']}") < 0:
             data["data"]["upload_folder_id_roof"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Dachbilder")
