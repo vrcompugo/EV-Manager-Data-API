@@ -29,7 +29,7 @@ def calculate_feasibility_study(offer: OfferV2):
         "south_west_east": 850,
         "north": 560
     }
-    if offer.reseller is not None and offer.reseller.document_style == "bsh":
+    if offer is not None and offer.reseller is not None and offer.reseller.document_style == "bsh":
         settings["data"]["wi_settings"]["pv_efficiancy"] = {
             "south": 1000,
             "west": 860,

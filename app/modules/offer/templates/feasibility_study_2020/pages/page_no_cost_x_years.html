@@ -52,15 +52,6 @@
 
       <div class="extra-large">{{ data.conventional_total_cost | currencyformat("de", 0) }}</div>
 
-      <small style="padding-right: 3em; display: block;">
-        Die oben genannten Energiekosten ergeben sich aus den von Ihnen zu zahlenden Grundgebühren und ihren angegebenen Energiekosten,
-        unter Berücksichtigung einer Preissteigerung
-        bei Strom von {{ data.cost_increase_rate | numberformat("de", 2) }}% sowie wenn angeben,
-        bei Wärmekosten von {{ data.cost_increase_rate_heat | numberformat("de", 2) }}% und
-        bei Tankkosten von {{ data.cost_increase_rate_emove | numberformat("de", 2) }}%.
-        Berücksichtigt wurde eine Inflation von {{ data.inflation_rate | numberformat("de", 2) }}% jeweils pro Jahr
-        innerhalb der kommenden {{ data.runtime }} Jahre.
-      </small>
     </div>
     <div class="right-side">&nbsp;</div>
   </div>
