@@ -99,6 +99,8 @@ def add_file(data):
         })
     if "result" in response:
         return response["result"]["ID"]
+    else:
+        print("upload error:", response)
     return None
 
 
