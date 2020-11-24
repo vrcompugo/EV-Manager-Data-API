@@ -1,4 +1,4 @@
-from app.modules.user.models import *
+from app.modules.user.models import User, UserRole, UserZipAssociation, UserSchema
 from app.modules.customer.models import *
 from app.modules.product.models import *
 from app.modules.reseller.models import *

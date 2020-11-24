@@ -136,8 +136,14 @@ def get_settings(section=None, domain_raw=None):
     return {}
 
 
-def set_settings(section=None):
-    pass
+def set_settings(section, data, domain_raw=None):
+    full_section = get_full_section_name(section, domain_raw)
+    settings_object = db.session.query(Settings).filter(Settings.section == full_section).first()
+    if settings_object is None:
+        raise ApiException("settings not found", "Einstellungen wurden nicht gefunden", 500)
+    settings_object.data = data
+    db.session.commit()
+    return settings_object.data
 
 
 def add_item(data):

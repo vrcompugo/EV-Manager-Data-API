@@ -1,85 +1,60 @@
-from flask_script import prompt
+import json
+import datetime
+from sqlalchemy import func, or_, and_
 
 from app import db
+from app.modules.external.bitrix24.deal import get_deal, update_deal
+from app.modules.external.bitrix24.contact import get_contact
 
-from .models import UserRole
-from .user_services import add_item
-
-
-def install():
-    from app.blueprint import full_permission_list
-
-    password = prompt("root password")
-    if password is None:
-        print("Installation canceled")
-        return
-
-    admin_role = UserRole(label="root", code="root", permissions=full_permission_list + ["create_root_user"])
-    dev_role = UserRole(label="Entwickler", code="dev", permissions=full_permission_list)
-    sales_role = UserRole(label=u"Verkäufer", code="sales", permissions=full_permission_list)
-    sales_lead_role = UserRole(label="Verkaufsleiter", code="sales_lead", permissions=full_permission_list)
-    front_office_role = UserRole(label="Front Office", code="front_office", permissions=full_permission_list)
-    bookkeeping_role = UserRole(label="Buchhaltung", code="bookkeeping", permissions=full_permission_list)
-    cloud_manager_role = UserRole(label="Cloud Manager", code="cloud_manager", permissions=full_permission_list)
-    evu_manager_role = UserRole(label="EVU Manager", code="evu_manager", permissions=full_permission_list)
-    construction_lead_role = UserRole(label="Montageleiter", code="construction_lead", permissions=full_permission_list)
-    construction_role = UserRole(label="Monteur", code="construction", permissions=full_permission_list)
-    warehouse_role = UserRole(label="Lagerverwaltung", code="warehouse", permissions=full_permission_list)
-    customer_service_role = UserRole(label="Kunden Service", code="customer_service", permissions=full_permission_list)
-    insurance_role = UserRole(label="Versicherung", code="insurance", permissions=full_permission_list)
-    maintenance_role = UserRole(label="Wartung", code="maintenance", permissions=full_permission_list)
-    wl_partner_role = UserRole(label="White-Label-Partner", code="white-label-partner", permissions=["cloud_calculation"])
-
-    db.session.add_all(
-        [admin_role, dev_role, sales_role, sales_lead_role, front_office_role, bookkeeping_role, cloud_manager_role,
-         evu_manager_role, construction_lead_role, construction_role, warehouse_role, customer_service_role,
-         insurance_role, maintenance_role, wl_partner_role])
-    db.session.commit()
-
-    role_ids = []
-    roles = db.session.query(UserRole).all()
-    for role in roles:
-        role_ids.append(role.id)
-    add_item({
-        "username": "root",
-        "password": password,
-        "email": "root@hbundb.de",
-        "roles": role_ids
-    })
+from .models.user_zip_association import UserZipAssociation
 
 
-def update_role_permissions():
-    from app.blueprint import full_permission_list
-    admin_role = db.session.query(UserRole).filter(UserRole.code == "root").first()
-    admin_role.permissions = full_permission_list + ["create_root_user"]
-    for role in ["dev", "sales", "sales_lead", "front_office", "bookkeeping", "cloud_manager",
-                 "evu_manager", "construction_lead", "construction", "warehouse", "customer_service",
-                 "insurance", "maintenance"]:
-        role_object = db.session.query(UserRole).filter(UserRole.code == role).first()
-        role_object.permissions = full_permission_list
-    db.session.commit()
+def auto_assign_lead_to_user(deal_id):
+    deal_data = get_deal(deal_id)
+    if "assigned_by_id" not in deal_data or deal_data["assigned_by_id"] != "17":
+        return None
+    if "contact_id" not in deal_data or deal_data["contact_id"] is None or int(deal_data["contact_id"]) == 0:
+        return None
 
+    contact_data = get_contact(deal_data["contact_id"])
+    if "zip" not in contact_data or contact_data["zip"] is None or contact_data["zip"] == "":
+        return None
 
-def import_test_data():
-    role_ids = []
-    roles = db.session.query(UserRole).all()
-    for role in roles:
-        role_ids.append(role.id)
-    username = prompt("dev username")
-    if username is None:
-        print("import canceled")
-        return
-    password = prompt("dev password")
-    if password is None:
-        print("import canceled")
-        return
-    email = prompt("dev email")
-    if email is None:
-        print("import canceled")
-        return
-    add_item({
-        "username": username,
-        "password": password,
-        "email": email,
-        "roles": role_ids
-    })
+    current_cycle_index = int(datetime.datetime.now().strftime("%V"))
+    user = UserZipAssociation.query\
+        .filter(UserZipAssociation.last_assigned.is_(None))\
+        .filter(or_(
+            and_(
+                UserZipAssociation.current_cycle_index == current_cycle_index,
+                UserZipAssociation.current_cycle_count < UserZipAssociation.max_leads
+            ),
+            UserZipAssociation.current_cycle_index != current_cycle_index,
+            UserZipAssociation.current_cycle_index.is_(None)
+        ))\
+        .filter(UserZipAssociation.data.contains([contact_data['zip']]))
+    user = user.first()
+    if user is None:
+        user = UserZipAssociation.query\
+            .filter(or_(
+                and_(
+                    UserZipAssociation.current_cycle_index == current_cycle_index,
+                    UserZipAssociation.current_cycle_count < UserZipAssociation.max_leads
+                ),
+                UserZipAssociation.current_cycle_index != current_cycle_index,
+                UserZipAssociation.current_cycle_index.is_(None)
+            ))\
+            .filter(UserZipAssociation.data.contains([contact_data['zip']]))\
+            .order_by(UserZipAssociation.last_assigned.asc())\
+            .first()
+    if user is None:
+        update_data = {"assigned_by_id": 1}
+    else:
+        update_data = {"assigned_by_id": user.user_id}
+    update_deal(deal_id, update_data)
+    if user is not None:
+        if user.current_cycle_index != current_cycle_index:
+            user.current_cycle_index = current_cycle_index
+            user.current_cycle_count = 0
+        user.current_cycle_count = user.current_cycle_count + 1
+        user.last_assigned = datetime.datetime.now()
+        db.session.commit()

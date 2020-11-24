@@ -1,116 +1,87 @@
-from flask import request
-from flask_restplus import Resource
-from flask_restplus import Namespace, fields
-from app.decorators import token_required, api_response
-from luqum.parser import parser
+import json
+from flask import Blueprint, Response, request, render_template
 
-from .user_services import *
-from .models import UserRole
-from app.modules.auth.auth_services import get_logged_in_user
-
-api = Namespace('Users')
-api2 = Namespace('UserRoles')
-
-_user_input = api.model("User_", model={
-    'email': fields.String(required=True, description='user email address'),
-    'username': fields.String(required=True, description='user username'),
-    'password': fields.String(required=True, description='user password'),
-    'roles': fields.List(required=True, description='', cls_or_instance=fields.Integer())
-})
-
-@api.route('/')
-class Items(Resource):
-    @api_response
-    @api.doc(params={
-        'offset': {"type":'integer', "default": 0},
-        "limit":{"type":'integer', "default": 10},
-        "sort": {"type":"string", "default": ""},
-        "fields": {"type":"string", "default": "_default_"},
-        "q": {"type":"string", "default": "", "description": "Lucene syntax search query"}
-    })
-    @token_required("list_user")
-    def get(self):
-        """
-            List users
-            sort:
-                - "column1,column2" -> column1 asc, column2 asc
-                - "+column1,-column2" -> column1 asc, column2 desc
-            fields:
-                Filter output to only needed fields
-                - "column1,column2" -> {column1: "", column2: ""}
-
-        """
-        offset = int(request.args.get("offset") or 0)
-        limit = int(request.args.get("limit") or 10)
-        sort = request.args.get("sort") or ""
-        fields = request.args.get("fields") or "_default_"
-        query = request.args.get("q") or None
-        tree = None
-        if query is not None:
-            tree = parser.parse(query)
-        data, total_count = get_items(tree, sort, offset, limit, fields)
-        return {"status":"success",
-                "fields": fields,
-                "sort": sort,
-                "offset": offset,
-                "limit": limit,
-                "query": query,
-                "total_count": total_count,
-                "data": data}
-
-    @api_response
-    @api.expect(_user_input, validate=True)
-    @token_required("create_user")
-    def post(self):
-        """Creates a new User """
-        data = request.json
-        user = get_logged_in_user(request)
-        if "roles" in data:
-            root_role = UserRole.query.filter(UserRole.code == "root").first()
-            if root_role.id in data["roles"] and "create_root_user" != user["permissions"]:
-                raise ApiException("invalid_permission", "Invalid Permission.", 401)
-        item = add_item(data=data)
-        item_dict = get_one_item(item.id)
-        return {"status":"success",
-                "data": item_dict}
+from app import db
+from app.modules.auth import validate_jwt, get_auth_info
+from app.modules.auth.jwt_parser import encode_jwt
+from app.modules.external.bitrix24.user import get_users_per_department
+from app.modules.settings import get_settings
+from app.models import UserZipAssociation
 
 
-@api.route('/<id>')
-class User(Resource):
-    @api_response
-    @api.doc(params={
-        "fields": {"type":"string", "default": "_default_"},
-    })
-    @token_required("show_user")
-    def get(self, id):
-        """get a user given its identifier"""
-        fields = request.args.get("fields") or "_default_"
-        item_dict = get_one_item(id, fields)
-        if not item_dict:
-            api.abort(404)
-        else:
-            return item_dict
-
-    @api.response(201, 'User successfully updated.')
-    @api.doc('update user')
-    @api.expect(_user_input, validate=True)
-    @token_required("update_user")
-    def put(self, id):
-        """Update User """
-        data = request.json
-        user = get_logged_in_user(request)
-        if "roles" in data:
-            root_role = UserRole.query.filter(UserRole.code == "root").first()
-            if root_role.id in data["roles"] and "create_root_user" != user["permissions"]:
-                raise ApiException("invalid_permission", "Invalid Permission.", 401)
-        return update_item(id, data=data)
+blueprint = Blueprint("users", __name__, template_folder='templates')
 
 
-@api2.route('/')
-class Items2(Resource):
-    @api_response
-    @token_required("list_user_roles")
-    def get(self):
-        data = get_role_items()
-        return {"status": "success",
-                "data": data}
+@blueprint.route("sales_users", methods=['GET'])
+def sales_users():
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden", 401
+    users = []
+    for department_id in [5, 23, 57, 43, 248, 272, 270]:
+        response = get_users_per_department(department_id)  # Verkauf/Außendienst
+        if response is None:
+            continue
+        for user in response:
+            existing_user = next((item for item in users if str(item["ID"]) == str(user["ID"])), None)
+            if existing_user is not None:
+                continue
+            if user["NAME"] is None or user["NAME"] == "":
+                user["NAME"] = user["EMAIL"]
+            association = UserZipAssociation.query.filter(UserZipAssociation.user_id == user["ID"]).first()
+            if association is None:
+                user["association"] = {
+                    "data": []
+                }
+            else:
+                user["association"] = {
+                    "data": association.data,
+                    "last_assigned": str(association.last_assigned),
+                    "max_leads": association.max_leads,
+                    "current_cycle_count": association.current_cycle_count
+                }
+                if user["association"]["last_assigned"] == "None":
+                    user["association"]["last_assigned"] = None
+            if user["ACTIVE"] is True or user["ACTIVE"] == "true" or user["association"].get("max_leads", 0) > 0:
+                users.append(user)
+    users.sort(key=lambda x: x["NAME"], reverse=True)
+    users.reverse()
+    return Response(
+        json.dumps({"status": "success", "data": users}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("sales_users", methods=['POST'])
+def sales_users_store():
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden", 401
+    data = request.json
+    association = UserZipAssociation.query.filter(UserZipAssociation.user_id == data["ID"]).first()
+    if association is None:
+        association = UserZipAssociation(
+            user_id=int(data["ID"]),
+            current_cycle_count=0,
+            comment=f"{data['NAME']} {data['LAST_NAME']}"
+        )
+        db.session.add(association)
+    association.data = data["association"]["data"]
+    if "max_leads" not in data["association"] or data["association"]["max_leads"] is None or data["association"]["max_leads"] == "":
+        data["association"]["max_leads"] = 0
+    association.max_leads = int(data["association"]["max_leads"])
+    db.session.commit()
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("sales_settings", methods=['GET', 'POST'])
+def sales_users_settings_app():
+    config = get_settings(section="external/bitrix24")
+    auth_info = get_auth_info()
+    if auth_info["user"] is None:
+        return "Forbidden"
+    token = encode_jwt(auth_info, expire_minutes=600)
+    return render_template("sales_settings/sales_settings.html", token=token)

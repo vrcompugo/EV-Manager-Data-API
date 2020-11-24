@@ -11,7 +11,7 @@ from .utils.jinja_filters import apply_filters
 
 db = SQLAlchemy()
 flask_bcrypt = Bcrypt()
-make_versioned(user_cls="User", plugins=[FlaskPlugin()])
+make_versioned(user_cls=None, plugins=[FlaskPlugin()])
 
 
 def create_app(config_name):
