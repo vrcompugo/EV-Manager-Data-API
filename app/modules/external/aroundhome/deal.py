@@ -150,7 +150,6 @@ def run_cron_import():
                 data["timeline_comment"]["entity_id"] = lead_data["id"]
                 add_timeline_comment(data["timeline_comment"])
             log_item("Lead", lead["lead_id"])
-            return
         config = get_settings("external/aroundhome")
         if config is not None:
             config["last_lead_import_time"] = str(import_time)

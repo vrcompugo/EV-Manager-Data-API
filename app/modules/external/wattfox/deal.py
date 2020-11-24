@@ -141,7 +141,6 @@ def run_cron_import():
                 data["timeline_comment"]["entity_id"] = lead_data["id"]
                 add_timeline_comment(data["timeline_comment"])
             log_item("Lead", lead["wf_leadid"])
-            return
         config = get_settings("external/wattfox")
         if config is not None:
             config["last_import_datetime"] = str(last_import_datetime)

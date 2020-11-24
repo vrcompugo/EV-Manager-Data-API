@@ -134,7 +134,6 @@ def run_cron_import():
                 data["timeline_comment"]["entity_id"] = lead_data["id"]
                 add_timeline_comment(data["timeline_comment"])
             log_item("Lead", lead["assignment"]["id"])
-            return
         config = get_settings("external/senec")
         if config is not None:
             config["last_import_datetime"] = last_import_datetime.strftime("%Y-%m-%d") + " 00:00:00"
