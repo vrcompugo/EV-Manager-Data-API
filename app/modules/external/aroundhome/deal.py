@@ -145,7 +145,7 @@ def run_cron_import():
 
                 data["lead"]["status_id"] = "9"
                 data["lead"]["contact_id"] = existing_contact["id"]
-                lead = add_lead(data["lead"])
+                lead_data = add_lead(data["lead"])
 
                 data["timeline_comment"]["entity_id"] = lead_data["id"]
                 add_timeline_comment(data["timeline_comment"])
