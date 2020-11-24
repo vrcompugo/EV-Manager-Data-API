@@ -4,10 +4,7 @@ from app.modules.external.bitrix24.deal import get_deal
 
 
 def cron(section=None):
-
-    if datetime.datetime.now() <= datetime.datetime(2020, 11, 1, 9, 0, 0):
-        print("cron outside of start", section)
-        return section
+    return None
 
     if section == "productive" or section == "import_leads_aroundhome":
         from app.modules.external.aroundhome.deal import run_cron_import
