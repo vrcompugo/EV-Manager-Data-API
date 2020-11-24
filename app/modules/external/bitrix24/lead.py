@@ -125,6 +125,7 @@ def add_lead(data, domain=None):
     config = get_settings(section="external/bitrix24", domain_raw=domain)
     fields = config["lead"]["fields"]
     update_data = {}
+    data = set_address_if_empty(data)
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
     response = post("crm.lead.add", update_data, domain=domain)
     if "result" in response and response["result"]:
@@ -143,3 +144,19 @@ def update_lead(id, data, domain=None):
         return True
     else:
         return False
+
+
+def set_address_if_empty(data):
+    if "street" in data:
+        if data["street"] is None or data["street"] is False or data["street"] == "":
+            data["street"] = "siehe Kundenanschrift"
+    if "street_nb" in data:
+        if data["street_nb"] is None or data["street_nb"] is False or data["street_nb"] == "":
+            data["street_nb"] = "siehe Kundenanschrift"
+    if "zip" in data:
+        if data["zip"] is None or data["zip"] is False or data["zip"] == "":
+            data["zip"] = "siehe Kundenanschrift"
+    if "city" in data:
+        if data["city"] is None or data["city"] is False or data["city"] == "":
+            data["city"] = "siehe Kundenanschrift"
+    return data
