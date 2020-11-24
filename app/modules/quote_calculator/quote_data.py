@@ -137,12 +137,6 @@ def calculate_products(data):
         add_product_pv_module(data)
         storage_product = add_product_storage(data)
         add_direct_product(
-            label="Montage Stromspeicher",
-            category="Stromspeicher",
-            quantity=1,
-            products=data["products"]
-        )
-        add_direct_product(
             label="Cloud Fähigkeit",
             category="Stromspeicher",
             quantity=1,

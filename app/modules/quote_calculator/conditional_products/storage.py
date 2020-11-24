@@ -16,4 +16,8 @@ def add_product(data):
     product["NAME"] = f"{version} {stack_count * 2.5 + 2.5} LI"
     product["PRICE"] = float(product["PRICE"]) + float(stack["PRICE"]) * stack_count
     data["products"].append(product)
+
+    product = get_product(label="Montage Stromspeicher", category="Stromspeicher")
+    product["quantity"] = math.ceil(data["calculated"]["storage_size"] / 10)
+    data["products"].append(product)
     return product
