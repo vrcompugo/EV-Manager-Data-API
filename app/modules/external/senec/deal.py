@@ -11,7 +11,7 @@ from app.modules.external.bitrix24.lead import get_lead, add_lead
 from app.modules.external.bitrix24.timeline_comment import add_timeline_comment
 from app.modules.settings import get_settings, set_settings
 from app.utils.error_handler import error_handler
-from app.utils.data_convert import street_to_street_with_nb
+from app.utils.data_convert import street_to_street_with_nb, internationalize_phonenumber
 
 from ._connector import get
 from ._association import log_item, find_log
@@ -39,7 +39,7 @@ def get_import_data(raw):
             "phone": [
                 {
                     "VALUE_TYPE": "WORK",
-                    "VALUE": raw["lead"]["telephone"],
+                    "VALUE": internationalize_phonenumber(raw["lead"]["telephone"]),
                     "TYPE_ID": "PHONE"
                 }
             ]
@@ -47,10 +47,12 @@ def get_import_data(raw):
         "lead": {
             "title": f"{raw['lead']['firstName']} {raw['lead']['lastName']}, {raw['lead']['homeAddress']['city']} (Senec)",
             "source_id": 3,
-            "street": "",
-            "street_nb": "",
-            "zip": "",
-            "city": ""
+            "first_name": raw["lead"]["firstName"],
+            "last_name": raw["lead"]["lastName"],
+            "street": street,
+            "street_nb": street_nb,
+            "zip": raw["lead"]["homeAddress"]["postalCode"],
+            "city": raw["lead"]["homeAddress"]["city"]
         },
         "timeline_comment": {
             "entity_type": "lead",
@@ -127,7 +129,7 @@ def run_cron_import():
             else:
                 print("already known", existing_contact["id"])
 
-                data["lead"]["status_id"] = "9"
+                data["lead"]["status_id"] = "14"
                 data["lead"]["contact_id"] = existing_contact["id"]
                 lead_data = add_lead(data["lead"])
 

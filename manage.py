@@ -42,7 +42,7 @@ def update_role_permissions():
 @manager.command
 def get_lead():
     from app.modules.external.bitrix24.lead import get_lead
-    print(json.dumps(get_lead(550), indent=2))
+    print(json.dumps(get_lead(14646), indent=2))
 
 
 @manager.option("-s", "--section", dest='section', default=None)
