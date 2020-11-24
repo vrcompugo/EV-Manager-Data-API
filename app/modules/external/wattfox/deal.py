@@ -46,7 +46,7 @@ def get_import_data(raw):
         },
         "lead": {
             "title": f"{raw['firstname']} {raw['lastname']}, {raw['city']} (Wattfox)",
-            "source_id": 6,
+            "source_id": "2",
             "street": "",
             "street_nb": "",
             "zip": "",
@@ -115,9 +115,8 @@ def run_cron_import():
 
             data = get_import_data(lead)
             existing_contact = get_contact_by_email(lead["email"])
-            data["lead"]["category_id"] = 1
             if existing_contact is None:
-                data["lead"]["stage_id"] = "C1:NEW"
+                data["lead"]["status_id"] = "NEW"
                 contact = add_contact(data["contact"])
                 data["lead"]["contact_id"] = contact["id"]
 
@@ -135,13 +134,14 @@ def run_cron_import():
             else:
                 print("already known", existing_contact["id"])
 
-                data["lead"]["stage_id"] = "C1:16"
+                data["lead"]["status_id"] = "9"
                 data["lead"]["contact_id"] = existing_contact["id"]
                 lead = add_lead(data["lead"])
 
                 data["timeline_comment"]["entity_id"] = lead["id"]
                 add_timeline_comment(data["timeline_comment"])
             log_item("Lead", lead["wf_leadid"])
+            return
         config = get_settings("external/wattfox")
         if config is not None:
             config["last_import_datetime"] = str(last_import_datetime)

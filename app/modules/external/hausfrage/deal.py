@@ -46,7 +46,7 @@ def get_import_data(raw):
         },
         "lead": {
             "title": f"{raw['Firstname']} {raw['Lastname']}, {raw['City']} (Hausfrage)",
-            "source_id": 4,
+            "source_id": 14,
             "street": "",
             "street_nb": "",
             "zip": "",
@@ -92,10 +92,9 @@ def run_cron_import():
                 continue
 
             data = get_import_data(lead)
-            data["lead"]["category_id"] = 1
             existing_contact = get_contact_by_email(lead["Email"])
             if existing_contact is None:
-                data["lead"]["stage_id"] = "C1:NEW"
+                data["lead"]["status_id"] = "NEW"
                 contact = add_contact(data["contact"])
                 data["lead"]["contact_id"] = contact["id"]
 
@@ -113,13 +112,14 @@ def run_cron_import():
             else:
                 print("already known", existing_contact["id"])
 
-                data["lead"]["stage_id"] = "C1:16"
+                data["lead"]["status_id"] = "9"
                 data["lead"]["contact_id"] = existing_contact["id"]
                 lead = add_lead(data["lead"])
 
                 data["timeline_comment"]["entity_id"] = lead["id"]
                 add_timeline_comment(data["timeline_comment"])
             log_item("Lead", lead["Email"])
+            return
         config = get_settings("external/hausfrage")
         if config is not None:
             config["last_lead_import_time"] = str(import_time)

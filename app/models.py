@@ -13,3 +13,4 @@ from app.modules.order.models.order import Order, OrderSchema
 from app.modules.commission.models.commission import Commission, CommissionSchema
 from app.modules.eeg.models import EEGRefundRate
 from app.modules.quote_calculator.models.quote_history import QuoteHistory
+from app.modules.external.models.transaction_log import TransactionLog

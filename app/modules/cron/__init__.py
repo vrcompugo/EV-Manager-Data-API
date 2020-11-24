@@ -4,8 +4,6 @@ from app.modules.external.bitrix24.deal import get_deal
 
 
 def cron(section=None):
-    return None
-
     if section == "productive" or section == "import_leads_aroundhome":
         from app.modules.external.aroundhome.deal import run_cron_import
         print("cron", "import_leads_aroundhome")
