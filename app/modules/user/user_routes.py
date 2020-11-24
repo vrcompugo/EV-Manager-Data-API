@@ -38,6 +38,7 @@ def sales_users():
                     "data": association.data,
                     "last_assigned": str(association.last_assigned),
                     "max_leads": association.max_leads,
+                    "current_cycle_index": association.current_cycle_index,
                     "current_cycle_count": association.current_cycle_count
                 }
                 if user["association"]["last_assigned"] == "None":
