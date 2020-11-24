@@ -30,7 +30,7 @@ def get_company(id):
     if "result" in data and len(data["result"]) > 0:
         return convert_config_values(data["result"])
     else:
-        print("error:", data)
+        print("error get company:", data)
     return None
 
 

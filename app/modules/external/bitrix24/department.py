@@ -17,5 +17,5 @@ def get_department(id):
         DEPARTMENT_CACHE[id] = data["result"][0]
         return DEPARTMENT_CACHE[id]
     else:
-        print("error:", data)
+        print("error get department:", data)
     return None

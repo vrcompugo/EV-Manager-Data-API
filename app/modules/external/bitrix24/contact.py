@@ -42,7 +42,7 @@ def get_contact(id):
     if "result" in data and len(data["result"]) > 0:
         return convert_config_values(data["result"])
     else:
-        print("error:", data)
+        print("error get contact:", data)
     return None
 
 
@@ -57,7 +57,7 @@ def get_contact_by_email(email):
             return None
         return convert_config_values(data["result"][0])
     else:
-        print("error:", data)
+        print("error get contact by email:", data)
     return None
 
 
@@ -86,6 +86,6 @@ def update_contact(id, data, domain=None):
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
     response = post("crm.contact.update", update_data, domain=domain)
     if "result" in response and response["result"]:
-        return get_contact(int(response["result"]))
+        return response["result"]
     else:
         return False

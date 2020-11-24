@@ -10,7 +10,7 @@ def get_user(id):
     if "result" in data and len(data["result"]) > 0:
         return data["result"][0]
     else:
-        print("error:", data)
+        print("error get user:", data)
     return None
 
 
@@ -21,5 +21,5 @@ def get_users_per_department(department_id):
     if "result" in data and len(data["result"]) > 0:
         return data["result"]
     else:
-        print("error:", data)
+        print("error get user per dep:", data)
     return None

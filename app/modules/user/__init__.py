@@ -11,12 +11,13 @@ from .models.user_zip_association import UserZipAssociation
 
 def auto_assign_lead_to_user(lead_id):
     lead_data = get_lead(lead_id)
-    if "assigned_by_id" not in lead_data or lead_data["assigned_by_id"] != "17":
+    if "assigned_by_id" not in lead_data or lead_data["assigned_by_id"] != "106":
         return None
     if "contact_id" not in lead_data or lead_data["contact_id"] is None or int(lead_data["contact_id"]) == 0:
         return None
 
     contact_data = get_contact(lead_data["contact_id"])
+    print(contact_data)
     if "zip" not in contact_data or contact_data["zip"] is None or contact_data["zip"] == "":
         return None
 
@@ -53,7 +54,7 @@ def auto_assign_lead_to_user(lead_id):
     update_lead(lead_id, update_data)
     update_contact(lead_data["contact_id"], update_data)
     if user is not None:
-        if user.current_cycle_index != current_cycle_index:
+        if user.current_cycle_index is None or user.current_cycle_index != current_cycle_index:
             user.current_cycle_index = current_cycle_index
             user.current_cycle_count = 0
         user.current_cycle_count = user.current_cycle_count + 1

@@ -28,7 +28,7 @@ def get_deal(id):
     if "result" in data:
         return convert_config_values(data["result"])
     else:
-        print("error:", data)
+        print("error deal get:", data)
     return None
 
 

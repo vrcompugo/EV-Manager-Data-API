@@ -66,7 +66,7 @@ def get_lead(id):
     if "result" in data:
         return convert_config_values(data["result"])
     else:
-        print("error:", data)
+        print("error get lead:", data)
     return None
 
 
