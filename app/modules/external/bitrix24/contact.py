@@ -14,7 +14,7 @@ def convert_config_values(data_raw):
         else:
             data[key.lower()] = data_raw[key]
     for local_field, external_field in config["contact"]["fields"].items():
-        if external_field in data:
+        if external_field.lower() in data:
             data[local_field] = data[external_field]
     if "salutation" in data and data["salutation"] == "HNR_DE_1":
         data["salutation"] = "ms"
@@ -84,6 +84,6 @@ def update_contact(id, data, domain=None):
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
     response = post("crm.contact.update", update_data, domain=domain)
     if "result" in response and response["result"]:
-        return True
+        return get_contact(int(response["result"]))
     else:
         return False
