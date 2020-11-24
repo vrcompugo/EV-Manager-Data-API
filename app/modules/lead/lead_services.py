@@ -227,13 +227,13 @@ def lead_reseller_assignment(lead: Lead, reseller: Reseller):
 
 
 def find_reseller(lead):
-    from app.utils.google_geocoding import geocode_address
+    # from app.utils.google_geocoding import geocode_address
 
-    location = geocode_address(f"{lead.customer.default_address.street}, {lead.customer.default_address.zip}  {lead.customer.default_address.city}")
+    # location = geocode_address(f"{lead.customer.default_address.street}, {lead.customer.default_address.zip}  {lead.customer.default_address.city}")
+    # if location is None:
+    #    return None
+
     print("reseller auto assign:", lead.id)
-    if location is None:
-        return None
-
     reseller_in_range = []
     resellers = db.session.query(Reseller).filter(Reseller.lead_balance < 0).filter(Reseller.active.is_(True)).all()
 
@@ -244,29 +244,11 @@ def find_reseller(lead):
             if lead.customer.default_address.zip in reseller.ziplist:
                 print("reseller ziplist", reseller.id)
                 reseller_in_range.append(reseller)
-        else:
-            if reseller.sales_lat is not None and reseller.sales_lng is not None:
-                distance = calculate_distance(
-                    {
-                        "lat": reseller.sales_lat,
-                        "lng": reseller.sales_lng
-                    },
-                    location
-                )
-                if reseller.sales_range > 0 and distance <= reseller.sales_range:
-                    reseller_in_range.append(reseller)
-                if (min_distance is None or distance < min_distance) and distance < 60:
-                    min_distance = distance
-                    min_distance_reseller = reseller
 
     if len(reseller_in_range) == 0:
-        if min_distance_reseller is not None:
-            print("min-distance", min_distance_reseller.id)
-            return min_distance_reseller
-        else:
-            kammandel = db.session.query(Reseller).get(76)
-            print("kammandel", kammandel.id)
-            return kammandel
+        kammandel = db.session.query(Reseller).get(76)
+        print("kammandel", kammandel.id)
+        return kammandel
 
     if len(reseller_in_range) == 1:
         print("only one found", reseller_in_range[0].id)
