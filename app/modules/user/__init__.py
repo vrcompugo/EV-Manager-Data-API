@@ -4,7 +4,7 @@ from sqlalchemy import func, or_, and_
 
 from app import db
 from app.modules.external.bitrix24.deal import get_deal, update_deal
-from app.modules.external.bitrix24.contact import get_contact
+from app.modules.external.bitrix24.contact import get_contact, update_contact
 
 from .models.user_zip_association import UserZipAssociation
 
@@ -51,6 +51,7 @@ def auto_assign_lead_to_user(deal_id):
     else:
         update_data = {"assigned_by_id": user.user_id}
     update_deal(deal_id, update_data)
+    update_contact(deal_data["contact_id"], update_data)
     if user is not None:
         if user.current_cycle_index != current_cycle_index:
             user.current_cycle_index = current_cycle_index
