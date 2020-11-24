@@ -166,6 +166,13 @@ def calculate_products(data):
             quantity=kwp,
             products=data["products"]
         )
+        if "cloud_price_heatcloud" in data["calculated"] and float(data["calculated"]["cloud_price_heatcloud"]) > 0:
+            add_direct_product(
+                label="Wärme Cloud Paket",
+                category="Elektrik",
+                quantity=1,
+                products=data["products"]
+            )
         if "technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]:
             quantity = 0
             if "technik_service_packet" in data["data"]["extra_options"]:
