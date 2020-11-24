@@ -107,20 +107,20 @@ def run_cron_import():
                     company = add_company(data["company"])
                     data["lead"]["company_id"] = company["id"]
 
-                lead = add_lead(data["lead"])
+                lead_data = add_lead(data["lead"])
 
-                data["timeline_comment"]["entity_id"] = lead["id"]
+                data["timeline_comment"]["entity_id"] = lead_data["id"]
                 add_timeline_comment(data["timeline_comment"])
 
-                auto_assign_lead_to_user(lead["id"])
+                auto_assign_lead_to_user(lead_data["id"])
             else:
                 print("already known", existing_contact["id"])
 
                 data["lead"]["status_id"] = "9"
                 data["lead"]["contact_id"] = existing_contact["id"]
-                lead = add_lead(data["lead"])
+                lead_data = add_lead(data["lead"])
 
-                data["timeline_comment"]["entity_id"] = lead["id"]
+                data["timeline_comment"]["entity_id"] = lead_data["id"]
                 add_timeline_comment(data["timeline_comment"])
             log_item("Lead", lead["sale_id"])
             return
