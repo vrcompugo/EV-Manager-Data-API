@@ -20,7 +20,7 @@ def auto_assign_lead_to_user(deal_id):
     if "zip" not in contact_data or contact_data["zip"] is None or contact_data["zip"] == "":
         return None
 
-    current_cycle_index = int(datetime.datetime.now().strftime("%V"))
+    current_cycle_index = int(datetime.datetime.now().month)
     user = UserZipAssociation.query\
         .filter(UserZipAssociation.last_assigned.is_(None))\
         .filter(or_(
