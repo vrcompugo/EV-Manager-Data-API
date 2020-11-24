@@ -128,7 +128,7 @@ def add_lead(data, domain=None):
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
     response = post("crm.lead.add", update_data, domain=domain)
     if "result" in response and response["result"]:
-        return get_deal(int(response["result"]))
+        return get_lead(int(response["result"]))
     else:
         return False
 
