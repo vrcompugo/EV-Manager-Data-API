@@ -75,3 +75,15 @@ def add_contact(data, domain=None):
         return get_contact(int(response["result"]))
     else:
         return False
+
+
+def update_contact(id, data, domain=None):
+    update_data = {"id": id}
+    config = get_settings(section="external/bitrix24", domain_raw=domain)
+    fields = config["contact"]["fields"]
+    update_data = flatten_dict(data, update_data, fields=fields, config=config)
+    response = post("crm.contact.update", update_data, domain=domain)
+    if "result" in response and response["result"]:
+        return True
+    else:
+        return False
