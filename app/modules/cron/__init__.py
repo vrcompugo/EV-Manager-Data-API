@@ -28,8 +28,3 @@ def cron(section=None):
         from app.modules.external.wattfox.deal import run_cron_import
         print("cron", "import_leads_wattfox")
         run_cron_import()
-
-    if section == "productive" or section == "dublicate_check":
-        from app.modules.external.bitrix24.deal import run_dublicate_check
-        print("cron", "dublicate_check")
-        run_dublicate_check()
