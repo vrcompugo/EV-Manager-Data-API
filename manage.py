@@ -33,106 +33,15 @@ def install():
 
 
 @manager.command
-def update_commission_values():
-    from commands.update_commission_values import update_commission_values
-    update_commission_values()
-
-
-@manager.command
-def import_orders_without_category():
-    from commands.import_orders_without_category import import_orders_without_category
-    import_orders_without_category()
-
-
-@manager.command
-def lead_comment_test():
-    from commands.lead_comment_test import lead_comment_test
-    lead_comment_test()
-
-
-@manager.command
-def cron_export_etermin_customers():
-    from commands.cron_export_etermin_customers import cron_export_etermin_customers
-    cron_export_etermin_customers()
-
-
-@manager.command
-def cron_import_etermin_events():
-    from commands.cron_import_etermin_events import cron_import_etermin_events
-    cron_import_etermin_events()
-
-
-@manager.command
-def cron_import_bitrix_customers():
-    from commands.cron_import_bitrix_customers import cron_import_bitrix_customers
-    cron_import_bitrix_customers()
-
-
-@manager.option("-l", "--local_id", dest='local_id', default=None)
-def generate_offer_by_survey(local_id):
-    from app.models import Survey
-    from app.modules.survey.survey_services import automatic_offer_creation_by_survey
-
-    survey = Survey.query.get(int(local_id))
-    if survey is not None:
-        automatic_offer_creation_by_survey(survey)
-    else:
-        print("Survey not found")
-
-
-@manager.option("-l", "--local_id", dest='local_id', default=None)
-def generate_offer_by_order(local_id):
-    from app.models import Order
-    from app.modules.offer.services.offer_generation import generate_offer_by_order
-
-    order = Order.query.get(int(local_id))
-    if order is not None:
-        generate_offer_by_order(order)
-    else:
-        print("Order not found")
-
-
-@manager.option("-l", "--local_id", dest='local_id', default=None)
-def generate_pdfs_for_offer(local_id):
-    from app.models import OfferV2
-    from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
-    from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
-    from app.modules.offer.services.pdf_generation.pv_offer import generate_pv_offer_pdf
-
-    offer = OfferV2.query.get(int(local_id))
-    if offer is not None:
-        generate_feasibility_study_pdf(offer)
-        generate_cloud_pdf(offer)
-        generate_pv_offer_pdf(offer)
-    else:
-        print("Offer not found")
-
-
-@manager.command
-def customer_export_missing():
-    from commands.customer_export_missing import customer_export_missing
-    customer_export_missing()
-
-
-@manager.command
 def update_role_permissions():
     from app.modules.user import update_role_permissions
     update_role_permissions()
 
 
-@manager.option("-l", "--local_id", dest='local_id', default=None)
-def auto_assign_lead(local_id):
-    from app.modules.lead.lead_services import Lead, lead_reseller_auto_assignment
-    if local_id is not None:
-        lead = db.session.query(Lead).get(local_id)
-        if lead is not None:
-            lead_reseller_auto_assignment(lead)
-
-
-@manager.command
-def cron():
-    from app.modules.importer import cron
-    cron()
+@manager.option("-s", "--section", dest='section', default=None)
+def cron(section):
+    from app.modules.cron import cron
+    cron(section)
 
 
 @manager.option("-m", "--module", dest='module', default=None)

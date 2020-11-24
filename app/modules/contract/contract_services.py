@@ -5,7 +5,6 @@ from app import db
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
-from app.modules.project.project_services import add_item as add_project
 from app.models import Offer
 
 from .models.contract import Contract, ContractSchema
@@ -20,14 +19,6 @@ def add_item(data):
         data["address_id"] = offer.address_id
         data["payment_account_id"] = offer.payment_account_id
         data["reseller_id"] = offer.reseller_id
-    project = add_project({
-        "customer_id": data["customer_id"],
-        "address_id": data["address_id"],
-        "payment_account_id": data["payment_account_id"],
-        "reseller_id": data["reseller_id"],
-        "datetime": data["datetime"]
-    })
-    data["project_id"] = project.id
     new_item = Contract()
     new_item = set_attr_by_dict(new_item, data, ["id"])
     new_item.number = "C{}".format(random.randint(100000, 999999))

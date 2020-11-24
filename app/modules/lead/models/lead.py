@@ -22,7 +22,6 @@ class Lead(db.Model):
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
     reseller = db.relationship("Reseller")
     project_id = db.Column(db.Integer, db.ForeignKey("project.id"))
-    project = db.relationship("Project")
     value = db.Column(db.Numeric(scale=4, precision=12))
     last_update = db.Column(db.DateTime)
     contact_source = db.Column(db.String(80))

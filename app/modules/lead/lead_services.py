@@ -5,7 +5,6 @@ from app import db
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
-from app.modules.email.email_services import generate_email, send_email
 from app.modules.settings.settings_services import get_one_item as get_settings
 from app.modules.reseller.services.reseller_services import update_item as update_reseller
 from app.models import Reseller
@@ -106,61 +105,6 @@ def get_items(tree, sort, offset, limit, fields):
 
 def get_one_item(id, fields=None):
     return get_one_item_by_model(Lead, LeadSchema, id, fields)
-
-
-def send_welcome_email(lead):
-    return False
-    from .lead_comment_services import add_item as add_comment_item
-
-    if lead.id < 12664:
-        return False
-
-    if lead is None or lead.customer is None:
-        raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
-
-    if lead.reseller_id is None or lead.reseller_id == 0:
-        return False
-
-    if lead.status != "new":
-        return False
-
-    existing_comment = LeadComment.query\
-        .filter(LeadComment.lead_id == lead.id)\
-        .filter(LeadComment.code == "welcome_email").first()
-    if existing_comment is not None:
-        return False
-
-    if lead.customer.email is None or lead.customer.email == "":
-        add_comment_item({
-            "lead_id": lead.id,
-            "user_id": None,
-            "change_to_offer_created": False,
-            "code": "welcome_email",
-            "automated": True,
-            "comment": "Achtung!!!: Automatischer Versand der Willkommens E-Mail an fehlgeschlagen, "
-                       "da keine E-Mail angegeben ist"
-        })
-        return False
-
-    schema = LeadSchema()
-    email = generate_email("lead_welcome_email", schema.dump(lead, many=False))
-    email.recipients = [lead.customer.email]
-    email = send_email(email=email)
-    if email.status == "sent":
-        comment = "Automatische Willkommens E-Mail versendet an {}".format(lead.customer.email)
-    else:
-        comment = "Achtung!!!: Automatischer Versand der Willkommens E-Mail an {} fehlgeschlagen.\nFehler: {}".format(lead.customer.email, email.status)
-
-    add_comment_item({
-        "lead_id": lead.id,
-        "user_id": None,
-        "change_to_offer_created": False,
-        "code": "welcome_email",
-        "automated": True,
-        "comment": comment
-    })
-
-    return True
 
 
 def load_commission_data(lead: Lead):

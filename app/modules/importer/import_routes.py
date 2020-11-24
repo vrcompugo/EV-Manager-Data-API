@@ -73,17 +73,3 @@ class Items(Resource):
                 "total_count": total_count,
                 "data": data}
 
-
-@api.route('/bitrix24/webhook/')
-class Items(Resource):
-
-    def get(self):
-        print("bitrix webhook get")
-
-    def post(self):
-        from .sources.bitrix24.task import run_import
-
-        if request.form.get("event") == "ONTASKUPDATE":
-            run_import(remote_id=request.form.get("data[FIELDS_AFTER][ID]"))
-            print(request.form)
-            print("bitrix webhook post")
