@@ -15,7 +15,7 @@ def convert_config_values(data_raw):
             data[key.lower()] = data_raw[key]
     for local_field, external_field in config["contact"]["fields"].items():
         if external_field.lower() in data:
-            data[local_field] = data[external_field]
+            data[local_field] = data[external_field.lower()]
     if "salutation" in data and data["salutation"] == "HNR_DE_1":
         data["salutation"] = "ms"
     else:
