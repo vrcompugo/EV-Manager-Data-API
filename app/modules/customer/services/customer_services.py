@@ -22,12 +22,14 @@ def add_item(data):
         db.session.add(new_item)
         db.session.flush()
         if "default_address" in data and data["default_address"] is not None:
-            customer_address = CustomerAddress(**data["default_address"])
+            customer_address = CustomerAddress()
+            customer_address = set_attr_by_dict(customer_address, data["default_address"], ["id"])
             customer_address.customer_id = new_item.id
             customer_address.status = "ok"
             new_item.default_address = customer_address
             if "default_payment_account" in data and data["default_payment_account"] is not None:
-                default_payment_account = CustomerPaymentAccount(**data["default_payment_account"])
+                default_payment_account = CustomerPaymentAccount()
+                default_payment_account = set_attr_by_dict(default_payment_account, data["default_payment_account"], ["id"])
                 default_payment_account.customer_id = new_item.id
                 default_payment_account.address = customer_address
                 new_item.default_payment_account = default_payment_account
