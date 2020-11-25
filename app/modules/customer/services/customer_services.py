@@ -86,6 +86,5 @@ def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(Customer, CustomerSchema, tree, sort, offset, limit, fields)
 
 
-def get_one_item(id, fields = None):
+def get_one_item(id, fields=None):
     return get_one_item_by_model(Customer, CustomerSchema, id, fields)
-
