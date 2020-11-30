@@ -18,7 +18,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote
-from .generator import generate_bluegen_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
+from .generator import generate_order_confirmation_pdf, generate_bluegen_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -282,21 +282,10 @@ def quote_calculator_pv_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
 
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
-    pdf_pv = generate_quote_pdf(lead_id, data)
-    if pdf_pv is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_pv"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_pv_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_pv,
-        "filename": "PV-Angebot.pdf"
-    })
-    if data["pdf_pv_file_id"] is None or data["pdf_pv_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
+
+    genrate_pdf(data, generate_quote_pdf, lead_id, "pdf_pv_file_id", "PV-Angebot.pdf", subfolder_id)
+    genrate_pdf(data, generate_quote_pdf, lead_id, "pdf_pv_file_id", "PV-Angebot.pdf", subfolder_id, order_confirmation=True)
+
     history.data = data
     db.session.commit()
     return Response(
@@ -312,21 +301,10 @@ def quote_calculator_heating_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
 
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
-    pdf_heating = generate_heating_pdf(lead_id, data)
-    if pdf_heating is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_pv"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_heating_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_heating,
-        "filename": "Heizung-Angebot.pdf"
-    })
-    if data["pdf_heating_file_id"] is None or data["pdf_heating_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
+
+    genrate_pdf(data, generate_heating_pdf, lead_id, "pdf_heating_file_id", "Heizung-Angebot.pdf", subfolder_id)
+    genrate_pdf(data, generate_heating_pdf, lead_id, "pdf_heating_file_id", "Heizung-Angebot.pdf", subfolder_id, order_confirmation=True)
+
     history.data = data
     db.session.commit()
     return Response(
@@ -342,21 +320,10 @@ def quote_calculator_bluegen_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
 
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
-    pdf_bluegen = generate_bluegen_pdf(lead_id, data)
-    if pdf_bluegen is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_pv"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_bluegen_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_bluegen,
-        "filename": "Heizung-Angebot.pdf"
-    })
-    if data["pdf_bluegen_file_id"] is None or data["pdf_bluegen_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
+
+    genrate_pdf(data, generate_bluegen_pdf, lead_id, "pdf_bluegen_file_id", "Bluegen-Angebot.pdf", subfolder_id)
+    genrate_pdf(data, generate_bluegen_pdf, lead_id, "pdf_bluegen_file_id", "Bluegen-Angebot.pdf", subfolder_id, order_confirmation=True)
+
     history.data = data
     db.session.commit()
     return Response(
@@ -372,21 +339,10 @@ def quote_calculator_roof_reconstruction_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
 
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
-    pdf_heating = generate_roof_reconstruction_pdf(lead_id, data)
-    if pdf_heating is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_pv"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_roof_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_heating,
-        "filename": "Dach-Angebot.pdf"
-    })
-    if data["pdf_roof_file_id"] is None or data["pdf_roof_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
+
+    genrate_pdf(data, generate_roof_reconstruction_pdf, lead_id, "pdf_roof_file_id", "Dach-Angebot.pdf", subfolder_id)
+    genrate_pdf(data, generate_roof_reconstruction_pdf, lead_id, "pdf_roof_file_id", "Dach-Angebot.pdf", subfolder_id, order_confirmation=True)
+
     history.data = data
     db.session.commit()
     return Response(
@@ -402,22 +358,9 @@ def quote_calculator_datasheets_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
-    pdf_datasheets = generate_datasheet_pdf(lead_id, data)
-    if pdf_datasheets is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_datasheets"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_datasheets_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_datasheets,
-        "filename": "Datenblaetter.pdf"
-    })
-    if data["pdf_datasheets_file_id"] is None or data["pdf_datasheets_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
+    genrate_pdf(data, generate_datasheet_pdf, lead_id, "pdf_datasheets_file_id", "Datenblaetter.pdf", subfolder_id)
     data["pdf_datasheets_link"] = get_public_link(data["pdf_datasheets_file_id"])
+
     history.data = data
     db.session.commit()
     update_lead(lead_id, {"pdf_datasheets_link": data["pdf_datasheets_link"]})
@@ -434,60 +377,11 @@ def quote_calculator_summary_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
-    pdf_letter = generate_cover_pdf(lead_id, data)
-    if request.method == "GET":
-        return Response(
-            pdf_letter,
-            status=200,
-            mimetype='application/pdf')
-    if pdf_letter is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_letter"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_cover_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_letter,
-        "filename": "Deckblatt.pdf"
-    })
-    if data["pdf_cover_file_id"] is None or data["pdf_cover_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
-
-    pdf_letter = generate_letter_pdf(lead_id, data)
-    if pdf_letter is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_letter"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_letter_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_letter,
-        "filename": "Anschreiben.pdf"
-    })
-    if data["pdf_letter_file_id"] is None or data["pdf_letter_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
-
-    pdf_summary = generate_summary_pdf(lead_id, data)
-    if pdf_summary is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_summary"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_summary_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_summary,
-        "filename": "Energiemappe.pdf"
-    })
-    if data["pdf_summary_file_id"] is None or data["pdf_summary_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
-
+    genrate_pdf(data, generate_cover_pdf, lead_id, "pdf_cover_file_id", "Deckblatt.pdf", subfolder_id)
+    genrate_pdf(data, generate_letter_pdf, lead_id, "pdf_letter_file_id", "Anschreiben.pdf", subfolder_id)
+    genrate_pdf(data, generate_summary_pdf, lead_id, "pdf_summary_file_id", "Energiemappe.pdf", subfolder_id)
     data["pdf_summary_link"] = get_public_link(data["pdf_summary_file_id"])
+
     history.data = data
     db.session.commit()
     update_lead(lead_id, {"pdf_summary_link": data["pdf_summary_link"]})
@@ -505,23 +399,11 @@ def quote_calculator_quote_summary_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
-    pdf_summary = generate_quote_summary_pdf(lead_id, data)
-    if pdf_summary is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_quote_summary_file_id"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_quote_summary_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_summary,
-        "filename": "Angebote.pdf"
-    })
-    if data["pdf_quote_summary_file_id"] is None or data["pdf_quote_summary_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
-
+    genrate_pdf(data, generate_quote_summary_pdf, lead_id, "pdf_quote_summary_file_id", "Angebote.pdf", subfolder_id)
     data["pdf_quote_summary_link"] = get_public_link(data["pdf_quote_summary_file_id"])
+    genrate_pdf(data, generate_order_confirmation_pdf, lead_id, "pdf_order_confirmation_file_id", "Auftragsbestätigungen.pdf", subfolder_id)
+    data["pdf_order_confirmation_link"] = get_public_link(data["pdf_order_confirmation_file_id"])
+
     history.data = data
     db.session.commit()
     update_lead(lead_id, {"pdf_quote_summary_link": data["pdf_quote_summary_link"]})
@@ -539,23 +421,9 @@ def quote_calculator_contract_summary_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
-    pdf_summary = generate_contract_summary_pdf(lead_id, data)
-    if pdf_summary is None:
-        return Response(
-            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: pdf_contract_summary_file_id"}',
-            status=404,
-            mimetype='application/json')
-    data["pdf_contract_summary_file_id"] = add_file(folder_id=subfolder_id, data={
-        "file_content": pdf_summary,
-        "filename": "Vertragsunterlagen.pdf"
-    })
-    if data["pdf_contract_summary_file_id"] is None or data["pdf_contract_summary_file_id"] <= 0:
-        return Response(
-            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
-            status=404,
-            mimetype='application/json')
-
+    genrate_pdf(data, generate_contract_summary_pdf, lead_id, "pdf_contract_summary_file_id", "Vertragsunterlagen.pdf", subfolder_id)
     data["pdf_contract_summary_link"] = get_public_link(data["pdf_contract_summary_file_id"])
+
     history.data = data
     db.session.commit()
     update_lead(lead_id, {"pdf_contract_summary_link": data["pdf_contract_summary_link"]})
@@ -564,6 +432,29 @@ def quote_calculator_contract_summary_pdf(lead_id):
         json.dumps({"status": "success", "data": data}),
         status=200,
         mimetype='application/json')
+
+
+def genrate_pdf(data, generate_function, lead_id, pdf_id_key, label, subfolder_id, order_confirmation=False):
+    if order_confirmation:
+        pdf = generate_function(lead_id, data, order_confirmation=order_confirmation)
+        pdf_id_key = pdf_id_key.replace("pdf_", "pdf_confirmation_")
+        label = "AB " + label
+    else:
+        pdf = generate_function(lead_id, data)
+    if pdf is None:
+        return Response(
+            '{"status": "error", "error_code": "pdf_generation_failed", "message": "pdf generation failed: ' + label + '"}',
+            status=404,
+            mimetype='application/json')
+    data[pdf_id_key] = add_file(folder_id=subfolder_id, data={
+        "file_content": pdf,
+        "filename": label
+    })
+    if data[pdf_id_key] is None or data[pdf_id_key] <= 0:
+        return Response(
+            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
+            status=404,
+            mimetype='application/json')
 
 
 @blueprint.route("", methods=['GET', 'POST'])

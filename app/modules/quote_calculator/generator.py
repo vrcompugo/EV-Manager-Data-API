@@ -93,10 +93,13 @@ def generate_letter_pdf(lead_id, data, return_string=False):
     return None
 
 
-def generate_quote_pdf(lead_id, data, return_string=False):
+def generate_quote_pdf(lead_id, data, return_string=False, order_confirmation=False):
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
+        data["heading"] = "Angebot/Leistungsverzeichnis"
+        if order_confirmation:
+            data["heading"] = "Auftragsbestätigung"
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
         foreword_product = get_product("Vortext: Angebot PV", "Texte")
@@ -138,10 +141,13 @@ def generate_quote_pdf(lead_id, data, return_string=False):
     return None
 
 
-def generate_roof_reconstruction_pdf(lead_id, data, return_string=False):
+def generate_roof_reconstruction_pdf(lead_id, data, return_string=False, order_confirmation=False):
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
+        data["heading"] = "Angebot/Leistungsverzeichnis"
+        if order_confirmation:
+            data["heading"] = "Auftragsbestätigung"
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
         foreword_product = get_product("Vortext: Angebot PV", "Texte")
@@ -183,10 +189,13 @@ def generate_roof_reconstruction_pdf(lead_id, data, return_string=False):
     return None
 
 
-def generate_heating_pdf(lead_id, data, return_string=False):
+def generate_heating_pdf(lead_id, data, return_string=False, order_confirmation=False):
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
+        data["heading"] = "Angebot/Leistungsverzeichnis"
+        if order_confirmation:
+            data["heading"] = "Auftragsbestätigung"
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
         foreword_product = get_product("Vortext: Angebot PV", "Texte")
@@ -228,10 +237,13 @@ def generate_heating_pdf(lead_id, data, return_string=False):
     return None
 
 
-def generate_bluegen_pdf(lead_id, data, return_string=False):
+def generate_bluegen_pdf(lead_id, data, return_string=False, order_confirmation=False):
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
+        data["heading"] = "Angebot/Leistungsverzeichnis"
+        if order_confirmation:
+            data["heading"] = "Auftragsbestätigung"
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
         header_content = render_template(
@@ -376,6 +388,27 @@ def generate_contract_summary_pdf(lead_id, data):
             add_pdf_by_drive_id(merger, 443348, cached=True)
     add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
     add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
+
+    merger.write(output_file)
+    merger.close()
+    output_file.seek(0)
+    pdf_content = output_file.read()
+    return pdf_content
+
+
+def generate_order_confirmation_pdf(lead_id, data):
+    config = get_settings(section="offer/summary_pdf")
+    output_file = io.BytesIO()
+    merger = PdfFileMerger()
+
+    if "pdf_confirmation_pv_file_id" in data and data["pdf_confirmation_pv_file_id"] > 0:
+        add_pdf_by_drive_id(merger, data["pdf_confirmation_pv_file_id"])
+    if "pdf_confirmation_heating_file_id" in data and data["pdf_confirmation_heating_file_id"] > 0:
+        add_pdf_by_drive_id(merger, data["pdf_confirmation_heating_file_id"])
+    if "pdf_confirmation_roof_file_id" in data and data["pdf_confirmation_roof_file_id"] > 0:
+        add_pdf_by_drive_id(merger, data["pdf_confirmation_roof_file_id"])
+    if "pdf_confirmation_bluegen_file_id" in data and data["pdf_confirmation_bluegen_file_id"] > 0:
+        add_pdf_by_drive_id(merger, data["pdf_confirmation_bluegen_file_id"])
 
     merger.write(output_file)
     merger.close()

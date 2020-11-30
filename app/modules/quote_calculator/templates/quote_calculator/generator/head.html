@@ -73,7 +73,11 @@
   {%- if heading -%}
     {{ heading }}
   {%- else -%}
-    Angebot/Leistungsverzeichnis
+    {%- if data.heading -%}
+      {{ data.heading }}
+    {%- else -%}
+      Angebot/Leistungsverzeichnis
+    {%- endif -%}
   {%- endif -%}
 </h2>
 
