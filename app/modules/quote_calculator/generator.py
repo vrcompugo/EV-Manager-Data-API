@@ -97,20 +97,21 @@ def generate_quote_pdf(lead_id, data, return_string=False, order_confirmation=Fa
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
-        data["heading"] = "Angebot/Leistungsverzeichnis"
-        if order_confirmation:
-            data["heading"] = "Auftragsbestätigung"
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
-        foreword_product = get_product("Vortext: Angebot PV", "Texte")
-        if foreword_product is not None:
-            data["foreword"] = foreword_product["DESCRIPTION"]
-            data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
+        data["heading"] = "Angebot/Leistungsverzeichnis"
+        if order_confirmation:
+            set_confirmation_text(data)
+        else:
+            foreword_product = get_product("Vortext: Angebot PV", "Texte")
+            if foreword_product is not None:
+                data["foreword"] = foreword_product["DESCRIPTION"]
+                data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
+            appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
+            if appendix_product is not None:
+                data["appendix"] = appendix_product["DESCRIPTION"]
+                data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
 
-        appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
-        if appendix_product is not None:
-            data["appendix"] = appendix_product["DESCRIPTION"]
-            data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
         header_content = render_template(
             "quote_calculator/generator/header.html",
             base_url=config_general["base_url"],
@@ -145,20 +146,21 @@ def generate_roof_reconstruction_pdf(lead_id, data, return_string=False, order_c
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
-        data["heading"] = "Angebot/Leistungsverzeichnis"
-        if order_confirmation:
-            data["heading"] = "Auftragsbestätigung"
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
-        foreword_product = get_product("Vortext: Angebot PV", "Texte")
-        if foreword_product is not None:
-            data["foreword"] = foreword_product["DESCRIPTION"]
-            data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
+        if order_confirmation:
+            set_confirmation_text(data)
+        else:
+            data["heading"] = "Angebot/Leistungsverzeichnis"
+            foreword_product = get_product("Vortext: Angebot PV", "Texte")
+            if foreword_product is not None:
+                data["foreword"] = foreword_product["DESCRIPTION"]
+                data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
 
-        appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
-        if appendix_product is not None:
-            data["appendix"] = appendix_product["DESCRIPTION"]
-            data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
+            appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
+            if appendix_product is not None:
+                data["appendix"] = appendix_product["DESCRIPTION"]
+                data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
         header_content = render_template(
             "quote_calculator/generator/header.html",
             base_url=config_general["base_url"],
@@ -193,20 +195,21 @@ def generate_heating_pdf(lead_id, data, return_string=False, order_confirmation=
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
-        data["heading"] = "Angebot/Leistungsverzeichnis"
-        if order_confirmation:
-            data["heading"] = "Auftragsbestätigung"
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
-        foreword_product = get_product("Vortext: Angebot PV", "Texte")
-        if foreword_product is not None:
-            data["foreword"] = foreword_product["DESCRIPTION"]
-            data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
+        if order_confirmation:
+            set_confirmation_text(data)
+        else:
+            data["heading"] = "Angebot/Leistungsverzeichnis"
+            foreword_product = get_product("Vortext: Angebot PV", "Texte")
+            if foreword_product is not None:
+                data["foreword"] = foreword_product["DESCRIPTION"]
+                data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
 
-        appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
-        if appendix_product is not None:
-            data["appendix"] = appendix_product["DESCRIPTION"]
-            data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
+            appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
+            if appendix_product is not None:
+                data["appendix"] = appendix_product["DESCRIPTION"]
+                data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
         header_content = render_template(
             "quote_calculator/generator/header.html",
             base_url=config_general["base_url"],
@@ -241,11 +244,21 @@ def generate_bluegen_pdf(lead_id, data, return_string=False, order_confirmation=
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
-        data["heading"] = "Angebot/Leistungsverzeichnis"
-        if order_confirmation:
-            data["heading"] = "Auftragsbestätigung"
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
+        if order_confirmation:
+            set_confirmation_text(data)
+        else:
+            data["heading"] = "Angebot/Leistungsverzeichnis"
+            foreword_product = get_product("Vortext: Angebot PV", "Texte")
+            if foreword_product is not None:
+                data["foreword"] = foreword_product["DESCRIPTION"]
+                data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
+
+            appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
+            if appendix_product is not None:
+                data["appendix"] = appendix_product["DESCRIPTION"]
+                data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
         header_content = render_template(
             "quote_calculator/generator/header.html",
             base_url=config_general["base_url"],
@@ -415,6 +428,23 @@ def generate_order_confirmation_pdf(lead_id, data):
     output_file.seek(0)
     pdf_content = output_file.read()
     return pdf_content
+
+
+def set_confirmation_text(data):
+    config_general = get_settings(section="general")
+    data["heading"] = "Auftragsbestätigung"
+    data["foreword"] = render_template(
+        "quote_calculator/generator/order_confirmation/foreword.html",
+        base_url=config_general["base_url"],
+        data=data
+    )
+    data["foreword_type"] = "html"
+    data["appendix"] = render_template(
+        "quote_calculator/generator/order_confirmation/appendix.html",
+        base_url=config_general["base_url"],
+        data=data
+    )
+    data["appendix_type"] = "html"
 
 
 def add_pdf_by_drive_id(merger, drive_id, cached=False):
