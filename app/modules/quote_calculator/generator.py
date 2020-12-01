@@ -300,7 +300,8 @@ def generate_datasheet_pdf(lead_id, data):
             add_pdf_by_drive_id(merger, 438048, cached=True)
         if "wwwp" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, 436218, cached=True)
-        add_pdf_by_drive_id(merger, 436174, cached=True)  # senec wallbox
+        if "wallbox" in data["data"]["extra_options"]:
+            add_pdf_by_drive_id(merger, 436174, cached=True)  # senec wallbox
 
         if "products" in data:
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 280 Watt") == 0), None)
@@ -316,10 +317,10 @@ def generate_datasheet_pdf(lead_id, data):
                     add_pdf_by_drive_id(merger, 436158, cached=True)
                 else:
                     add_pdf_by_drive_id(merger, 436128, cached=True)
-            pv_module = next((item for item in data["products"] if item["NAME"].find("Senec V2.1") == 0), None)
+            pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec v2.1") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 443354, cached=True)
-            pv_module = next((item for item in data["products"] if item["NAME"].find("Senec V3") == 0), None)
+            pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec v3") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 436116, cached=True)
         add_pdf_by_drive_id(merger, 436112, cached=True)  # zebra_zertifgikat
