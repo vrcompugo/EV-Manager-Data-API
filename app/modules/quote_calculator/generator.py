@@ -402,6 +402,7 @@ def generate_contract_summary_pdf(lead_id, data):
             add_pdf_by_drive_id(merger, 443348, cached=True)
     add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
     add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
+    add_pdf_by_drive_id(merger, 523230, cached=True)  # Abtretungsformular
 
     merger.write(output_file)
     merger.close()
