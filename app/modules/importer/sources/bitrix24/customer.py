@@ -78,10 +78,10 @@ def filter_export_data(customer: Customer):
         "phone": customer.phone
     }
     if customer.email is not None:
-        if verify_email(customer.email):
-            data["email"] = customer.email
+        if verify_email(customer.email.strip()):
+            data["email"] = customer.email.strip()
         else:
-            data["fields[UF_CRM_1573021516]"] = customer.email
+            data["fields[UF_CRM_1573021516]"] = customer.email.strip()
     if customer.customer_number is not None and customer.customer_number != "":
         data["fields[UF_CRM_1572949928]"] = customer.customer_number
     if customer.default_address is not None:
