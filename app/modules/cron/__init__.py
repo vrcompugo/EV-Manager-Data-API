@@ -1,6 +1,7 @@
 import datetime
 import json
 from app.modules.external.bitrix24.deal import get_deal
+from app.utils.error_handler import error_handler
 
 
 def cron(section=None):
@@ -28,3 +29,15 @@ def cron(section=None):
         from app.modules.external.wattfox.deal import run_cron_import
         print("cron", "import_leads_wattfox")
         run_cron_import()
+
+    from app.modules.importer.sources.bitrix24.reseller import run_import
+    try:
+        run_import()
+    except Exception as e:
+        error_handler()
+
+    from app.modules.importer.sources.bitrix24.user import run_cron_import
+    try:
+        run_cron_import()
+    except Exception as e:
+        error_handler()
