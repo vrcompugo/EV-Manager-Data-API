@@ -1,11 +1,11 @@
 import pprint
 import time
 import datetime
-from verify_email import verify_email
 
 from app.models import Customer
 from app.modules.settings.settings_services import get_one_item as get_config_item, update_item as update_config_item
 from app.modules.customer.services.customer_services import add_item, update_item
+from app.utils.verify_email import verify_email
 
 from ._connector import post, get
 from ._association import find_association, associate_item
