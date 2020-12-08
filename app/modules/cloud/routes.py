@@ -106,6 +106,10 @@ class User(Resource):
         item_dict = get_one_item_v2(offer.id, fields)
         if item_dict is None:
             api.abort(404)
+        if "data" in item_dict:
+            for consumer in item_dict["data"].get("consumers", []):
+                if "address" not in consumer:
+                    consumer["address"] = {}
         item_dict["address"] = {}
         if offer.address_id is not None and offer.address_id > 0:
             item_dict["address"] = get_address_data(offer.address_id)
