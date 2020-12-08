@@ -186,12 +186,12 @@
             <td>
               Cloud Gebühren
               {% if offer.reseller.document_style == "bsh" %}
-                inkl. <br>
-                - Wartung <small>({{ data.maintainance_cost_yearly }} €/Jahr)<br></small>
-                - Versicherung <small>(85 €/Jahr)<br></small>
-                - Reparaturrücklagen <small>(10% der Anschaffungskosten)</small>
+                <br>
+                + Wartung <small>({{ data.maintainance_cost_yearly }} €/Jahr)<br></small>
+                + Versicherung <small>(85 €/Jahr)<br></small>
+                + Reparaturrücklagen <small>(10% der Anschaffungskosten)</small>
                 {% if data.eeg_direct_usage_cost > 0 %}
-                <br>- verminderte EEG Umlage nach §61 EEG
+                <br>+ verminderte EEG Umlage nach §61 EEG
                 {% endif %}
               {% else %}
                 <br>
