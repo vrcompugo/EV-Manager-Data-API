@@ -142,7 +142,8 @@ def quote_calculator_update(lead_id):
     contact_id = None
     lead = get_lead(lead_id)
     if lead["contact_id"] is None or lead["contact_id"] is False or lead["contact_id"] == "" or int(lead["contact_id"]) == 0:
-        contact_id = add_contact(lead["contact"])
+        contact = add_contact(lead["contact"])
+        contact_id = contact.get("id", None)
     if "unique_identifier" not in lead or lead["unique_identifier"] is None or lead["unique_identifier"] != "":
         lead["unique_identifier"] = lead_id
 
