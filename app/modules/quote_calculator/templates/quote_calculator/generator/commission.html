@@ -24,7 +24,7 @@
     </thead>
     <tbody>
       {% set index = {'index': 1, 'unused': 0} %}
-      {% if data.calculated.commission_value > 0 %}
+      {% if data.calculated.commission_value and data.calculated.commission_value > 0 %}
         <tr>
           <td class="align-right align-top">{{ index.index }}</td>
           <td class="border-right align-top description"><div>PV-Angebot</div></td>
@@ -32,7 +32,7 @@
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
       {% endif %}
-      {% if data.roof_reconstruction_quote and data.roof_reconstruction_quote.calculated.commission_value > 0 %}
+      {% if data.roof_reconstruction_quote and data.roof_reconstruction_quote.calculated.commission_value and data.roof_reconstruction_quote.calculated.commission_value > 0 %}
         <tr>
           <td class="align-right align-top">{{ index.index }}</td>
           <td class="border-right align-top description"><div>Dachsanierung</div></td>
@@ -40,7 +40,7 @@
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
       {% endif %}
-      {% if data.heating_quote and data.heating_quote.calculated.commission_value > 0 %}
+      {% if data.heating_quote and data.heating_quote.calculated.commission_value and data.heating_quote.calculated.commission_value > 0 %}
         <tr>
           <td class="align-right align-top">{{ index.index }}</td>
           <td class="border-right align-top description"><div>Heizung</div></td>
@@ -48,7 +48,7 @@
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
       {% endif %}
-      {% if data.bluegen_quote and data.bluegen_quote.calculated.commission_value > 0 %}
+      {% if data.bluegen_quote and data.bluegen_quote.calculated.commission_value and data.bluegen_quote.calculated.commission_value > 0 %}
         <tr>
           <td class="align-right align-top">{{ index.index }}</td>
           <td class="border-right align-top description"><div>BlueGen</div></td>
