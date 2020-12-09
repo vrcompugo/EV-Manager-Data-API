@@ -6,7 +6,7 @@ def calculate_commission_data(quote_data, data, quote_key=""):
         if data["data"].get(f"{quote_key}_special_offer_technik_service", False) is True and "technik_service_packet" in data["data"]["extra_options"]:
             technik_and_service_produkt = {
                 "NAME": "Sonderaktion Technik und Service Paket",
-                "DESCRIPTION": f"Sonderaktion Technik und Service Paket",
+                "DESCRIPTION": f"",
                 "DESCRIPTION_TYPE": "text",
                 "quantity": 1,
                 "PRICE": -4260,
@@ -48,7 +48,7 @@ def calculate_commission_data(quote_data, data, quote_key=""):
                 data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
         quote_data["products"].append({
             "NAME": "Nachlass",
-            "DESCRIPTION": f"Nachlass",
+            "DESCRIPTION": f"",
             "DESCRIPTION_TYPE": "text",
             "quantity": 1,
             "PRICE": -float(data["data"][f"{quote_key}_discount_euro"]),
