@@ -199,7 +199,7 @@ def quote_calculator_update(lead_id):
             "quote_number": history_data["number"],
             "history_id": history.id,
             "unique_identifier": str(lead_id),
-            "special_conditions": data["data"]["special_conditions_pv_quote"]
+            "special_conditions": data["data"].get("special_conditions_pv_quote", None)
         })
         update_quote_products(quote["id"], data)
     if "has_roof_reconstruction_quote" in data["data"] and data["data"]["has_roof_reconstruction_quote"]:
@@ -214,7 +214,7 @@ def quote_calculator_update(lead_id):
             "quote_number": history_data["number"],
             "history_id": history.id,
             "unique_identifier": str(lead_id),
-            "special_conditions": data["data"]["special_conditions_roof_reconstruction_quote"]
+            "special_conditions": data["data"].get("special_conditions_roof_reconstruction_quote", None)
         })
         update_quote_products(quote["id"], data["roof_reconstruction_quote"])
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
@@ -229,7 +229,7 @@ def quote_calculator_update(lead_id):
             "quote_number": history_data["number"],
             "history_id": history.id,
             "unique_identifier": str(lead_id),
-            "special_conditions": data["data"]["special_conditions_heating_quote"]
+            "special_conditions": data["data"].get("special_conditions_heating_quote", "")
         })
         update_quote_products(quote["id"], data["heating_quote"])
     if "has_bluegen_quote" in data["data"] and data["data"]["has_bluegen_quote"]:
@@ -244,7 +244,7 @@ def quote_calculator_update(lead_id):
             "quote_number": history_data["number"],
             "history_id": history.id,
             "unique_identifier": str(lead_id),
-            "special_conditions": data["data"]["special_conditions_bluegen_quote"]
+            "special_conditions": data["data"].get("special_conditions_bluegen_quote", "")
         })
         update_quote_products(quote["id"], data["bluegen_quote"])
 
