@@ -16,7 +16,7 @@
             "placement.bind",
             {
               "PLACEMENT": "CRM_QUOTE_DOCUMENTGENERATOR_BUTTON",
-              "TITLE": "Auftragsbestätigung{% if env in ['dev', 'staging'] %} ({{ env }}){% else %} (beta){% endif %}",
+              "TITLE": "Auftragsbestätigung{% if env in ['dev', 'staging'] %} ({{ env }}){% endif %}",
               "HANDLER": "https://{{ domain }}/order_confirmation",
             },
             function(result) {
