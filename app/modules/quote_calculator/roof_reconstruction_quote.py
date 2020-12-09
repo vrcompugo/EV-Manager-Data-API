@@ -4,6 +4,8 @@ from app.exceptions import ApiException
 from app.modules.external.bitrix24.products import get_product
 from app.modules.settings import get_settings
 
+from .commission import calculate_commission_data
+
 
 def get_roof_reconstruction_calculation(data):
     calculated = {}
@@ -54,6 +56,7 @@ def get_roof_reconstruction_products(data):
             data["roof_reconstruction_quote"]["subtotal_net"] = data["roof_reconstruction_quote"]["subtotal_net"] + product["total_price"]
         else:
             print(product["NAME"])
+    calculate_commission_data(data["roof_reconstruction_quote"], data, quote_key="roof_reconstruction_quote")
     data["roof_reconstruction_quote"]["total_net"] = data["roof_reconstruction_quote"]["subtotal_net"]
     data["roof_reconstruction_quote"]["total_tax"] = data["roof_reconstruction_quote"]["total_net"] * (config["taxrate"] / 100)
     data["roof_reconstruction_quote"]["total"] = data["roof_reconstruction_quote"]["total_net"] + data["roof_reconstruction_quote"]["total_tax"]

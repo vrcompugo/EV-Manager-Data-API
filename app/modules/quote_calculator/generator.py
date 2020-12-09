@@ -432,6 +432,42 @@ def generate_order_confirmation_pdf(lead_id, data):
     return pdf_content
 
 
+def generate_commission_pdf(lead_id, data, return_string=False, order_confirmation=False):
+    config_general = get_settings(section="general")
+    if data is not None:
+        if "datetime" not in data:
+            data["datetime"] = datetime.datetime.now()
+        data["heading"] = "Provisionsaufstellung"
+        header_content = render_template(
+            "quote_calculator/generator/header.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data
+        )
+        footer_content = render_template(
+            "quote_calculator/generator/footer.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data
+        )
+        content = render_template(
+            "quote_calculator/generator/commission.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data
+        )
+        data["datetime"] = str(data["datetime"])
+        if return_string:
+            return content
+        pdf = gotenberg_pdf(
+            content,
+            content_header=header_content,
+            content_footer=footer_content,
+            landscape=False)
+        return pdf
+    return None
+
+
 def set_confirmation_text(data):
     config_general = get_settings(section="general")
     data["heading"] = "Auftragsbestätigung"

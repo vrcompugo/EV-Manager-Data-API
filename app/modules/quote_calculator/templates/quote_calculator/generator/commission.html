@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PV-Angebot</title>
+  {% include('quote_calculator/generator/style.html') %}
+  {% include('quote_calculator/generator/elements/table.html') %}
+</head>
+<body>
+  {% set heading = 'Provisionsaufstellung' %}
+  {% include('quote_calculator/generator/head.html') %}
+
+  <br>
+  Kein Rechtsanspruch auf die Richtigkeit dieser Provisionsdarstellung<br>
+  <br>
+  <table cellspacing="0" class="table table-condensed" style="width: 100%;">
+    <thead>
+      <tr>
+        <th class="table--th">Pos.</th>
+        <th class="table--th">Angebot</th>
+        <th class="table--th">Provision</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set index = {'index': 1, 'unused': 0} %}
+      {% if data.calculated.commission_value > 0 %}
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="border-right align-top description"><div>PV-Angebot</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ data.calculated.commission_value | currencyformat }}</td>
+        </tr>
+        {% if index.update({"index": index.index + 1 }) %} {% endif %}
+      {% endif %}
+      {% if data.roof_reconstruction_quote and data.roof_reconstruction_quote.calculated.commission_value > 0 %}
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="border-right align-top description"><div>Dachsanierung</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ data.roof_reconstruction_quote.calculated.commission_value | currencyformat }}</td>
+        </tr>
+        {% if index.update({"index": index.index + 1 }) %} {% endif %}
+      {% endif %}
+      {% if data.heating_quote and data.heating_quote.calculated.commission_value > 0 %}
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="border-right align-top description"><div>Heizung</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ data.heating_quote.calculated.commission_value | currencyformat }}</td>
+        </tr>
+        {% if index.update({"index": index.index + 1 }) %} {% endif %}
+      {% endif %}
+      {% if data.bluegen_quote and data.bluegen_quote.calculated.commission_value > 0 %}
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="border-right align-top description"><div>BlueGen</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ data.bluegen_quote.calculated.commission_value | currencyformat }}</td>
+        </tr>
+        {% if index.update({"index": index.index + 1 }) %} {% endif %}
+      {% endif %}
+    </tbody>
+  </table>
+  <table>
+    <tbody>
+      <tr class="foot-line">
+        <td class="align-right" style="font-size: 1.2em; font-weight: bold;" >Gesamtprovision</td>
+        <td class="align-right" style="white-space: nowrap;font-size: 1.2em; font-weight: bold;">{{ data.commission_total_value | currencyformat }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
+
+

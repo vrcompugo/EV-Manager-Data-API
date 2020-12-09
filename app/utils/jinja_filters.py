@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from flask import Markup
 
 
@@ -32,20 +32,23 @@ def boolformat(value):
     return "Nein"
 
 
-def dateformat(value, format='%d.%m.%Y'):
+def convert_to_datetime(value):
     if value is None or value == "":
-        return ""
+        return None
+    if isinstance(value, date):
+        return value
     if type(value) == str:
-        value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
-    return value.strftime(format)
+        if value.find("T") >= 0:
+            return datetime.fromisoformat(value)
+        return datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+
+
+def dateformat(value, format='%d.%m.%Y'):
+    return convert_to_datetime(value).strftime(format)
 
 
 def datetimeformat(value, format='%d.%m.%Y %H:%M'):
-    if value is None or value == "":
-        return ""
-    if type(value) == str:
-        value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
-    return value.strftime(format)
+    return convert_to_datetime(value).strftime(format)
 
 
 def numberformat(value, format='de', digits=2):

@@ -4,6 +4,8 @@ from app.exceptions import ApiException
 from app.modules.external.bitrix24.products import get_product
 from app.modules.settings import get_settings
 
+from .commission import calculate_commission_data
+
 
 def get_heating_calculation(data):
     calculated = {
@@ -235,6 +237,7 @@ def get_heating_products(data):
             data["heating_quote"]["subtotal_net"] = data["heating_quote"]["subtotal_net"] + product["total_price"]
         else:
             print(product["NAME"])
+    calculate_commission_data(data["heating_quote"], data, quote_key="heating_quote")
     data["heating_quote"]["total_net"] = data["heating_quote"]["subtotal_net"]
     data["heating_quote"]["total_tax"] = data["heating_quote"]["total_net"] * (config["taxrate"] / 100)
     data["heating_quote"]["total"] = data["heating_quote"]["total_net"] + data["heating_quote"]["total_tax"]

@@ -99,6 +99,30 @@ def get_settings(section=None, domain_raw=None):
                 "fields": {
                 }
             },
+            "quote": {
+                "units": {
+                    "None": "Stück",
+                    "6": "Meter",
+                    "112": "Liter",
+                    "163": "Gramm",
+                    "166": "Kilogramm",
+                    "796": "Stück",
+                    "101": "Monate á",
+                    "123": "kWp",
+                    "124": "kWh",
+                    "125": "AW",
+                    "126": "m²",
+                    "127": "m³"
+                },
+                "fields": {
+                    "unique_identifier": "UF_CRM_1607078985",
+                    "history_id": "UF_CRM_1607079008",
+                    "pdf_link": "UF_CRM_1607079246",
+                    "quote_number": "UF_CRM_1607085112",
+                    "special_conditions": "TERMS",
+                    "expected_construction_week": "UF_CRM_1607444032"
+                }
+            },
             "lead": {
                 "fields": {
                     "unique_identifier": "UF_CRM_1603895163",

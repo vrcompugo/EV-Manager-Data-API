@@ -7,6 +7,7 @@ from app.modules.reseller.models.reseller import Reseller, ResellerSchema
 from app.modules.cloud.services.calculation import calculate_cloud as get_cloud_calculation
 from app.modules.importer.sources.bitrix24._association import find_association
 from app.modules.external.bitrix24.lead import get_lead
+from app.modules.external.bitrix24.user import get_user
 from app.modules.external.bitrix24.products import get_list as get_product_list, get_product
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.settings import get_settings
@@ -18,6 +19,7 @@ from .conditional_products.storage import add_product as add_product_storage
 from .heating_quote import get_heating_calculation, get_heating_products
 from .bluegen_quote import get_bluegen_calculation, get_bluegen_products
 from .roof_reconstruction_quote import get_roof_reconstruction_calculation, get_roof_reconstruction_products
+from .commission import calculate_commission_data
 
 
 def calculate_quote(lead_id, data=None, create_quote=False):
@@ -43,6 +45,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
     return_data = {
         "id": lead_id,
         "assigned_by_id": lead_data["assigned_by_id"],
+        "assigned_user": None,
         "datetime": str(datetime.datetime.now()),
         "data": {
             "emove_tarif": "none",
@@ -93,6 +96,8 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "products": [],
         "contact": lead_data["contact"]
     }
+    if lead_data["assigned_by_id"] is not None and lead_data["assigned_by_id"] != "":
+        return_data["assigned_user"] = get_user(lead_data["assigned_by_id"])
     reseller_link = find_association("Reseller", remote_id=lead_data["assigned_by_id"])
     if reseller_link is not None:
         schema = ResellerSchema()
@@ -100,19 +105,24 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         return_data["reseller"] = schema.dump(reseller, many=False)
     if data is not None:
         return_data["data"] = data
+        return_data["commission_total_value"] = 0
         if "has_pv_quote" in data and data["has_pv_quote"]:
             calculated = get_cloud_calculation(data)
             return_data["calculated"] = calculated
             return_data = calculate_products(return_data)
+            return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["calculated"]["commission_value"]
         if "has_roof_reconstruction_quote" in data and data["has_roof_reconstruction_quote"]:
             return_data["roof_reconstruction_quote"]["calculated"] = get_roof_reconstruction_calculation(return_data)
             return_data = get_roof_reconstruction_products(return_data)
+            return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["roof_reconstruction_quote"]["calculated"]["commission_value"]
         if "has_heating_quote" in data and data["has_heating_quote"]:
             return_data["heating_quote"]["calculated"] = get_heating_calculation(return_data)
             return_data = get_heating_products(return_data)
+            return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["heating_quote"]["calculated"]["commission_value"]
         if "has_bluegen_quote" in data and data["has_bluegen_quote"]:
             return_data["bluegen_quote"]["calculated"] = get_bluegen_calculation(return_data)
             return_data = get_bluegen_products(return_data)
+            return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["bluegen_quote"]["calculated"]["commission_value"]
 
     return return_data
 
@@ -173,11 +183,12 @@ def calculate_products(data):
                 quantity=1,
                 products=data["products"]
             )
+        technik_and_service_produkt = None
         if "technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]:
             quantity = 0
             if "technik_service_packet" in data["data"]["extra_options"]:
                 quantity = 1
-            add_direct_product(
+            technik_and_service_produkt = add_direct_product(
                 label="Service, Technik & Garantie Paket",
                 category="Extra Pakete",
                 quantity=quantity,
@@ -272,20 +283,20 @@ def calculate_products(data):
             else:
                 data["data"]["extra_options_wallbox_count"] = int(data["data"]["extra_options_wallbox_count"])
             quantity = 0
-            if "wallbox" in data["data"]["extra_options"]:
+            if "wallbox" in data["data"]["extra_options"] and "wallbox" in data["data"]["extra_options"]:
                 quantity = data["data"]["extra_options_wallbox_count"]
             if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "22kW":
                 add_direct_product(
                     label="Wallbox SENEC 22kW",
                     category="Extra Pakete",
-                    quantity=data["data"]["extra_options_wallbox_count"],
+                    quantity=quantity,
                     products=data["products"]
                 )
             else:
                 add_direct_product(
                     label="Wallbox SENEC 11kW",
                     category="Extra Pakete",
-                    quantity=data["data"]["extra_options_wallbox_count"],
+                    quantity=quantity,
                     products=data["products"]
                 )
         add_direct_product(
@@ -294,17 +305,6 @@ def calculate_products(data):
             quantity=1,
             products=data["products"]
         )
-
-        if "has_discount" in data["data"] and data["data"]["has_discount"]:
-            if "discount_total" in data["data"] and data["data"]["discount_total"] is not None and data["data"]["discount_total"] != "":
-                data["products"].append({
-                    "NAME": "Nachlass",
-                    "DESCRIPTION": f"{currencyformat(data['data']['discount_total'])} Nachlass",
-                    "DESCRIPTION_TYPE": "text",
-                    "quantity": 1,
-                    "PRICE": -float(data["data"]["discount_total"])
-                })
-
     except Exception as e:
         trace_output = traceback.format_exc()
         print(trace_output)
@@ -313,12 +313,11 @@ def calculate_products(data):
     data["subtotal_net"] = 0
     for product in data["products"]:
         if product["PRICE"] is not None:
-            if "reseller" in data and "document_style" in data["reseller"] and data["reseller"]["document_style"] is not None and data["reseller"]["document_style"] == "mitte":
-                product["PRICE"] = float(product["PRICE"]) * 1.19
             product["total_price"] = float(product["PRICE"]) * float(product["quantity"])
             data["subtotal_net"] = data["subtotal_net"] + product["total_price"]
         else:
             print(product["NAME"])
+    calculate_commission_data(data, data, quote_key="pv_quote")
     data["total_net"] = data["subtotal_net"]
     data["total_tax"] = data["total_net"] * (config["taxrate"] / 100)
     data["total"] = data["total_net"] + data["total_tax"]
@@ -331,6 +330,7 @@ def add_direct_product(label, category, quantity, products):
     if product is not None:
         product["quantity"] = quantity
         products.append(product)
+    return product
 
 
 def calculate_extra_products(data):

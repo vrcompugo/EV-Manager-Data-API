@@ -9,6 +9,7 @@ from app.decorators import api_response
 from app.modules.auth import get_auth_info
 from app.modules.auth.jwt_parser import decode_jwt, encode_jwt
 from app.modules.external.bitrix24.lead import get_lead, update_lead
+from app.modules.external.bitrix24.quote import get_quote, add_quote, update_quote_products
 from app.modules.external.bitrix24.drive import get_file, add_file, get_public_link, create_folder_path
 from app.modules.external.bitrix24.products import reload_products
 from app.modules.external.bitrix24.contact import add_contact
@@ -18,7 +19,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote
-from .generator import generate_order_confirmation_pdf, generate_bluegen_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
+from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -186,6 +187,67 @@ def quote_calculator_update(lead_id):
         update_data["contact_id"] = contact_id
     update_lead(lead_id, update_data)
 
+    if "has_pv_quote" in data["data"] and data["data"]["has_pv_quote"]:
+        quote = add_quote({
+            "title": f"PV {lead['contact']['first_name']} {lead['contact']['last_name']}, {lead['contact']['city']}",
+            "currency_id": "EUR",
+            "opportunity": data["total"],
+            "tax_value": data["total_tax"],
+            "contact_id": lead["contact_id"],
+            "assigned_by_id": lead["assigned_by_id"],
+            "lead_id": lead_id,
+            "quote_number": history_data["number"],
+            "history_id": history.id,
+            "unique_identifier": str(lead_id),
+            "special_conditions": data["data"]["special_conditions_pv_quote"]
+        })
+        update_quote_products(quote["id"], data)
+    if "has_roof_reconstruction_quote" in data["data"] and data["data"]["has_roof_reconstruction_quote"]:
+        quote = add_quote({
+            "title": f"Dachsanierung {lead['contact']['first_name']} {lead['contact']['last_name']}, {lead['contact']['city']}",
+            "currency_id": "EUR",
+            "opportunity": data["roof_reconstruction_quote"]["total"],
+            "tax_value": data["roof_reconstruction_quote"]["total_tax"],
+            "contact_id": lead["contact_id"],
+            "assigned_by_id": lead["assigned_by_id"],
+            "lead_id": lead_id,
+            "quote_number": history_data["number"],
+            "history_id": history.id,
+            "unique_identifier": str(lead_id),
+            "special_conditions": data["data"]["special_conditions_roof_reconstruction_quote"]
+        })
+        update_quote_products(quote["id"], data["roof_reconstruction_quote"])
+    if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
+        quote = add_quote({
+            "title": f"Heizung {lead['contact']['first_name']} {lead['contact']['last_name']}, {lead['contact']['city']}",
+            "currency_id": "EUR",
+            "opportunity": data["heating_quote"]["total"],
+            "tax_value": data["heating_quote"]["total_tax"],
+            "contact_id": lead["contact_id"],
+            "assigned_by_id": lead["assigned_by_id"],
+            "lead_id": lead_id,
+            "quote_number": history_data["number"],
+            "history_id": history.id,
+            "unique_identifier": str(lead_id),
+            "special_conditions": data["data"]["special_conditions_heating_quote"]
+        })
+        update_quote_products(quote["id"], data["heating_quote"])
+    if "has_bluegen_quote" in data["data"] and data["data"]["has_bluegen_quote"]:
+        quote = add_quote({
+            "title": f"BlueGen {lead['contact']['first_name']} {lead['contact']['last_name']}, {lead['contact']['city']}",
+            "currency_id": "EUR",
+            "opportunity": data["bluegen_quote"]["total"],
+            "tax_value": data["bluegen_quote"]["total_tax"],
+            "contact_id": lead["contact_id"],
+            "assigned_by_id": lead["assigned_by_id"],
+            "lead_id": lead_id,
+            "quote_number": history_data["number"],
+            "history_id": history.id,
+            "unique_identifier": str(lead_id),
+            "special_conditions": data["data"]["special_conditions_bluegen_quote"]
+        })
+        update_quote_products(quote["id"], data["bluegen_quote"])
+
     return {"status": "success", "data": data}
 
 
@@ -285,7 +347,6 @@ def quote_calculator_pv_pdf(lead_id):
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
     genrate_pdf(data, generate_quote_pdf, lead_id, "pdf_pv_file_id", "PV-Angebot.pdf", subfolder_id)
-    genrate_pdf(data, generate_quote_pdf, lead_id, "pdf_pv_file_id", "PV-Angebot.pdf", subfolder_id, order_confirmation=True)
 
     history.data = data
     db.session.commit()
@@ -304,7 +365,6 @@ def quote_calculator_heating_pdf(lead_id):
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
     genrate_pdf(data, generate_heating_pdf, lead_id, "pdf_heating_file_id", "Heizung-Angebot.pdf", subfolder_id)
-    genrate_pdf(data, generate_heating_pdf, lead_id, "pdf_heating_file_id", "Heizung-Angebot.pdf", subfolder_id, order_confirmation=True)
 
     history.data = data
     db.session.commit()
@@ -323,7 +383,6 @@ def quote_calculator_bluegen_pdf(lead_id):
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
     genrate_pdf(data, generate_bluegen_pdf, lead_id, "pdf_bluegen_file_id", "Bluegen-Angebot.pdf", subfolder_id)
-    genrate_pdf(data, generate_bluegen_pdf, lead_id, "pdf_bluegen_file_id", "Bluegen-Angebot.pdf", subfolder_id, order_confirmation=True)
 
     history.data = data
     db.session.commit()
@@ -342,7 +401,25 @@ def quote_calculator_roof_reconstruction_pdf(lead_id):
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
     genrate_pdf(data, generate_roof_reconstruction_pdf, lead_id, "pdf_roof_file_id", "Dach-Angebot.pdf", subfolder_id)
-    genrate_pdf(data, generate_roof_reconstruction_pdf, lead_id, "pdf_roof_file_id", "Dach-Angebot.pdf", subfolder_id, order_confirmation=True)
+
+    history.data = data
+    db.session.commit()
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("/<lead_id>/commission_pdf", methods=['PUT'])
+def quote_calculator_commission_pdf(lead_id):
+    lead = get_lead(lead_id)
+    history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    data = json.loads(json.dumps(history.data))
+
+    subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
+
+    genrate_pdf(data, generate_commission_pdf, lead_id, "pdf_commission_file_id", "Provision.pdf", subfolder_id)
+    data["pdf_commission_link"] = get_public_link(data["pdf_commission_file_id"])
 
     history.data = data
     db.session.commit()
@@ -402,8 +479,6 @@ def quote_calculator_quote_summary_pdf(lead_id):
 
     genrate_pdf(data, generate_quote_summary_pdf, lead_id, "pdf_quote_summary_file_id", "Angebote.pdf", subfolder_id)
     data["pdf_quote_summary_link"] = get_public_link(data["pdf_quote_summary_file_id"])
-    genrate_pdf(data, generate_order_confirmation_pdf, lead_id, "pdf_order_confirmation_file_id", "Auftragsbestätigungen.pdf", subfolder_id)
-    data["pdf_order_confirmation_link"] = get_public_link(data["pdf_order_confirmation_file_id"])
 
     history.data = data
     db.session.commit()

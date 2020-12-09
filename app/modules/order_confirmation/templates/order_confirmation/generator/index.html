@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PV-Angebot</title>
+  {% include('order_confirmation/generator/style.html') %}
+  {% include('order_confirmation/generator/elements/table.html') %}
+</head>
+<body>
+
+  {% include('order_confirmation/generator/head.html') %}
+    {% if data.contact %}
+      {% if data.contact.salutation == "ms" %}
+        Sehr geehrte Frau {{ data.contact.last_name }},<br>
+      {% else %}
+        Sehr geehrter Herr {{ data.contact.last_name }},<br>
+      {% endif%}
+      <br>
+    {% endif%}
+    <div class="foreword">
+      {% include('order_confirmation/generator/order_confirmation/foreword.html') %}
+    </div>
+  <br>
+  <table cellspacing="0" class="table table-condensed" style="width: 100%;">
+    <thead>
+      <tr>
+        <th class="table--th">Pos.</th>
+        <th class="table--th">Anzahl</th>
+        <th class="table--th">Einheit</th>
+        <th class="table--th">Bezeichnung</th>
+        {% if not data.data.only_show_total_price %}
+          <th class="table--th">Einzelpreis</th>
+          <th class="table--th">Gesamtpreis</th>
+        {% endif%}
+      </tr>
+    </thead>
+    <tbody>
+      {% set index = {'index': 1, 'unused': 0} %}
+      {% for item in data.products %}
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="align-right align-top empty-on-split">{{ item.QUANTITY | numberformat("de", digits=None) }}</td>
+          <td class="border-right align-top empty-on-split">{{ item.MEASURE_NAME }}</td>
+          <td class="border-right align-top description">
+            <div>
+              <b>{{ item.PRODUCT_NAME }}</b><br>
+              {{ item.PRODUCT_DESCRIPTION | safe }}
+            </div>
+          </td>
+          {% if not data.data.only_show_total_price %}
+            <td class="border-right align-right align-top empty-on-split">{{ item.PRICE_NETTO | currencyformat }}</td>
+            <td class="border-right align-right align-top empty-on-split">{{ (item.PRICE_NETTO * item.QUANTITY) | currencyformat }}</td>
+          {% endif%}
+        </tr>
+        {% if index.update({"index": index.index + 1 }) %} {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <table>
+    <tbody>
+      <tr>
+        <td class="align-right" width="80%">Zwischensumme netto:</td>
+        <td class="align-right" width="30%" style="white-space: nowrap;">{{ (data.opportunity - data.tax_value) | currencyformat }}</td>
+      </tr>
+      <tr>
+        <td class="align-right" style="font-size: 0.8em;">Mehrwertsteuer</td>
+        <td class="align-right" style="white-space: nowrap;font-size: 0.8em;">{{ data.tax_value | currencyformat }}</td>
+      </tr>
+      <tr class="foot-line">
+        <td class="align-right" style="font-size: 1.2em; font-weight: bold;" >Zu zahlender Betrag</td>
+        <td class="align-right" style="white-space: nowrap;font-size: 1.2em; font-weight: bold;">{{ data.opportunity | currencyformat }}</td>
+      </tr>
+    </tbody>
+  </table>
+  {% if data.special_conditions %}
+    <div style="border: 1px solid #ccc; padding: 1em; margin: 1.5em 0;">
+      <b>Sonderkondtitionen</b><br>
+      {{ data.special_conditions }}
+    </div>
+  {% endif%}
+
+  {% include('order_confirmation/generator/order_confirmation/appendix.html') %}
+
+</body>
+</html>
+
+

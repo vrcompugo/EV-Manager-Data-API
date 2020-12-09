@@ -4,6 +4,8 @@ from app.exceptions import ApiException
 from app.modules.external.bitrix24.products import get_product
 from app.modules.settings import get_settings
 
+from .commission import calculate_commission_data
+
 
 def get_bluegen_calculation(data):
     calculated = {
@@ -49,6 +51,7 @@ def get_bluegen_products(data):
             data["bluegen_quote"]["subtotal_net"] = data["bluegen_quote"]["subtotal_net"] + product["total_price"]
         else:
             print(product["NAME"])
+    calculate_commission_data(data["bluegen_quote"], data, quote_key="bluegen_quote")
     data["bluegen_quote"]["total_net"] = data["bluegen_quote"]["subtotal_net"]
     data["bluegen_quote"]["total_tax"] = data["bluegen_quote"]["total_net"] * (config["taxrate"] / 100)
     data["bluegen_quote"]["total"] = data["bluegen_quote"]["total_net"] + data["bluegen_quote"]["total_tax"]
