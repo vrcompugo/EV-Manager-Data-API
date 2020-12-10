@@ -13,20 +13,22 @@ def calculate_commission_data(quote_data, data, quote_key=""):
                 "total_price": -4260
             }
             if 272 in data["assigned_user"]["UF_DEPARTMENT"]:
-                technik_and_service_produkt["PRICE"] = -4854.4
-                technik_and_service_produkt["total_price"] = -4854.4
+                technik_and_service_produkt["PRICE"] = -4727.68
+                technik_and_service_produkt["total_price"] = -4727.68
             quote_data["products"].append(technik_and_service_produkt)
             quote_data["subtotal_net"] = quote_data["subtotal_net"] + technik_and_service_produkt["total_price"]
     quote_data["calculated"]["unchanged_total_net"] = quote_data["subtotal_net"]
 
-    if 272 in data["assigned_user"]["UF_DEPARTMENT"]:
-        data["data"][f"{quote_key}_price_increase_percent"] = 19
     if data["data"].get(f"{quote_key}_price_increase_percent", None) is not None and data["data"].get(f"{quote_key}_price_increase_percent", None) != "":
         data["data"][f"{quote_key}_price_increase_percent"] = float(data["data"][f"{quote_key}_price_increase_percent"])
         data["data"][f"{quote_key}_price_increase_euro"] = round(quote_data["calculated"]["unchanged_total_net"] * data["data"][f"{quote_key}_price_increase_percent"] / 100, 2)
         if data["data"][f"{quote_key}_price_increase_percent"] > 10:
             data["data"][f"{quote_key}_price_increase_percent"] = 10
             data["data"][f"{quote_key}_price_increase_euro"] = round(quote_data["calculated"]["unchanged_total_net"] * data["data"][f"{quote_key}_price_increase_percent"] / 100, 2)
+
+    if 272 in data["assigned_user"]["UF_DEPARTMENT"]:
+        data["data"][f"{quote_key}_price_increase_percent"] = 16.8
+        data["data"][f"{quote_key}_price_increase_euro"] = round(quote_data["calculated"]["unchanged_total_net"] * data["data"][f"{quote_key}_price_increase_percent"] / 100, 2)
 
     quote_data["subtotal_net"] = 0
     for product in quote_data["products"]:
