@@ -12,6 +12,9 @@ def calculate_commission_data(quote_data, data, quote_key=""):
                 "PRICE": -4260,
                 "total_price": -4260
             }
+            if data["data"].get(f"{quote_key}_price_increase_percent", None) is not None and data["data"].get(f"{quote_key}_price_increase_percent", None) != "":
+                technik_and_service_produkt["PRICE"] = -(5760 * (1 + float(data["data"][f"{quote_key}_price_increase_percent"]) / 100) - 1500) / (1 + float(data["data"][f"{quote_key}_price_increase_percent"]) / 100)
+                technik_and_service_produkt["total_price"] = -(5760 * (1 + float(data["data"][f"{quote_key}_price_increase_percent"]) / 100) - 1500) / (1 + float(data["data"][f"{quote_key}_price_increase_percent"]) / 100)
             if 272 in data["assigned_user"]["UF_DEPARTMENT"]:
                 technik_and_service_produkt["PRICE"] = -4047.6712328767
                 technik_and_service_produkt["total_price"] = -4047.6712328767
