@@ -71,7 +71,7 @@ def calculate_commission_data(quote_data, data, quote_key=""):
     quote_data["calculated"]["commission_rate"] = get_commission_rate(quote_data=quote_data, data=data, quote_key=quote_key)
 
     quote_data["calculated"]["unchanged_commission_value"] = quote_data["calculated"]["unchanged_total_net"] * (quote_data["calculated"]["commission_rate"] / 100)
-    quote_data["calculated"]["after_increase_commission_value"] = quote_data["calculated"]["unchanged_commission_value"] + (quote_data["calculated"]["after_increase_total_net"] - data["calculated"]["unchanged_total_net"]) / 2
+    quote_data["calculated"]["after_increase_commission_value"] = quote_data["calculated"]["unchanged_commission_value"] + (quote_data["calculated"]["after_increase_total_net"] - quote_data["calculated"]["unchanged_total_net"]) / 2
     quote_data["calculated"]["after_discount_commission_value"] = quote_data["calculated"]["after_discount_total_net"] * (quote_data["calculated"]["commission_rate"] / 100)
     quote_data["calculated"]["commission_value"] = quote_data["calculated"]["commission_total_net"] * (quote_data["calculated"]["commission_rate"] / 100)
     if quote_data["calculated"]["commission_total_net"] > quote_data["calculated"]["unchanged_total_net"]:
