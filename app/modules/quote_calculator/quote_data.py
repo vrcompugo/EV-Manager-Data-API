@@ -110,19 +110,23 @@ def calculate_quote(lead_id, data=None, create_quote=False):
             calculated = get_cloud_calculation(data)
             return_data["calculated"] = calculated
             return_data = calculate_products(return_data)
-            return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["calculated"]["commission_value"]
+            if "commission_value" in return_data["calculated"]:
+                return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["calculated"]["commission_value"]
         if "has_roof_reconstruction_quote" in data and data["has_roof_reconstruction_quote"]:
             return_data["roof_reconstruction_quote"]["calculated"] = get_roof_reconstruction_calculation(return_data)
             return_data = get_roof_reconstruction_products(return_data)
-            return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["roof_reconstruction_quote"]["calculated"]["commission_value"]
+            if "commission_value" in return_data["roof_reconstruction_quote"]["calculated"]:
+                return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["roof_reconstruction_quote"]["calculated"]["commission_value"]
         if "has_heating_quote" in data and data["has_heating_quote"]:
             return_data["heating_quote"]["calculated"] = get_heating_calculation(return_data)
             return_data = get_heating_products(return_data)
-            return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["heating_quote"]["calculated"]["commission_value"]
+            if "commission_value" in return_data["heating_quote"]["calculated"]:
+                return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["heating_quote"]["calculated"]["commission_value"]
         if "has_bluegen_quote" in data and data["has_bluegen_quote"]:
             return_data["bluegen_quote"]["calculated"] = get_bluegen_calculation(return_data)
             return_data = get_bluegen_products(return_data)
-            return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["bluegen_quote"]["calculated"]["commission_value"]
+            if "commission_value" in return_data["bluegen_quote"]["calculated"]:
+                return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["bluegen_quote"]["calculated"]["commission_value"]
 
     return return_data
 
