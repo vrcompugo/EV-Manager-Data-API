@@ -13,8 +13,8 @@ def calculate_commission_data(quote_data, data, quote_key=""):
                 "total_price": -4260
             }
             if 272 in data["assigned_user"]["UF_DEPARTMENT"]:
-                technik_and_service_produkt["PRICE"] = -4727.68
-                technik_and_service_produkt["total_price"] = -4727.68
+                technik_and_service_produkt["PRICE"] = -4047.67
+                technik_and_service_produkt["total_price"] = -4047.67
             quote_data["products"].append(technik_and_service_produkt)
             quote_data["subtotal_net"] = quote_data["subtotal_net"] + technik_and_service_produkt["total_price"]
     quote_data["calculated"]["unchanged_total_net"] = quote_data["subtotal_net"]
