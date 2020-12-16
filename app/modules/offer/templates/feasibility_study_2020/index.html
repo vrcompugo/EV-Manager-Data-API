@@ -186,20 +186,18 @@
   {% set current_page = current_page + 1 %}
   <div class="page">
     {% if offer.reseller.document_style == "bsh" %}
-      {% include('feasibility_study_2020/pages/page_disclaimer_bsh.html') %}
+      {% include('feasibility_study_2020/pages/page_disclaimer_notes_bsh.html') %}
     {% else %}
       {% include('feasibility_study_2020/pages/page_disclaimer.html') %}
     {% endif %}
   </div>
 
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% if offer.reseller.document_style == "bsh" %}
-      {% include('feasibility_study_2020/pages/page_notes_bsh.html') %}
-    {% else %}
+  {% if offer.reseller.document_style != "bsh" %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
       {% include('feasibility_study_2020/pages/page_notes.html') %}
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 
 
 </body>
