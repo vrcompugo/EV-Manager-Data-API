@@ -1,0 +1,50 @@
+import json
+from datetime import datetime
+
+from app import db
+
+from app.modules.settings import get_settings, set_settings
+from app.utils.error_handler import error_handler
+from app.models import PowerMeter, PowerMeterMeasurement
+
+from ._connector import get
+
+
+def run_cron_import():
+    config = get_settings("external/smartme")
+    print("import values smartme")
+    if config is None:
+        print("no config for smartme import")
+        return None
+    last_import_datetime = datetime.now()
+    current_month = datetime(year=last_import_datetime.year, month=last_import_datetime.month, day=1)
+    existing_measurements = PowerMeterMeasurement.query.filter(PowerMeterMeasurement.datetime >= current_month).all()
+    if len(existing_measurements) > 0:
+        return
+    devices = get("/Devices")
+    if len(devices) > 0:
+        for device in devices:
+            print(device["Name"])
+            power_meter = PowerMeter.query.filter(PowerMeter.number == str(device["Serial"])).first()
+            if power_meter is None:
+                power_meter = PowerMeter(
+                    label=device["Name"],
+                    number=str(device["Serial"]),
+                    device_energy_type=device["DeviceEnergyType"],
+                    family_type=device["FamilyType"]
+                )
+                db.session.add(power_meter)
+                db.session.commit()
+            power_meter_measurement = PowerMeterMeasurement(
+                power_meter_id=power_meter.id,
+                datetime=device["ValueDate"],
+                value=device["CounterReading"],
+                raw=device
+            )
+            db.session.add(power_meter_measurement)
+            db.session.commit()
+
+        config = get_settings("external/smartme")
+        if config is not None:
+            config["last_import_datetime"] = str(last_import_datetime)
+        set_settings("external/smartme", config)

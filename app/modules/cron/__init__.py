@@ -30,14 +30,23 @@ def cron(section=None):
         print("cron", "import_leads_wattfox")
         run_cron_import()
 
-    from app.modules.importer.sources.bitrix24.reseller import run_import
-    try:
-        run_import()
-    except Exception as e:
-        error_handler()
+    if section == "productive" or section == "import_power_meter_values":
+        from app.modules.external.smartme.powermeter_measurement import run_cron_import
+        print("cron", "import_power_meter_values")
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
 
-    from app.modules.importer.sources.bitrix24.user import run_cron_import
-    try:
-        run_cron_import()
-    except Exception as e:
-        error_handler()
+    if section == "productive":
+        from app.modules.importer.sources.bitrix24.reseller import run_import
+        try:
+            run_import()
+        except Exception as e:
+            error_handler()
+
+        from app.modules.importer.sources.bitrix24.user import run_cron_import
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
