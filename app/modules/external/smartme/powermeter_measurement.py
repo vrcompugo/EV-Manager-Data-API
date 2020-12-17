@@ -16,11 +16,11 @@ def run_cron_import():
     if config is None:
         print("no config for smartme import")
         return None
-    last_import_datetime = datetime.now()
-    current_month = datetime(year=last_import_datetime.year, month=last_import_datetime.month, day=1)
-    existing_measurements = PowerMeterMeasurement.query.filter(PowerMeterMeasurement.datetime >= current_month).all()
-    if len(existing_measurements) > 0:
+    now = datetime.now()
+    last_import = datetime.strptime(config["last_import_datetime"], "%Y-%m-%d %H:%M:%S.%f")
+    if last_import.month == now.month:
         return
+    last_import_datetime = now
     devices = get("/Devices")
     if len(devices) > 0:
         for device in devices:
