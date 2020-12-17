@@ -17,9 +17,10 @@ def run_cron_import():
         print("no config for smartme import")
         return None
     now = datetime.now()
-    last_import = datetime.strptime(config["last_import_datetime"], "%Y-%m-%d %H:%M:%S.%f")
-    if last_import.month == now.month:
-        return
+    if "last_import_datetime" in config:
+        last_import = datetime.strptime(config["last_import_datetime"], "%Y-%m-%d %H:%M:%S.%f")
+        if last_import.month == now.month:
+            return
     last_import_datetime = now
     devices = get("/Devices")
     if len(devices) > 0:
