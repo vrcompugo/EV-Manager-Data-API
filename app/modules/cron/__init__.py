@@ -38,6 +38,12 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+        from app.modules.external.smartme2.powermeter_measurement import run_cron_import
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
+
     if section == "productive":
         from app.modules.importer.sources.bitrix24.reseller import run_import
         try:
