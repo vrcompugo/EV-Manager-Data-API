@@ -66,7 +66,7 @@ def register_routes(api: Blueprint):
                     reseller_id=id,
                     month=month,
                     year=year,
-                    taxrate=16
+                    taxrate=19
                 )
                 db.session.add(commission)
             if request.form.get("extra_item") is not None:

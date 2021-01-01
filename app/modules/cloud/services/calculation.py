@@ -411,7 +411,7 @@ def get_cloud_products(data=None, offer=None):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
-    tax_rate = 16
+    tax_rate = 19
     offer_data = {}
     wish_price = False
     pv_production = (
@@ -647,7 +647,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
 
 
 def monthly_price_product_base(description, single_price):
-    taxrate = 16
+    taxrate = 19
     return {
         "label": "",
         "description": description,

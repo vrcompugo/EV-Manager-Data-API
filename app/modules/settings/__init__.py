@@ -158,8 +158,6 @@ def get_settings(section=None, domain_raw=None):
                 }
             }
         }
-        if datetime.datetime.now() >= datetime.datetime(2020, 7, 1) and datetime.datetime.now() < datetime.datetime(2021, 1, 1):
-            data["taxrate"] = 16
         return data
     return {}
 

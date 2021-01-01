@@ -100,7 +100,7 @@ def update_lead_comment(lead_comment):
     remote_link = find_association("Lead", local_id=lead_comment.lead_id)
     if remote_link is not None:
         lead_data = {
-            "amount": float(lead_comment.lead.value) / 1.16
+            "amount": float(lead_comment.lead.value) / 1.19
         }
         if lead_comment.change_to_offer_created:
             lead_data["step"] = "Angebot erstellt"

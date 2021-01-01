@@ -139,7 +139,7 @@ def import_test_data():
                         "feedrate": 7.68
                     }
                 ],
-                "taxrate": 16,
+                "taxrate": 19,
                 "base_per_drain": 12.5
             },
             "errors": []

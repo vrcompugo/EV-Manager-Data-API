@@ -10,7 +10,7 @@ def base_offer_data(offer_group, survey=None, order=None):
         "offer_group": offer_group,
         "datetime": datetime.datetime.now(),
         "currency": "eur",
-        "tax_rate": 16,
+        "tax_rate": 19,
         "subtotal": 0,
         "subtotal_net": 0,
         "shipping_cost": 0,
@@ -60,7 +60,7 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
     if product is None:
         print("Product not found: {}".format(product_name))
         return offer_data
-    tax_rate = 16
+    tax_rate = 19
     single_price = round(float(product.price_net) * (1 + tax_rate / 100) * price_markup_faktor, 4)
     single_price_net = float(product.price_net) * price_markup_faktor
     single_tax_amount = single_price - single_price_net
@@ -82,7 +82,7 @@ def add_item_to_offer(survey=None, offer_data=None, product_name=None, product_f
         "weight_total": 0,
         "quantity": quantity,
         "cost": 0,
-        "tax_rate": 16,
+        "tax_rate": 19,
         "single_price": single_price,
         "single_price_net": single_price_net,
         "single_tax_amount": single_tax_amount,
