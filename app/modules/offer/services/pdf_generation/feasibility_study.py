@@ -46,6 +46,7 @@ def calculate_feasibility_study(offer: OfferV2):
             pv_efficiancy = int(1150 * int(offer.data["pv_efficiancy"]) / 1150)
     in_use_date = offer.datetime + dateutil.relativedelta.relativedelta(months=1)
     price_increase_heat = 2
+    price_increase_ecloud = 2
     price_increase_emove = 2.5
     investment_type = "financing"
     loan_interest_rate = None
@@ -70,6 +71,8 @@ def calculate_feasibility_study(offer: OfferV2):
         inflation_rate = 2.5
         if "price_increase_rate" in offer.data and offer.data["price_increase_rate"] != "":
             price_increase = float(offer.data["price_increase_rate"])
+            if offer.reseller is not None and offer.reseller.document_style == "bsh":
+                price_increase_heat = float(offer.data["price_increase_rate"])
         if "inflation_rate" in offer.data and offer.data["inflation_rate"] != "":
             inflation_rate = float(offer.data["inflation_rate"])
         if "investment_type" in offer.data and offer.data["investment_type"] != "":
@@ -209,10 +212,12 @@ def calculate_feasibility_study(offer: OfferV2):
         "conventional_heat_cost_per_kwh": 0.23,
         "cost_increase_rate": price_increase,
         "cost_increase_rate_heat": price_increase_heat,
+        "cost_increase_rate_ecloud": price_increase_ecloud,
         "cost_increase_rate_emove": price_increase_emove,
         "inflation_rate": inflation_rate,
         "full_cost_increase_rate": price_increase + inflation_rate,
         "full_cost_increase_rate_heat": price_increase_heat + inflation_rate,
+        "full_cost_increase_rate_ecloud": price_increase_ecloud + inflation_rate,
         "full_cost_increase_rate_emove": price_increase_emove + inflation_rate,
         "conventional_total_cost": None,
         "consumer_count": consumer,
@@ -316,11 +321,11 @@ def calculate_feasibility_study(offer: OfferV2):
             "price_tomorrow": cloud_calulation["cloud_price_ecloud_incl_refund"]
         }
         base = base + data["ecloud"]["price_today"] * 12
-        data["ecloud"]["price_half_time"] = data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** (data["cloud_runtime"] / 2)
-        data["ecloud"]["price_full_time"] = data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** data["cloud_runtime"]
+        data["ecloud"]["price_half_time"] = data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_ecloud"] / 100) ** (data["cloud_runtime"] / 2)
+        data["ecloud"]["price_full_time"] = data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_ecloud"] / 100) ** data["cloud_runtime"]
         data["ecloud"]["price_runtime"] = 0
         for i in range(data["runtime"]):
-            data["ecloud"]["price_runtime"] = data["ecloud"]["price_runtime"] + (data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_heat"] / 100) ** i) * 12
+            data["ecloud"]["price_runtime"] = data["ecloud"]["price_runtime"] + (data["ecloud"]["price_today"] * (1 + data["full_cost_increase_rate_ecloud"] / 100) ** i) * 12
         data["ecloud"]["max_value"] = data["ecloud"]["price_full_time"]
         if data["ecloud"]["price_tomorrow"] < 0:
             data["ecloud"]["max_value"] = data["ecloud"]["max_value"] - data["ecloud"]["price_tomorrow"]
