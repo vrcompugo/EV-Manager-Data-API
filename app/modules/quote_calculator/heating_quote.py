@@ -124,7 +124,8 @@ def get_heating_products(data):
                     label=product_name,
                     category=f"Heizung - {label_type}",
                     quantity=1,
-                    products=data["heating_quote"]["products"]
+                    products=data["heating_quote"]["products"],
+                    data=data["data"]
                 )
 
             if data["data"]["new_heating_type"] == "heatpump":
@@ -245,8 +246,8 @@ def get_heating_products(data):
     return data
 
 
-def add_direct_product(label, category, quantity, products):
-    product = get_product(label=label, category=category)
+def add_direct_product(label, category, quantity, products, data=None):
+    product = get_product(label=label, category=category, data=data)
     if product is not None:
         product["quantity"] = quantity
         products.append(product)

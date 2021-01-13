@@ -102,7 +102,7 @@ def get_list(filters=None):
     return product_cache["products"]
 
 
-def get_product(label, category):
+def get_product(label, category, data=None):
     config = get_settings(section="external/bitrix24")
     categories = config["product"]["categories"]
     products = get_list()
@@ -110,5 +110,10 @@ def get_product(label, category):
         if category not in categories:
             continue
         if product["NAME"] == label and str(product["SECTION_ID"]) == str(categories[category]):
-            return json.loads(json.dumps(product))
+            if data is not None and product.get("range_type", None) is not None:
+                if product.get("range_type") == "heating_sqm":
+                    if product.get("range_start") < float(data["heating_quote_sqm"]) <= product.get("range_end"):
+                        return json.loads(json.dumps(product))
+            else:
+                return json.loads(json.dumps(product))
     raise Exception(f"product '{label}' '{category}' not found")
