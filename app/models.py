@@ -15,5 +15,6 @@ from app.modules.eeg.models import EEGRefundRate
 from app.modules.quote_calculator.models.quote_history import QuoteHistory
 from app.modules.external.models.transaction_log import TransactionLog
 from app.modules.external.bitrix24.models.department import BitrixDepartment
+from app.modules.external.bitrix24.models.drive_folder import BitrixDriveFolder
 from app.modules.power_meter.models.power_meter import PowerMeter, PowerMeterSchema
 from app.modules.power_meter.models.power_meter_measurement import PowerMeterMeasurement, PowerMeterMeasurementSchema

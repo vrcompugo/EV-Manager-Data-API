@@ -6,11 +6,13 @@ import random
 import requests
 import string
 
+from app import db
 from app.modules.auth import get_auth_info
 from app.modules.settings import get_settings
 from app.modules.auth.jwt_parser import encode_jwt
 
 from ._connector import get, post
+from .models.drive_folder import BitrixDriveFolder
 
 FOLDER_CACHE = {}
 
@@ -36,7 +38,7 @@ def get_file_content(id):
             print("file content: error", result.content[:1])
             data = result.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
-                time.sleep(3)
+                time.sleep(10)
                 print("FILE CONtent QUERY_LIMIT_EXCEEDED")
                 # return get_file_content(id)
         except Exception as e:
@@ -84,35 +86,46 @@ def get_folder(id):
     return result
 
 
+def get_folder_id(parent_folder_id, subfolder):
+    subfolder = subfolder.strip("/")
+    folder = BitrixDriveFolder.query\
+        .filter(BitrixDriveFolder.parent_folder_id == parent_folder_id)\
+        .filter(BitrixDriveFolder.path == subfolder)\
+        .first()
+    if folder is not None:
+        return folder.bitrix_id
+    children = get_folder(parent_folder_id)
+    existing_child = next((item for item in children if item["NAME"] == str(subfolder)), None)
+    if existing_child is not None:
+        folder = BitrixDriveFolder(
+            bitrix_id=existing_child["ID"],
+            parent_folder_id=parent_folder_id,
+            path=subfolder
+        )
+        db.session.add(folder)
+        db.session.commit()
+        return existing_child["ID"]
+    else:
+        return None
+
+
 def create_folder_path(parent_folder_id, path):
     path = path.strip("/")
-    if path in FOLDER_CACHE:
-        return FOLDER_CACHE[path]
     parts = path.split("/")
-    original_parent_folder_id = parent_folder_id
-    children = get_folder(parent_folder_id)
-    current_path = ""
+    new_path = ""
     for part in parts:
-        current_path = current_path + "/" + part
-        current_path = current_path.strip("/")
-        if children is None:
-            existing_child = None
-        else:
-            existing_child = next((item for item in children if item["NAME"] == str(part)), None)
-        if existing_child is not None:
-            FOLDER_CACHE[current_path] = existing_child["ID"]
-            parent_folder_id = existing_child["ID"]
-            children = get_folder(existing_child["ID"])
-        else:
-            result = add_subfolder(parent_folder_id, part)
-            if result is not None and "ID" in result and result["ID"] > 0:
-                FOLDER_CACHE[current_path] = result["ID"]
-                parent_folder_id = int(result["ID"])
-                children = get_folder(parent_folder_id)
-            else:
-                break
-    if original_parent_folder_id != parent_folder_id:
-        FOLDER_CACHE[path] = parent_folder_id
+        new_folder_id = get_folder_id(parent_folder_id, part)
+        if new_folder_id is None:
+            new_folder = add_subfolder(parent_folder_id, part)
+            new_folder_id = new_folder["ID"]
+            folder = BitrixDriveFolder(
+                bitrix_id=new_folder_id,
+                parent_folder_id=parent_folder_id,
+                path=part
+            )
+            db.session.add(folder)
+            db.session.commit()
+        parent_folder_id = new_folder_id
     return parent_folder_id
 
 

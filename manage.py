@@ -40,15 +40,9 @@ def update_role_permissions():
 
 
 @manager.command
-def get_lead():
-    from app.modules.user import auto_assign_lead_to_user
-    for lead_id in [14618, 14620, 14636, 14642, 14648, 14654, 14660, 14666, 14672, 14678, 14684, 14690, 14696, 14702,
-                    14708, 14714, 14720, 14726, 14732, 14738, 14744, 14750, 14758, 14760, 14764, 14766, 14768, 14770,
-                    14772, 14776, 14778, 14780, 14782, 14784, 14786, 14788, 14790, 14792, 14794, 14796, 14798, 14800,
-                    14802, 14804, 14806, 14808, 14810, 14812, 14814, 14816, 14818, 14820, 14822, 14824, 14826, 14828,
-                    14830, 14832, 14938, 14940, 14942, 14952, 14954, 14974]:
-        print(lead_id)
-        json.dumps(auto_assign_lead_to_user(lead_id), indent=2)
+def test_folder():
+    from app.modules.external.bitrix24.drive import create_folder_path
+    print(create_folder_path(442866, "test/folder/path/tester"))
 
 
 @manager.option("-s", "--section", dest='section', default=None)
