@@ -52,6 +52,8 @@ def reload_products(filters=None, force=False):
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]:
+                if item["NAME"] == "Abfallentsorgung":
+                    print(str(item["SECTION_ID"]))
                 if str(item["SECTION_ID"]) == str(categories["PV Module"]):
                     kwp = re.search(r"(.*) ([0-9]+) Watt(.*)\(([0-9,]+)qm\)$", item["NAME"])
                     if kwp is not None and kwp.group(2) != "":
@@ -112,7 +114,14 @@ def get_product(label, category, data=None):
         if product["NAME"] == label and str(product["SECTION_ID"]) == str(categories[category]):
             if data is not None and product.get("range_type", None) is not None:
                 if product.get("range_type") == "heating_sqm":
+                    print(product.get("range_start"), float(data["heating_quote_sqm"]), product.get("range_end"))
                     if product.get("range_start") < float(data["heating_quote_sqm"]) <= product.get("range_end"):
+                        return json.loads(json.dumps(product))
+                if product.get("range_type") == "dqm":
+                    if product.get("range_start") < float(data["roof_sqm"]) <= product.get("range_end"):
+                        return json.loads(json.dumps(product))
+                if product.get("range_type") == "personen":
+                    if product.get("range_start") < float(data) <= product.get("range_end"):
                         return json.loads(json.dumps(product))
             else:
                 return json.loads(json.dumps(product))

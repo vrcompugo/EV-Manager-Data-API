@@ -30,8 +30,14 @@ def get_heating_products(data):
     config = get_settings(section="external/bitrix24")
     try:
 
+        if "heating_quote_people" not in data["data"] or data["data"]["heating_quote_people"] == "":
+            data["data"]["heating_quote_people"] = 1
+        else:
+            data["data"]["heating_quote_people"] = int(data["data"]["heating_quote_people"])
+        data["heating_quote_sqm"] = int(data["data"]["heating_quote_sqm"])
+        data["data"]["heating_quote_sqm"] = int(data["data"]["heating_quote_sqm"])
         if data["data"]["new_heating_type"] == "heatpump":
-            data["data"]["heating_quote_sqm"] = int(data["data"]["heating_quote_sqm"])
+            extra_quantity = 0
             product_name = ""
             if 0 < data["data"]["heating_quote_sqm"] <= 120:
                 product_name = "Luft/Wasser-Wärmepumpe (Bestand 120)"
@@ -44,137 +50,111 @@ def get_heating_products(data):
             if "heating_quote_house_build" in data["data"] and data["data"]["heating_quote_house_build"] == "2016 und neuer":
                 if 0 < data["data"]["heating_quote_sqm"] <= 200:
                     product_name = "Luft/Wasser-Wärmepumpe (Neubau 200)"
-                if 200 < data["data"]["heating_quote_sqm"]:
+                if 200 < data["data"]["heating_quote_sqm"] <= 300:
                     product_name = "Luft/Wasser-Wärmepumpe (Neubau 300)"
+                if 300 < data["data"]["heating_quote_sqm"]:
+                    product_name = "Luft/Wasser-Wärmepumpe (Neubau 400)"
+            if 400 < data["data"]["heating_quote_sqm"]:
+                extra_quantity = data["data"]["heating_quote_sqm"] - 400
             add_direct_product(
                 label=product_name,
                 category=f"online WP (Neu)",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
+            if extra_quantity > 0:
+                add_direct_product(
+                    label="Erweiterung Heizfläche",
+                    category=f"online WP (Neu)",
+                    quantity=extra_quantity,
+                    products=data["heating_quote"]["products"]
+                )
             add_direct_product(
                 label="Inbetriebnahme",
                 category=f"online WP (Neu)",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
+            if "extra_warm_water" in data["data"].get("heating_quote_extra_options", []):
+                quantity = 1
+                if data["data"].get("heating_quote_extra_options_extra_warm_water_count", 0) not in [0, "", None]:
+                    quantity = int(data["data"].get("heating_quote_extra_options_extra_warm_water_count"))
+
+                add_direct_product(
+                    label="grössere Warmwasser Anforderung",
+                    category=f"online WP (Neu)",
+                    quantity=quantity,
+                    products=data["heating_quote"]["products"],
+                    data=data["data"]
+                )
             add_direct_product(
                 label="Hydraulischer Abgleich",
                 category=f"online WP (Neu)",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
-            add_direct_product(
-                label='Ausbau der "alten" Heizung ohne Tanks',
-                category=f"online WP (Neu)",
-                quantity=0,
-                products=data["heating_quote"]["products"]
-            )
-            add_direct_product(
-                label="grössere Warmwasser Anforderung",
-                category=f"online WP (Neu)",
-                quantity=0,
-                products=data["heating_quote"]["products"]
-            )
-            add_direct_product(
-                label="vorhandene Solarthermie mit einbinden",
-                category=f"online WP (Neu)",
-                quantity=0,
-                products=data["heating_quote"]["products"]
-            )
-            add_direct_product(
-                label="Kein Ablauf im Raum der WP vorhanden",
-                category=f"online WP (Neu)",
-                quantity=0,
-                products=data["heating_quote"]["products"]
-            )
+            if "no_drain" in data["data"].get("heating_quote_extra_options", []):
+                add_direct_product(
+                    label="Kein Ablauf im Raum der WP vorhanden",
+                    category=f"online WP (Neu)",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
         else:
-            if "person_in_household" not in data["data"] or data["data"]["person_in_household"] == "":
-                data["data"]["person_in_household"] = 1
-            else:
-                data["data"]["person_in_household"] = int(data["data"]["person_in_household"])
-
+            label_type = "Gas"
             if data["data"]["new_heating_type"] == "oil":
                 label_type = "Öl"
             if data["data"]["new_heating_type"] == "gas":
                 label_type = "Gas"
-            if data["data"]["new_heating_type"] == "heatpump":
-                label_type = "WP"
 
-            add_direct_product(
-                label=f"AIO Paket",
-                category=f"Heizung - {label_type}",
-                quantity=1,
-                products=data["heating_quote"]["products"]
-            )
+            data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"]
+            if "heating_quote_house_build" in data["data"]:
+                if data["data"]["heating_quote_house_build"] == "1940-1969":
+                    data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"] * 2
+                if data["data"]["heating_quote_house_build"] == "1970-1979":
+                    data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"] * 1.75
+                if data["data"]["heating_quote_house_build"] == "1980-1999":
+                    data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"] * 1.5
+                if data["data"]["heating_quote_house_build"] == "2000-2015":
+                    data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"] * 1.25
 
             if data["data"]["new_heating_type"] == "oil":
                 add_direct_product(
                     label="Öl Heizung",
                     category=f"Heizung - {label_type}",
                     quantity=1,
-                    products=data["heating_quote"]["products"]
+                    products=data["heating_quote"]["products"],
+                    data=data
                 )
-
+            print(data["heating_quote_sqm"])
+            product_name = "HANSA Gas Pega"
             if data["data"]["new_heating_type"] == "gas":
                 product_name = "HANSA Gas"
-                if data["data"]["person_in_household"] > 3:
+                if data["data"]["heating_quote_people"] > 3 or data["heating_quote_sqm"] > 200:
                     product_name = "HANSA Gas Pega"
                 add_direct_product(
                     label=product_name,
                     category=f"Heizung - {label_type}",
                     quantity=1,
                     products=data["heating_quote"]["products"],
-                    data=data["data"]
+                    data=data
                 )
 
-            if data["data"]["new_heating_type"] == "heatpump":
-                data["data"]["heating_quote_sqm"] = int(data["data"]["heating_quote_sqm"])
-                if 0 < data["data"]["heating_quote_sqm"] <= 120:
-                    product_name = "Luft-Wasser Wärmepumpe Bestand (0-120)"
-                if 120 < data["data"]["heating_quote_sqm"] <= 120:
-                    product_name = "Luft-Wasser Wärmepumpe Bestand (125-185)"
-                if 185 < data["data"]["heating_quote_sqm"] <= 300:
-                    product_name = "Luft-Wasser Wärmepumpe Bestand (185-300)"
-                if 300 < data["data"]["heating_quote_sqm"]:
-                    product_name = "Luft-Wasser Wärmepumpe Bestand (300-500)"
-                if "heating_quote_house_build" in data["data"] and data["data"]["heating_quote_house_build"] == "2016 und neuer":
-                    if 0 < data["data"]["heating_quote_sqm"] <= 180:
-                        product_name = "Neubau Wärmepumpe Komplettpaket (0-180)"
-                    if 180 < data["data"]["heating_quote_sqm"]:
-                        product_name = "Neubau Wärmepumpe Komplettpaket (181-250)"
-                add_direct_product(
-                    label=product_name,
-                    category=f"Heizung - {label_type}",
-                    quantity=1,
-                    products=data["heating_quote"]["products"]
-                )
-
-            if data["data"]["new_heating_type"] in ["oil", "gas"]:
+            if data["data"]["new_heating_type"] in ["oil", "gas"] and product_name != "HANSA Gas":
                 product_name = "Brauchwasserspeicher"
-                if "heating_quote_extra_options" in data["data"] and "solarthermie" in data["data"]["heating_quote_extra_options"]:
+                category_name = "Heizung - Optionen für Heizung Gas/Öl"
+                if "connect_existing_solarthermie" in data["data"].get("heating_quote_extra_options", []) or "new_solarthermie" in data["data"].get("heating_quote_extra_options", []):
                     product_name = "Schichtenspeicher"
+                    category_name = "Solarthermie online"
+                people = data["data"].get("heating_quote_people", 1)
+                if people in ["", 0, None]:
+                    people = 1
                 add_direct_product(
                     label=product_name,
-                    category="Heizung - Optionen für Heizung",
+                    category=category_name,
                     quantity=1,
-                    products=data["heating_quote"]["products"]
-                )
-            if data["data"]["new_heating_type"] == "heatpump":
-                if "heating_quote_extra_options" in data["data"] and "solarthermie" in data["data"]["heating_quote_extra_options"]:
-                    add_direct_product(
-                        label="Schichtenspeicher",
-                        category="Heizung - Optionen für Heizung",
-                        quantity=1,
-                        products=data["heating_quote"]["products"]
-                    )
-
-            if "heating_quote_extra_options" in data["data"] and "solarthermie" in data["data"]["heating_quote_extra_options"]:
-                add_direct_product(
-                    label="Solarthermie Set (8)",
-                    category="Heizung - Solarthermie",
-                    quantity=1,
-                    products=data["heating_quote"]["products"]
+                    products=data["heating_quote"]["products"],
+                    data=people
                 )
 
             if "heating_quote_radiator_type" in data["data"] and data["data"]["heating_quote_radiator_type"] == "mixed":
@@ -192,35 +172,64 @@ def get_heating_products(data):
                 products=data["heating_quote"]["products"]
             )
 
-            if data["data"]["new_heating_type"] == "heatpump":
-                add_direct_product(
-                    label="WP Elektrik",
-                    category=f"Heizung - {label_type}",
-                    quantity=1,
-                    products=data["heating_quote"]["products"]
-                )
-                add_direct_product(
-                    label="WP Inbetriebnahme",
-                    category=f"Heizung - {label_type}",
-                    quantity=1,
-                    products=data["heating_quote"]["products"]
-                )
-                add_direct_product(
-                    label="WP Befestigung",
-                    category=f"Heizung - {label_type}",
-                    quantity=1,
-                    products=data["heating_quote"]["products"]
-                )
-
             add_direct_product(
                 label=f"Hydraulischer Abgleich {label_type}",
                 category=f"Heizung - {label_type}",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
+            quantitiy = data["data"].get("heating_quote_radiator_count", "")
+            if quantitiy in ["", 0, None]:
+                quantitiy = 10
+            else:
+                quantitiy = int(quantitiy)
             add_direct_product(
                 label=f"Hydraulischer Abgleich {label_type} II",
                 category=f"Heizung - {label_type}",
+                quantity=quantitiy,
+                products=data["heating_quote"]["products"]
+            )
+
+        if "bufferstorage" in data["data"].get("heating_quote_extra_options", []) or data["heating_quote_sqm"] >= 350:
+            add_direct_product(
+                label="Heizungspufferspeicher",
+                category=f"Heizung - Optionen für Heizung Gas/Öl",
+                quantity=1,
+                products=data["heating_quote"]["products"]
+            )
+
+        if "remove_existing_solarthermie" in data["data"].get("heating_quote_extra_options", []):
+            add_direct_product(
+                label="vorhandene Solarthermie demontieren",
+                category=f"Optionen Heizung online",
+                quantity=1,
+                products=data["heating_quote"]["products"]
+            )
+
+        if "connect_existing_solarthermie" in data["data"].get("heating_quote_extra_options", []):
+            add_direct_product(
+                label="vorhandene Solarthermie mit einbinden",
+                category=f"Optionen Heizung online",
+                quantity=1,
+                products=data["heating_quote"]["products"]
+            )
+
+        if "new_solarthermie" in data["data"].get("heating_quote_extra_options", []):
+            label = "Solarthermie Set (10)"
+            print(data["data"].get("heating_quote_new_solarthermie_type", ""))
+            if str(data["data"].get("heating_quote_new_solarthermie_type", "")) == "11":
+                label = "Solarthermie Set (11)"
+            add_direct_product(
+                label=label,
+                category=f"Solarthermie online",
+                quantity=1,
+                products=data["heating_quote"]["products"]
+            )
+
+        if "deconstruct_old_heater" in data["data"].get("heating_quote_extra_options", []):
+            add_direct_product(
+                label='Ausbau der "alten" Heizung ohne Tanks',
+                category=f"Optionen Heizung online",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )

@@ -87,12 +87,16 @@ def get_settings(section=None, domain_raw=None):
                     "Heizung - Gas": 238,
                     "Heizung - Öl": 216,
                     "Heizung - Optionen für Heizung": 220,
+                    "Heizung - Optionen für Heizung Gas/Öl": 220,
                     "Heizung - Optionen für Heizung online": 302,
                     "Heizung - Solarthermie": 240,
                     "Erneuerbare Energie - Dach": 194,
                     "Brennstoffzelle": 298,
                     "online WP (Neu)": 306,
                     "Texte": 304,
+                    "Dachsanierung online Bogen": 290,
+                    "Optionen Heizung online": 302,
+                    "Solarthermie online": 300
                 }
             },
             "deal": {
