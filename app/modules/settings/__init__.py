@@ -147,6 +147,10 @@ def get_settings(section=None, domain_raw=None):
                     "city": "UF_CRM_5DD4020239456"
                 }
             },
+            "company": {
+                "fields": {
+                }
+            },
             "contact": {
                 "fields": {
                     "salutation": "HONORIFIC",
@@ -154,7 +158,8 @@ def get_settings(section=None, domain_raw=None):
                     "street": "UF_CRM_1572950758",
                     "street_nb": "UF_CRM_1572950777",
                     "zip": "UF_CRM_1572963458",
-                    "city": "UF_CRM_1572963448"
+                    "city": "UF_CRM_1572963448",
+                    "fakturia_number": "UF_CRM_1611055654633"
                 }
             },
             "timeline_comment": {

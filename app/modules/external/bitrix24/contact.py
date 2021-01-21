@@ -46,6 +46,27 @@ def get_contact(id):
     return None
 
 
+def get_contacts_by_changedate(changedate, start, limit):
+    payload = {
+        "FILTER[>DATE_MODIFY]": str(changedate),
+        "start": start
+    }
+    result = []
+    while payload["start"] is not None:
+        data = post("crm.contact.list", payload)
+        if "result" in data:
+            payload["start"] = data["next"] if "next" in data else None
+            for item in data["result"]:
+                result.append(convert_config_values(item))
+            if len(result) >= limit:
+                return result
+        else:
+            print("error3:", data)
+            payload["start"] = None
+            return None
+    return result
+
+
 def get_contact_by_email(email):
     if email is None:
         return None

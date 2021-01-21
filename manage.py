@@ -40,9 +40,9 @@ def update_role_permissions():
 
 
 @manager.command
-def test_folder():
-    from app.modules.external.bitrix24.drive import create_folder_path
-    print(create_folder_path(442866, "test/folder/path/tester"))
+def test_fakturia_export():
+    from app.modules.external.fakturia.customer import run_cron_export
+    run_cron_export()
 
 
 @manager.option("-s", "--section", dest='section', default=None)
