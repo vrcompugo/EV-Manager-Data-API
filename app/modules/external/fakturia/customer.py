@@ -57,18 +57,12 @@ def run_cron_export():
 
     import_time = datetime.now()
     if "last_contact_export_time" not in config:
-        contacts = get_bitrix_contacts_by_changedate("2018-01-10 00:00:00", start=0, limit=50)
+        contacts = get_bitrix_contacts_by_changedate("2021-01-20 00:00:00")
     else:
         contacts = get_bitrix_contacts_by_changedate(config["last_contact_export_time"])
-    start = 0
-    while contacts is not None and len(contacts) > 0:
-        for contact in contacts:
-            # print(contact["id"])
-            contact = get_bitrix_contact(contact["id"])
-            export_contact(contact)
-        start = start + len(contacts)
-        contacts = get_bitrix_contacts_by_changedate("2018-01-10 00:00:00", start=start, limit=50)
-    return
+    for contact in contacts:
+        contact = get_bitrix_contact(contact["id"])
+        export_contact(contact)
     config = get_settings("external/fakturia")
     if config is not None:
         config["last_contact_export_time"] = str(import_time)

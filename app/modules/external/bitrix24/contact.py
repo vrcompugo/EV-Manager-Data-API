@@ -46,10 +46,10 @@ def get_contact(id):
     return None
 
 
-def get_contacts_by_changedate(changedate, start, limit):
+def get_contacts_by_changedate(changedate):
     payload = {
         "FILTER[>DATE_MODIFY]": str(changedate),
-        "start": start
+        "start": 0
     }
     result = []
     while payload["start"] is not None:
@@ -58,8 +58,6 @@ def get_contacts_by_changedate(changedate, start, limit):
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]:
                 result.append(convert_config_values(item))
-            if len(result) >= limit:
-                return result
         else:
             print("error3:", data)
             payload["start"] = None

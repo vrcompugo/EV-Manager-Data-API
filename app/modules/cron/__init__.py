@@ -56,3 +56,17 @@ def cron(section=None):
             run_cron_import()
         except Exception as e:
             error_handler()
+
+    if section == "procutive" or section == "fakturia_customer_export":
+        from app.modules.external.fakturia.customer import run_cron_export
+        try:
+            run_cron_export()
+        except Exception as e:
+            error_handler()
+
+    if section == "procutive" or section == "auto_assignment_facebook_leads":
+        from app.modules.lead.lead_services import auto_assignment_facebook_leads
+        try:
+            auto_assignment_facebook_leads()
+        except Exception as e:
+            error_handler()

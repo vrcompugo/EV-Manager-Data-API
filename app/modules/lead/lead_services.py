@@ -1,11 +1,13 @@
 import datetime
 import random
+import json
 
 from app import db
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.settings.settings_services import get_one_item as get_settings
+from app.modules.settings import get_settings as get_settings2, set_settings
 from app.modules.reseller.services.reseller_services import update_item as update_reseller
 from app.models import Reseller
 
@@ -144,6 +146,32 @@ def lead_commission_calulation(lead: Lead):
                             option["value_net"] = 250 if is_external else 200
                             commission["provision_net"] = commission["provision_net"] + option["value_net"]
     return lead
+
+
+def auto_assignment_facebook_leads():
+    from app.modules.user import auto_assign_lead_to_user
+    from app.modules.external.bitrix24.lead import get_leads_by_createdate
+    from app.modules.importer.sources.bitrix24.lead import run_import as run_bitrix_lead_import
+
+    print("auto_assignment_facebook_leads")
+    config = get_settings2("leads/facebook")
+    print("import leads bitrix facebook")
+    if config is None:
+        print("no config for bitrix facebook import")
+        return None
+    import_time = datetime.datetime.now()
+    if "last_lead_import_time" not in config:
+        leads = get_leads_by_createdate('2021-01-22 00:00:00')
+    else:
+        leads = get_leads_by_createdate(config["last_lead_import_time"])
+    for lead_data in leads:
+        if lead_data["SOURCE_ID"] == "21":
+            print(lead_data["ID"])
+            auto_assign_lead_to_user(lead_data["ID"])
+    config = get_settings2("leads/facebook")
+    if config is not None:
+        config["last_lead_import_time"] = str(import_time)
+    set_settings("leads/facebook", config)
 
 
 def lead_reseller_auto_assignment(lead: Lead):

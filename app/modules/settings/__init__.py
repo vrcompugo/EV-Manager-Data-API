@@ -6,6 +6,7 @@ from app import db
 from flask import request
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.auth import get_auth_info, get_logged_in_user
+from app.exceptions import ApiException
 from .models.settings import Settings
 
 
