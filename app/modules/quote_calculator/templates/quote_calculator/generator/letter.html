@@ -12,20 +12,21 @@
   {% include('quote_calculator/generator/head2.html') %}
   <div class="letter-text" style="margin-top: -7em;">
     <h2>Ihr individuelles Energiekonzept</h2>
-    <br>
-    {% if data.contact %}
-      {% if data.contact.salutation == "ms" %}
-        Sehr geehrte Frau {{ data.contact.last_name }},<br>
+    <p>
+      {% if data.contact %}
+        {% if data.contact.salutation == "ms" %}
+          Sehr geehrte Frau {{ data.contact.last_name }},<br>
+        {% else %}
+          Sehr geehrter Herr {{ data.contact.last_name }},<br>
+        {% endif%}
       {% else %}
-        Sehr geehrter Herr {{ data.contact.last_name }},<br>
+        Sehr geehrte Damen und Herren,<br>
       {% endif%}
-    {% else %}
-      Sehr geehrte Damen und Herren,<br>
-    {% endif%}
-    wir freuen uns über Ihr Interesse an unseren Produkten.<br>
-    <br>
-    Als Systemanbieter für erneuerbare Energien sowie in Deutschland verwenden wir nur Komponenten namhafter Hersteller. Somit ist gewährleistet, dass Sie mit Ihrer Anlage über einen langen Zeitraum viel Freude haben werden. Selbstverständlich bieten wir Ihnen, auch über die reine Montage der Anlage hinaus, einen umfassenden und exclusiven Service.<br>
-    <br>
+      wir freuen uns über Ihr Interesse an unseren Produkten.
+    </p>
+    <p>
+      Als Systemanbieter für erneuerbare Energien sowie in Deutschland verwenden wir nur Komponenten namhafter Hersteller. Somit ist gewährleistet, dass Sie mit Ihrer Anlage über einen langen Zeitraum viel Freude haben werden. Selbstverständlich bieten wir Ihnen, auch über die reine Montage der Anlage hinaus, einen umfassenden und exclusiven Service.
+    </p>
     <div class="layout horizontal">
       <div class="flex">
         <b>Wir übernehmen für Sie:</b>
@@ -46,13 +47,13 @@
         </ul>
       </div>
     </div>
-    <br>
-    Sie können mit dieser Anlage ohne Speicher nur 30% Autarkie erreichen. Mit Stromspeicher 50-65% und mit unserer eigenen C.Cloud werden Sie zu 100% autark also <b>unabhängig vom traditionellen Energieversorger</b>. Nutzen sie Ihren Solarstrom über das ganze Jahr hinweg und profitieren Sie von den einzigartigen Möglichkeiten der besten Cloud Deutschlands wie zum Beispiel - 12 Jahre Preisgarantie - Strom einfach deutschlandweit an weitere Abnehmer liefern - z.B. Ihr Ferienhaus oder e.move Strom von Ihrem Haus - an 30.000 Lademöglichkeiten deutschlandweit abnehmen -<br>
-    Ihre Heizung wird Grün - Die Gastherme mit Solarstrom betreiben das geht nur mit unserer Cloud.<br>
-    <br>
-    Für Rückfragen stehen wir Ihnen gerne zur Verfügung -<br>
-    Ihr Anbieter für ein ganzheitliches Öko-System<br>
-    <br>
+    <p style="margin-top: 0;">
+      Sie können mit dieser Anlage ohne Speicher nur 30% Autarkie erreichen. Mit Stromspeicher 50-65% und mit unserer eigenen C.Cloud werden Sie zu 100% autark also <b>unabhängig vom traditionellen Energieversorger</b>. Nutzen sie Ihren Solarstrom über das ganze Jahr hinweg und profitieren Sie von den einzigartigen Möglichkeiten der besten Cloud Deutschlands wie zum Beispiel - 12 Jahre Preisgarantie - Strom einfach deutschlandweit an weitere Abnehmer liefern - z.B. Ihr Ferienhaus oder e.move Strom von Ihrem Haus - an 30.000 Lademöglichkeiten deutschlandweit abnehmen -<br>
+      Ihre Heizung wird Grün - Die Gastherme mit Solarstrom betreiben das geht nur mit unserer Cloud.<br>
+      <br>
+      Für Rückfragen stehen wir Ihnen gerne zur Verfügung -<br>
+      Ihr Anbieter für ein ganzheitliches Öko-System<br>
+    </p>
     Mit sonnigen Grüssen<br>
     Ihr energieZENTRUM Korbach - RheinMain-Rheinland
 

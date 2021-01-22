@@ -59,8 +59,8 @@
             </div>
           </td>
           {% if not data.data.only_show_total_price %}
-            <td class="border-right align-right align-top empty-on-split">{{ item.PRICE | currencyformat }}</td>
-            <td class="border-right align-right align-top empty-on-split">{{ item.total_price | currencyformat }}</td>
+            <td class="border-right align-right align-top empty-on-split" style="white-space: nowrap;">{{ item.PRICE | currencyformat }}</td>
+            <td class="border-right align-right align-top empty-on-split" style="white-space: nowrap;">{{ item.total_price | currencyformat }}</td>
           {% endif%}
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
