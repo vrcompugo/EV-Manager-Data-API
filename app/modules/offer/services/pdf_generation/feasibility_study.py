@@ -409,9 +409,9 @@ def calculate_feasibility_study(offer: OfferV2):
     data["maintainance_cost_yearly"] = 110
     if offer.reseller is not None and offer.reseller.document_style == "bsh":
         data["insurance_cost_yearly"] = 85
-        if 50000 < data["pv_offer_total"] <= 80000:
+        if 50000 < data["pv_offer_total"] * 1.19 <= 80000:
             data["insurance_cost_yearly"] = 130
-        if 80000 < data["pv_offer_total"]:
+        if 80000 < data["pv_offer_total"] * 1.19:
             data["insurance_cost_yearly"] = 200
 
         repair_cost_yearly = data["pv_offer_total"] * 0.10
