@@ -67,19 +67,19 @@
       {% endfor %}
     </tbody>
   </table>
-  <table>
+  <table style="width: 100%;">
     <tbody>
       <tr>
         <td class="align-right" width="80%">Zwischensumme netto:</td>
         <td class="align-right" width="30%" style="white-space: nowrap;">{{ data.subtotal_net | currencyformat }}</td>
       </tr>
       <tr>
-        <td class="align-right" style="font-size: 0.8em;">Mehrwertsteuer {{ data.tax_rate | percentformat }} auf {{ data.total_net | currencyformat }}</td>
-        <td class="align-right" style="white-space: nowrap;font-size: 0.8em;">{{ data.total_tax | currencyformat }}</td>
+        <td class="align-right">Mehrwertsteuer {{ data.tax_rate | percentformat }}</td>
+        <td class="align-right" style="white-space: nowrap;">{{ data.total_tax | currencyformat }}</td>
       </tr>
       <tr class="foot-line">
-        <td class="align-right" style="font-size: 1.2em; font-weight: bold;" >Zu zahlender Betrag</td>
-        <td class="align-right" style="white-space: nowrap;font-size: 1.2em; font-weight: bold;">{{ data.total | currencyformat }}</td>
+        <td class="align-right" style="font-weight: bold;" >Gesamtbetrag</td>
+        <td class="align-right" style="white-space: nowrap;font-weight: bold;">{{ data.total | currencyformat }}</td>
       </tr>
     </tbody>
   </table>
