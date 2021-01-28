@@ -76,7 +76,7 @@ def calculate_cloud(data):
         result["pv_kwp"] = data["pv_kwp"]
     else:
         data["pv_kwp"] = 0
-    if data["pv_kwp"] > 99:
+    if data["pv_kwp"] > 99 and str(user["id"]) != "13":
         return None
     if pv_efficiancy_faktor is None:
         direction_factor_kwp = 1
@@ -122,8 +122,10 @@ def calculate_cloud(data):
                 power_to_kwp_factor = 1.4
             if 7000 < data["power_usage"] <= 25000:
                 power_to_kwp_factor = 1.55
-            if 25000 < data["power_usage"]:
+            if 25000 < data["power_usage"] < 52000:
                 power_to_kwp_factor = 1.87
+            if 52000 < data["power_usage"]:
+                power_to_kwp_factor = 2.07
         if "name" in user and user["name"].lower() in ["aev", "eeg"]:
             power_to_kwp_factor = power_to_kwp_factor * 1.34
         result["power_usage"] = data["power_usage"]
