@@ -69,9 +69,9 @@
           <td>Größe der PV-Anlage</td>
           <td>
             {% if data.cloud_calulation.pv_kwp > 0 %}
-              {{ data.cloud_calulation.pv_kwp | numberformat('de', 2) }} kWp
+              {{ data.cloud_calulation.pv_kwp | numberformat('de', 3) }} kWp
             {% else %}
-              mind. {{ data.cloud_calulation.min_kwp | numberformat('de', 2) }} kWp
+              mind. {{ data.cloud_calulation.min_kwp | numberformat('de', 3) }} kWp
             {% endif %}
           </td>
         </tr>
