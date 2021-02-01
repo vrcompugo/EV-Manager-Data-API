@@ -18,11 +18,13 @@ def post(url, post_data=None, files=None, domain=None):
     base_url = authenticate(domain=domain)
 
     if base_url is not None:
+        if url == "disk.folder.getchildren":
+            print("disk.folder.getchildren", post_data)
         response = requests.post(base_url + url, data=post_data)
         try:
             data = response.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
-                time.sleep(10)
+                time.sleep(5)
                 print(url, json.dumps(post_data, indent=2))
                 traceback.print_exc(file=sys.stdout)
                 print("query limit reached")
