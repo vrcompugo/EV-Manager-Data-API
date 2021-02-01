@@ -152,12 +152,22 @@ def add_file(folder_id, data):
         "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
     })
     if "result" not in response:
-        print("add_file error", response)
-        response = post("disk.file.uploadversion", {
-            "id": existing_file["ID"],
-            "fileContent[0]": data["filename"],
-            "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
-        })
+        if response.get("error") == "DISK_OBJ_22000":
+            existing_file = None
+            children = get_folder(folder_id)
+            for child in children:
+                if child["NAME"] == data["filename"]:
+                    existing_file = child
+            if existing_file is None:
+                print("add_file existing not found", response)
+            else:
+                response = post("disk.file.uploadversion", {
+                    "id": existing_file["ID"],
+                    "fileContent[0]": data["filename"],
+                    "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
+                })
+        else:
+            print("add_file error", response)
     if "result" in response:
         return int(response["result"]["ID"])
     else:
