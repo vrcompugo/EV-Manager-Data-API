@@ -1,5 +1,7 @@
 import requests
 import time
+import json
+import traceback
 
 from app.modules.settings.settings_services import get_one_item
 
@@ -22,6 +24,8 @@ def post(url, post_data=None, files=None):
             data = response.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
                 time.sleep(10)
+                print(url, json.dumps(post_data, indent=2))
+                traceback.print_exc(file=sys.stdout)
                 return post(url, post_data, files)
             return data
         except Exception as e:
