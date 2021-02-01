@@ -114,9 +114,8 @@ def create_folder_path(parent_folder_id, path):
     parts = path.split("/")
     new_path = ""
     for part in parts:
-        new_folder_id = get_folder_id(parent_folder_id, part)
-        if new_folder_id is None:
-            new_folder = add_subfolder(parent_folder_id, part)
+        new_folder = add_subfolder(parent_folder_id, part)
+        if new_folder is not None:
             new_folder_id = new_folder["ID"]
             folder = BitrixDriveFolder(
                 bitrix_id=new_folder_id,
@@ -125,6 +124,8 @@ def create_folder_path(parent_folder_id, path):
             )
             db.session.add(folder)
             db.session.commit()
+        else:
+            new_folder_id = get_folder_id(parent_folder_id, part)
         parent_folder_id = new_folder_id
     return parent_folder_id
 
@@ -137,7 +138,7 @@ def add_subfolder(parent_id, subfolder_name):
     if "result" in data:
         return data["result"]
     else:
-        print("error:", data)
+        print("error new folder:", data)
     return None
 
 
