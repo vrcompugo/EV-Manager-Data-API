@@ -145,24 +145,14 @@ def add_file(folder_id, data):
     config = get_settings(section="external/bitrix24")
     folders = {"next": 0, "total": 1}
 
-    children = post("disk.folder.getchildren", {
-        "id": folder_id
+    response = post("disk.folder.uploadfile", {
+        "id": folder_id,
+        "data[NAME]": data["filename"],
+        "fileContent[0]": data["filename"],
+        "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
     })
-    existing_file = None
-    for child in children["result"]:
-        if child["NAME"] == data["filename"]:
-            existing_file = child
-    if "file" in data:
-        data["file_content"] = data["file"].read()
-
-    if existing_file is None:
-        response = post("disk.folder.uploadfile", {
-            "id": folder_id,
-            "data[NAME]": data["filename"],
-            "fileContent[0]": data["filename"],
-            "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
-        })
-    else:
+    if "result" not in response:
+        print("add_file error", response)
         response = post("disk.file.uploadversion", {
             "id": existing_file["ID"],
             "fileContent[0]": data["filename"],
