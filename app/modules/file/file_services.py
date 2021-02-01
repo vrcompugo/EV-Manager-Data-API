@@ -55,6 +55,8 @@ def update_item(id, data):
             else:
                 folder_id = create_folder_path(446126, f"{data['prepend_path']}")
         print("update file2")
+        if item.bitrix_file_id is not None:
+            data["bitrix_file_id"] = item.bitrix_file_id
         bitrix_file_id = add_file(folder_id, data)
         print("update file3")
         if bitrix_file_id is None:
