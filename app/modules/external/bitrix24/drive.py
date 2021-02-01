@@ -145,7 +145,7 @@ def add_file(folder_id, data):
 
     if data.get("bitrix_file_id", None) is not None:
         response = post("disk.file.uploadversion", {
-            "id": existing_file["ID"],
+            "id": data.get("bitrix_file_id"),
             "fileContent[0]": data["filename"],
             "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
         })
