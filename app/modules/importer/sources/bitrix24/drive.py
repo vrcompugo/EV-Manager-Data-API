@@ -8,11 +8,13 @@ from ._connector import get, post
 from app.modules.external.bitrix24.drive import create_folder_path, add_file as bitrix_add_file, add_subfolder
 
 
-def get_folder(id):
+def get_folder(id, namefilter=None):
     payload = {
         "id": id,
         "start": 0
     }
+    if namefilter is not None:
+        payload["filter[NAME]"] = namefilter
     result = []
     while payload["start"] is not None:
         data = post("disk.folder.getchildren", payload)

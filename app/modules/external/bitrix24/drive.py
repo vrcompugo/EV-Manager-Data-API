@@ -68,11 +68,13 @@ def get_attached_file(id):
     return None
 
 
-def get_folder(id):
+def get_folder(id, namefilter=None):
     payload = {
         "id": id,
         "start": 0
     }
+    if namefilter is not None:
+        payload["filter[NAME]"] = namefilter
     result = []
     while payload["start"] is not None:
         data = post("disk.folder.getchildren", payload)
@@ -94,7 +96,7 @@ def get_folder_id(parent_folder_id, subfolder):
         .first()
     if folder is not None:
         return folder.bitrix_id
-    children = get_folder(parent_folder_id)
+    children = get_folder(parent_folder_id, subfolder)
     existing_child = next((item for item in children if item["NAME"] == str(subfolder)), None)
     if existing_child is not None:
         folder = BitrixDriveFolder(
@@ -114,8 +116,9 @@ def create_folder_path(parent_folder_id, path):
     parts = path.split("/")
     new_path = ""
     for part in parts:
-        new_folder = add_subfolder(parent_folder_id, part)
-        if new_folder is not None:
+        new_folder_id = get_folder_id(parent_folder_id, part)
+        if new_folder_id is None:
+            new_folder = add_subfolder(parent_folder_id, part)
             new_folder_id = new_folder["ID"]
             folder = BitrixDriveFolder(
                 bitrix_id=new_folder_id,
@@ -124,8 +127,6 @@ def create_folder_path(parent_folder_id, path):
             )
             db.session.add(folder)
             db.session.commit()
-        else:
-            new_folder_id = get_folder_id(parent_folder_id, part)
         parent_folder_id = new_folder_id
     return parent_folder_id
 
@@ -151,29 +152,26 @@ def add_file(folder_id, data):
             "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
         })
     else:
-        response = post("disk.folder.uploadfile", {
-            "id": folder_id,
-            "data[NAME]": data["filename"],
-            "fileContent[0]": data["filename"],
-            "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
-        })
+        existing_file = None
+        children = get_folder(folder_id, data["filename"])
+        for child in children:
+            if child["NAME"] == data["filename"]:
+                existing_file = child
+        if existing_file is None:
+            response = post("disk.folder.uploadfile", {
+                "id": folder_id,
+                "data[NAME]": data["filename"],
+                "fileContent[0]": data["filename"],
+                "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
+            })
+        else:
+            response = post("disk.file.uploadversion", {
+                "id": existing_file["ID"],
+                "fileContent[0]": data["filename"],
+                "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
+            })
         if "result" not in response:
-            if response.get("error") == "DISK_OBJ_22000":
-                existing_file = None
-                children = get_folder(folder_id)
-                for child in children:
-                    if child["NAME"] == data["filename"]:
-                        existing_file = child
-                if existing_file is None:
-                    print("add_file existing not found", response)
-                else:
-                    response = post("disk.file.uploadversion", {
-                        "id": existing_file["ID"],
-                        "fileContent[0]": data["filename"],
-                        "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
-                    })
-            else:
-                print("add_file error", response)
+            print("add_file error", response)
     if "result" in response:
         return int(response["result"]["ID"])
     else:
