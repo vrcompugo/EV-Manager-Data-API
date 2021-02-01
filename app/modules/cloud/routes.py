@@ -131,6 +131,7 @@ class User(Resource):
         offer = get_offer_by_offer_number(offer_number)
         if offer is None:
             api.abort(404)
+        offer.tax_rate = 19
         data = request.json
         user = get_logged_in_user()
         reseller = Reseller.query.filter(Reseller.user_id == user["id"]).first()
@@ -147,6 +148,7 @@ class User(Resource):
             if data["loan_total"] is None or data["loan_total"] == "":
                 del data["loan_total"]
         offer_v2_data = {
+            "tax_rate": 19,
             "datetime": datetime.datetime.now(),
             "subtotal": calculated["cloud_price"],
             "subtotal_net": calculated["cloud_price"] / 1.19,
