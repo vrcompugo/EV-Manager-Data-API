@@ -16,6 +16,8 @@ class DevelopmentConfig(Config):
     # SQLALCHEMY_DATABASE_URI = postgres_local_base
     DEBUG = True
     ENV = "dev"
+    SQLALCHEMY_POOL_SIZE = 20
+    SQLALCHEMY_MAX_OVERFLOW = 20
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI') or 'sqlite:///' + os.path.join(basedir, 'dev.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -24,6 +26,8 @@ class TestingConfig(Config):
     DEBUG = True
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'flask_boilerplate_test.db')
+    SQLALCHEMY_POOL_SIZE = 20
+    SQLALCHEMY_MAX_OVERFLOW = 20
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -31,6 +35,8 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI')
+    SQLALCHEMY_POOL_SIZE = 20
+    SQLALCHEMY_MAX_OVERFLOW = 20
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # uncomment the line below to use postgres
     # SQLALCHEMY_DATABASE_URI = postgres_local_base
