@@ -115,8 +115,14 @@ def calculate_cloud(data):
             power_to_kwp_factor = 1.6
         if 7000 < data["power_usage"] <= 25000:
             power_to_kwp_factor = 1.78
-        if 25000 < data["power_usage"]:
+        if 25000 < data["power_usage"] <= 52000:
             power_to_kwp_factor = 1.89
+        if 52000 < data["power_usage"] < 300000:
+            power_to_kwp_factor = 2.07
+        if 300000 <= data["power_usage"] < 750000:
+            power_to_kwp_factor = 2.55
+        if 750000 <= data["power_usage"]:
+            power_to_kwp_factor = 3.37
         if "price_guarantee" in data and data["price_guarantee"] == "2_years":
             if 0 < data["power_usage"] <= 7000:
                 power_to_kwp_factor = 1.4
@@ -124,8 +130,12 @@ def calculate_cloud(data):
                 power_to_kwp_factor = 1.55
             if 25000 < data["power_usage"] < 52000:
                 power_to_kwp_factor = 1.87
-            if 52000 < data["power_usage"]:
+            if 52000 < data["power_usage"] <= 300000:
                 power_to_kwp_factor = 2.07
+            if 300000 <= data["power_usage"] < 750000:
+                power_to_kwp_factor = 2.55
+            if 750000 <= data["power_usage"]:
+                power_to_kwp_factor = 3.37
         if "name" in user and user["name"].lower() in ["aev", "eeg"]:
             power_to_kwp_factor = power_to_kwp_factor * 1.34
         result["power_usage"] = data["power_usage"]
