@@ -21,6 +21,22 @@ def convert_config_values(data_raw):
     return data
 
 
+def get_deals(payload):
+    payload["start"] = 0
+    result = []
+    while payload["start"] is not None:
+        data = post("crm.deal.list", payload)
+        if "result" in data:
+            payload["start"] = data["next"] if "next" in data else None
+            for item in data["result"]:
+                result.append(convert_config_values(item))
+        else:
+            print("error3:", data)
+            payload["start"] = None
+            return None
+    return result
+
+
 def get_deal(id):
     data = post("crm.deal.get", {
         "ID": id

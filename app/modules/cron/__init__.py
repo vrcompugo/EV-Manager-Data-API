@@ -70,3 +70,10 @@ def cron(section=None):
             auto_assignment_facebook_leads()
         except Exception as e:
             error_handler()
+
+    if section == "productive" or section == "folder_creation":
+        from app.modules.external.bitrix24.drive import run_cron_folder_creation
+        try:
+            run_cron_folder_creation()
+        except Exception as e:
+            error_handler()

@@ -65,6 +65,22 @@ def get_contacts_by_changedate(changedate):
     return result
 
 
+def get_contacts(payload):
+    payload["start"] = 0
+    result = []
+    while payload["start"] is not None:
+        data = post("crm.contact.list", payload)
+        if "result" in data:
+            payload["start"] = data["next"] if "next" in data else None
+            for item in data["result"]:
+                result.append(convert_config_values(item))
+        else:
+            print("error3:", data)
+            payload["start"] = None
+            return None
+    return result
+
+
 def get_contact_by_email(email):
     if email is None:
         return None

@@ -5,14 +5,17 @@ import base64
 import random
 import requests
 import string
+from datetime import datetime
 
 from app import db
 from app.modules.auth import get_auth_info
-from app.modules.settings import get_settings
+from app.modules.settings import get_settings, set_settings
 from app.modules.auth.jwt_parser import encode_jwt
 
 from ._connector import get, post
 from .models.drive_folder import BitrixDriveFolder
+from .contact import get_contacts, get_contact, update_contact
+from .deal import get_deal, get_deals, update_deal
 
 FOLDER_CACHE = {}
 
@@ -188,3 +191,93 @@ def get_public_link(id, expire_minutes=86400):
 def get_random_string(length):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(length))
+
+
+def run_cron_folder_creation():
+    config = get_settings("external/bitrix24/folder_creation")
+    print("folder_creation")
+    if config is None or "folders" not in config:
+        print("no config for folder_creation")
+        return None
+    last_import = datetime(2021, 2, 6, 0, 0, 0)
+    import_time = datetime.now()
+    if "last_run_time" in config:
+        last_import = datetime.strptime(config["last_run_time"], "%Y-%m-%d %H:%M:%S.%f")
+
+    contacts = get_contacts({"ORDER[DATE_CREATE]": "DESC", "FILTER[>DATE_CREATE]": str(last_import)})
+
+    for contact in contacts:
+        post_data = {}
+        for folder in config["folders"]:
+            time.sleep(1)
+            if contact.get(folder["key"]) in [None, "", "0", 0]:
+                subpath = f"Kunde {contact['id']}"
+                new_folder_id = create_folder_path(folder["folder_id"], subpath)
+                if new_folder_id is not None:
+                    if folder["key"] == "drive_myportal_folder":
+                        create_folder_path(new_folder_id, "Documents")
+                        create_folder_path(new_folder_id, "Data Sheets")
+                        create_folder_path(new_folder_id, "Protocols")
+                        create_folder_path(new_folder_id, "Various")
+                    post_data[folder["key"]] = f"{folder['base_url']}{subpath}"
+        if len(post_data) > 0:
+            update_contact(contact["id"], post_data)
+
+    drive_insurance_folder = next((item for item in config["folders"] if item["key"] == "drive_insurance_folder"), None)
+    if drive_insurance_folder is not None:
+        deals_insurance = get_deals({"FILTER[CATEGORY_ID]": "70", "FILTER[>DATE_CREATE]": str(last_import)})
+        for deal in deals_insurance:
+            deal = get_deal(deal["id"])
+            if deal.get("drive_insurance_folder") in [None, "", "0", 0]:
+                deal_path = get_deal_path(deal, "")
+                create_folder_path(drive_insurance_folder["folder_id"], deal_path)
+                update_deal(deal["id"], {"drive_insurance_folder": f"{drive_insurance_folder['base_url']}{deal_path}"})
+                time.sleep(1)
+        deals_insurance_external = get_deals({"FILTER[CATEGORY_ID]": "110", "FILTER[>DATE_CREATE]": str(last_import)})
+        for deal in deals_insurance_external:
+            deal = get_deal(deal["id"])
+            if deal.get("drive_insurance_folder") in [None, "", "0", 0]:
+                deal_path = get_deal_path(deal, "")
+                create_folder_path(drive_insurance_folder["folder_id"], deal_path)
+                update_deal(deal["id"], {"drive_insurance_folder": f"{drive_insurance_folder['base_url']}{deal_path}"})
+                time.sleep(1)
+
+    drive_rental_folder = next((item for item in config["folders"] if item["key"] == "drive_rental_contract_folder"), None)
+    drive_rental_folder2 = next((item for item in config["folders"] if item["key"] == "drive_rental_documents_folder"), None)
+    if drive_rental_folder is not None and drive_rental_folder2 is not None:
+        deals_rental = get_deals({"FILTER[CATEGORY_ID]": "168", "FILTER[>DATE_CREATE]": str(last_import)})
+        for deal in deals_rental:
+            deal = get_deal(deal["id"])
+            if deal.get("drive_rental_contract_folder") in [None, "", "0", 0]:
+                deal_path = get_deal_path(deal, "")
+                create_folder_path(drive_rental_folder["folder_id"], deal_path)
+                update_deal(deal["id"], {"drive_rental_contract_folder": f"{drive_rental_folder['base_url']}{deal_path}"})
+                create_folder_path(drive_rental_folder2["folder_id"], deal_path)
+                update_deal(deal["id"], {"drive_rental_documents_folder": f"{drive_rental_folder2['base_url']}{deal_path}"})
+                time.sleep(1)
+
+    drive_cloud_folder = next((item for item in config["folders"] if item["key"] == "drive_cloud_folder"), None)
+    if drive_cloud_folder is not None:
+        deals_cloud = get_deals({"FILTER[CATEGORY_ID]": "15", "FILTER[>DATE_CREATE]": str(last_import)})
+        for deal in deals_cloud:
+            deal = get_deal(deal["id"])
+            if deal.get("drive_cloud_folder") in [None, "", "0", 0]:
+                deal_path = get_deal_path(deal, "")
+                create_folder_path(drive_cloud_folder["folder_id"], deal_path)
+                update_deal(deal["id"], {"drive_cloud_folder": f"{drive_cloud_folder['base_url']}{deal_path}"})
+                time.sleep(1)
+
+    config = get_settings("external/bitrix24/folder_creation")
+    if config is not None:
+        config["last_run_time"] = str(import_time)
+    set_settings("external/bitrix24/folder_creation", config)
+
+
+def get_deal_path(deal, path):
+    path = path.strip("/")
+    new_path = ""
+    if deal.get("contact_id") not in [None, "", "0", 0]:
+        new_path = f"Kunde {deal['contact_id']}/"
+    if deal.get("unique_identifier") in [None, "", "0", 0]:
+        return f"{new_path}Auftrag {deal['id']}/{path}"
+    return f"{new_path}Vorgang {deal['unique_identifier']}/{path}"

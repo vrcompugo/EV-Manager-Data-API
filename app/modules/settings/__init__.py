@@ -100,8 +100,19 @@ def get_settings(section=None, domain_raw=None):
                     "Solarthermie online": 300
                 }
             },
+            "task": {
+                "fields": {
+                    "mfr_id": "ufAuto422491195439"
+                }
+            },
             "deal": {
                 "fields": {
+                    "mfr_service_object_id": "UF_CRM_1612190018299",
+                    "unique_identifier": "UF_CRM_5FA43F983EBAB",
+                    "drive_insurance_folder": "UF_CRM_1612521127848",
+                    "drive_rental_contract_folder": "UF_CRM_1612534834920",
+                    "drive_rental_documents_folder": "UF_CRM_1612534862483",
+                    "drive_cloud_folder": "UF_CRM_1612535045945",
                 }
             },
             "quote": {
@@ -150,6 +161,12 @@ def get_settings(section=None, domain_raw=None):
             },
             "company": {
                 "fields": {
+                    "street": "UF_CRM_5DE18F4023B26",
+                    "street_nb": "UF_CRM_5DE18F402C2CC",
+                    "zip": "UF_CRM_5DE18F403BE8A",
+                    "city": "UF_CRM_5DE18F4033826",
+                    "mfr_id": "UF_CRM_1611663098516",
+                    "mfr_service_object_id": "UF_CRM_1612189949145"
                 }
             },
             "contact": {
@@ -160,7 +177,20 @@ def get_settings(section=None, domain_raw=None):
                     "street_nb": "UF_CRM_1572950777",
                     "zip": "UF_CRM_1572963458",
                     "city": "UF_CRM_1572963448",
-                    "fakturia_number": "UF_CRM_1611055654633"
+                    "fakturia_number": "UF_CRM_1611055654633",
+                    "mfr_id": "UF_CRM_1611663069960",
+                    "mfr_service_object_id": "UF_CRM_1612189860475",
+                    "drive_myportal_folder": "UF_CRM_1612518385676",
+                    "drive_abnahmen_folder": "UF_CRM_1612533349639",
+                    "drive_internal_folder": "UF_CRM_1612533369175",
+                    "drive_service_protocol_folder": "UF_CRM_1612533388171",
+                    "drive_order_confirmation_folder": "UF_CRM_1612533409927",
+                    "drive_orgamax_folder": "UF_CRM_1612533423669",
+                    "drive_insurance_folder": "UF_CRM_1612533445604",
+                    "drive_remote_care_folder": "UF_CRM_1612533596622",
+                    "drive_rental_contract_folder": "UF_CRM_1612533461553",
+                    "drive_rental_documents_folder": "UF_CRM_1612533480143",
+                    "drive_cloud_folder": "UF_CRM_1612533500465"
                 }
             },
             "timeline_comment": {
