@@ -2,6 +2,7 @@ import requests
 import time
 import json
 import traceback
+import sys
 
 from app.modules.settings import get_settings
 
@@ -24,13 +25,14 @@ def post(url, post_data=None, files=None, domain=None):
         try:
             data = response.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
-                time.sleep(5)
+                time.sleep(2)
                 print(url, json.dumps(post_data, indent=2))
                 traceback.print_exc(file=sys.stdout)
                 print("query limit reached")
-                return post(url, post_data, files)
+                return post(url, post_data, files, domain)
             return data
         except Exception as e:
+            print(e)
             print("error1", response.text)
     return {}
 
@@ -44,7 +46,8 @@ def get(url, parameters=None):
         try:
             data = response.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
-                time.sleep(5)
+                time.sleep(2)
+                print("query limit reached")
                 return get(url, parameters)
             return data
         except Exception as e:
