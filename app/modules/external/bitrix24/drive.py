@@ -41,9 +41,9 @@ def get_file_content(id):
             print("file content: error", result.content[:1])
             data = result.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
-                time.sleep(10)
+                time.sleep(5)
                 print("FILE CONtent QUERY_LIMIT_EXCEEDED")
-                # return get_file_content(id)
+                return get_file_content(id)
         except Exception as e:
             pass
     return result.content
