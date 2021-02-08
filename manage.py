@@ -40,9 +40,9 @@ def update_role_permissions():
 
 
 @manager.command
-def test_fakturia_export():
-    from app.modules.external.fakturia.customer import run_cron_export
-    run_cron_export()
+def run_legacy_folder_creation():
+    from app.modules.external.bitrix24.drive import run_legacy_folder_creation
+    run_legacy_folder_creation()
 
 
 @manager.option("-s", "--section", dest='section', default=None)
