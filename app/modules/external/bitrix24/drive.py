@@ -204,7 +204,22 @@ def run_cron_folder_creation():
     if "last_run_time" in config:
         last_import = datetime.strptime(config["last_run_time"], "%Y-%m-%d %H:%M:%S.%f")
 
-    contacts = get_contacts({"ORDER[DATE_CREATE]": "DESC", "FILTER[>DATE_CREATE]": str(last_import)})
+    contacts = get_contacts({
+        "ORDER[DATE_CREATE]": "DESC",
+        "FILTER[>DATE_CREATE]": str(last_import),
+        "SELECT[0]": "ID",
+        "SELECT[1]": "UF_CRM_1612518385676",
+        "SELECT[2]": "UF_CRM_1612533349639",
+        "SELECT[3]": "UF_CRM_1612533369175",
+        "SELECT[4]": "UF_CRM_1612533388171",
+        "SELECT[5]": "UF_CRM_1612533409927",
+        "SELECT[6]": "UF_CRM_1612533423669",
+        "SELECT[7]": "UF_CRM_1612533445604",
+        "SELECT[8]": "UF_CRM_1612533596622",
+        "SELECT[9]": "UF_CRM_1612533461553",
+        "SELECT[10]": "UF_CRM_1612533480143",
+        "SELECT[11]": "UF_CRM_1612533500465"
+    })
 
     for contact in contacts:
         post_data = {}
@@ -304,7 +319,7 @@ def run_legacy_folder_creation():
         "SELECT[8]": "UF_CRM_1612533596622",
         "SELECT[9]": "UF_CRM_1612533461553",
         "SELECT[10]": "UF_CRM_1612533480143",
-        "SELECT[11]": "UF_CRM_1612533500465",
+        "SELECT[11]": "UF_CRM_1612533500465"
     }
     payload["start"] = 0
     while payload["start"] is not None:
