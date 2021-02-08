@@ -90,6 +90,8 @@ def calculate_feasibility_study(offer: OfferV2):
                 pv_efficiancy = settings["data"]["wi_settings"]["pv_efficiancy"][offer.data["roof_direction"]]
         if "roof_direction" not in offer.data:
             orientation = "west_east"
+        else:
+            orientation = offer.data.get("roof_direction")
         orientation_label = "West/Ost"
         if "roof_direction" in offer.data and offer.data["roof_direction"] == "north":
             orientation_label = "Nord"
