@@ -13,6 +13,7 @@ from app.modules.file.file_services import add_item as add_file, update_item as 
 from app.models import OfferV2, S3File, EEGRefundRate
 from app.utils.gotenberg import generate_pdf as gotenberg_pdf
 from app.modules.cloud.services.calculation import cloud_offer_calculation_by_pv_offer
+from app.modules.loan_calculation import loan_calculation
 
 from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
 
@@ -62,6 +63,8 @@ def calculate_feasibility_study(offer: OfferV2):
         usage = offer.calculated["power_usage"]
         heatcloud_usage = offer.calculated["heater_usage"]
         ecloud_usage = offer.calculated["ecloud_usage"]
+        loan_upfront = offer.data.get("loan_upfront", 0)
+        loan_runtime = offer.data.get("loan_runtime", 240)
         run_time = 30
         if "runtime" in offer.data and offer.data["runtime"] is not None and offer.data["runtime"] != "":
             run_time = int(offer.data["runtime"])
@@ -229,6 +232,8 @@ def calculate_feasibility_study(offer: OfferV2):
         "refund_per_kwh": settings["data"]["wi_settings"]["refund_per_kwh"],
         "pv_offer_total": pv_offer_total,
         "loan_interest_rate": settings["data"]["wi_settings"]["loan_interest_rate"],
+        "loan_upfront": loan_upfront,
+        "loan_runtime": loan_runtime,
         "cloud_calulation": cloud_calulation,
         "loan_total": None,
         "cloud_total": None,
@@ -282,16 +287,18 @@ def calculate_feasibility_study(offer: OfferV2):
         data["pv_offer_total"] = float(offer.data["loan_total"])
     if offer.data is not None and "total_net" in offer.data and offer.data["total_net"] is not None and offer.data["total_net"] != "":
         data["pv_offer_total"] = float(offer.data["total_net"])
-    yearly_loan_payment = data["pv_offer_total"] / 20
-    if data["loan_interest_rate"] > 0:
-        yearly_loan_payment = (data["pv_offer_total"] * data["loan_interest_rate"] / 100) / (1 - (1 + data["loan_interest_rate"] / 100) ** -20)
+    data["yearly_loan_payment"] = data["pv_offer_total"] / 20
     data["loan_total_interest"] = 0
-    rest_loan = data["pv_offer_total"]
-    for n in range(20):
-        interest = rest_loan * (data["loan_interest_rate"] / 100)
-        data["loan_total_interest"] = data["loan_total_interest"] + interest
-        rest_loan = rest_loan + interest - yearly_loan_payment
-    data["loan_total"] = data["loan_total_interest"] + data["pv_offer_total"]
+    data["loan_total"] = data["pv_offer_total"]
+    if data.get("loan_runtime") in [None, "", "0", 0]:
+        data["loan_runtime"] = 240
+    if data.get("loan_upfront") in [None, "", "0", 0]:
+        data["loan_upfront"] = 0
+    if data["loan_interest_rate"] > 0:
+        data["loan_calculation"] = loan_calculation(data["pv_offer_total"], data["loan_upfront"], data["loan_interest_rate"], data["loan_runtime"])
+        data["yearly_loan_payment"] = data["loan_calculation"]["yearly_payment"]
+        data["loan_total_interest"] = data["loan_calculation"]["interest_cost"]
+        data["loan_total"] = data["loan_calculation"]["total_cost"]
     data["conventional_usage_cost"] = data["conventional_base_cost_per_kwh"] * float(data["usage"])
 
     base = data["conventional_usage_cost"] + data["conventional_base_cost_per_year"]
@@ -442,6 +449,9 @@ def calculate_feasibility_study(offer: OfferV2):
         data["eeg_direct_usage_cost"] = cloud_calulation["power_usage"] * 0.6 * (0.06756 / 2) * data["runtime"]
         data["cloud_total"] = data["cloud_total"] + data["eeg_direct_usage_cost"]
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
+    if "loan_calculation" in data:
+        print(data["loan_calculation"].get("upfront_payment", 0))
+        data["cost_total"] = data["cost_total"] + data["loan_calculation"].get("upfront_payment", 0)
     data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
     max_cost = data["conventional_total_cost"]
     if data["cost_total"] > max_cost:

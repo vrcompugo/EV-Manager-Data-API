@@ -176,6 +176,12 @@
           <tr class="highlight">
             <td colspan="2">Zusammensetzung</td>
           </tr>
+          {% if data.loan_calculation and data.loan_calculation.upfront_payment > 0 %}
+            <tr>
+              <td>Anzahlung</td>
+              <td class="align-right"><b>{{ data.loan_calculation.upfront_payment | currencyformat }}</b></td>
+            </tr>
+          {% endif %}
           <tr>
             <td>
               Investitionskosten
@@ -205,7 +211,7 @@
             </td>
             <td class="align-right"><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
           </tr>
-          <tr class="highlight">
+          <tr class="highlight" {% if data.loan_calculation and data.loan_calculation.upfront_payment > 0 %} style="background-color: #fff;" {% endif %}>
             <td>Gesamtkosten</td>
             <td class="align-right"><b>{{ data.cost_total | currencyformat("de", 0) }}</b></td>
           </tr>
