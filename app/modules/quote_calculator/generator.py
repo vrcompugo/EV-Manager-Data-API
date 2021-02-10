@@ -334,8 +334,8 @@ def generate_datasheet_pdf(lead_id, data):
 
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
-            # add_pdf_by_drive_id(merger, 436226)  # password protected watterkote
-            add_pdf_by_drive_id(merger, 436222, cached=True)
+            # add_pdf_by_drive_id(merger, 436226)  # password protected Waterkotte Wärmepumpen.pdf
+            add_pdf_by_drive_id(merger, 436222, cached=True)  # Nibe Wärmepumpen.pdf
     if "has_roof_reconstruction_quote" in data["data"] and data["data"]["has_roof_reconstruction_quote"]:
         add_pdf_by_drive_id(merger, 436216, cached=True)
         add_pdf_by_drive_id(merger, 436214, cached=True)
