@@ -23,7 +23,7 @@ def convert_config_values(data_raw):
             data[local_field] = data[external_field.lower()]
         if external_field in data:
             data[local_field] = data[external_field]
-        if local_field in config["select_lists"]:
+        if local_field in data and local_field in config["select_lists"]:
             if data[local_field] in config["select_lists"][local_field]:
                 data[local_field] = config["select_lists"][local_field][data[local_field]]
 
