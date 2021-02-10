@@ -179,7 +179,7 @@
           {% if data.loan_calculation and data.loan_calculation.upfront_payment > 0 %}
             <tr>
               <td>Anzahlung</td>
-              <td class="align-right"><b>{{ data.loan_calculation.upfront_payment | currencyformat }}</b></td>
+              <td class="align-right"><b>{{ data.loan_calculation.upfront_payment | currencyformat("de", 0) }}</b></td>
             </tr>
           {% endif %}
           <tr>
