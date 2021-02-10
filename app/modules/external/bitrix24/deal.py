@@ -18,6 +18,15 @@ def convert_config_values(data_raw):
         else:
             data[key.lower()] = data_raw[key]
 
+    for local_field, external_field in config["deal"]["fields"].items():
+        if external_field.lower() in data:
+            data[local_field] = data[external_field.lower()]
+        if external_field in data:
+            data[local_field] = data[external_field]
+        if local_field in config["select_lists"]:
+            if data[local_field] in config["select_lists"][local_field]:
+                data[local_field] = config["select_lists"][local_field][data[local_field]]
+
     return data
 
 

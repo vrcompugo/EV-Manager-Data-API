@@ -58,6 +58,13 @@ def get_settings(section=None, domain_raw=None):
                 "salutation": {
                     "HNR_DE_2": "mr",
                     "HNR_DE_1": "ms"
+                },
+                "mfr_category": {
+                    "": "default",
+                    "3978": "electric",
+                    "3980": "roof",
+                    "3982": "heating",
+                    "3984": "service"
                 }
             },
             "product": {
@@ -113,6 +120,7 @@ def get_settings(section=None, domain_raw=None):
                     "drive_rental_contract_folder": "UF_CRM_1612534834920",
                     "drive_rental_documents_folder": "UF_CRM_1612534862483",
                     "drive_cloud_folder": "UF_CRM_1612535045945",
+                    "mfr_category": "UF_CRM_1612967946042"
                 }
             },
             "quote": {

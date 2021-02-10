@@ -77,3 +77,10 @@ def cron(section=None):
             run_cron_folder_creation()
         except Exception as e:
             error_handler()
+
+    if section == "productive" or section == "mfr_task_export":
+        from app.modules.external.mfr.task import run_cron_export
+        try:
+            run_cron_export()
+        except Exception as e:
+            error_handler()
