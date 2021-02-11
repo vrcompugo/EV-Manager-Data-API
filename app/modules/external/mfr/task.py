@@ -31,7 +31,8 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
         "ServiceObjects": service_objects,
         "CustomerId": main_mfr_id,
         "Description": task_data.get("description"),
-        "ExternalId": task_data.get("id")
+        "ExternalId": task_data.get("id"),
+        "State": "ReadyForScheduling"
     }
     if task_data.get("timeestimate") not in [None, "", "0", 0]:
         data["TargetTimeInMinutes"] = str(int(int(task_data.get("timeestimate")) / 60))
@@ -84,8 +85,7 @@ def export_by_bitrix_id(bitrix_id):
         else:
             print(json.dumps(response, indent=2))
     else:
-        response = put(f"/ServiceRequests({post_data.get('mfr_id')}L)", post_data=post_data)
-        # TODO does not work yet. Response error: System.NullReferenceException: Object reference not set to an instance of an object
+        response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data=post_data)
 
 
 def get_linked_data_by_task(task_data):

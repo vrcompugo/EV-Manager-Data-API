@@ -71,16 +71,16 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "folder_creation":
-        from app.modules.external.bitrix24.drive import run_cron_folder_creation
-        try:
-            run_cron_folder_creation()
-        except Exception as e:
-            error_handler()
-
     if section == "productive" or section == "mfr_task_export":
         from app.modules.external.mfr.task import run_cron_export
         try:
             run_cron_export()
+        except Exception as e:
+            error_handler()
+
+    if section == "productive" or section == "folder_creation":
+        from app.modules.external.bitrix24.drive import run_cron_folder_creation
+        try:
+            run_cron_folder_creation()
         except Exception as e:
             error_handler()
