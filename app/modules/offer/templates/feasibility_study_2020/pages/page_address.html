@@ -21,7 +21,11 @@
   }
   .page_address .right-side {
     flex: 1 0 20%;
-    background: url("{{ data.base_url }}/static/feasibility_study_2020/child-running.jpg");
+    {% if offer.reseller.document_style == "bsh" %}
+      background: url("{{ data.base_url }}/static/feasibility_study_2020/solar_roof_dark.jpg");
+    {% else %}
+      background: url("{{ data.base_url }}/static/feasibility_study_2020/child-running.jpg");
+    {% endif %}
     background-size: cover;
   }
   .page_address .address-customer {
