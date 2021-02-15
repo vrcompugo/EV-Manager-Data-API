@@ -30,7 +30,7 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
         "Name": f"{contact_data.get('first_name')} {contact_data.get('last_name')}",
         "ServiceObjects": service_objects,
         "CustomerId": main_mfr_id,
-        "Description": task_data.get("description"),
+        "Description": task_data.get("description", "").replace("\n", "<br>\n"),
         "ExternalId": task_data.get("id"),
         "State": "ReadyForScheduling"
     }
@@ -54,7 +54,7 @@ def run_cron_export():
     last_task_export_time = config.get("last_task_export_time", "2021-01-01")
     tasks = get_tasks({
         "select[0]": "ID",
-        "filter[>CREATED_DATE]": last_task_export_time,
+        "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
     last_task_export_time = datetime.now()
@@ -78,7 +78,6 @@ def export_by_bitrix_id(bitrix_id):
             company_data = get_company(company_data["id"])
     post_data = get_export_data(task_data, contact_data, deal_data, company_data)
     if task_data.get("mfr_id", None) in ["", None, 0]:
-        print(json.dumps(post_data, indent=2))
         response = post("/ServiceRequests", post_data=post_data)
         if response.get("Id") not in ["", None, 0]:
             update_task(bitrix_id, {"mfr_id": response.get("Id")})
