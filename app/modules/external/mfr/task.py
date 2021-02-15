@@ -18,10 +18,10 @@ from .company import export_by_bitrix_id as export_company_by_bitrix_id
 def get_export_data(task_data, contact_data, deal_data, company_data):
     main_mfr_id = 0
     service_objects = []
-    if contact_data.get("mfr_service_object_id") not in [None, "", "0", 0]:
+    if contact_data is not None and contact_data.get("mfr_service_object_id") not in [None, "", "0", 0]:
         main_mfr_id = contact_data.get("mfr_id")
         service_objects.append({"Id": contact_data.get("mfr_service_object_id")})
-    if company_data.get("mfr_service_object_id") not in [None, "", "0", 0]:
+    if company_data is not None and company_data.get("mfr_service_object_id") not in [None, "", "0", 0]:
         main_mfr_id = company_data.get("mfr_id")
         service_objects.append({"Id": company_data.get("mfr_service_object_id")})
 
@@ -130,6 +130,8 @@ def get_template_id_by_deal(deal_data):
         "heating": "17996480515",
         "service": "17991565318"
     }
+    if deal_data is None:
+        return config["default"]
     if deal_data.get("mfr_category", "") in config:
         return config[deal_data.get("mfr_category", "")]
     if deal_data.get("category_id", "") == "32":
