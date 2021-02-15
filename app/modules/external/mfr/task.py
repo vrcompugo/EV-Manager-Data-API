@@ -57,6 +57,7 @@ def run_cron_export():
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
+    print(tasks)
     last_task_export_time = datetime.now()
     for task in tasks:
         export_by_bitrix_id(task["id"])
