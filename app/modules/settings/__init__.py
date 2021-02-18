@@ -64,7 +64,18 @@ def get_settings(section=None, domain_raw=None):
                     "3978": "electric",
                     "3980": "roof",
                     "3982": "heating",
-                    "3984": "service"
+                    "3984": "service",
+                    "4044": "holiday",
+                    "4042": "roof_reconstruction_pv"
+                    "4040": "roof_reconstruction",
+                    "4038": "service_storage_pb",
+                    "4034": "service_storage_li",
+                    "4030": "service_pv_storage_li",
+                    "4018": "service_pv_storage_pb",
+                    "4016": "storage_swap",
+                    "4014": "repair_electric",
+                    "4012": "additional_roof",
+                    "4010": "solar_edge_change_test"
                 }
             },
             "product": {

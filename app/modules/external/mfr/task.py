@@ -126,9 +126,20 @@ def get_template_id_by_deal(deal_data):
     config = {
         "default": "17991565319",
         "electric": "17432084483",
+        "service": "17991565318",
         "roof": "17991565317",
         "heating": "17996480515",
-        "service": "17991565318"
+        "holiday": "17996480515",
+        "roof_reconstruction_pv": "18134892576"
+        "roof_reconstruction": "18145247234",
+        "service_storage_pb": "18134892577",
+        "service_storage_li": "18134892579",
+        "service_pv_storage_li": "18147409921",
+        "service_pv_storage_pb": "18147409922",
+        "storage_swap": "18145247235",
+        "repair_electric": "18137612317",
+        "additional_roof": "18145247236",
+        "solar_edge_change_test": "18147409920"
     }
     if deal_data is None:
         return config["default"]
