@@ -130,7 +130,7 @@ def get_template_id_by_deal(deal_data):
         "roof": "17991565317",
         "heating": "17996480515",
         "holiday": "17996480515",
-        "roof_reconstruction_pv": "18134892576"
+        "roof_reconstruction_pv": "18134892576",
         "roof_reconstruction": "18145247234",
         "service_storage_pb": "18134892577",
         "service_storage_li": "18134892579",
