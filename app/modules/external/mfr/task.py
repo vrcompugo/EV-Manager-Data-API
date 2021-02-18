@@ -44,8 +44,28 @@ def get_import_data(raw):
     return data
 
 
-def run_cron_export():
+def import_by_id(service_request_id):
+    response = get(f"/ServiceRequests({service_request_id}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
+        "id": service_request_id
+    })
+    task_data = get_task(response["ExternalId"])
+    if task_data["status"] != "5" and response["State"] in ["IsWorkDone", "Closed"]:
+        print("complete task")
+    if len(response.get("Appointments", [])) > 0:
+        appointment = response["Appointments"][0]
+        contacts = appointment.get("Contacts")
+        if task_data["startdateplan"] != appointment["StartDateTime"]:
+            print("update start")
+        if task_data["enddateplan"] != appointment["EndDateTime"]:
+            print("update end")
+        for contact in contacts:
+            print(contact.get("Email"))
 
+    print("task_data", json.dumps(task_data, indent=2))
+    print(response["ExternalId"])
+
+
+def run_cron_export():
     config = get_settings("external/mfr")
     print("export task mfr")
     if config is None:
@@ -57,7 +77,6 @@ def run_cron_export():
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
-    print(tasks)
     last_task_export_time = datetime.now()
     for task in tasks:
         export_by_bitrix_id(task["id"])
@@ -68,6 +87,7 @@ def run_cron_export():
 
 
 def export_by_bitrix_id(bitrix_id):
+    print("export task ", bitrix_id)
     task_data = get_task(bitrix_id)
     deal_data, contact_data, company_data = get_linked_data_by_task(task_data)
     if contact_data is not None:
@@ -77,6 +97,8 @@ def export_by_bitrix_id(bitrix_id):
         if company_data is not None:
             export_company_by_bitrix_id(company_data["id"])
             company_data = get_company(company_data["id"])
+    if contact_data is None and company_data is None:
+        print("no contact", bitrix_id)
     post_data = get_export_data(task_data, contact_data, deal_data, company_data)
     if task_data.get("mfr_id", None) in ["", None, 0]:
         response = post("/ServiceRequests", post_data=post_data)
