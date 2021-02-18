@@ -66,7 +66,7 @@ def get_settings(section=None, domain_raw=None):
                     "3982": "heating",
                     "3984": "service",
                     "4044": "holiday",
-                    "4042": "roof_reconstruction_pv"
+                    "4042": "roof_reconstruction_pv",
                     "4040": "roof_reconstruction",
                     "4038": "service_storage_pb",
                     "4034": "service_storage_li",
