@@ -32,32 +32,14 @@ def get_task(id):
         "select[3]": "CONTACT_ID",
         "select[4]": "COMPANY_ID",
         "select[5]": "TIME_ESTIMATE",
-        "select[6]": "UF_AUTO_422491195439"
-    })
-    if "result" in data:
-        return convert_config_values(data["result"]["task"])
-    else:
-        print("error get lead:", data)
-    return None
-
-
-def get_task(id):
-    data = post("tasks.task.get", {
-        "taskId": id,
-        "select[0]": "TITLE",
-        "select[1]": "DESCRIPTION",
-        "select[2]": "UF_CRM_TASK",
-        "select[3]": "CONTACT_ID",
-        "select[4]": "COMPANY_ID",
-        "select[5]": "TIME_ESTIMATE",
         "select[6]": "UF_AUTO_422491195439",
         "select[7]": "STATUS",
         "select[8]": "START_DATE_PLAN",
         "select[9]": "END_DATE_PLAN",
         "select[10]": "RESPONSIBLE_ID",
-        "select[11]": "ACCOMPLICE",
+        "select[11]": "ACCOMPLICES",
         "select[12]": "SUBORDINATE",
-        "select[13]": "AUDITOR",
+        "select[13]": "AUDITORS",
         "select[14]": "DEADLINE"
     })
     if "result" in data:

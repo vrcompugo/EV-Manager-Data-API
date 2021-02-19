@@ -18,3 +18,4 @@ from app.modules.external.bitrix24.models.department import BitrixDepartment
 from app.modules.external.bitrix24.models.drive_folder import BitrixDriveFolder
 from app.modules.power_meter.models.power_meter import PowerMeter, PowerMeterSchema
 from app.modules.power_meter.models.power_meter_measurement import PowerMeterMeasurement, PowerMeterMeasurementSchema
+from app.modules.external.mfr.models.task_persistent_users import TaskPersistentUsers

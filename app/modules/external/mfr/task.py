@@ -1,6 +1,7 @@
 from app.modules.external.bitrix24.company import get_company
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.deal import get_deal
+from app.modules.external.bitrix24.user import get_user_by_email
 import time
 import json
 import random
@@ -13,6 +14,7 @@ from app.modules.settings import get_settings, set_settings
 from ._connector import get, post, put
 from .contact import export_by_bitrix_id as export_contact_by_bitrix_id
 from .company import export_by_bitrix_id as export_company_by_bitrix_id
+from .models.task_persistent_users import TaskPersistentUsers
 
 
 def get_export_data(task_data, contact_data, deal_data, company_data):
@@ -55,6 +57,14 @@ def import_by_id(service_request_id):
     })
     task_id = response["ExternalId"]
     task_data = get_task(task_id)
+    persistent_users = TaskPersistentUsers.query.filter(TaskPersistentUsers.bitrix_task_id == task_id).first()
+    if persistent_users is None:
+        persistent_users = TaskPersistentUsers(
+            bitrix_task_id=task_id,
+            data=task_data["accomplices"]
+        )
+        db.session.add(persistent_users)
+        db.session.commit()
     update_data = {}
     if response["State"] in ["IsWorkDone", "Closed"] and task_data["status"] not in ["4", "5"]:
         update_data["status"] = "4"
@@ -67,6 +77,7 @@ def import_by_id(service_request_id):
             update_data["END_DATE_PLAN"] = str(convert_datetime(appointment["EndDateTime"])).replace(" ", "T")
             update_data["DEADLINE"] = update_data["END_DATE_PLAN"]
         new_leading = None
+        supporting_users = []
         for contact in contacts:
             if contact.get("Email") in config["task"]["leading_users"]:
                 if task_data["responsibleid"] == config["task"]["leading_users"][contact.get("Email")]:
@@ -74,8 +85,22 @@ def import_by_id(service_request_id):
                     break
                 else:
                     new_leading = config["task"]["leading_users"][contact.get("Email")]
+        for contact in contacts:
+            supporting_user = get_user_by_email(contact.get("Email"))
+            if supporting_user is not None:
+                if new_leading is None:
+                    if task_data["responsibleid"] != supporting_user["ID"]:
+                        supporting_users.append(supporting_user["ID"])
+                else:
+                    if new_leading != supporting_user["ID"]:
+                        supporting_users.append(supporting_user["ID"])
+            else:
+                print(contact.get("Email"))
         if new_leading is not None:
             update_data["RESPONSIBLE_ID"] = new_leading
+        new_support_users_list = persistent_users.data + supporting_users
+        if set(task_data["accomplices"]) != set(new_support_users_list):
+            update_data["ACCOMPLICES"] = new_support_users_list
     if len(update_data.keys()) > 0:
         print(task_id, json.dumps(update_data, indent=2))
         update_task(task_id, update_data)
