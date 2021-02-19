@@ -13,6 +13,7 @@ def convert_config_values(data_raw):
         if key[:2].lower() == "uf":
             data[key] = data_raw[key]
         else:
+            data[key] = data_raw[key]
             data[key.lower()] = data_raw[key]
     for local_field, external_field in config["task"]["fields"].items():
         if external_field.lower() in data:
@@ -49,7 +50,14 @@ def get_task(id):
         "select[3]": "CONTACT_ID",
         "select[4]": "COMPANY_ID",
         "select[5]": "TIME_ESTIMATE",
-        "select[6]": "UF_AUTO_422491195439"
+        "select[6]": "UF_AUTO_422491195439",
+        "select[7]": "STATUS",
+        "select[8]": "START_DATE_PLAN",
+        "select[9]": "END_DATE_PLAN",
+        "select[10]": "RESPONSIBLE_ID",
+        "select[11]": "ACCOMPLICE",
+        "select[12]": "SUBORDINATE",
+        "select[12]": "AUDITOR"
     })
     if "result" in data:
         return convert_config_values(data["result"]["task"])

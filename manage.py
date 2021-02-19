@@ -45,6 +45,12 @@ def run_legacy_folder_creation():
     run_legacy_folder_creation()
 
 
+@manager.command
+def run_mfr_subscriptor():
+    from app.modules.external.mfr.amqp import run_mfr_amqp_messaging_subscriptor
+    run_mfr_amqp_messaging_subscriptor()
+
+
 @manager.option("-s", "--section", dest='section', default=None)
 def cron(section):
     from app.modules.cron import cron

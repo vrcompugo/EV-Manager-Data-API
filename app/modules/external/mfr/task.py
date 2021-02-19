@@ -39,30 +39,46 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
     return data
 
 
-def get_import_data(raw):
-    data = {}
-    return data
+def convert_datetime(value):
+    if value is None:
+        return None
+    if value.find("+"):
+        return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S%z')
+    return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S%Z')
 
 
 def import_by_id(service_request_id):
+    print("mfr import", service_request_id)
+    config = get_settings("external/bitrix24")
     response = get(f"/ServiceRequests({service_request_id}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
         "id": service_request_id
     })
-    task_data = get_task(response["ExternalId"])
-    if task_data["status"] != "5" and response["State"] in ["IsWorkDone", "Closed"]:
-        print("complete task")
+    task_id = response["ExternalId"]
+    task_data = get_task(task_id)
+    update_data = {}
+    if response["State"] in ["IsWorkDone", "Closed"] and task_data["status"] not in ["4", "5"]:
+        update_data["status"] = "4"
     if len(response.get("Appointments", [])) > 0:
         appointment = response["Appointments"][0]
         contacts = appointment.get("Contacts")
-        if task_data["startdateplan"] != appointment["StartDateTime"]:
-            print("update start")
-        if task_data["enddateplan"] != appointment["EndDateTime"]:
-            print("update end")
+        if convert_datetime(task_data["startdateplan"]) != convert_datetime(appointment["StartDateTime"]):
+            update_data["START_DATE_PLAN"] = str(convert_datetime(appointment["StartDateTime"])).replace(" ", "T")
+        if convert_datetime(task_data["enddateplan"]) != convert_datetime(appointment["EndDateTime"]):
+            update_data["END_DATE_PLAN"] = str(convert_datetime(appointment["EndDateTime"])).replace(" ", "T")
+            update_data["DEADLINE"] = update_data["END_DATE_PLAN"]
+        new_leading = None
         for contact in contacts:
-            print(contact.get("Email"))
-
-    print("task_data", json.dumps(task_data, indent=2))
-    print(response["ExternalId"])
+            if contact.get("Email") in config["task"]["leading_users"]:
+                if task_data["responsibleid"] == config["task"]["leading_users"][contact.get("Email")]:
+                    new_leading = None
+                    break
+                else:
+                    new_leading = config["task"]["leading_users"][contact.get("Email")]
+        if new_leading is not None:
+            update_data["RESPONSIBLE_ID"] = new_leading
+    if len(update_data.keys()) > 0:
+        print(task_id, json.dumps(update_data, indent=2))
+        update_task(task_id, update_data)
 
 
 def run_cron_export():

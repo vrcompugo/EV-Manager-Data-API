@@ -75,7 +75,9 @@ def get_settings(section=None, domain_raw=None):
                     "4016": "storage_swap",
                     "4014": "repair_electric",
                     "4012": "additional_roof",
-                    "4010": "solar_edge_change_test"
+                    "4010": "solar_edge_change_test",
+                    "4054": "enpal_mvt",
+                    "4056": "enpal_verbau"
                 }
             },
             "product": {
@@ -121,6 +123,26 @@ def get_settings(section=None, domain_raw=None):
             "task": {
                 "fields": {
                     "mfr_id": "ufAuto422491195439"
+                },
+                "leading_users": {
+                    "onur.berber.e360@gmail.com": "410",
+                    "bernd.buechsenschuetz.kez@gmail.com": "70",
+                    "dieter.hartmann.kez@gmail.com": "72",
+                    "heiko.burzlaff.kez@gmail.com": "76",
+                    "jason.hardy.kez@gmail.com": "100",
+                    "joudi.daher.kez@gmail.com": "68",
+                    "liviu.vasile.kez@gmail.com": "74",
+                    "marco.gentsch.kez@gmail.com": "56",
+                    "kbez330@gmail.com": "90",
+                    "maurice.dobes.kez@gmail.com": "96",
+                    "becker@korbacher-energiezentrum.de": "320",
+                    "nebras.aboumoghdeb.kez@gmail.com": "58",
+                    "rafat.alkuferi.kez@gmail.com": "62",
+                    "rene.schroeder.kez@gmail.com": "298",
+                    "roesner@energie360.de": "408",
+                    "ronny.pokutta.kez@gmail.com": "64",
+                    "volker.boemeke.kez@gmail.com": "98",
+                    "mario.scherbaum.e360@gmail.com": "412"
                 }
             },
             "deal": {
