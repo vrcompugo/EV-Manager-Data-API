@@ -54,6 +54,7 @@ def get_task(id):
         "select[7]": "STATUS",
         "select[8]": "START_DATE_PLAN",
         "select[9]": "END_DATE_PLAN",
+        "select[9]": "DEADLINE",
         "select[10]": "RESPONSIBLE_ID",
         "select[11]": "ACCOMPLICE",
         "select[12]": "SUBORDINATE",
