@@ -177,7 +177,9 @@ def get_template_id_by_deal(deal_data):
         "storage_swap": "18145247235",
         "repair_electric": "18137612317",
         "additional_roof": "18145247236",
-        "solar_edge_change_test": "18147409920"
+        "solar_edge_change_test": "18147409920",
+        "enpal_mvt": "18214387720",
+        "enpal_verbau": "18214387721"
     }
     if deal_data is None:
         return config["default"]
