@@ -208,8 +208,6 @@ def get_template_id_by_deal(deal_data):
     }
     if deal_data is None:
         return config["default"]
-    if deal_data.get("mfr_category", "") in config:
-        return config[deal_data.get("mfr_category", "")]
     if deal_data.get("category_id", "") == "32":
         return config["electric"]
     if deal_data.get("category_id", "") == "1":
@@ -218,4 +216,6 @@ def get_template_id_by_deal(deal_data):
         return config["heating"]
     if deal_data.get("category_id", "") == "134":
         return config["service"]
+    if deal_data.get("mfr_category", "") in config:
+        return config[deal_data.get("mfr_category", "")]
     return config["default"]
