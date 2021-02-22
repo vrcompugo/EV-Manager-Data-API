@@ -354,4 +354,4 @@ def run_legacy_folder_creation():
                 if len(post_data) > 0:
                     update_contact(contact["id"], post_data)
                     print("update", contact["id"])
-                    time.sleep(10)
+                    time.sleep(20)
