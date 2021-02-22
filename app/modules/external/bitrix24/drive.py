@@ -338,9 +338,6 @@ def run_legacy_folder_creation():
                 post_data = {}
                 for folder in config["folders"]:
                     if contact.get(folder["key"]) in [None, "", "0", 0]:
-                        print(f"Kunde {contact['id']}")
-                        time.sleep(10)
-                        print(f"Kunde {contact['id']}")
                         subpath = f"Kunde {contact['id']}"
                         new_folder_id = create_folder_path(folder["folder_id"], subpath)
                         if new_folder_id is not None:
@@ -357,3 +354,4 @@ def run_legacy_folder_creation():
                 if len(post_data) > 0:
                     update_contact(contact["id"], post_data)
                     print("update", contact["id"])
+                    time.sleep(10)
