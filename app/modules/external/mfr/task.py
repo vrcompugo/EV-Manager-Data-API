@@ -57,6 +57,8 @@ def import_by_id(service_request_id):
     })
     task_id = response["ExternalId"]
     task_data = get_task(task_id)
+    if task_data is None:
+        return
     persistent_users = TaskPersistentUsers.query.filter(TaskPersistentUsers.bitrix_task_id == task_id).first()
     if persistent_users is None:
         persistent_users = TaskPersistentUsers(

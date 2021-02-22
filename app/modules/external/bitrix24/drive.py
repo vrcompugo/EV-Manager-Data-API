@@ -338,9 +338,9 @@ def run_legacy_folder_creation():
                 post_data = {}
                 for folder in config["folders"]:
                     if contact.get(folder["key"]) in [None, "", "0", 0]:
+                        time.sleep(30)
                         subpath = f"Kunde {contact['id']}"
                         new_folder_id = create_folder_path(folder["folder_id"], subpath)
-                        time.sleep(2)
                         if new_folder_id is not None:
                             if folder["key"] == "drive_myportal_folder":
                                 create_folder_path(new_folder_id, "Documents")
