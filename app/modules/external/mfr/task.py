@@ -20,13 +20,15 @@ from .models.task_persistent_users import TaskPersistentUsers
 def get_export_data(task_data, contact_data, deal_data, company_data):
     main_mfr_id = 0
     service_objects = []
+    if contact_data is None:
+        print(json.dumps(task_data, indent=2))
+        raise Exception("no contact")
     if contact_data is not None and contact_data.get("mfr_service_object_id") not in [None, "", "0", 0]:
         main_mfr_id = contact_data.get("mfr_id")
         service_objects.append({"Id": contact_data.get("mfr_service_object_id")})
     if company_data is not None and company_data.get("mfr_service_object_id") not in [None, "", "0", 0]:
         main_mfr_id = company_data.get("mfr_id")
         service_objects.append({"Id": company_data.get("mfr_service_object_id")})
-
     data = {
         "CreateFromServiceRequestTemplateId": get_template_id_by_deal(deal_data),
         "Name": f"{contact_data.get('first_name')} {contact_data.get('last_name')}",
