@@ -338,21 +338,21 @@ def run_legacy_folder_creation():
                 post_data = {}
                 for folder in config["folders"]:
                     if contact.get(folder["key"]) in [None, "", "0", 0]:
-                        time.sleep(2)
+                        time.sleep(10)
                         subpath = f"Kunde {contact['id']}"
                         new_folder_id = create_folder_path(folder["folder_id"], subpath)
                         if new_folder_id is not None:
                             if folder["key"] == "drive_myportal_folder":
                                 create_folder_path(new_folder_id, "Documents")
-                                time.sleep(2)
+                                time.sleep(10)
                                 create_folder_path(new_folder_id, "Data Sheets")
-                                time.sleep(2)
+                                time.sleep(10)
                                 create_folder_path(new_folder_id, "Protocols")
-                                time.sleep(2)
+                                time.sleep(10)
                                 create_folder_path(new_folder_id, "Various")
-                                time.sleep(2)
+                                time.sleep(10)
                             post_data[folder["key"]] = f"{folder['base_url']}{subpath}"
                 if len(post_data) > 0:
                     update_contact(contact["id"], post_data)
                     print("update", contact["id"])
-                    time.sleep(20)
+                    time.sleep(60)
