@@ -336,6 +336,7 @@ def filter_export_input_cloud(data, order: Order, consumer_index=None):
         for file_key in ["cloud_config_id", "signed_offer_pdf_id", "refund_transfer_pdf_id", "sepa_form_id",
                          "old_power_invoice_id", "old_gas_invoice_id"]:
             if file_key in order.data:
+                file = get_file(order.data[file_key])
                 file_content = get_file_content(order.data[file_key])
                 data["cloud_files"].append({
                     "fileData": [
