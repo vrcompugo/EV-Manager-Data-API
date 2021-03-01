@@ -31,7 +31,7 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
         "Name": f"{contact_data.get('first_name')} {contact_data.get('last_name')}",
         "ServiceObjects": service_objects,
         "CustomerId": main_mfr_id,
-        "Description": task_data.get("description", "").replace("\n", "<br>\n"),
+        "Description": f'<a href="https://keso.bitrix24.de/company/personal/user/15/tasks/task/view/{task_data["id"]}/" target="_blank">Bitrix-Aufgabenlink</a><br>\n<br>\n' + task_data.get("description", "").replace("\n", "<br>\n"),
         "ExternalId": task_data.get("id"),
         "State": "ReadyForScheduling"
     }
