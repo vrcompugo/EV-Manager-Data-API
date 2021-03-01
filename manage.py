@@ -51,15 +51,6 @@ def run_mfr_subscriptor():
     run_mfr_amqp_messaging_subscriptor()
 
 
-@manager.option("-i", "--id", dest='task_id', default=None)
-def run_mfr_test(task_id):
-    from app.modules.external.mfr.task import import_by_id
-    if task_id is None:
-        print("no id given")
-    else:
-        import_by_id(task_id)
-
-
 @manager.option("-s", "--section", dest='section', default=None)
 def cron(section):
     from app.modules.cron import cron
