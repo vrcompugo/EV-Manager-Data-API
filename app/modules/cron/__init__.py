@@ -84,3 +84,17 @@ def cron(section=None):
             run_cron_folder_creation()
         except Exception as e:
             error_handler()
+
+    if section == "etermin_import":
+        from app.modules.external.etermin.appointment import import_new_appointments
+        try:
+            import_new_appointments()
+        except Exception as e:
+            error_handler()
+
+    if section == "etermin_export":
+        from app.modules.external.etermin.appointment import export_appointments
+        try:
+            export_appointments()
+        except Exception as e:
+            error_handler()

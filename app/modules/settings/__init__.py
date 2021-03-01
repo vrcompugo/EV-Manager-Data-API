@@ -122,7 +122,8 @@ def get_settings(section=None, domain_raw=None):
             },
             "task": {
                 "fields": {
-                    "mfr_id": "ufAuto422491195439"
+                    "mfr_id": "ufAuto422491195439",
+                    "etermin_id": "ufAuto219922666303"
                 },
                 "leading_users": {
                     "onur.berber.e360@gmail.com": "410",
@@ -153,7 +154,10 @@ def get_settings(section=None, domain_raw=None):
                     "drive_rental_contract_folder": "UF_CRM_1612534834920",
                     "drive_rental_documents_folder": "UF_CRM_1612534862483",
                     "drive_cloud_folder": "UF_CRM_1612535045945",
-                    "mfr_category": "UF_CRM_1612967946042"
+                    "mfr_category": "UF_CRM_1612967946042",
+                    "service_appointment_notes": "UF_CRM_1573029988665",
+                    "service_appointment_date": "UF_CRM_1594740636",
+                    "etermin_id": "UF_CRM_1614177772351"
                 }
             },
             "quote": {

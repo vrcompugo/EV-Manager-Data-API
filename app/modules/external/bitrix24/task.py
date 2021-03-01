@@ -72,6 +72,8 @@ def update_task(id, data, domain=None):
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
     if "fields[ufAuto422491195439]" in update_data:
         update_data["fields[UF_AUTO_422491195439]"] = update_data["fields[ufAuto422491195439]"]
+    if "fields[ufAuto219922666303]" in update_data:
+        update_data["fields[UF_AUTO_219922666303]"] = update_data["fields[ufAuto219922666303]"]
     response = post("tasks.task.update", update_data, domain=domain)
     if "result" in response and response["result"]:
         return response["result"]
