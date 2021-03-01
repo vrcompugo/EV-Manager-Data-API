@@ -54,6 +54,8 @@ def import_by_id(service_request_id):
     response = get(f"/ServiceRequests({service_request_id}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
         "id": service_request_id
     })
+    if response.get("ExternalId", None) is None:
+        return
     task_id = response["ExternalId"]
     task_data = get_task(task_id)
     if task_data is None:
@@ -99,6 +101,7 @@ def import_by_id(service_request_id):
                 print(contact.get("Email"))
         if new_leading is not None:
             update_data["RESPONSIBLE_ID"] = new_leading
+        print(persistent_users.data)
         new_support_users_list = persistent_users.data + supporting_users
         if set(task_data["accomplices"]) != set(new_support_users_list):
             update_data["ACCOMPLICES"] = new_support_users_list

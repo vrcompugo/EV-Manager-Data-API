@@ -14,4 +14,7 @@ def run_mfr_amqp_messaging_subscriptor():
                 if msg.message._application_properties.get(b"ServiceRequestId", None) is not None:
                     service_request_id = str(msg.message._application_properties.get(b"ServiceRequestId", None))
                     if service_request_id not in ["", "0"]:
-                        import_by_id(service_request_id)
+                        try:
+                            import_by_id(service_request_id)
+                        except Exception as e:
+                            print(e)
