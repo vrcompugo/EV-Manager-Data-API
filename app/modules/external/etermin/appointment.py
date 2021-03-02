@@ -10,7 +10,7 @@ from app.modules.user import auto_assign_lead_to_user
 from app.modules.external.bitrix24.company import add_company
 from app.modules.external.bitrix24.contact import get_contact_by_email, add_contact
 from app.modules.external.bitrix24.deal import get_deals, add_deal
-from app.modules.external.bitrix24.task import get_tasks
+from app.modules.external.bitrix24.task import get_tasks, update_task
 from app.modules.external.bitrix24.timeline_comment import add_timeline_comment
 from app.modules.external.mfr.task import get_linked_data_by_task
 from app.modules.settings import get_settings, set_settings
@@ -90,6 +90,7 @@ def export_appointments():
         deal_data, contact_data, company_data = get_linked_data_by_task(task)
         if str(deal_data.get("category_id")) == "134":
             continue
+        print("export task", task["id"])
         startDatetime = dateutil.parser.parse(task.get("startDatePlan"))
         endDatetime = dateutil.parser.parse(task.get("endDatePlan"))
         post_data = {
@@ -108,10 +109,9 @@ def export_appointments():
             post_data["street"] = contact_data["street"]
             post_data["zip"] = contact_data["zip"]
             post_data["city"] = contact_data["city"]
-        print(post_data)
         response = post("/api/appointment", post_data=post_data)
-        print(response)
-        return
+        if "cid" in response:
+            update_task(task["id"], {"etermin_id": response["cid"]})
     config = get_settings("external/etermin")
     if config is not None:
         config["last_task_export_time"] = str(last_task_export_time)

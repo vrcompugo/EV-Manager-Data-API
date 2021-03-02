@@ -57,9 +57,9 @@ def post(url, post_data=None, files=None):
             data=post_data
         )
         try:
-            xml_id = re.findall(r'\<id\>([0-9]*)\<\/id\>', response.text)
+            xml_id = re.findall(r'\<id\>([a-z0-9\-]*)\<\/id\>', response.text)
             if len(xml_id) > 0:
-                return {"cid": int(xml_id[0])}
+                return {"cid": xml_id[0]}
             data = response.json()
             return data
         except Exception as e:
