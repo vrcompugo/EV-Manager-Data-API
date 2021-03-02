@@ -88,7 +88,7 @@ def export_appointments():
         if task.get("startDatePlan") in [None, "", "0"]:
             continue
         deal_data, contact_data, company_data = get_linked_data_by_task(task)
-        if str(deal_data.get("category_id")) == "134":
+        if task.get("etermin_id") in [None, "", "0"] or str(deal_data.get("category_id")) == "134":
             continue
         print("export task", task["id"])
         startDatetime = dateutil.parser.parse(task.get("startDatePlan"))
