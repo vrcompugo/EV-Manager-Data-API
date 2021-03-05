@@ -26,6 +26,7 @@ def import_new_appointments():
     syncToken = 1
     if "SyncToken" in config:
         syncToken = config["SyncToken"]
+    syncToken = 92
     response = get("/api/appointmentsync", parameters={"synctoken": syncToken})
     if response is not None and "SyncToken" in response:
         for appointment in response["data"]:
@@ -55,7 +56,17 @@ def import_new_appointments():
                 deal_data["service_appointment_startdate"] = str(startDatetime)
                 deal_data["service_appointment_enddate"] = str(endDatetime)
                 deal_data["etermin_id"] = f"{appointment['ID']}"
-                deal_data["comments"] = f"Gebucht am: {appointment['BookingDate']}<br>\nThema: {appointment['SelectedAnswers']}"
+                deal_data["comments"] = f"Gebucht am: {appointment['BookingDate']}<br>\nOrt: {appointment['Location']}<br>\nThema: {appointment['SelectedAnswers']}<br>\nKommentar: {appointment['Notes']}"
+                if appointment['SelectedAnswers'] == "PV Anlage ohne Speicher":
+                    deal_data["mfr_category"] = "service"
+                if appointment['SelectedAnswers'] == "PV Anlage mit Lithiumspeicher":
+                    deal_data["mfr_category"] = "service_pv_storage_li"
+                if appointment['SelectedAnswers'] == "PV Anlage mit Bleispeicher":
+                    deal_data["mfr_category"] = "service_pv_storage_pb"
+                if appointment['SelectedAnswers'] == "Lithiumspeicher ohne Photovoltaik-Anlage":
+                    deal_data["mfr_category"] = "service_storage_li"
+                if appointment['SelectedAnswers'] == "Bleispeicher ohne Photovoltaik-Anlage":
+                    deal_data["mfr_category"] = "service_storage_pb"
                 print("add deal", add_deal(deal_data))
         config = get_settings("external/etermin")
         if config is not None:
