@@ -57,7 +57,7 @@ def get_tasks(payload):
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]["tasks"]:
-                result.append(item)
+                result.append(convert_config_values(item))
         else:
             print("error3:", data)
             payload["start"] = None
