@@ -29,6 +29,8 @@ def import_new_appointments():
     response = get("/api/appointmentsync", parameters={"synctoken": syncToken})
     if response is not None and "SyncToken" in response:
         for appointment in response["data"]:
+            if appointment.get('SelectedAnswers') in [None, ""]:
+                continue
             existing_deals = get_deals({"FILTER[UF_CRM_1614177772351]": appointment['ID']})
             if len(existing_deals) == 0:
                 contact = get_contact_by_email(appointment["Email"])
