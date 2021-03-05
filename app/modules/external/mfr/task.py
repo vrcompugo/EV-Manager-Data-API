@@ -184,6 +184,8 @@ def export_by_bitrix_id(bitrix_id):
                 "EndDateTime": deal_data["service_appointment_enddate"],
                 "ContactId": "18105040909"
             })
+            post_data["State"] = "Released"
+            response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data=post_data)
 
 
 def get_linked_data_by_task(task_data):
