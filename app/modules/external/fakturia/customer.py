@@ -77,7 +77,7 @@ def export_contact(contact):
 
     if contact.get("fakturia_number") in ["", None] and "email" in export_data:
         customer_data = post(f"/Customers", post_data=export_data)
-        if "customerNumber" in customer_data:
+        if customer_data is not None and "customerNumber" in customer_data:
             contact["fakturia_number"] = customer_data["customerNumber"]
             put(f"/Customers/{contact.get('fakturia_number')}/CustomFields", post_data=export_data["customFields"])
             update_bitrix_contact(contact["id"], {
