@@ -30,6 +30,23 @@ def get(url, parameters=None):
     return {}
 
 
+def get_download(url, parameters=None):
+    config = get_settings("external/mfr")
+    token = authenticate()
+
+    if token is not None:
+        response = requests.get(
+            "https://portal.mobilefieldreport.com" + url,
+            headers={'Authorization': "Basic {}".format(token)},
+            params=parameters
+        )
+        try:
+            return response
+        except Exception as e:
+            print(response.text)
+    return {}
+
+
 def post(url, post_data=None, files=None):
     config = get_settings("external/mfr")
     token = authenticate()

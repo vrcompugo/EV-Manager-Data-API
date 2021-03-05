@@ -77,7 +77,8 @@ def get_settings(section=None, domain_raw=None):
                     "4012": "additional_roof",
                     "4010": "solar_edge_change_test",
                     "4054": "enpal_mvt",
-                    "4056": "enpal_verbau"
+                    "4056": "enpal_verbau",
+                    "4074": "additional_electric"
                 }
             },
             "product": {
@@ -157,6 +158,8 @@ def get_settings(section=None, domain_raw=None):
                     "mfr_category": "UF_CRM_1612967946042",
                     "service_appointment_notes": "UF_CRM_1573029988665",
                     "service_appointment_date": "UF_CRM_1594740636",
+                    "service_appointment_startdate": "UF_CRM_1614935800",
+                    "service_appointment_enddate": "UF_CRM_1614935821",
                     "etermin_id": "UF_CRM_1614177772351"
                 }
             },

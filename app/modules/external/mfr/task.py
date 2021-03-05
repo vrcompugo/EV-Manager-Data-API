@@ -9,9 +9,10 @@ from datetime import datetime, timedelta
 
 from app import db
 from app.modules.external.bitrix24.task import get_task, update_task, get_tasks
+from app.modules.external.bitrix24.drive import add_file, create_folder_path
 from app.modules.settings import get_settings, set_settings
 
-from ._connector import get, post, put
+from ._connector import get, post, put, get_download
 from .contact import export_by_bitrix_id as export_contact_by_bitrix_id
 from .company import export_by_bitrix_id as export_company_by_bitrix_id
 from .models.task_persistent_users import TaskPersistentUsers
@@ -51,6 +52,8 @@ def convert_datetime(value):
 def import_by_id(service_request_id):
     print("mfr import", service_request_id)
     config = get_settings("external/bitrix24")
+    config_folders = get_settings("external/bitrix24/folder_creation")
+    drive_abnahmen_folder = next((item for item in config_folders["folders"] if item["key"] == "drive_abnahmen_folder"), None)
     response = get(f"/ServiceRequests({service_request_id}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
         "id": service_request_id
     })
@@ -71,6 +74,19 @@ def import_by_id(service_request_id):
     update_data = {}
     if response["State"] in ["IsWorkDone", "Closed"] and task_data["status"] not in ["4", "5"]:
         update_data["status"] = "4"
+        if len(response.get("Reports", [])) == 0:
+            deal_data, contact_data, company_data = get_linked_data_by_task(task_data)
+            if contact_data is not None and contact_data.get("id") not in [None, "", "0"]:
+                report = post(f"/ServiceRequests({service_request_id}L)/GenerateReportHash", post_data={
+                    "reportDefinitionId": "18146623488"
+                })
+                if "value" in report:
+                    report_content = get_download(f"/System/CustomerReport/{report['value']}")
+                    folder_id = create_folder_path(drive_abnahmen_folder["folder_id"], f"Kunde {contact_data['id']}")
+                    add_file(folder_id, {
+                        "filename": f"Abnahme MFR ({task_data['id']}).pdf",
+                        "file_content": report_content.content
+                    })
     if len(response.get("Appointments", [])) > 0:
         appointment = response["Appointments"][0]
         contacts = appointment.get("Contacts")
@@ -101,7 +117,6 @@ def import_by_id(service_request_id):
                 print(contact.get("Email"))
         if new_leading is not None:
             update_data["RESPONSIBLE_ID"] = new_leading
-        print(persistent_users.data)
         new_support_users_list = persistent_users.data + supporting_users
         if set(task_data["accomplices"]) != set(new_support_users_list):
             update_data["ACCOMPLICES"] = new_support_users_list
@@ -149,11 +164,26 @@ def export_by_bitrix_id(bitrix_id):
     if task_data.get("mfr_id", None) in ["", None, 0]:
         response = post("/ServiceRequests", post_data=post_data)
         if response.get("Id") not in ["", None, 0]:
+            task_data['mfr_id'] = response.get("Id")
             update_task(bitrix_id, {"mfr_id": response.get("Id")})
         else:
             print(json.dumps(response, indent=2))
     else:
+        post_data["ServiceRequestId"] = str(task_data.get('mfr_id'))
         response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data=post_data)
+    if deal_data is not None and str(deal_data.get("category_id")) == "134":
+        response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
+            "id": str(task_data.get('mfr_id'))
+        })
+        if response is not None and len(response.get("Appointments", [])) == 0:
+            response = post("/Appointments", post_data={
+                "ServiceRequestId": str(task_data.get('mfr_id')),
+                "Type": "MFR.Domain.DTO.AppointmentDto",
+                "State": "NotVisited",
+                "StartDateTime": deal_data["service_appointment_startdate"],
+                "EndDateTime": deal_data["service_appointment_enddate"],
+                "ContactId": "18105040909"
+            })
 
 
 def get_linked_data_by_task(task_data):
@@ -209,7 +239,8 @@ def get_template_id_by_deal(deal_data):
         "additional_roof": "18145247236",
         "solar_edge_change_test": "18147409920",
         "enpal_mvt": "18214387720",
-        "enpal_verbau": "18214387721"
+        "enpal_verbau": "18214387721",
+        "additional_electric": "18511986693"
     }
     if deal_data is None:
         return config["default"]
