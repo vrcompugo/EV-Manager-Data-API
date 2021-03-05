@@ -91,7 +91,6 @@ def export_appointments():
         "select[7]": "START_DATE_PLAN",
         "select[8]": "END_DATE_PLAN",
         "select[9]": "UF_CRM_TASK",
-        "filter[RESPONSIBLE_ID]": 90,
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
