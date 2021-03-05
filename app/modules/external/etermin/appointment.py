@@ -26,7 +26,6 @@ def import_new_appointments():
     syncToken = 1
     if "SyncToken" in config:
         syncToken = config["SyncToken"]
-    syncToken = 92
     response = get("/api/appointmentsync", parameters={"synctoken": syncToken})
     if response is not None and "SyncToken" in response:
         for appointment in response["data"]:
