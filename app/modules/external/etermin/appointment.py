@@ -98,10 +98,12 @@ def export_appointments():
     for task in tasks:
         if task.get("startDatePlan") in [None, "", "0"]:
             continue
-        deal_data, contact_data, company_data = get_linked_data_by_task(task)
-        if task.get("etermin_id") in [None, "", "0"] or str(deal_data.get("category_id")) == "134":
+        if task.get("etermin_id") not in [None, "", "0"]:
             continue
-        print("export task", task["id"])
+        deal_data, contact_data, company_data = get_linked_data_by_task(task)
+        if deal_data is None or str(deal_data.get("category_id")) != "134":
+            continue
+        print("export task etermin", task["id"])
         startDatetime = dateutil.parser.parse(task.get("startDatePlan"))
         endDatetime = dateutil.parser.parse(task.get("endDatePlan"))
         post_data = {

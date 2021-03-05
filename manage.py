@@ -40,6 +40,12 @@ def update_role_permissions():
 
 
 @manager.command
+def test_akjsdb():
+    from app.modules.external.mfr.task import export_by_bitrix_id
+    export_by_bitrix_id(123)
+
+
+@manager.command
 def run_legacy_folder_creation():
     from app.modules.external.bitrix24.drive import run_legacy_folder_creation
     run_legacy_folder_creation()
