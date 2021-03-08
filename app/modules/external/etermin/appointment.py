@@ -55,8 +55,8 @@ def import_new_appointments():
                     deal_data["title"] = f"{contact['last_name']} {contact['first_name']} {contact['city']} am {startDatetime.strftime('%d.%m.%Y')}"
                 deal_data["service_appointment_notes"] = f"Wartungstermin für den {startDatetime.strftime('%d.%m.%Y %H:%M:%S')} bis {endDatetime.strftime('%d.%m.%Y %H:%M:%S')} // eTermin"
                 deal_data["service_appointment_date"] = startDatetime.strftime('%d.%m.%Y')
-                deal_data["service_appointment_startdate"] = startDatetime.astimezone().isoformat()
-                deal_data["service_appointment_enddate"] = endDatetime.astimezone().isoformat()
+                deal_data["service_appointment_startdate"] = startDatetime.strftime('%d.%m.%Y %H:%M:%S')
+                deal_data["service_appointment_enddate"] = endDatetime.strftime('%d.%m.%Y %H:%M:%S')
                 deal_data["etermin_id"] = f"{appointment['ID']}"
                 deal_data["comments"] = f"Gebucht am: {appointment['BookingDate']}<br>\nOrt: {appointment['Location']}<br>\nThema: {appointment['SelectedAnswers']}<br>\nKommentar: {appointment['Notes']}"
                 if appointment['SelectedAnswers'] == "PV Anlage ohne Speicher":
