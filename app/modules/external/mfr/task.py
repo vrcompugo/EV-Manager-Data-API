@@ -150,11 +150,11 @@ def export_by_bitrix_id(bitrix_id):
     print("export task ", bitrix_id)
     task_data = get_task(bitrix_id)
     deal_data, contact_data, company_data = get_linked_data_by_task(task_data)
-    if contact_data is not None:
+    if contact_data is not None and contact_data.get("mfr_id") in [None, "", "0"]:
         export_contact_by_bitrix_id(contact_data["id"])
         contact_data = get_contact(contact_data["id"])
     else:
-        if company_data is not None:
+        if company_data is not None and company_data.get("mfr_id") in [None, "", "0"]:
             export_company_by_bitrix_id(company_data["id"])
             company_data = get_company(company_data["id"])
     if contact_data is None and company_data is None:
