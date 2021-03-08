@@ -169,8 +169,10 @@ def export_by_bitrix_id(bitrix_id):
         else:
             print(json.dumps(response, indent=2))
     else:
-        post_data["Id"] = str(task_data.get('mfr_id'))
-        response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data=post_data)
+        response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data={
+            "Id": str(task_data.get('mfr_id')),
+            "Description": post_data["Description"]
+        })
     if deal_data is not None and str(deal_data.get("category_id")) == "134":
         response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
             "id": str(task_data.get('mfr_id'))
