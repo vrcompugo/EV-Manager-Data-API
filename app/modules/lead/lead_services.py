@@ -170,7 +170,7 @@ def auto_assignment_facebook_leads():
             auto_assign_lead_to_user(lead_data["ID"])
     config = get_settings2("leads/facebook")
     if config is not None:
-        config["last_lead_import_time"] = str(import_time)
+        config["last_lead_import_time"] = import_time.astimezone().isoformat()
     set_settings("leads/facebook", config)
 
 
