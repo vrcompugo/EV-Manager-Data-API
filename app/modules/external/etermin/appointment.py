@@ -12,7 +12,7 @@ from app.modules.user import auto_assign_lead_to_user
 from app.modules.external.bitrix24.company import add_company
 from app.modules.external.bitrix24.contact import get_contact_by_email, add_contact
 from app.modules.external.bitrix24.deal import get_deals, add_deal
-from app.modules.external.bitrix24.task import get_tasks, update_task
+from app.modules.external.bitrix24.task import get_tasks, update_task, get_task
 from app.modules.external.bitrix24.timeline_comment import add_timeline_comment
 from app.modules.external.mfr.task import get_linked_data_by_task
 from app.modules.settings import get_settings, set_settings
@@ -111,8 +111,8 @@ def export_appointments():
         startDatetime = dateutil.parser.parse(task.get("startDatePlan"))
         endDatetime = dateutil.parser.parse(task.get("endDatePlan"))
         post_data = {
-            "start": startDatetime.astimezone().isoformat(),
-            "end": endDatetime.astimezone().isoformat(),
+            "start": startDatetime.strftime("%Y-%m-%d %H:%M:%S"),
+            "end": endDatetime.strftime("%Y-%m-%d %H:%M:%S"),
             "calendarid": 93100,
             "sendemail": False
         }
