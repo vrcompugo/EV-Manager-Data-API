@@ -169,7 +169,7 @@ def export_by_bitrix_id(bitrix_id):
         else:
             print(json.dumps(response, indent=2))
     else:
-        post_data["ServiceRequestId"] = str(task_data.get('mfr_id'))
+        post_data["Id"] = str(task_data.get('mfr_id'))
         response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data=post_data)
     if deal_data is not None and str(deal_data.get("category_id")) == "134":
         response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
@@ -185,10 +185,9 @@ def export_by_bitrix_id(bitrix_id):
                 "ContactId": "18105040909"
             })
             response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data={
-                "ServiceRequestId": str(task_data.get('mfr_id')),
+                "Id": str(task_data.get('mfr_id')),
                 "State": "Released"
             })
-            print("change state", response)
 
 
 def get_linked_data_by_task(task_data):
