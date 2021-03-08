@@ -110,8 +110,8 @@ def export_appointments():
         startDatetime = dateutil.parser.parse(task.get("startDatePlan"))
         endDatetime = dateutil.parser.parse(task.get("endDatePlan"))
         post_data = {
-            "start": startDatetime.strftime("%Y-%m-%d %H:%M:%S"),
-            "end": endDatetime.strftime("%Y-%m-%d %H:%M:%S"),
+            "start": startDatetime.strftime("%Y-%m-%d %H:%M:%S.%f"),
+            "end": endDatetime.strftime("%Y-%m-%d %H:%M:%S.%f"),
             "calendarid": 93100,
             "sendemail": False
         }
