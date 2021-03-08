@@ -65,7 +65,7 @@ def run_cron_export():
         export_contact(contact)
     config = get_settings("external/fakturia")
     if config is not None:
-        config["last_contact_export_time"] = str(import_time)
+        config["last_contact_export_time"] = import_time.astimezone().isoformat()
     set_settings("external/fakturia", config)
 
 
