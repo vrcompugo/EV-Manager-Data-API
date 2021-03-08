@@ -55,8 +55,8 @@ def import_new_appointments():
                     deal_data["title"] = f"{contact['last_name']} {contact['first_name']} {contact['city']} am {startDatetime.strftime('%d.%m.%Y')}"
                 deal_data["service_appointment_notes"] = f"Wartungstermin für den {startDatetime.strftime('%d.%m.%Y %H:%M:%S')} bis {endDatetime.strftime('%d.%m.%Y %H:%M:%S')} // eTermin"
                 deal_data["service_appointment_date"] = startDatetime.strftime('%d.%m.%Y')
-                deal_data["service_appointment_startdate"] = startDatetime.isoformat()
-                deal_data["service_appointment_enddate"] = endDatetime.isoformat()
+                deal_data["service_appointment_startdate"] = startDatetime.astimezone().isoformat()
+                deal_data["service_appointment_enddate"] = endDatetime.astimezone().isoformat()
                 deal_data["etermin_id"] = f"{appointment['ID']}"
                 deal_data["comments"] = f"Gebucht am: {appointment['BookingDate']}<br>\nOrt: {appointment['Location']}<br>\nThema: {appointment['SelectedAnswers']}<br>\nKommentar: {appointment['Notes']}"
                 if appointment['SelectedAnswers'] == "PV Anlage ohne Speicher":
@@ -110,8 +110,8 @@ def export_appointments():
         startDatetime = dateutil.parser.parse(task.get("startDatePlan"))
         endDatetime = dateutil.parser.parse(task.get("endDatePlan"))
         post_data = {
-            "start": startDatetime.isoformat(),
-            "end": endDatetime.isoformat(),
+            "start": startDatetime.astimezone().isoformat(),
+            "end": endDatetime.astimezone().isoformat(),
             "calendarid": 93100,
             "sendemail": False
         }
@@ -130,5 +130,5 @@ def export_appointments():
             update_task(task["id"], {"etermin_id": response["cid"]})
     config = get_settings("external/etermin")
     if config is not None:
-        config["last_task_export_time"] = last_task_export_time.isoformat()
+        config["last_task_export_time"] = last_task_export_time.astimezone().isoformat()
     set_settings("external/etermin", config)
