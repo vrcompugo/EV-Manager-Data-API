@@ -28,7 +28,6 @@ def import_new_appointments():
     syncToken = 1
     if "SyncToken" in config:
         syncToken = config["SyncToken"]
-    syncToken = 109
     response = get("/api/appointmentsync", parameters={"synctoken": syncToken})
     if response is not None and "SyncToken" in response:
         for appointment in response["data"]:
@@ -57,8 +56,8 @@ def import_new_appointments():
                     deal_data["title"] = f"{contact['last_name']} {contact['first_name']} {contact['city']} am {startDatetime.strftime('%d.%m.%Y')}"
                 deal_data["service_appointment_notes"] = f"Wartungstermin für den {startDatetime.strftime('%d.%m.%Y %H:%M:%S')} bis {endDatetime.strftime('%d.%m.%Y %H:%M:%S')} // eTermin"
                 deal_data["service_appointment_date"] = startDatetime.strftime('%d.%m.%Y')
-                deal_data["service_appointment_startdate"] = startDatetime.astimezone(pytz.timezone("Europe/Berlin")).isoformat()
-                deal_data["service_appointment_enddate"] = endDatetime.astimezone(pytz.timezone("Europe/Berlin")).isoformat()
+                deal_data["service_appointment_startdate"] = pytz.timezone("Europe/Berlin").localize(startDatetime).isoformat()
+                deal_data["service_appointment_enddate"] = pytz.timezone("Europe/Berlin").localize(endDatetime).isoformat()
                 deal_data["etermin_id"] = f"{appointment['ID']}"
                 deal_data["comments"] = f"Gebucht am: {appointment['BookingDate']}<br>\nOrt: {appointment['Location']}<br>\nThema: {appointment['SelectedAnswers']}<br>\nKommentar: {appointment['Notes']}"
                 if appointment['SelectedAnswers'] == "PV Anlage ohne Speicher":
