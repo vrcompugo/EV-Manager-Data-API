@@ -205,14 +205,14 @@ def run_cron_folder_creation():
     if config is None or "folders" not in config:
         print("no config for folder_creation")
         return None
-    last_import = datetime(2021, 2, 6, 0, 0, 0)
+    last_import = "2021-02-06"
     import_time = datetime.now()
     if "last_run_time" in config:
-        last_import = datetime.strptime(config["last_run_time"], "%Y-%m-%d %H:%M:%S.%f")
+        last_import = config["last_run_time"]
 
     contacts = get_contacts({
         "ORDER[DATE_CREATE]": "DESC",
-        "FILTER[>DATE_CREATE]": str(last_import),
+        "FILTER[>DATE_CREATE]": last_import,
         "SELECT[0]": "ID",
         "SELECT[1]": "UF_CRM_1612518385676",
         "SELECT[2]": "UF_CRM_1612533349639",
@@ -290,7 +290,7 @@ def run_cron_folder_creation():
 
     config = get_settings("external/bitrix24/folder_creation")
     if config is not None:
-        config["last_run_time"] = str(import_time)
+        config["last_run_time"] = import_time.astimezone().isoformat()
     set_settings("external/bitrix24/folder_creation", config)
 
 
