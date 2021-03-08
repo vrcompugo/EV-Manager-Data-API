@@ -142,7 +142,7 @@ def run_cron_export():
         export_by_bitrix_id(task["id"])
     config = get_settings("external/mfr")
     if config is not None:
-        config["last_task_export_time"] = last_task_export_time.strftime("%Y-%m-%d %H:%M:%S.%f")
+        config["last_task_export_time"] = last_task_export_time.isoformat()
     set_settings("external/mfr", config)
 
 
