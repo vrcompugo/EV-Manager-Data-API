@@ -256,8 +256,8 @@ def get_template_id_by_deal(deal_data):
         return config["roof"]
     if deal_data.get("category_id", "") == "9":
         return config["heating"]
+    if deal_data.get("mfr_category", "") != "default" and deal_data.get("mfr_category", "") in config:
+        return config[deal_data.get("mfr_category", "")]
     if deal_data.get("category_id", "") == "134":
         return config["service"]
-    if deal_data.get("mfr_category", "") in config:
-        return config[deal_data.get("mfr_category", "")]
     return config["default"]
