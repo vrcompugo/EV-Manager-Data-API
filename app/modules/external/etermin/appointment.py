@@ -95,6 +95,8 @@ def export_appointments():
         "select[7]": "START_DATE_PLAN",
         "select[8]": "END_DATE_PLAN",
         "select[9]": "UF_CRM_TASK",
+        "select[10]": "RESPONSIBLE_ID",
+        "select[11]": "ACCOMPLICES",
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
@@ -104,8 +106,10 @@ def export_appointments():
             continue
         if task.get("etermin_id") not in [None, "", "0"]:
             continue
+        if str(task.get("responsibleid")) != "90" and "90" not in task.get("accomplices", []):
+            continue
         deal_data, contact_data, company_data = get_linked_data_by_task(task)
-        if deal_data is None or str(deal_data.get("category_id")) != "134":
+        if deal_data is None or deal_data.get("etermin_id") not in [None, "", "0"]:
             continue
         print("export task etermin", task["id"])
         startDatetime = dateutil.parser.parse(task.get("startDatePlan"))
