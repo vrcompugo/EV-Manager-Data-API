@@ -5,7 +5,9 @@ from app.modules.external.bitrix24.user import get_user_by_email
 import time
 import json
 import random
+import pytz
 from datetime import datetime, timedelta
+import dateutil.parser
 
 from app import db
 from app.modules.external.bitrix24.task import get_task, update_task, get_tasks
@@ -41,12 +43,10 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
     return data
 
 
-def convert_datetime(value):
+def convert_datetime(value, zone="Europe/Berlin"):
     if value is None:
         return None
-    if value.find("+"):
-        return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S%z')
-    return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S%Z')
+    return dateutil.parser.parse(value).astimezone(pytz.timezone(zone)).strftime("%Y-%m-%dT%H:%M:%S")
 
 
 def import_by_id(service_request_id):
@@ -91,9 +91,9 @@ def import_by_id(service_request_id):
         appointment = response["Appointments"][0]
         contacts = appointment.get("Contacts")
         if convert_datetime(task_data["startdateplan"]) != convert_datetime(appointment["StartDateTime"]):
-            update_data["START_DATE_PLAN"] = appointment["StartDateTime"]
+            update_data["START_DATE_PLAN"] = convert_datetime(appointment["StartDateTime"]) + "+01:00"
         if convert_datetime(task_data["enddateplan"]) != convert_datetime(appointment["EndDateTime"]):
-            update_data["END_DATE_PLAN"] = appointment["EndDateTime"]
+            update_data["END_DATE_PLAN"] = convert_datetime(appointment["EndDateTime"]) + "+01:00"
             update_data["DEADLINE"] = update_data["END_DATE_PLAN"]
         new_leading = None
         supporting_users = []
