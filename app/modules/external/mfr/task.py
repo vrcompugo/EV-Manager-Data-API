@@ -91,9 +91,9 @@ def import_by_id(service_request_id):
         appointment = response["Appointments"][0]
         contacts = appointment.get("Contacts")
         if convert_datetime(task_data["startdateplan"]) != convert_datetime(appointment["StartDateTime"]):
-            update_data["START_DATE_PLAN"] = str(convert_datetime(appointment["StartDateTime"])).replace(" ", "T")
+            update_data["START_DATE_PLAN"] = appointment["StartDateTime"]
         if convert_datetime(task_data["enddateplan"]) != convert_datetime(appointment["EndDateTime"]):
-            update_data["END_DATE_PLAN"] = str(convert_datetime(appointment["EndDateTime"])).replace(" ", "T")
+            update_data["END_DATE_PLAN"] = appointment["EndDateTime"]
             update_data["DEADLINE"] = update_data["END_DATE_PLAN"]
         new_leading = None
         supporting_users = []
