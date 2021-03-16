@@ -42,6 +42,8 @@ def filter_import_data(item_data):
         group_id = 6
     if "energiezentrum-mitte EXTERN" in bitrix_department:
         group_id = 6
+    if "AEV Vertrieb GmbH" in bitrix_department:
+        group_id = 6
     if "Buchhaltung" in bitrix_department:
         group_id = 8
     if "Finanzbuchhaltung" in bitrix_department:
