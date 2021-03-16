@@ -44,6 +44,13 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "productive" or section == "aev_lead_convert":
+        from app.modules.external.bitrix24.lead import run_aev_lead_convert
+        try:
+            run_aev_lead_convert()
+        except Exception as e:
+            error_handler()
+
     if section == "productive":
         from app.modules.importer.sources.bitrix24.reseller import run_import
         try:

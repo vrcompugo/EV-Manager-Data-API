@@ -1,8 +1,10 @@
+from datetime import datetime
 import json
 
-from app.modules.settings import get_settings
+from app.modules.settings import get_settings, set_settings
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.user import get_user
+from app.modules.external.bitrix24.deal import add_deal, get_deals
 from app.utils.dict_func import flatten_dict
 
 from ._connector import get, post
@@ -30,10 +32,10 @@ def convert_config_values(data_raw):
         "last_name": data["last_name"],
         "firstname": data["first_name"],
         "lastname": data["last_name"],
-        "street": data["street"],
-        "street_nb": data["street_nb"],
-        "zip": data["zip"],
-        "city": data["city"]
+        "street": data.get("street"),
+        "street_nb": data.get("street_nb"),
+        "zip": data.get("zip"),
+        "city": data.get("city")
     }
     if "contact_id" in data and data["contact_id"] is not None and data["contact_id"] is not False and data["contact_id"] != "" and int(data["contact_id"]) > 0:
         contact_data = get_contact(data["contact_id"])
@@ -181,3 +183,55 @@ def get_leads_by_createdate(created_after_datetime):
             payload["start"] = None
             return None
     return result
+
+
+def get_leads(payload):
+    payload["start"] = 0
+    result = []
+    while payload["start"] is not None:
+        data = post("crm.lead.list", payload)
+        if "result" in data:
+            payload["start"] = data["next"] if "next" in data else None
+            for item in data["result"]:
+                result.append(convert_config_values(item))
+        else:
+            print("error3:", data)
+            payload["start"] = None
+            return None
+    return result
+
+
+def convert_lead_to_deal(lead):
+    return lead
+
+
+def run_aev_lead_convert():
+    config = get_settings("external/bitrix24/aev_lead_convert")
+    print("aev_lead_convert")
+    if config is None:
+        print("no config for aev_lead_convert import")
+        return None
+    now = datetime.now()
+    # "FILTER[>DATE_CREATE]": config.get("last_import", "2021-01-01"),
+    leads = get_leads({
+        "FILTER[>DATE_CREATE]": "2021-01-01",
+        "FILTER[SOURCE_ID]": "23"
+    })
+    if leads is not None:
+        for lead_data in leads:
+            lead = get_lead(lead_data["id"])
+            lead["unique_identifier"] = lead["id"]
+            deal_datas = get_deals({
+                "FILTER[UF_CRM_5FA43F983EBAB]": lead["unique_identifier"],
+                "FILTER[CATEGORY_ID]": "170",
+                "SELECT[0]": "ID",
+                "SELECT[1]": "UF_CRM_5FA43F983EBAB"
+            })
+            if len(deal_datas) == 0:
+                deal_data = convert_lead_to_deal(lead)
+                deal_data["category_id"] = "170"
+                add_deal(deal_data)
+        config = get_settings("external/bitrix24/aev_lead_convert")
+        if config is not None:
+            config["last_import"] = now.astimezone().isoformat()
+        set_settings("external/bitrix24/aev_lead_convert", config)

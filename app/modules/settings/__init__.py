@@ -160,7 +160,8 @@ def get_settings(section=None, domain_raw=None):
                     "service_appointment_date": "UF_CRM_1594740636",
                     "service_appointment_startdate": "UF_CRM_1614935800",
                     "service_appointment_enddate": "UF_CRM_1614935821",
-                    "etermin_id": "UF_CRM_1614177772351"
+                    "etermin_id": "UF_CRM_1614177772351",
+                    "aev_reseller": "UF_CRM_1615824273"
                 }
             },
             "quote": {
@@ -204,7 +205,8 @@ def get_settings(section=None, domain_raw=None):
                     "street": "UF_CRM_5DD4020221169",
                     "street_nb": "UF_CRM_5DD402022E300",
                     "zip": "UF_CRM_5DD4020242167",
-                    "city": "UF_CRM_5DD4020239456"
+                    "city": "UF_CRM_5DD4020239456",
+                    "aev_reseller": "UF_CRM_1615824261"
                 }
             },
             "company": {

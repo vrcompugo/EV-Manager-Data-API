@@ -13,7 +13,7 @@ class Settings(db.Model):
     __tablename__ = "settings"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    section = db.Column(db.String(40))
+    section = db.Column(db.String(120))
     data = db.Column(db.JSON)
 
     @hybrid_property
