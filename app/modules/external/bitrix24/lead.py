@@ -212,9 +212,8 @@ def run_aev_lead_convert():
         print("no config for aev_lead_convert import")
         return None
     now = datetime.now()
-    # "FILTER[>DATE_CREATE]": config.get("last_import", "2021-01-01"),
     leads = get_leads({
-        "FILTER[>DATE_CREATE]": "2021-01-01",
+        "FILTER[>DATE_CREATE]": config.get("last_import", "2021-01-01"),
         "FILTER[SOURCE_ID]": "23"
     })
     if leads is not None:
