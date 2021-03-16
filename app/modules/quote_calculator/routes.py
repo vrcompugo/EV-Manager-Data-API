@@ -9,6 +9,7 @@ from app.decorators import api_response
 from app.modules.auth import get_auth_info
 from app.modules.auth.jwt_parser import decode_jwt, encode_jwt
 from app.modules.external.bitrix24.lead import get_lead, update_lead
+from app.modules.external.bitrix24.deal import get_deal
 from app.modules.external.bitrix24.quote import get_quote, add_quote, update_quote_products
 from app.modules.external.bitrix24.drive import get_file, add_file, get_public_link, create_folder_path
 from app.modules.external.bitrix24.products import reload_products
@@ -543,6 +544,9 @@ def quote_calculator_index():
     if options is None:
         return "Keine Placement Optionen gesetzt"
     options = json.loads(options)
+    if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
+        deal = get_deal(options["ID"])
+        options["ID"] = deal["unique_identifier"]
     if "ID" not in options:
         return "Keine ID gewählt"
     token = encode_jwt(auth_info, expire_minutes=600)

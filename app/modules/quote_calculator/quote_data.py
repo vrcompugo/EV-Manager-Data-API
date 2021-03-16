@@ -7,6 +7,7 @@ from app.modules.reseller.models.reseller import Reseller, ResellerSchema
 from app.modules.cloud.services.calculation import calculate_cloud as get_cloud_calculation
 from app.modules.importer.sources.bitrix24._association import find_association
 from app.modules.external.bitrix24.lead import get_lead
+from app.modules.external.bitrix24.deal import get_deal, get_deals
 from app.modules.external.bitrix24.user import get_user
 from app.modules.external.bitrix24.products import get_list as get_product_list, get_product
 from app.modules.external.bitrix24.contact import get_contact
@@ -42,6 +43,13 @@ def calculate_quote(lead_id, data=None, create_quote=False):
                     }
                 )
     lead_data = get_lead(lead_id)
+    if lead_data["source_id"] == "1":
+        deal_datas = get_deals({
+            "FILTER[UF_CRM_1603895163]": lead_data["unique_identifier"],
+            "FILTER[CATEGORY_ID]": "170"
+        })
+        if deal_datas is not None and len(deal_datas) > 0:
+            lead_data["assigned_by_id"] = deal_datas[0]["assigned_by_id"]
     return_data = {
         "id": lead_id,
         "assigned_by_id": lead_data["assigned_by_id"],
