@@ -45,7 +45,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
     lead_data = get_lead(lead_id)
     if lead_data["source_id"] == "23":
         deal_datas = get_deals({
-            "FILTER[UF_CRM_1603895163]": lead_data["unique_identifier"],
+            "FILTER[UF_CRM_5FA43F983EBAB]": lead_data["unique_identifier"],
             "FILTER[CATEGORY_ID]": "170"
         })
         if deal_datas is not None and len(deal_datas) > 0:
