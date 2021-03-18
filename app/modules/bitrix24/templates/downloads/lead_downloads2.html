@@ -1,0 +1,33 @@
+<html lang="de">
+<head>
+  <title>Downloads</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <style>
+    body {
+      font: 500 13px/18px "Helvetica Neue",Arial,Helvetica,sans-serif;
+      color: #545c6a;
+    }
+    .offer {
+      padding-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <h2>Downloads</h2>
+  <div id="download_page">
+    Wird geladen...
+  </div>
+  <script>
+    var reloader = function () {
+      var oReq = new XMLHttpRequest();
+      oReq.addEventListener("load", function(e){
+        document.getElementById("download_page").innerHTML = this.responseText;
+        setTimeout(reloader, 10000);
+      });
+      oReq.open("GET", "/bitrix24/downloads/reload2/?lead_id={{ lead_id }}");
+      oReq.send();
+    };
+    reloader();
+  </script>
+</body>
+</html>

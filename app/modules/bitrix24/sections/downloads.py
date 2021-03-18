@@ -4,6 +4,7 @@ import pprint
 import datetime
 
 from app.models import Lead, OfferV2, LeadComment, S3File, Order, QuoteHistory
+from app.modules.external.bitrix24.deal import get_deal
 
 from ..utils import get_bitrix_auth_info
 
@@ -30,10 +31,20 @@ def register_routes(api: Blueprint):
                 return "Lead not found2"
         if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
             order_id = json.loads(request.form.get("PLACEMENT_OPTIONS"))["ID"]
+            deal_data = get_deal(order_id)
+            if deal_data.get("unique_identifier") not in [None, "", "0"]:
+                lead_id = deal_data.get("unique_identifier")
+                lead_link = find_association("Lead", remote_id=lead_id)
+                if lead_link is None:
+                    return render_template("downloads/lead_downloads2.html", lead_id=deal_data.get("unique_identifier"))
+                else:
+                    lead = Lead.query.filter(Lead.id == lead_link.local_id).first()
+                    if lead is not None:
+                        return render_template("downloads/lead_downloads.html", lead=lead)
             order_link = find_association("Order", remote_id=order_id)
             if order_link is None:
                 order_import(remote_id=order_id)
-                order_link = find_association("Lead", remote_id=lead_id)
+                order_link = find_association("Order", remote_id=order_id)
             if order_link is None:
                 return "Order not found"
             order = Order.query.filter(Order.id == order_link.local_id).first()
@@ -69,6 +80,14 @@ def register_routes(api: Blueprint):
                         attachment["public_link"] = s3_file.public_link
         histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_link.remote_id).order_by(QuoteHistory.datetime.desc()).all()
         return render_template("downloads/lead_downloads_list.html", offers=offers, lead_comments=lead_comments, histories=histories)
+
+
+    @api.route("/downloads/reload2/", methods=["GET"])
+    def reload2():
+        lead_id = request.args.get("lead_id")
+        histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).all()
+        return render_template("downloads/lead_downloads2_list.html", histories=histories)
+
 
     @api.route("/downloads/install/", methods=["POST"])
     def installer():
