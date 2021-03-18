@@ -89,35 +89,34 @@ def import_by_id(service_request_id):
                     })
     if len(response.get("Appointments", [])) > 0:
         appointment = response["Appointments"][0]
-        contacts = appointment.get("Contacts")
         if convert_datetime(task_data["startdateplan"]) != convert_datetime(appointment["StartDateTime"]):
             update_data["START_DATE_PLAN"] = convert_datetime(appointment["StartDateTime"]) + "+01:00"
         if convert_datetime(task_data["enddateplan"]) != convert_datetime(appointment["EndDateTime"]):
             update_data["END_DATE_PLAN"] = convert_datetime(appointment["EndDateTime"]) + "+01:00"
             update_data["DEADLINE"] = update_data["END_DATE_PLAN"]
         new_leading = None
-        supporting_users = []
-        for contact in contacts:
-            if contact.get("Email") in config["task"]["leading_users"]:
-                if task_data["responsibleid"] == config["task"]["leading_users"][contact.get("Email")]:
-                    new_leading = None
-                    break
-                else:
-                    new_leading = config["task"]["leading_users"][contact.get("Email")]
-        for contact in contacts:
-            supporting_user = get_user_by_email(contact.get("Email"))
-            if supporting_user is not None:
-                if new_leading is None:
-                    if task_data["responsibleid"] != supporting_user["ID"]:
-                        supporting_users.append(supporting_user["ID"])
-                else:
-                    if new_leading != supporting_user["ID"]:
-                        supporting_users.append(supporting_user["ID"])
-            else:
-                print(contact.get("Email"))
+        contacts = {}
+        for appointment in response["Appointments"]:
+            for contact in appointment.get("Contacts"):
+                if contact.get("Email") not in contacts:
+                    contacts[contact.get("Email")] = contact
+                    contacts[contact.get("Email")]["user"] = get_user_by_email(contact.get("Email"))
+                    if contacts[contact.get("Email")]["user"] is None:
+                        print("error user not found:", contact.get("Email"))
+                    else:
+                        if str(task_data["responsibleid"]) == str(contacts[contact.get("Email")]["user"]["ID"]):
+                            new_leading = contact.get("Email")
+                        else:
+                            if new_leading is None and contact.get("JobTitle") in ["Elektriker", "Montage"]:
+                                new_leading = contact.get("Email")
         if new_leading is not None:
-            update_data["RESPONSIBLE_ID"] = new_leading
-        new_support_users_list = persistent_users.data + supporting_users
+            if task_data["responsibleid"] != contacts[new_leading]["user"]["ID"]:
+                update_data["RESPONSIBLE_ID"] = contacts[new_leading]["user"]["ID"]
+            del contacts[new_leading]
+        supporting_users = []
+        for contact in contacts.keys():
+            supporting_users.append(contacts[contact]["user"]["ID"])
+        new_support_users_list = persistent_users.data + list(set(supporting_users) - set(persistent_users.data))
         if set(task_data["accomplices"]) != set(new_support_users_list):
             update_data["ACCOMPLICES"] = new_support_users_list
     if len(update_data.keys()) > 0:
