@@ -96,6 +96,7 @@ def run_cron_import():
             "assignedFrom": config["last_import_datetime"],
             "limit": 1000
         })
+        print(leads)
     else:
         leads = get("/assignments", parameters={
             "assignedFrom": "2020-11-01",
