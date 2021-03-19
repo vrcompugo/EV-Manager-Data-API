@@ -23,7 +23,7 @@ def convert_config_values(data_raw):
     return data
 
 
-def get_task(id):
+def get_task(id, with_comments=False):
     data = post("tasks.task.get", {
         "taskId": id,
         "select[0]": "TITLE",
@@ -43,7 +43,13 @@ def get_task(id):
         "select[14]": "DEADLINE"
     })
     if "result" in data:
-        return convert_config_values(data["result"]["task"])
+        task_data = convert_config_values(data["result"]["task"])
+        comments = post("task.commentitem.getlist", {
+            "taskId": id
+        })
+        if "result" in comments:
+            task_data["comments"] = comments["result"]
+        return task_data
     else:
         print("error get lead:", data)
     return None

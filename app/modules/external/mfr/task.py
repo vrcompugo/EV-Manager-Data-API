@@ -29,12 +29,26 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
     if company_data is not None and company_data.get("mfr_service_object_id") not in [None, "", "0", 0]:
         main_mfr_id = company_data.get("mfr_id")
         service_objects.append({"Id": company_data.get("mfr_service_object_id")})
+    task_link = f'<a href="https://keso.bitrix24.de/company/personal/user/15/tasks/task/view/{task_data["id"]}/" target="_blank">Bitrix-Aufgabenlink</a>'
+    comment_list = ""
+    if task_data.get("comments") is not None:
+        for comment in task_data.get("comments"):
+            if comment['POST_MESSAGE'].find("Verantwortliche Person bestimmt:") >= 0:
+                continue
+            if comment['POST_MESSAGE'].find("Mitwirkende zugefügt:") >= 0:
+                continue
+            if comment['POST_MESSAGE'].find("Sie sollten die Aufgabe schließen oder heute noch die Frist ändern.") >= 0:
+                continue
+            if comment['POST_MESSAGE'].find("Aufgabe geschlossen.") >= 0:
+                continue
+            post_date = dateutil.parser.parse(comment['POST_DATE'])
+            comment_list = comment_list + f"{post_date.strftime('%d.%m.%Y %H:%M:%S')} von {comment['AUTHOR_NAME']}<br>\n{comment['POST_MESSAGE']}<br>\n{'-' * 20}<br>\n"
     data = {
         "CreateFromServiceRequestTemplateId": get_template_id_by_deal(deal_data),
         "Name": f"{contact_data.get('first_name')} {contact_data.get('last_name')}",
         "ServiceObjects": service_objects,
         "CustomerId": main_mfr_id,
-        "Description": f'<a href="https://keso.bitrix24.de/company/personal/user/15/tasks/task/view/{task_data["id"]}/" target="_blank">Bitrix-Aufgabenlink</a><br>\n<br>\n' + task_data.get("description", "").replace("\n", "<br>\n"),
+        "Description": f'{task_link}<br>\n<br>\nKommentare:<br>\n{comment_list}<br><br>\n' + task_data.get("description", "").replace("\n", "<br>\n"),
         "ExternalId": task_data.get("id"),
         "State": "ReadyForScheduling"
     }
@@ -168,10 +182,12 @@ def export_by_bitrix_id(bitrix_id):
         else:
             print(json.dumps(response, indent=2))
     else:
-        '''response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data={
-            "Id": str(task_data.get('mfr_id')),
-            "Description": post_data["Description"]
-        })'''
+        response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
+            "id": task_data.get('mfr_id')
+        })
+        if response.get("State") not in [None, ""]:
+            response["Description"] = post_data["Description"]
+            response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data=response)
     if deal_data is not None and str(deal_data.get("category_id")) == "134":
         response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
             "id": str(task_data.get('mfr_id'))
