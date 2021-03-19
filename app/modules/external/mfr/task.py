@@ -41,6 +41,12 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
                 continue
             if comment['POST_MESSAGE'].find("Aufgabe geschlossen.") >= 0:
                 continue
+            if comment['POST_MESSAGE'].find("Frist geändert:") >= 0:
+                continue
+            if comment['POST_MESSAGE'].find("Sie sollten die Aufgabe schließen oder die Frist ändern.") >= 0:
+                continue
+            if comment['POST_MESSAGE'].find("Beobachter zugefügt:") >= 0:
+                continue
             post_date = dateutil.parser.parse(comment['POST_DATE'])
             comment_list = comment_list + f"{post_date.strftime('%d.%m.%Y %H:%M:%S')} von {comment['AUTHOR_NAME']}<br>\n{comment['POST_MESSAGE']}<br>\n{'-' * 20}<br>\n"
     data = {
