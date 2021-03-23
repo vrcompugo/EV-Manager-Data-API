@@ -41,8 +41,8 @@ def update_role_permissions():
 
 @manager.command
 def test_akjsdb():
-    from app.modules.external.mfr.task import export_by_bitrix_id
-    export_by_bitrix_id("66660")
+    from app.modules.external.mfr.task import import_by_id
+    import_by_id("18977718315")
 
 
 @manager.command
