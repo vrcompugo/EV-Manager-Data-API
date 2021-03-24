@@ -32,18 +32,6 @@ def calculate_commission_data(quote_data, data, quote_key=""):
     if 272 in data["assigned_user"]["UF_DEPARTMENT"]:
         data["data"][f"{quote_key}_price_increase_percent"] = 16.8
         data["data"][f"{quote_key}_price_increase_euro"] = round(quote_data["calculated"]["unchanged_total_net"] * data["data"][f"{quote_key}_price_increase_percent"] / 100, 2)
-    if 330 in data["assigned_user"]["UF_DEPARTMENT"]:
-        increase = 0
-        if quote_key == "pv_quote":
-            increase = 8.5
-        if quote_key == "heating_quote":
-            increase = 20
-        if quote_key == "roof_reconstruction_quote":
-            increase = 20
-        if quote_key == "bluegen_quote":
-            increase = 10
-        data["data"][f"{quote_key}_price_increase_percent"] = increase
-        data["data"][f"{quote_key}_price_increase_euro"] = round(quote_data["calculated"]["unchanged_total_net"] * data["data"][f"{quote_key}_price_increase_percent"] / 100, 2)
 
     quote_data["subtotal_net"] = 0
     for product in quote_data["products"]:

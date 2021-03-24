@@ -115,6 +115,11 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         return_data["data"] = data
         return_data["commission_total_value"] = 0
         if "has_pv_quote" in data and data["has_pv_quote"]:
+            if return_data.get("assigned_user") not in [None, ""]:
+                data["assigned_user"] = return_data.get("assigned_user")
+                if 330 in return_data["assigned_user"]["UF_DEPARTMENT"] or "330" in return_data["assigned_user"]["UF_DEPARTMENT"]:
+                    return_data["data"]["price_guarantee"] = "2_years"
+                    data["price_guarantee"] = "2_years"
             calculated = get_cloud_calculation(data)
             return_data["calculated"] = calculated
             return_data = calculate_products(return_data)
