@@ -9,7 +9,7 @@ from luqum.parser import parser
 from app.decorators import token_required, api_response
 from app.exceptions import ApiException
 from app.modules.auth.jwt_parser import decode_jwt
-from app.modules.external.bitrix24.drive import get_file
+from app.modules.external.bitrix24.drive import get_file, get_file_content
 
 from .file_services import sync_item, update_item, get_items, get_one_item, decode_file_token, S3File
 
@@ -91,8 +91,8 @@ class ViewFile(Resource):
         try:
             data = decode_jwt(token)
             file = get_file(data["file_id"])
-            r = requests.get(file["DOWNLOAD_URL"])
-            response = make_response(r.content)
+            content = get_file_content(data["file_id"])
+            response = make_response(content)
             response.headers['Content-Type'] = 'application/pdf'
             response.headers['Content-Disposition'] = \
                 'inline; filename=%s' % file["NAME"]
