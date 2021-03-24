@@ -5,38 +5,7 @@ import string
 
 
 from ._connector import get, post
-from app.modules.external.bitrix24.drive import create_folder_path, add_file as bitrix_add_file, add_subfolder
-
-
-def get_folder(id, namefilter=None):
-    payload = {
-        "id": id,
-        "start": 0
-    }
-    if namefilter is not None:
-        payload["filter[NAME]"] = namefilter
-    result = []
-    while payload["start"] is not None:
-        data = post("disk.folder.getchildren", payload)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            result = result + data["result"]
-        else:
-            print("error:", data)
-            payload["start"] = None
-            return None
-    return result
-
-
-def get_file(id):
-    data = post("disk.file.get", {
-        "id": id
-    })
-    if "result" in data:
-        return data["result"]
-    else:
-        print("error:", data)
-    return None
+from app.modules.external.bitrix24.drive import create_folder_path, add_file as bitrix_add_file, add_subfolder, get_file, get_folder
 
 
 def get_random_string(length):
