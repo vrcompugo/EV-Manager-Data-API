@@ -27,7 +27,7 @@ def get_file(id):
     if "result" in data:
         return data["result"]
     else:
-        print("error:", data)
+        print("error get file:", data)
     return None
 
 

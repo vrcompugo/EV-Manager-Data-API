@@ -14,7 +14,7 @@ def authenticate(domain=None):
     return None
 
 
-def post(url, post_data=None, files=None, domain=None):
+def post(url, post_data=None, files=None, domain=None, no_repeat=False):
 
     base_url = authenticate(domain=domain)
 
@@ -37,6 +37,8 @@ def post(url, post_data=None, files=None, domain=None):
         except Exception as e:
             print(e)
             print("error1", response.text)
+    if no_repeat is False:
+        return post(url, post_data=post_data, files=files, domain=domain, no_repeat=True)
     return {}
 
 
