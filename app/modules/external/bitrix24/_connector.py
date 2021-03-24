@@ -26,7 +26,10 @@ def post(url, post_data=None, files=None, domain=None):
             data = response.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
                 time.sleep(2)
-                print(url, json.dumps(post_data, indent=2))
+                if post_data.get("fileContent[1]") is not None:
+                    print(url, "with filecontent")
+                else:
+                    print(url, json.dumps(post_data, indent=2))
                 traceback.print_exc(file=sys.stdout)
                 print("query limit reached")
                 return post(url, post_data, files, domain)
