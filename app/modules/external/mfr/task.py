@@ -66,7 +66,7 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
 def convert_datetime(value, zone="Europe/Berlin"):
     if value is None:
         return None
-    return dateutil.parser.parse(value).astimezone(pytz.timezone(zone)).strftime("%Y-%m-%dT%H:%M:%S")
+    return dateutil.parser.parse(value).astimezone(pytz.timezone(zone)).strftime("%Y-%m-%dT%H:%M:00")
 
 
 def import_by_id(service_request_id):
@@ -109,8 +109,10 @@ def import_by_id(service_request_id):
                     })
     if len(response.get("Appointments", [])) > 0:
         appointment = response["Appointments"][0]
+        print(task_data["startdateplan"], appointment["StartDateTime"], convert_datetime(task_data["startdateplan"], "Europe/London"), convert_datetime(appointment["StartDateTime"]))
         if convert_datetime(task_data["startdateplan"], "Europe/London") != convert_datetime(appointment["StartDateTime"]):
             update_data["START_DATE_PLAN"] = convert_datetime(appointment["StartDateTime"]) + "+01:00"
+        print(task_data["enddateplan"], appointment["EndDateTime"], convert_datetime(task_data["enddateplan"], "Europe/London"), convert_datetime(appointment["EndDateTime"]))
         if convert_datetime(task_data["enddateplan"], "Europe/London") != convert_datetime(appointment["EndDateTime"]):
             update_data["END_DATE_PLAN"] = convert_datetime(appointment["EndDateTime"]) + "+01:00"
             update_data["DEADLINE"] = update_data["END_DATE_PLAN"]
@@ -244,7 +246,7 @@ def get_linked_data_by_task(task_data):
     else:
         if company_id is not None:
             company_data = get_company(company_id)
-    if company_data.get("street") in ["", 0, False, None]:
+    if company_data is not None and company_data.get("street") in ["", 0, False, None]:
         company_data = None
     return deal_data, contact_data, company_data
 
