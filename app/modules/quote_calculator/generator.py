@@ -69,7 +69,7 @@ def generate_letter_pdf(lead_id, data, return_string=False):
             data=data
         )
         footer_content = render_template(
-            "quote_calculator/generator/footer.html",
+            "quote_calculator/generator/footer2.html",
             base_url=config_general["base_url"],
             lead_id=lead_id,
             data=data
@@ -88,6 +88,7 @@ def generate_letter_pdf(lead_id, data, return_string=False):
             content,
             content_header=header_content,
             content_footer=footer_content,
+            margins=["0.3", "0.3", "0.6", "0.3"],
             landscape=True)
         return pdf
     return None

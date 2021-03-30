@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <style>
+            .footer {
+                font-size: 8rem;
+                width: 98%;
+                padding: 0 5%;
+                -webkit-print-color-adjust: exact;
+            }
+            .cols {
+                display: flex;
+            }
+        </style>
+    </head>
+    <body>
+      <div class="footer">
+        <div class="cols">
+          <div style="flex: 1;">Angebots-Nr.: {{ data.number }}</div>
+          <div style="text-align: right;">
+              <span class="pageNumber"></span> von <span class="totalPages"></span>
+          </div>
+        </div>
+      </div>
+    </body>
+</html>
+

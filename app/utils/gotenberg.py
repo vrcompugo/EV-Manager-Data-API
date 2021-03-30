@@ -23,10 +23,10 @@ def generate_pdf(content, output_path=None, content_footer=None, content_header=
         "waitTimeout": (None, 30)
     }
     if len(margins) == 0:
+        data["marginTop"] = (None, "0.3")
+        data["marginRight"] = (None, "0.3")
         data["marginBottom"] = (None, "1.4")
         data["marginLeft"] = (None, "0.3")
-        data["marginRight"] = (None, "0.3")
-        data["marginTop"] = (None, "0.3")
     else:
         data["marginTop"] = (None, margins[0])
         data["marginRight"] = (None, margins[1])
