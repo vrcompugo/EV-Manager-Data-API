@@ -46,6 +46,12 @@ def test_akjsdb():
 
 
 @manager.command
+def test_2fsfasd():
+    from app.modules.external.mfr.task import export_by_bitrix_id
+    export_by_bitrix_id("72554")
+
+
+@manager.command
 def run_legacy_folder_creation():
     from app.modules.external.bitrix24.drive import run_legacy_folder_creation
     run_legacy_folder_creation()

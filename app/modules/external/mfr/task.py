@@ -244,6 +244,8 @@ def get_linked_data_by_task(task_data):
     else:
         if company_id is not None:
             company_data = get_company(company_id)
+    if company_data.get("street") in ["", 0, False, None]:
+        company_data = None
     return deal_data, contact_data, company_data
 
 

@@ -15,8 +15,8 @@ def get_export_data(company_data, contact_data):
             "IsPhysicalPerson": False,
             "Location": {
                 "AddressString": f"{company_data.get('street')} {company_data.get('street_nb')}",
-                "Postal": company_data.get("zip"),
-                "City": company_data.get("city")
+                "Postal": str(company_data.get("zip")),
+                "City": str(company_data.get("city"))
             },
             "ExternalId": f"Cp{company_data.get('id')}"
         },
@@ -25,8 +25,8 @@ def get_export_data(company_data, contact_data):
             "Name": f"{company_data.get('street')} {company_data.get('street_nb')}, {company_data.get('zip')} {company_data.get('city')}",
             "Location": {
                 "AddressString": f"{company_data.get('street')} {company_data.get('street_nb')}",
-                "Postal": company_data.get("zip"),
-                "City": company_data.get("city")
+                "Postal": str(company_data.get("zip")),
+                "City": str(company_data.get("city"))
             },
             "ExternalId": f"Cp{company_data.get('id')}"
         }
@@ -69,6 +69,7 @@ def export_by_bitrix_id(bitrix_id):
                 post_data["service_object"]["CompanyId"] = post_data["contact"]["CompanyId"]
                 response = post("/ServiceObjects", post_data=post_data["service_object"])
                 if response.get("Id") in ["", None, 0]:
+                    print(json.dumps(post_data["service_object"], indent=2))
                     print(json.dumps(response, indent=2))
                 else:
                     update_company(bitrix_id, {"mfr_id": mfr_id, "mfr_service_object_id": response.get("Id")})

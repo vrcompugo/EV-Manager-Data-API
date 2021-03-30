@@ -1,3 +1,4 @@
+from app.modules.external.bitrix24.company import get_company
 import json
 
 from app import db
@@ -53,7 +54,9 @@ def export_by_bitrix_id(bitrix_id):
 
     contact_data = get_contact(bitrix_id)
     if contact_data.get("company_id") not in [None, "", 0]:
-        return export_company_by_bitrix_id(contact_data.get("company_id"))
+        company_data = get_company(contact_data.get("company_id"))
+        if company_data.get("street") not in ["", 0, False, None]:
+            return export_company_by_bitrix_id(contact_data.get("company_id"))
     post_data = get_export_data(contact_data)
     if contact_data.get("mfr_id", None) in ["", None, 0]:
         response = post("/Companies", post_data=post_data["contact"])
