@@ -313,6 +313,9 @@ def generate_datasheet_pdf(lead_id, data):
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 320 Watt") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 436124, cached=True)
+            pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 380 Watt Black") == 0), None)
+            if pv_module is not None:
+                add_pdf_by_drive_id(merger, 1086940, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 400 Watt") == 0), None)
             if pv_module is not None:
                 pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 400 Watt Black") == 0), None)
