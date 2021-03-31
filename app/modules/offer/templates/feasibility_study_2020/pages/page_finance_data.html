@@ -40,12 +40,12 @@
             <td colspan="2">Bisher</td>
           </tr>
           <tr>
-            <td>Effektiver Strompreis<br>(Brutto inkl. Grundgebühr)</td>
+            <td>Effektiver Strompreis<br>(Brutto <b>inkl.</b> Grundgebühr)</td>
             <td><b>{{ (100 * data.conventional_base_cost_per_kwh) | numberformat('de', 2) }}</b>&nbsp;cent&nbsp;pro&nbsp;kWh</td>
           </tr>
           {% if data.heatcloud_usage > 0 %}
             <tr>
-              <td>Effektiver Wärmestrompreis<br>(Brutto inkl. Grundgebühr)</td>
+              <td>Effektiver Wärmestrompreis<br>(Brutto <b>inkl.</b> Grundgebühr)</td>
               <td><b>{{ (100 * data.conventional_heat_cost_per_kwh) | numberformat('de', 2) }}</b>&nbsp;cent&nbsp;pro&nbsp;kWh</td>
             </tr>
           {% endif %}
@@ -123,7 +123,7 @@
               </tr>
             {% endif %}
             <tr>
-              <td>Kreditsumme</td>
+              <td>Kreditsumme {% if offer.reseller.document_style == "bsh" %}(Nettoinvestition){% endif %}</td>
               <td>{{ data.loan_calculation.load_amount | currencyformat }}</td>
             </tr>
             <tr>
@@ -139,9 +139,15 @@
               <td>{{ data.loan_calculation.total_cost | currencyformat }}</td>
             </tr>
             <tr>
-              <td>monatliche Finanzierungsrate</td>
+              <td>{% if offer.reseller.document_style == "bsh" %}mtl. Finanzierungsrate <small>(Nettoinvestition)</small>{% else %}monatliche Finanzierungsrate{% endif %}</td>
               <td><b>{{ data.loan_calculation.monthly_payment | currencyformat }}</b></td>
             </tr>
+            {% if offer.reseller.document_style == "bsh" %}
+              <tr>
+                <td>mtl. Finanzierungsrate <small>(Bruttoinvestition)</small></td>
+                <td>{{ data.loan_calculation.monthly_payment_with_tax | currencyformat }}</td>
+              </tr>
+            {% endif %}
           {% else %}
             <tr>
               <td>Gesamtinvestition</td>

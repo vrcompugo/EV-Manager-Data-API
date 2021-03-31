@@ -14,6 +14,7 @@ def loan_calculation(total_amount, upfront_payment, interest_rate, runtime_in_mo
         "load_amount": loan_amount,
         "upfront_payment": upfront_payment,
         "monthly_payment": round(monthly_loan_payment, 2),
+        "monthly_payment_with_tax": round(monthly_loan_payment * 1.19, 2),
         "yearly_payment": round(monthly_loan_payment * 12, 2),
         "total_cost": 0,
         "interest_rate": interest_rate,
