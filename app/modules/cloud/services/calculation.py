@@ -80,7 +80,7 @@ def calculate_cloud(data):
         result["pv_kwp"] = data["pv_kwp"]
     else:
         data["pv_kwp"] = 0
-    if data["pv_kwp"] > 99 and str(user["id"]) != "13":
+    if data["pv_kwp"] > 99 and str(user["id"]) != "13" and str(user["id"]) != "107":
         return None
     if pv_efficiancy_faktor is None:
         direction_factor_kwp = 1
