@@ -2,7 +2,11 @@
   .page_monthly_heatcloud .headline {
     font-family: 'Quicksand', sans-serif;
     font-size: 38px;
-    padding: 0 36vw 10px 50px;
+    {% if offer.reseller.document_style == "bsh" %}
+      padding: 0 36vw 10px 50px;
+    {% else %}
+      padding: 0 16vw 10px 50px;
+    {% endif %}
   }
   .page_monthly_heatcloud .left-side {
     position: relative;
@@ -32,7 +36,11 @@
 
   <div class="headline">
     Profitieren Sie heute und in Zukunft<br>
-    von der cleveren Cloud Lösung
+    {% if offer.reseller.document_style == "bsh" %}
+      von der cleveren Cloud Lösung
+    {% else %}
+      von der sichersten Cloud Lösung Deutschlands
+    {% endif %}
   </div>
 
   <div class="layout horizontal">
@@ -141,11 +149,11 @@
   </div>
 
   <div class="layout horizontal" style="padding: 0 100px 0 190px;">
-    <small style="padding-right: 2em;">
+    <small style="padding-right: 2em; {% if offer.reseller.document_style != 'bsh' %}font-size: 11px;{% endif %}">
       Bezüglich des Netto- oder Bruttoausweises der vorliegenden
       Angaben wird auf die Erläuterungen im Anhang verwiesen.
     </small>
-    <small>
+    <small {% if offer.reseller.document_style != 'bsh' %}style="font-size: 11px;"{% endif %}>
       Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt.
       Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
     </small>

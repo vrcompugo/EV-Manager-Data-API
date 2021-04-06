@@ -139,8 +139,13 @@
       <img src="{{ data.base_url }}/static/feasibility_study_2020/diagram_4.jpg" />
     </div>
     <div class="text">
-      <b>Ihre ConnectCloud</b><br>
-      Wenn Ihre Photovoltaikanlage einmal nicht genügend Strom erzeugt und auch der Strom in Ihrer Sonnen Batterie aufgebraucht ist (z.B. nachts oder im Winter), werden Sie mit grünem Strom aus derCloud versorgt. Somit werden Sie 100% unabhängig.
+      {% if offer.reseller.document_style == "bsh" %}
+        <b>Ihre ConnectCloud</b><br>
+        Wenn Ihre Photovoltaikanlage einmal nicht genügend Strom erzeugt und auch der Strom in Ihrer Sonnen Batterie aufgebraucht ist (z.B. nachts oder im Winter), werden Sie mit grünem Strom aus derCloud versorgt. Somit werden Sie 100% unabhängig.
+      {% else %}
+        <b>Ihr Energiekonzept</b><br>
+        Wenn Ihre Photovoltaikanlage einmal nicht genügend Strom erzeugt und auch der Strom in Ihrer Sonnen Batterie aufgebraucht ist (z.B. nachts oder im Winter), werden Sie mit grünem Strom aus derCloud versorgt. Somit werden Sie <b>100% unabhängig</b>.
+      {% endif %}
       <div class="layout horizontal">
         <div style="padding-right: 1em;">
           <div class="layout horizontal center">

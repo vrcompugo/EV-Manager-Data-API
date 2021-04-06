@@ -37,6 +37,9 @@
     position: relative;
     padding-left: 3em;
     margin: 1.5em 0;
+    {% if offer.reseller.document_style != "bsh" %}
+      white-space: nowrap;
+    {% endif %}
   }
   .page_pv_system ul li::before {
     position: absolute;
@@ -80,7 +83,11 @@
   {% include('feasibility_study_2020/elements/logos.html') %}
 
   <div class="headline">
-    Ihre Photovoltaik-Anlage
+    {% if offer.reseller.document_style == "bsh" %}
+      Ihre Photovoltaik-Anlage
+    {% else %}
+      Ihre Entwicklung der Energiekosten
+    {% endif %}
   </div>
 
   <div class="layout horizontal">
@@ -90,7 +97,11 @@
       PV-Stromproduktion pro Monat:<br>
       <br>
       <div style="text-align: center;">
-        <img style="height: 260px;" src="{{ data.base_url }}/static/feasibility_study_2020/yearly_production_graph.jpg" />
+        {% if offer.reseller.document_style == "bsh" %}
+          <img style="height: 260px;" src="{{ data.base_url }}/static/feasibility_study_2020/yearly_production_graph.jpg" />
+        {% else %}
+          <img style="height: 200px;" src="{{ data.base_url }}/static/feasibility_study_2020/yearly_production_diagram.jpg" />
+        {% endif %}
       </div>
       {% if False %}
         <br>
@@ -121,12 +132,21 @@
       <br>
       <div class="layout horizontal">
         <div>
-          <img style="height: 200px;" src="{{ data.base_url }}/static/feasibility_study_2020/70_30_pie_chart.jpg" />
+          {% if offer.reseller.document_style == "bsh" %}
+            <img style="height: 200px;" src="{{ data.base_url }}/static/feasibility_study_2020/70_30_pie_chart.jpg" />
+          {% else %}
+            <img style="height: 310px;" src="{{ data.base_url }}/static/feasibility_study_2020/70_30_pie_chart2.jpg" />
+          {% endif %}
         </div>
         <div class="flex">
           <ul>
-            <li>Eigenverbrauch (60 %)</li>
-            <li class="blue">{{ cloud_name }} (40 %)</li>
+            {% if offer.reseller.document_style == "bsh" %}
+              <li>Eigenverbrauch (60 %)</li>
+              <li class="blue">{{ cloud_name }} (40 %)</li>
+            {% else %}
+              <li>Eigenverbrauch (70 %)</li>
+              <li class="blue">{{ cloud_name }} (30 %)</li>
+            {% endif %}
           </ul>
         </div>
       </div>

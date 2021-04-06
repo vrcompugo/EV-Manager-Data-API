@@ -38,7 +38,11 @@
         Vom Beratungsgespräch bis zur Installation immer an Ihrer Seite
       </div>
       <br>
-      <img style="width: 90%;" src="{{ data.base_url }}/static/feasibility_study_2020/steps.jpg" />
+      {% if offer.reseller.document_style == "bsh" %}
+        <img style="width: 90%;" src="{{ data.base_url }}/static/feasibility_study_2020/steps.jpg" />
+      {% else %}
+        <img style="width: 90%;" src="{{ data.base_url }}/static/feasibility_study_2020/steps2.jpg" />
+      {% endif %}
 
     </div>
     <div class="right-side">&nbsp;</div>

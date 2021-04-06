@@ -65,7 +65,7 @@
 
     <div class="left_side">
       <div class="heading">
-        <div class="large">Eine Lösung von SENEC</div>
+        <div class="large">Eine Lösung von {% if offer.reseller.document_style == "bsh" %}SENEC{% else %}energie360{% endif %}</div>
         <div class="small">Wir sind Ihr zuverlässiger Partner.</div>
       </div>
     </div>
@@ -78,10 +78,6 @@
         <div>BSH GmbH &amp; Co. KG</div>
       </div>
     {% else %}
-      <div class="sidenote">
-        <div class="large">SENEC-Niederlassung-Hessen</div>
-        <div>Qualität ist nicht verhandelbar.</div>
-      </div>
     {% endif %}
 
   </div>

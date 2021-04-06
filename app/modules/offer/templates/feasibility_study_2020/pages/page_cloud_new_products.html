@@ -46,8 +46,14 @@
 
   <div class="step" style="margin-left: -50px;">
     <div class="step__number"><span>&nbsp;</span></div>
-    <div class="step__label">Ihre Energiezunkunft mit Senec</div>
-    <div class="step__label2">... Ihre Lösung, um noch heute in die Zukunft zu starten</div>
+    <div class="step__label">Ihre Energiezukunft mit
+      {% if offer.reseller.document_style == "bsh" %}
+        Senec
+      {% else %}
+        energie360
+      {% endif %}
+    </div>
+    <div class="step__label2">... Ihre Lösung, um noch heute in die <b>Zukunft</b> zu starten</div>
   </div>
 
   {% if data.cloud_calulation.ecloud_usage > 0 %}
@@ -68,11 +74,19 @@
   <h2>Ihre neuen Produkte</h2>
   <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/solar_icon.jpg');">
     <b>Ihre Photovoltaikanlage</b><br>
-    Mit der Kraft der Sonne produziert Ihre ausgewählte PV Anlage genau den Strom, den Sie für eine 100% Unabhängigkeit benötigen und das 365 Tage im Jahr - 24 Stunden am Tag.Und nur bei uns: Das Verbrauchsverhalten bleibt hiervon unberührt.
+    {% if offer.reseller.document_style == "bsh" %}
+      Mit der Kraft der Sonne produziert Ihre ausgewählte PV Anlage genau den Strom, den Sie für eine 100% Unabhängigkeit benötigen und das 365 Tage im Jahr - 24 Stunden am Tag.Und nur bei uns: Das Verbrauchsverhalten bleibt hiervon unberührt.
+    {% else %}
+      Mit der Kraft der Sonne produziert Ihre ausgewählte PV Anlage genau den Strom, den Sie für eine 100% Unabhängigkeit benötigen und das 365 Tage im Jahr - 24 Stunden am Tag. Und <b>nur bei </b>cloud: <b>Das Verbrauchsverhalten bleibt hiervon unberührt.</b>
+    {% endif %}
   </div>
   <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/speicher_icon.jpg');">
     <b>Ihr Senec Speicher</b><br>
-    Damit Sie sauberen und selbst produzierten Strom nutzen können, auch wenn die Sonne nicht scheint, speichert Ihre SenecBatterie den überschüssigen Strom. Mit dem neu entwickelten KMS - Kapazität Management System ist es möglich den Speicher je nach Be- und Entladevorgängen sowie Ihres Nutzungsverhaltens mehrmals zu be- und entladen und die Speicherpazität dadurch zu verdreifachen.
+    {% if offer.reseller.document_style == "bsh" %}
+      Damit Sie sauberen und selbst produzierten Strom nutzen können, auch wenn die Sonne nicht scheint, speichert Ihre SenecBatterie den überschüssigen Strom. Mit dem neu entwickelten KMS - Kapazität Management System ist es möglich den Speicher je nach Be- und Entladevorgängen sowie Ihres Nutzungsverhaltens mehrmals zu be- und entladen und die Speicherpazität dadurch zu verdreifachen.
+    {% else %}
+      Damit Sie sauberen und selbst produzierten Strom nutzen können, auch wenn die Sonne nicht scheint, speichert Ihre SenecBatterie den überschüssigen Strom. Mit dem neu entwickelten <b>KMS</b> - Kapazität Management System ist es möglich den Speicher je nach Be- und Entladevorgängen sowie Ihres Nutzungsverhaltens mehrmals zu be- und entladen um so die Speicherpazität bis zu <b>verdreifachen</b>.
+    {% endif %}
   </div>
   <div class="with-icon" style="background-image: url('{{ data.base_url }}/static/feasibility_study_2020/vertrag_icon.jpg');">
     <b>Ihre Cloud</b><br>
