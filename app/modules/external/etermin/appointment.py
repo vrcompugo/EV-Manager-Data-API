@@ -100,8 +100,7 @@ def export_appointments():
         "select[10]": "RESPONSIBLE_ID",
         "select[11]": "ACCOMPLICES",
         "filter[>CHANGED_DATE]": last_task_export_time,
-        "filter[TITLE]": "%[mfr]%",
-        "filter[ID]": "65790"
+        "filter[TITLE]": "%[mfr]%"
     })
     last_task_export_time = datetime.now()
     for task in tasks:
