@@ -20,7 +20,7 @@ def calculate_cloud(data):
     except Exception as e:
         pass
     user_id_for_prices = user["id"]
-    if user_id_for_prices not in [113, 119, 120, 121, 123]:
+    if user_id_for_prices not in [113, 120, 121, 123]:
         user_id_for_prices = 1
     if data.get("assigned_user") is not None:
         if 330 in data["assigned_user"]["UF_DEPARTMENT"] or "330" in data["assigned_user"]["UF_DEPARTMENT"]:
@@ -170,7 +170,6 @@ def calculate_cloud(data):
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_prices"][str(user_id_for_prices)]
         ))[0]["value"]
-        print(data["price_guarantee"])
         if "price_guarantee" in data and data["price_guarantee"] == "2_years":
             if 0 < data["power_usage"] <= 5000:
                 result["cloud_price_light"] = 29
