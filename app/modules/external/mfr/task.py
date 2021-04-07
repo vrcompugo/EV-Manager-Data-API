@@ -109,10 +109,9 @@ def import_by_id(service_request_id):
                     })
     if len(response.get("Appointments", [])) > 0:
         appointment = response["Appointments"][0]
-        print(convert_datetime(task_data["startdateplan"], "Europe/Kiev"), convert_datetime(appointment["StartDateTime"]))
-        if convert_datetime(task_data["startdateplan"], "Europe/Kiev") != convert_datetime(appointment["StartDateTime"]):
+        if convert_datetime(task_data["startdateplan"], "Europe/Berlin") != convert_datetime(appointment["StartDateTime"]):
             update_data["START_DATE_PLAN"] = convert_datetime(appointment["StartDateTime"]) + "+02:00"
-        if convert_datetime(task_data["enddateplan"], "Europe/Kiev") != convert_datetime(appointment["EndDateTime"]):
+        if convert_datetime(task_data["enddateplan"], "Europe/Berlin") != convert_datetime(appointment["EndDateTime"]):
             update_data["END_DATE_PLAN"] = convert_datetime(appointment["EndDateTime"]) + "+02:00"
             update_data["DEADLINE"] = update_data["END_DATE_PLAN"]
         new_leading = None

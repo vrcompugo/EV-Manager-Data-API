@@ -42,7 +42,7 @@ def update_role_permissions():
 @manager.command
 def test_akjsdb():
     from app.modules.external.mfr.task import import_by_id
-    import_by_id("19019169830")
+    import_by_id("19236159515")
 
 
 @manager.command
