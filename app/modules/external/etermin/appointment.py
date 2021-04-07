@@ -85,7 +85,6 @@ def export_appointments():
         print("no config for export task etermin")
         return None
     last_task_export_time = config.get("last_task_export_time", "2021-01-01")
-    last_task_export_time = "2021-02-01"
     tasks = get_tasks({
         "select[0]": "ID",
         "select[1]": "TITLE",
