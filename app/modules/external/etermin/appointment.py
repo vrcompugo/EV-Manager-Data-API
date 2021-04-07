@@ -59,7 +59,8 @@ def import_new_appointments():
                 deal_data["service_appointment_startdate"] = pytz.timezone("Europe/Berlin").localize(startDatetime).isoformat()
                 deal_data["service_appointment_enddate"] = pytz.timezone("Europe/Berlin").localize(endDatetime).isoformat()
                 deal_data["etermin_id"] = f"{appointment['ID']}"
-                deal_data["comments"] = f"Gebucht am: {appointment['BookingDate']}<br>\nOrt: {appointment['Location']}<br>\nThema: {appointment['SelectedAnswers']}<br>\nKommentar: {appointment['Notes']}"
+                deal_data["comments"] = f"Name: {appointment['FirstName']} {appointment['LastName']}<br>\nE-Mail: {appointment['Email']}<br>\n"
+                deal_data["comments"] = f"{deal_data['comments']}Gebucht am: {appointment['BookingDate']}<br>\nOrt: {appointment['Location']}<br>\nThema: {appointment['SelectedAnswers']}<br>\nKommentar: {appointment['Notes']}"
                 if appointment['SelectedAnswers'] == "PV Anlage ohne Speicher":
                     deal_data["mfr_category"] = "service"
                 if appointment['SelectedAnswers'] == "PV Anlage mit Lithiumspeicher":
