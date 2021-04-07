@@ -109,6 +109,7 @@ def import_by_id(service_request_id):
                     })
     if len(response.get("Appointments", [])) > 0:
         appointment = response["Appointments"][0]
+        print(convert_datetime(task_data["startdateplan"], "Europe/Kiev"), convert_datetime(appointment["StartDateTime"]))
         if convert_datetime(task_data["startdateplan"], "Europe/Kiev") != convert_datetime(appointment["StartDateTime"]):
             update_data["START_DATE_PLAN"] = convert_datetime(appointment["StartDateTime"]) + "+02:00"
         if convert_datetime(task_data["enddateplan"], "Europe/Kiev") != convert_datetime(appointment["EndDateTime"]):
@@ -140,6 +141,7 @@ def import_by_id(service_request_id):
         if set(task_data["accomplices"]) != set(new_support_users_list):
             update_data["ACCOMPLICES"] = new_support_users_list
     if len(update_data.keys()) > 0:
+        print(task_id, json.dumps(update_data, indent=2))
         print(task_id, json.dumps(update_data, indent=2))
         update_task(task_id, update_data)
 
