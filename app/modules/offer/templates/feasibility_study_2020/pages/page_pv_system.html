@@ -76,6 +76,11 @@
     background-color: #1475BD;
     border-bottom-color: #1475BD;
   }
+  .page_pv_system ul li.dark-green::before,
+  .page_pv_system ul li.dark-green::after {
+    background-color: #63B231;
+    border-bottom-color: #63B231;
+  }
 </style>
 
 
@@ -145,7 +150,7 @@
               <li class="blue">{{ cloud_name }} (40 %)</li>
             {% else %}
               <li>Eigenverbrauch (70 %)</li>
-              <li class="blue">{{ cloud_name }} (30 %)</li>
+              <li class="dark-green">{{ cloud_name }} (30 %)</li>
             {% endif %}
           </ul>
         </div>
