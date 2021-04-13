@@ -81,7 +81,14 @@ def quote_calculator_defaults(lead_id):
                 "upload_link_electric": data["data"]["upload_link_electric"],
                 "upload_link_heating": data["data"]["upload_link_heating"],
                 "upload_link_invoices": data["data"]["upload_link_invoices"],
-                "upload_link_contract": data["data"]["upload_link_contract"]
+                "upload_link_contract": data["data"]["upload_link_contract"],
+            }
+            update_lead(lead_id, update_data)
+        if "upload_link_firstcall" not in data["data"] or data["data"]["upload_link_firstcall"].find(f"Vorgang {lead['unique_identifier']}") < 0:
+            data["data"]["upload_folder_id_firstcall"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/First Call")
+            data["data"]["upload_link_firstcall"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/First Call"
+            update_data = {
+                "upload_link_firstcall": data["data"]["upload_link_firstcall"]
             }
             update_lead(lead_id, update_data)
         return Response(

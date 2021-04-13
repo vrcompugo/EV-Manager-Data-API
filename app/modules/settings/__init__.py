@@ -166,6 +166,7 @@ def get_settings(section=None, domain_raw=None):
                     "upload_link_heating": "UF_CRM_1600762727113",
                     "upload_link_invoices": "UF_CRM_1600762755535",
                     "upload_link_contract": "UF_CRM_1600762796533",
+                    "upload_link_firstcall": "UF_CRM_1618302925",
                     "aev_reseller": "UF_CRM_1615824273"
                 }
             },
@@ -205,6 +206,7 @@ def get_settings(section=None, domain_raw=None):
                     "upload_link_heating": "UF_CRM_1603982160",
                     "upload_link_invoices": "UF_CRM_1603982179",
                     "upload_link_contract": "UF_CRM_1603982205",
+                    "upload_link_firstcall": "UF_CRM_1618302626914",
                     "salutation": "HONORIFIC",
                     "first_name": "NAME",
                     "street": "UF_CRM_5DD4020221169",
