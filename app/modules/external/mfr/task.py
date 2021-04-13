@@ -212,7 +212,7 @@ def export_by_bitrix_id(bitrix_id):
             "id": task_data.get('mfr_id')
         })
         for document in post_data.get("documents"):
-            existing_document = next((item for item in response.get("Documents") if item["FileName"] == str(document["NAME"])), None)
+            existing_document = next((item for item in response.get("Documents", []) if item["FileName"] == str(document["NAME"])), None)
             if existing_document is None:
                 file_content = get_file_content(document["ID"])
                 mime_type = magic.from_buffer(file_content, mime=True)
