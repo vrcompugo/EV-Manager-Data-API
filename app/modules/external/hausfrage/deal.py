@@ -98,7 +98,8 @@ def run_cron_import():
             if existing_contact is None:
                 data["lead"]["status_id"] = "NEW"
                 contact = add_contact(data["contact"])
-                data["lead"]["contact_id"] = contact["id"]
+                if contact is not False:
+                    data["lead"]["contact_id"] = contact["id"]
 
                 if "company" in data:
                     data["company"]["contact_id"] = contact["id"]
