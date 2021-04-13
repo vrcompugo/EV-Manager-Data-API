@@ -100,6 +100,8 @@ def run_cron_import():
                 contact = add_contact(data["contact"])
                 if contact is not False:
                     data["lead"]["contact_id"] = contact["id"]
+                else:
+                    print(json.dumps(data["contact"], indent=2))
 
                 if "company" in data:
                     data["company"]["contact_id"] = contact["id"]
