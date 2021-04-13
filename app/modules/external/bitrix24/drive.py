@@ -91,27 +91,36 @@ def get_folder(id, namefilter=None):
     return result
 
 
-def get_folder_id(parent_folder_id, subfolder):
-    subfolder = subfolder.strip("/")
-    folder = BitrixDriveFolder.query\
-        .filter(BitrixDriveFolder.parent_folder_id == parent_folder_id)\
-        .filter(BitrixDriveFolder.path == subfolder)\
-        .first()
-    if folder is not None:
-        return folder.bitrix_id
-    children = get_folder(parent_folder_id, subfolder)
-    existing_child = next((item for item in children if item["NAME"] == str(subfolder)), None)
-    if existing_child is not None:
-        folder = BitrixDriveFolder(
-            bitrix_id=existing_child["ID"],
-            parent_folder_id=parent_folder_id,
-            path=subfolder
-        )
-        db.session.add(folder)
-        db.session.commit()
-        return existing_child["ID"]
-    else:
+def get_folder_id(parent_folder_id, subfolder=None, path=None):
+    if subfolder is not None:
+        subfolder = subfolder.strip("/")
+        folder = BitrixDriveFolder.query\
+            .filter(BitrixDriveFolder.parent_folder_id == parent_folder_id)\
+            .filter(BitrixDriveFolder.path == subfolder)\
+            .first()
+        if folder is not None:
+            return folder.bitrix_id
+        children = get_folder(parent_folder_id, subfolder)
+        existing_child = next((item for item in children if item["NAME"] == str(subfolder)), None)
+        if existing_child is not None:
+            folder = BitrixDriveFolder(
+                bitrix_id=existing_child["ID"],
+                parent_folder_id=parent_folder_id,
+                path=subfolder
+            )
+            db.session.add(folder)
+            db.session.commit()
+            return existing_child["ID"]
         return None
+    if path is not None:
+        path = path.strip("/")
+        parts = path.split("/")
+        for part in parts:
+            new_folder_id = get_folder_id(parent_folder_id, part)
+            if new_folder_id is None:
+                return None
+            parent_folder_id = new_folder_id
+        return parent_folder_id
 
 
 def create_folder_path(parent_folder_id, path):
@@ -287,6 +296,17 @@ def run_cron_folder_creation():
                 create_folder_path(drive_cloud_folder["folder_id"], deal_path)
                 update_deal(deal["id"], {"drive_cloud_folder": f"{drive_cloud_folder['base_url']}{deal_path}"})
                 time.sleep(1)
+
+    '''drive_firstcall_folder = next((item for item in config["folders"] if item["key"] == "drive_firstcall_folder"), None)
+    if drive_firstcall_folder is not None:
+        deals = get_deals({"FILTER[>DATE_CREATE]": str(last_import)})
+        for deal in deals:
+            deal = get_deal(deal["id"])
+            if deal.get("drive_firstcall_folder") in [None, "", "0", 0]:
+                deal_path = get_deal_path(deal, "")
+                create_folder_path(drive_firstcall_folder["folder_id"], deal_path)
+                update_deal(deal["id"], {"drive_firstcall_folder": f"{drive_firstcall_folder['base_url']}{deal_path}"})
+                time.sleep(1)'''
 
     config = get_settings("external/bitrix24/folder_creation")
     if config is not None:
