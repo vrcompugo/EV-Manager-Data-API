@@ -1,17 +1,20 @@
+from io import BytesIO
 from app.modules.external.bitrix24.company import get_company
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.deal import get_deal
 from app.modules.external.bitrix24.user import get_user_by_email
 import time
+import magic
 import json
 import random
 import pytz
+import tempfile
 from datetime import datetime, timedelta
 import dateutil.parser
 
 from app import db
 from app.modules.external.bitrix24.task import get_task, update_task, get_tasks
-from app.modules.external.bitrix24.drive import add_file, create_folder_path
+from app.modules.external.bitrix24.drive import add_file, create_folder_path, get_file_content, get_folder_id, get_folder
 from app.modules.settings import get_settings, set_settings
 
 from ._connector import get, post, put, get_download
@@ -60,6 +63,15 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
     }
     if task_data.get("timeestimate") not in [None, "", "0", 0]:
         data["TargetTimeInMinutes"] = str(int(int(task_data.get("timeestimate")) / 60))
+    if deal_data is not None:
+        folder_id = None
+        if str(deal_data.get("category_id")) in ["1", "44"]:
+            folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_roof").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
+        if str(deal_data.get("category_id")) == "32":
+            folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_electric").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
+        if folder_id is not None:
+            files = get_folder(folder_id)
+            data["documents"] = files
     return data
 
 
@@ -195,6 +207,20 @@ def export_by_bitrix_id(bitrix_id):
         if response.get("State") not in [None, ""]:
             response["Description"] = post_data["Description"]
             response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data=response)
+    if "documents" in post_data:
+        response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Documents,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
+            "id": task_data.get('mfr_id')
+        })
+        for document in post_data.get("documents"):
+            existing_document = next((item for item in response.get("Documents") if item["FileName"] == str(document["NAME"])), None)
+            if existing_document is None:
+                file_content = get_file_content(document["ID"])
+                mime_type = magic.from_buffer(file_content, mime=True)
+                upload_response = post("/Document/UploadAndCreate", files=[
+                    ("FilePath", (document["NAME"], file_content, mime_type))
+                ], type="mfr")
+                if 'DocumentDto' in upload_response and "Id" in upload_response.get('DocumentDto'):
+                    response_document_attach = put(f"/ServiceRequest/{task_data.get('mfr_id')}/Document/{upload_response.get('DocumentDto').get('Id')}", type="mfr")
     if deal_data is not None and str(deal_data.get("category_id")) == "134":
         response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
             "id": str(task_data.get('mfr_id'))

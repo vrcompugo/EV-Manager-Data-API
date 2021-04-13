@@ -161,6 +161,11 @@ def get_settings(section=None, domain_raw=None):
                     "service_appointment_startdate": "UF_CRM_1614935800",
                     "service_appointment_enddate": "UF_CRM_1614935821",
                     "etermin_id": "UF_CRM_1614177772351",
+                    "upload_link_roof": "UF_CRM_1600762711357",
+                    "upload_link_electric": "UF_CRM_1600762741782",
+                    "upload_link_heating": "UF_CRM_1600762727113",
+                    "upload_link_invoices": "UF_CRM_1600762755535",
+                    "upload_link_contract": "UF_CRM_1600762796533",
                     "aev_reseller": "UF_CRM_1615824273"
                 }
             },

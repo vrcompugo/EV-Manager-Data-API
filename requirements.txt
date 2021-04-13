@@ -53,3 +53,4 @@ PyPDF2
 pdfkit
 verify-email
 azure-servicebus
+python-magic

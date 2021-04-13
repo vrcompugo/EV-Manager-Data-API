@@ -47,19 +47,32 @@ def get_download(url, parameters=None):
     return {}
 
 
-def post(url, post_data=None, files=None):
+def post(url, post_data=None, files=None, type=None):
     config = get_settings("external/mfr")
+    base_url = config["url"]
     token = authenticate()
 
     if token is not None:
-        response = requests.post(
-            config["url"] + url,
-            json=post_data,
-            headers={
-                'Authorization': "Basic {}".format(token),
-                'accept': 'application/json'
-            }
-        )
+        if type is not None and type == "mfr":
+            base_url = base_url.replace("/odata", "/mfr")
+        if files is not None:
+            response = requests.post(
+                base_url + url,
+                files=files,
+                headers={
+                    'Authorization': "Basic {}".format(token),
+                    'accept': 'application/json'
+                }
+            )
+        else:
+            response = requests.post(
+                base_url + url,
+                json=post_data,
+                headers={
+                    'Authorization': "Basic {}".format(token),
+                    'accept': 'application/json'
+                }
+            )
         try:
             return response.json()
         except Exception as e:
@@ -67,13 +80,16 @@ def post(url, post_data=None, files=None):
     return {}
 
 
-def put(url, post_data=None, files=None):
+def put(url, post_data=None, files=None, type=None):
     config = get_settings("external/mfr")
+    base_url = config["url"]
     token = authenticate()
 
     if token is not None:
+        if type is not None and type == "mfr":
+            base_url = base_url.replace("/odata", "/mfr")
         response = requests.put(
-            config["url"] + url,
+            base_url + url,
             json=post_data,
             headers={
                 'Authorization': "Basic {}".format(token),
