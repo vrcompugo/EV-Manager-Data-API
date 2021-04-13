@@ -37,7 +37,6 @@ def get(url, parameters=None):
         )
         try:
             data = response.json()
-            print("resp?", data)
             if "assignments" in data:
                 return data["assignments"]
             return None
