@@ -16,7 +16,7 @@
   {% set total_pages = 19 %}
 
   {% if offer.reseller.document_style == "bsh" %}
-    {% set total_pages = total_pages - 4 %}
+    {% set total_pages = total_pages - 6 %}
   {% endif %}
 
 
@@ -47,10 +47,12 @@
     {% include('feasibility_study_2020/pages/page2.html') %}
   </div>
 
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% include('feasibility_study_2020/pages/page_address.html') %}
-  </div>
+  {% if offer.reseller.document_style != "bsh" %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_address.html') %}
+    </div>
+  {% endif %}
 
   {% set current_page = current_page + 1 %}
   <div class="page">
@@ -142,20 +144,24 @@
     </div>
   {% endif %}
 
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% include('feasibility_study_2020/pages/page_solution_by_senec.html') %}
-  </div>
+  {% if offer.reseller.document_style != "bsh" %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_solution_by_senec.html') %}
+    </div>
+  {% endif %}
 
   {% set current_page = current_page + 1 %}
   <div class="page">
     {% include('feasibility_study_2020/pages/page_rewards.html') %}
   </div>
 
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% include('feasibility_study_2020/pages/page_others.html') %}
-  </div>
+  {% if offer.reseller.document_style != "bsh" %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_others.html') %}
+    </div>
+  {% endif %}
 
   {% set current_page = current_page + 1 %}
   <div class="page">
