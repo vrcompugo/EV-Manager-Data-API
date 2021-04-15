@@ -1,4 +1,6 @@
 from io import BytesIO
+
+from flask_cors.core import try_match
 from app.modules.external.bitrix24.company import get_company
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.deal import get_deal
@@ -195,7 +197,12 @@ def export_by_bitrix_id(bitrix_id):
         print("no contact", bitrix_id)
         return
     post_data = get_export_data(task_data, contact_data, deal_data, company_data)
+    documents = None
+    if "documents" in post_data:
+        documents = post_data["documents"]
+        del post_data["documents"]
     if task_data.get("mfr_id", None) in ["", None, 0]:
+        print(json.dumps(post_data, indent=2))
         response = post("/ServiceRequests", post_data=post_data)
         if response.get("Id") not in ["", None, 0]:
             task_data['mfr_id'] = response.get("Id")
@@ -209,11 +216,11 @@ def export_by_bitrix_id(bitrix_id):
         if response.get("State") not in [None, ""]:
             response["Description"] = post_data["Description"]
             response = put(f"/ServiceRequests({task_data.get('mfr_id')}L)", post_data=response)
-    if "documents" in post_data:
+    if documents is not None and task_data.get('mfr_id') not in [None, ""]:
         response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Documents,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
             "id": task_data.get('mfr_id')
         })
-        for document in post_data.get("documents"):
+        for document in documents:
             existing_document = next((item for item in response.get("Documents", []) if item["FileName"] == str(document["NAME"])), None)
             if existing_document is None:
                 file_content = get_file_content(document["ID"])
