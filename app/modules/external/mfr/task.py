@@ -131,6 +131,8 @@ def import_by_id(service_request_id):
         for appointment in response["Appointments"]:
             for contact in appointment.get("Contacts"):
                 if contact.get("Email") not in contacts:
+                    if contact.get("Email") == "mike.becker.kez@gmail.com":
+                        contact.set("Email", "becker@korbacher-energiezentrum.de"
                     contacts[contact.get("Email")] = contact
                     contacts[contact.get("Email")]["user"] = get_user_by_email(contact.get("Email"))
                     if contacts[contact.get("Email")]["user"] is None:
