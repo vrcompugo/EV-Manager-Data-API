@@ -23,6 +23,7 @@ from ._connector import get, post, put, get_download
 from .contact import export_by_bitrix_id as export_contact_by_bitrix_id
 from .company import export_by_bitrix_id as export_company_by_bitrix_id
 from .models.task_persistent_users import TaskPersistentUsers
+from .models.mfr_import_buffer import MfrImportBuffer
 
 
 def get_export_data(task_data, contact_data, deal_data, company_data):
@@ -93,6 +94,24 @@ def import_by_id(service_request_id):
     })
     if response.get("ExternalId", None) is None:
         return
+    buffer_data = MfrImportBuffer.query.filter(MfrImportBuffer.service_request_id == service_request_id).first()
+    if buffer_data is None:
+        buffer_data = MfrImportBuffer(service_request_id=service_request_id, data=response)
+        db.session.add(buffer_data)
+        db.session.commit()
+    else:
+        changes_found = False
+        important_fields = ["State", "Reports", "Appointments"]
+        for field in important_fields:
+            if json.dumps(buffer_data.data.get(field)) != json.dumps(response.get(field)):
+                changes_found = True
+                break
+        if changes_found is False:
+            print("no import needed")
+            return
+    buffer_data.last_change = datetime.now()
+    db.session.commit()
+
     task_id = response["ExternalId"]
     task_data = get_task(task_id)
     if task_data is None:
