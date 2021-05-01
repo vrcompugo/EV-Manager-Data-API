@@ -20,7 +20,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote
-from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf
+from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -505,6 +505,12 @@ def quote_calculator_contract_summary_pdf(lead_id):
     data = json.loads(json.dumps(history.data))
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
+    genrate_pdf(data, generate_contract_summary_part1_pdf, lead_id, "pdf_contract_summary_part1_file_id", "Verkaufsunterlagen.pdf", subfolder_id)
+    genrate_pdf(data, generate_contract_summary_part2_pdf, lead_id, "pdf_contract_summary_part2_file_id", "Abtrettung.pdf", subfolder_id)
+    genrate_pdf(data, generate_contract_summary_part3_pdf, lead_id, "pdf_contract_summary_part3_file_id", "Contracting.pdf", subfolder_id)
+    if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
+        if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
+            genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Wärmepumpenfragebogen.pdf", subfolder_id)
     genrate_pdf(data, generate_contract_summary_pdf, lead_id, "pdf_contract_summary_file_id", "Vertragsunterlagen.pdf", subfolder_id)
     data["pdf_contract_summary_link"] = get_public_link(data["pdf_contract_summary_file_id"])
 
@@ -539,6 +545,169 @@ def genrate_pdf(data, generate_function, lead_id, pdf_id_key, label, subfolder_i
             '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
             status=404,
             mimetype='application/json')
+
+
+@blueprint.route("/insign/callback/<token>", methods=['GET', 'POST'])
+def get_insign_callback(token):
+    from app.modules.external.insign.signature import download_file
+    token_data = decode_jwt(token)
+    session_id = request.args.get("sessionid")
+    event_type = request.args.get("eventid")
+    print(json.dumps(token_data))
+    if event_type != "EXTERNBEARBEITUNGFERTIG":
+        return Response(
+            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
+            status=200,
+            mimetype='application/json')
+    lead = get_lead(token_data["unique_identifier"])
+    for file in token_data.get("documents", []):
+        file_content = download_file(sessionId=session_id, file_id=file["id"])
+        if file_content[0:1] != "{":
+            '''add_file(0, {
+                "bitrix_file_id": file["id"],
+                "filename": file["displayname"],
+                "file_content": file_content
+            })'''
+            if file["displayname"] == "Verkaufsunterlagen":
+                add_file(token_data["upload_folder_id_electric"], {
+                    "filename": file["displayname"] + ".pdf",
+                    "file_content": file_content
+                })
+            else:
+                add_file(token_data["upload_folder_id_contract"], {
+                    "filename": file["displayname"] + ".pdf",
+                    "file_content": file_content
+                })
+
+    return Response(
+            '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
+            status=200,
+            mimetype='application/json')
+
+
+@blueprint.route("/<lead_id>/insign/data", methods=['POST'])
+def get_insign_data(lead_id):
+    from app.modules.external.insign.signature import get_public_url
+
+    auth_info = get_auth_info()
+    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+        lead_id = int(lead_id)
+        history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+        data = json.loads(json.dumps(history.data))
+        sessionId = get_insign_session(data)
+        return Response(
+            json.dumps({"status": "success", "data": {"url": get_public_url(sessionId, data["contact"]["email"][0]["VALUE"])}}),
+            status=200,
+            mimetype='application/json')
+    return Response(
+        '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
+        status=501,
+        mimetype='application/json')
+
+
+@blueprint.route("/<lead_id>/insign/email", methods=['POST'])
+def send_insign_email(lead_id):
+    from app.modules.external.insign.signature import send_insign_email
+
+    auth_info = get_auth_info()
+    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+        lead_id = int(lead_id)
+        history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+        data = json.loads(json.dumps(history.data))
+        sessionId = get_insign_session(data)
+        return Response(
+            json.dumps({
+                "status": "success",
+                "data": send_insign_email(sessionId, data["contact"]["email"][0]["VALUE"])
+            }),
+            status=200,
+            mimetype='application/json')
+    return Response(
+        '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
+        status=501,
+        mimetype='application/json')
+
+
+def get_insign_session(data):
+    from app.modules.external.insign.signature import get_session_id
+
+    signatures = [
+        {
+            "id": "mainsig",
+            "displayname": "Unterschrift",
+            "textsearch": f"__main_sig__",
+            "required": True
+        }
+    ]
+    documents = []
+    if "pdf_pv_file_id" in data and data["pdf_pv_file_id"] > 0:
+        documents.append({
+            "id": data["pdf_pv_file_id"],
+            "displayname": "PV-Angebot",
+            "signatures": signatures
+        })
+    if "pdf_cloud_config_file_id" in data and data["pdf_cloud_config_file_id"] > 0:
+        documents.append({
+            "id": data["pdf_cloud_config_file_id"],
+            "displayname": "Cloud-Angebot",
+            "signatures": signatures
+        })
+    if "pdf_heating_file_id" in data and data["pdf_heating_file_id"] > 0:
+        documents.append({
+            "id": data["pdf_heating_file_id"],
+            "displayname": "Heizung-Angebot",
+            "signatures": signatures
+        })
+    if "pdf_roof_file_id" in data and data["pdf_roof_file_id"] > 0:
+        documents.append({
+            "id": data["pdf_roof_file_id"],
+            "displayname": "Dach-Angebot",
+            "signatures": signatures
+        })
+    if "pdf_bluegen_file_id" in data and data["pdf_bluegen_file_id"] > 0:
+        documents.append({
+            "id": data["pdf_bluegen_file_id"],
+            "displayname": "Bluegen-Angebot",
+            "signatures": signatures
+        })
+
+    documents.append({
+        "id": data["pdf_contract_summary_part1_file_id"],
+        "displayname": "Verkaufsunterlagen"
+    })
+    documents.append({
+        "id": data["pdf_contract_summary_part2_file_id"],
+        "displayname": "Abtretungsformular"
+    })
+    documents.append({
+        "id": data["pdf_contract_summary_part3_file_id"],
+        "displayname": "Contractigvertrag"
+    })
+    if "pdf_contract_summary_part4_file_id" in data:
+        documents.append({
+            "id": data["pdf_contract_summary_part4_file_id"],
+            "displayname": "Wärmepumpenfragebogen"
+        })
+    token = encode_jwt(
+        {
+            "unique_identifier": data["id"],
+            "number": data["number"],
+            "documents": documents,
+            "upload_folder_id_electric": data["data"]["upload_folder_id_electric"],
+            "upload_folder_id_contract": data["data"]["upload_folder_id_contract"]
+        },
+        172800
+    )
+
+    return get_session_id({
+        "displayname": data["number"],
+        "foruser": data["assigned_by_id"],
+        "callbackURL": "https://www.energie360.de/insign-callback/",
+        "serverSidecallbackURL": f"https://api.korbacher-energiezentrum.de.ah.hbbx.de/quote_calculator/insign/callback/{token['token']}",
+        "userFullName": f'{data["assigned_user"]["NAME"]} {data["assigned_user"]["LAST_NAME"]}',
+        "userEmail": data["assigned_user"]["EMAIL"],
+        "documents": documents
+    })
 
 
 @blueprint.route("", methods=['GET', 'POST'])

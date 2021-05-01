@@ -406,7 +406,7 @@ def generate_contract_summary_pdf(lead_id, data):
 
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
-            add_pdf_by_drive_id(merger, 443348, cached=True)
+            add_pdf_by_drive_id(merger, 443348, cached=True)  # Wärmepumpenfragebogen
     add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
     add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
     add_pdf_by_drive_id(merger, 523230, cached=True)  # Abtretungsformular
@@ -416,6 +416,22 @@ def generate_contract_summary_pdf(lead_id, data):
     output_file.seek(0)
     pdf_content = output_file.read()
     return pdf_content
+
+
+def generate_contract_summary_part1_pdf(lead_id, data):
+    return get_file_content_cached(443352)  # Verkaufsunterlagen
+
+
+def generate_contract_summary_part2_pdf(lead_id, data):
+    return get_file_content_cached(523230)  # Abtretungsformular
+
+
+def generate_contract_summary_part3_pdf(lead_id, data):
+    return get_file_content_cached(443350)  # Contractigvertrag
+
+
+def generate_contract_summary_part4_pdf(lead_id, data):
+    return get_file_content_cached(443348)  # Wärmepumpenfragebogen
 
 
 def generate_order_confirmation_pdf(lead_id, data):
