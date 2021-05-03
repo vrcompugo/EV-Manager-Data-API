@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>asd</title>
+  {% include('feasibility_study_2020/style.html') %}
+  {% include('feasibility_study_2020/elements/graph-line.html') %}
+  {% include('feasibility_study_2020/elements/table.html') %}
+  {% include('feasibility_study_2020/elements/bar.html') %}
+  {% include('feasibility_study_2020/elements/step.html') %}
+  {% include('feasibility_study_2020/elements/arrow.html') %}
+</head>
+<body>
+
+  {% set total_pages = 4 %}
+
+  {% if data.ecloud %}
+    {% set total_pages = total_pages + 1 %}
+  {% endif %}
+  {% if data.heatcloud %}
+    {% set total_pages = total_pages + 1 %}
+  {% endif %}
+  {% if data.emove %}
+    {% set total_pages = total_pages + 1 %}
+  {% endif %}
+
+
+  {% if offer.reseller.document_style == "bsh" %}
+    {% set cloud_name = "BSH Cloud" %}
+  {% else %}
+    {% set cloud_name = "C.Cloud" %}
+  {% endif %}
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page2.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page_no_cost_x_years.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page_price_change.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('feasibility_study_2020/pages/page_monthly_lightcloud.html') %}
+  </div>
+
+  {% if data.ecloud %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_monthly_ecloud.html') %}
+    </div>
+  {% endif %}
+
+  {% if data.heatcloud %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_monthly_heatcloud.html') %}
+    </div>
+  {% endif %}
+
+  {% if data.emove %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_monthly_emove.html') %}
+    </div>
+  {% endif %}
+
+</body>
+</html>
+
+

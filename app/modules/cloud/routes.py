@@ -39,7 +39,7 @@ class Items(Resource):
     @api_response
     @token_required("cloud_calculation")
     def post(self):
-        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
+        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf, generate_feasibility_study_short_pdf
 
         data = request.json
         user = get_logged_in_user()
@@ -89,6 +89,9 @@ class Items(Resource):
             generate_feasibility_study_pdf(item)
             if item.feasibility_study_pdf is not None:
                 item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
+            generate_feasibility_study_short_pdf(item)
+            if item.feasibility_study_short_pdf is not None:
+                item_dict["pdf_short_wi_link"] = item.feasibility_study_short_pdf.public_link
         return {"status": "success",
                 "data": item_dict}
 

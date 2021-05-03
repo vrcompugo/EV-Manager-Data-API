@@ -137,6 +137,30 @@ class OfferV2(db.Model):
             return None
         return s3_file
 
+    @hybrid_property
+    def feasibility_study_short_pdf(self):
+        from app.models import S3File
+        from ..services.pdf_generation.feasibility_study import generate_feasibility_study_short_pdf
+
+        s3_file = S3File.query\
+            .filter(S3File.model == "OfferV2FeasibilityStudyShort")\
+            .filter(S3File.model_id == self.id)\
+            .first()
+        if s3_file is None:
+            if self.offer_group == "pv-offer" or self.offer_group == "cloud-offer":
+                if self.offer_group == "cloud-offer":
+                    if self.data is None or "loan_total" not in self.data or self.data["loan_total"] == "" or self.data["loan_total"] is None:
+                        return None
+                generate_feasibility_study_short_pdf(self)
+                s3_file = S3File.query\
+                    .filter(S3File.model == "OfferV2FeasibilityStudyShort")\
+                    .filter(S3File.model_id == self.id)\
+                    .first()
+                if s3_file is not None:
+                    return s3_file
+            return None
+        return s3_file
+
 
 class OfferV2Schema(ModelSchema):
 
