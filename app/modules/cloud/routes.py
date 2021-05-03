@@ -91,7 +91,7 @@ class Items(Resource):
                 item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
             generate_feasibility_study_short_pdf(item)
             if item.feasibility_study_short_pdf is not None:
-                item_dict["pdf_short_wi_link"] = item.feasibility_study_short_pdf.public_link
+                item_dict["pdf_wi_short_link"] = item.feasibility_study_short_pdf.public_link
         return {"status": "success",
                 "data": item_dict}
 
@@ -121,7 +121,7 @@ class User(Resource):
         if offer.feasibility_study_pdf is not None:
             item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
         if offer.feasibility_study_short_pdf is not None:
-            item_dict["pdf_short_wi_link"] = offer.feasibility_study_short_pdf.public_link
+            item_dict["pdf_wi_short_link"] = offer.feasibility_study_short_pdf.public_link
         return {
             "status": "success",
             "data": item_dict
@@ -183,7 +183,7 @@ class User(Resource):
         if item.feasibility_study_pdf is not None:
             item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
         if offer.feasibility_study_short_pdf is not None:
-            item_dict["pdf_short_wi_link"] = offer.feasibility_study_short_pdf.public_link
+            item_dict["pdf_wi_short_link"] = offer.feasibility_study_short_pdf.public_link
         return {"status": "success",
                 "data": item_dict}
 
