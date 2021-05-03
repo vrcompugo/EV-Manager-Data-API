@@ -85,6 +85,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "pdf_link": "",
         "pdf_quote_link": "",
         "pdf_wi_link": "",
+        "pdf_wi_short_link": "",
         "pdf_datasheet_link": "",
         "is_sent": "",
         "foreword": "",
