@@ -240,6 +240,9 @@ def export_by_bitrix_id(bitrix_id):
             "id": task_data.get('mfr_id')
         })
         for document in documents:
+            if document["TYPE"] != "file":
+                print("wrong type: ", document["TYPE"])
+                continue
             existing_document = next((item for item in response.get("Documents", []) if item["FileName"] == str(document["NAME"])), None)
             if existing_document is None:
                 file_content = get_file_content(document["ID"])
