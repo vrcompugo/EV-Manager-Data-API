@@ -570,12 +570,12 @@ def get_insign_callback(token):
             })'''
             if file["displayname"] == "Verkaufsunterlagen":
                 add_file(token_data["upload_folder_id_electric"], {
-                    "filename": file["displayname"] + ".pdf",
+                    "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                     "file_content": file_content
                 })
             else:
                 add_file(token_data["upload_folder_id_contract"], {
-                    "filename": file["displayname"] + ".pdf",
+                    "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                     "file_content": file_content
                 })
 
@@ -698,15 +698,18 @@ def get_insign_session(data):
         },
         172800
     )
-
     return get_session_id({
         "displayname": data["number"],
-        "foruser": data["assigned_by_id"],
+        "foruser": data["assigned_by_id"] + " " + data["assigned_user"]["EMAIL"],
         "callbackURL": "https://www.energie360.de/insign-callback/",
-        "serverSidecallbackURL": f"https://api.korbacher-energiezentrum.de.ah.hbbx.de/quote_calculator/insign/callback/{token['token']}",
         "userFullName": f'{data["assigned_user"]["NAME"]} {data["assigned_user"]["LAST_NAME"]}',
         "userEmail": data["assigned_user"]["EMAIL"],
-        "documents": documents
+        "serverSidecallbackURL": f"https://api.korbacher-energiezentrum.de.ah.hbbx.de/quote_calculator/insign/callback/{token['token']}",
+        "documents": documents,
+        "deliveryConfig": {
+            "emailEmpfaengerBCC": 'bcc@hbb-werbung.de',
+            "empfaengerBCCExtern": 'bcc@hbb-werbung.de',
+        }
     })
 
 

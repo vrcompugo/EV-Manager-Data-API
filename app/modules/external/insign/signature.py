@@ -74,10 +74,6 @@ def upload_file(sessionId, file_id):
 
 
 def download_file(sessionId, file_id):
-    print({
-        "sessionid": sessionId,
-        "docid": file_id
-    })
     response = get("/get/document", parameters={
         "sessionid": sessionId,
         "docid": file_id
@@ -93,8 +89,8 @@ def get_public_url(sessionId, recipient):
     post_data = {
         "externUsers": [
             {
+                "callbackURL": "https://www.energie360.de/insign-callback/",
                 "recipient": recipient,
-                "recipientbcc": "bcc@hbundb.de",
                 "sendEmails": False,
                 "singleSignOnEnabled": True
             }
@@ -113,6 +109,7 @@ def send_insign_email(sessionId, recipient):
     post_data = {
         "externUsers": [
             {
+                "callbackURL": "https://www.energie360.de/insign-callback/",
                 "recipient": recipient,
                 "sendEmails": True,
                 "singleSignOnEnabled": True
