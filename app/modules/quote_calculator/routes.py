@@ -7,7 +7,7 @@ from flask import Blueprint, request, render_template, redirect, make_response, 
 from app import db
 from app.decorators import api_response
 from app.modules.auth import get_auth_info
-from app.modules.auth.jwt_parser import decode_jwt, encode_jwt
+from app.modules.auth.jwt_parser import decode_jwt, encode_jwt, encode_shared_jwt
 from app.modules.external.bitrix24.lead import get_lead, update_lead
 from app.modules.external.bitrix24.deal import get_deal
 from app.modules.external.bitrix24.quote import get_quote, add_quote, update_quote_products
@@ -560,6 +560,7 @@ def get_insign_callback(token):
             status=200,
             mimetype='application/json')
     lead = get_lead(token_data["unique_identifier"])
+    collection_files = []
     for file in token_data.get("documents", []):
         file_content = download_file(sessionId=session_id, file_id=file["id"])
         if file_content[0:1] != "{":
@@ -568,16 +569,29 @@ def get_insign_callback(token):
                 "filename": file["displayname"],
                 "file_content": file_content
             })'''
+            file_id = None
             if file["displayname"] == "Verkaufsunterlagen":
-                add_file(token_data["upload_folder_id_electric"], {
+                file_id = add_file(token_data["upload_folder_id_electric"], {
                     "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                     "file_content": file_content
                 })
             else:
-                add_file(token_data["upload_folder_id_contract"], {
+                file_id = add_file(token_data["upload_folder_id_contract"], {
                     "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                     "file_content": file_content
                 })
+            if file_id is not None:
+                collection_files.append({
+                    "id": file_id,
+                    "filename": file["displayname"] + ".pdf"
+                })
+    if len(collection_files) > 0:
+        jwt = encode_shared_jwt(data={
+            "files": collection_files
+        }, expire_minutes=343200)
+        update_lead(token_data["unique_identifier"], {
+            "collection_url": f"https://kez-customer-portal.ah.hbbx.de/files/collection?token={jwt['token']}"
+        })
 
     return Response(
             '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
