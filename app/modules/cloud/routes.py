@@ -252,8 +252,8 @@ class OrderUpload(Resource):
     @api_response
     @token_required("cloud_calculation")
     def post(self):
-        from app.modules.order.order_services import add_item, Order
-        from app.modules.importer.sources.bitrix24.order import run_export as run_order_export
+        from app.modules.order.order_services import add_item, Order, update_item
+        from app.modules.importer.sources.bitrix24.order import run_export as run_order_export, find_association
 
         data = request.json
         user = get_logged_in_user()
@@ -274,8 +274,6 @@ class OrderUpload(Resource):
         offer_v2_data["is_sent"] = True
         offer = update_item_v2(id=offer.id, data=offer_v2_data)
         order = Order.query.filter(Order.offer_id == offer.id).first()
-        if order is not None:
-            raise ApiException("already-sent", "Already sent", 412)
         order_data = {
             "datetime": datetime.datetime.now(),
             "lead_number": None,
@@ -295,9 +293,16 @@ class OrderUpload(Resource):
             "status": "new",
             "is_checked": False
         }
-        order = add_item(order_data)
         if order is None:
-            raise ApiException("already-sent", "Already sent", 404)
+            order = add_item(order_data)
+            if order is None:
+                raise ApiException("order-failed", "Order creation failed", 404)
+        else:
+            link = find_association("Order", local_id=order.id)
+            if link is None:
+                update_item(order.id, order_data)
+            else:
+                raise ApiException("already-sent", "Already sent", 412)
         run_order_export(local_id=order.id)
         return {"status": "success",
                 "data": order.id}
