@@ -590,7 +590,7 @@ def get_insign_callback(token):
             "files": collection_files
         }, expire_minutes=343200)
         update_lead(token_data["unique_identifier"], {
-            "collection_url": f"https://kez-customer-portal.ah.hbbx.de/files/collection?token={jwt['token']}"
+            "collection_url": f"https://kunden.energie360.de/files/collection?token={jwt['token']}"
         })
 
     return Response(
