@@ -9,7 +9,7 @@ def cli_command():
     session_data = {
         "displayname": "My- First Test-Session",
         "foruser": "a.hedderich@hbb-werbung.de",
-        "callbackURL": "https://api.korbacher-energiezentrum.de/quote_calculator/insign/callback/",
+        "callbackURL": "https://www.energie360.de/insign/callback/",
         "userFullName": "Max Power",
         "userEmail": "max.power@nowhere.com",
         "documents": [
