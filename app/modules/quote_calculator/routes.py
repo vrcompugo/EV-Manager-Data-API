@@ -723,7 +723,7 @@ def get_insign_session(data):
         "callbackURL": "https://www.energie360.de/insign-callback/",
         "userFullName": f'{data["assigned_user"]["NAME"]} {data["assigned_user"]["LAST_NAME"]}',
         "userEmail": data["assigned_user"]["EMAIL"],
-        "serverSidecallbackURL": f"https://api.korbacher-energiezentrum.de.ah.hbbx.de/quote_calculator/insign/callback/{token['token']}",
+        "serverSidecallbackURL": f"https://api.korbacher-energiezentrum.de/quote_calculator/insign/callback/{token['token']}",
         "documents": documents,
         "deliveryConfig": {
             "emailEmpfaengerBCC": 'bcc@hbb-werbung.de',
