@@ -9,6 +9,14 @@
     width: 320px;
     margin-top: 70px;
   }
+  {% if offer.reseller.document_style == "bsh" %}
+    .page_2 .senec-storage {
+      position: absolute;
+      right: -40px;
+      width: 470px;
+      margin-top: 160px;
+    }
+  {% endif %}
   .page_2 .head-bulb {
     position: absolute;
     bottom: 0;
@@ -66,7 +74,12 @@
   {% include('feasibility_study_2020/elements/logos.html') %}
 
   <div class="triangle"></div>
-  <img class="senec-storage" src="{{ data.base_url }}/static/feasibility_study_2020/senec-storage.jpg" />
+
+  {% if offer.reseller.document_style == "bsh" %}
+    <img class="senec-storage" src="{{ data.base_url }}/static/feasibility_study_2020/senec-storage-bsh.jpg" />
+  {% else %}
+    <img class="senec-storage" src="{{ data.base_url }}/static/feasibility_study_2020/senec-storage.jpg" />
+  {% endif %}
   <img class="head-bulb" src="{{ data.base_url }}/static/feasibility_study_2020/head-bulb.png" />
 
   <div class="content">
