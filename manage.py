@@ -53,8 +53,8 @@ def test_akjsdb():
 
 @manager.command
 def test_2fsfasd():
-    from app.modules.external.mfr.task import export_by_bitrix_id
-    export_by_bitrix_id("61196")
+    from app.modules.importer.sources.bitrix24.order import run_export as run_order_export
+    run_order_export(local_id=3798)
 
 
 @manager.command
