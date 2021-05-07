@@ -40,6 +40,12 @@ def update_role_permissions():
 
 
 @manager.command
+def test_insign():
+    from app.modules.external.insign.signature import cli_command
+    cli_command()
+
+
+@manager.command
 def test_akjsdb():
     from app.modules.external.mfr.task import import_by_id
     import_by_id("18798411784")

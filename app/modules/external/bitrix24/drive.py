@@ -38,7 +38,7 @@ def get_file_content(id):
     result = requests.get(file_data["DOWNLOAD_URL"])
     if result.content[:1] == b'{' or result.content[:1] == b'[':
         try:
-            print("file content: error", result.content[:1])
+            print("file content: error", id, result.content[:100])
             data = result.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
                 time.sleep(5)

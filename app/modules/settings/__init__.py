@@ -213,7 +213,8 @@ def get_settings(section=None, domain_raw=None):
                     "street_nb": "UF_CRM_5DD402022E300",
                     "zip": "UF_CRM_5DD4020242167",
                     "city": "UF_CRM_5DD4020239456",
-                    "aev_reseller": "UF_CRM_1615824261"
+                    "aev_reseller": "UF_CRM_1615824261",
+                    "collection_url": "UF_CRM_1620134803"
                 }
             },
             "company": {
