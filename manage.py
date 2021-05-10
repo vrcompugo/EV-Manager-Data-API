@@ -48,13 +48,14 @@ def test_insign():
 @manager.command
 def test_akjsdb():
     from app.modules.external.mfr.task import import_by_id
-    import_by_id("18798411784")
+    import_by_id("18629525517")
 
 
 @manager.command
-def test_2fsfasd():
-    from app.modules.importer.sources.bitrix24.order import run_export as run_order_export
-    run_order_export(local_id=3798)
+def test_akjsdb2():
+    from app.modules.external.etermin.appointment import export_appointment
+    from app.modules.external.bitrix24.task import get_task
+    export_appointment(get_task("66482"))
 
 
 @manager.command

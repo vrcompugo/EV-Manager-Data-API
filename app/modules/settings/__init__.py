@@ -124,7 +124,9 @@ def get_settings(section=None, domain_raw=None):
             "task": {
                 "fields": {
                     "mfr_id": "ufAuto422491195439",
-                    "etermin_id": "ufAuto219922666303"
+                    "etermin_id": "ufAuto219922666303",
+                    "mfr_appointments": "ufAuto343721853755",
+                    "etermin_appointments": "ufAuto513701476131"
                 },
                 "leading_users": {
                     "onur.berber.e360@gmail.com": "410",

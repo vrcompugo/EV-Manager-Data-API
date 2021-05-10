@@ -142,13 +142,16 @@ def import_by_id(service_request_id):
                     })
     if len(response.get("Appointments", [])) > 0:
         appointment = response["Appointments"][0]
+        last_appointment = response["Appointments"][len(response["Appointments"]) - 1]
         if convert_datetime(task_data["startdateplan"], "Europe/Berlin") != convert_datetime(appointment["StartDateTime"]):
             update_data["START_DATE_PLAN"] = convert_datetime(appointment["StartDateTime"]) + "+02:00"
         if convert_datetime(task_data["enddateplan"], "Europe/Berlin") != convert_datetime(appointment["EndDateTime"]):
             update_data["END_DATE_PLAN"] = convert_datetime(appointment["EndDateTime"]) + "+02:00"
-            update_data["DEADLINE"] = update_data["END_DATE_PLAN"]
+        if convert_datetime(task_data["deadline"], "Europe/Berlin") != convert_datetime(last_appointment["EndDateTime"]):
+            update_data["DEADLINE"] = convert_datetime(last_appointment["EndDateTime"]) + "+02:00"
         new_leading = None
         contacts = {}
+        local_appointments = []
         for appointment in response["Appointments"]:
             for contact in appointment.get("Contacts"):
                 if contact.get("Email") not in contacts:
@@ -164,6 +167,15 @@ def import_by_id(service_request_id):
                         else:
                             if new_leading is None and contact.get("JobTitle") in ["Elektriker", "Montage"]:
                                 new_leading = contact.get("Email")
+            bitrix_user_ids = []
+            for contact in appointment.get("Contacts"):
+                if contact.get("Email") in contacts:
+                    bitrix_user_ids.append(contacts[contact.get("Email") ]["user"]["ID"])
+            local_appointments.append({
+                "StartDateTime": convert_datetime(appointment["StartDateTime"]) + "+02:00",
+                "EndDateTime": convert_datetime(appointment["EndDateTime"]) + "+02:00",
+                "bitrix_user_ids": bitrix_user_ids
+            })
         if new_leading is not None:
             if task_data["responsibleid"] != contacts[new_leading]["user"]["ID"]:
                 update_data["RESPONSIBLE_ID"] = contacts[new_leading]["user"]["ID"]
@@ -174,8 +186,9 @@ def import_by_id(service_request_id):
         new_support_users_list = persistent_users.data + list(set(supporting_users) - set(persistent_users.data))
         if set(task_data["accomplices"]) != set(new_support_users_list):
             update_data["ACCOMPLICES"] = new_support_users_list
+        if len(update_data.keys()) > 0:
+            update_data["mfr_appointments"] = json.dumps(local_appointments)
     if len(update_data.keys()) > 0:
-        print(task_id, json.dumps(update_data, indent=2))
         print(task_id, json.dumps(update_data, indent=2))
         update_task(task_id, update_data)
 

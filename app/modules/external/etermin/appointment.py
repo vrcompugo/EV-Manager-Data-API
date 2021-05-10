@@ -92,6 +92,8 @@ def export_appointments():
         "select[3]": "COMPANY_ID",
         "select[4]": "UF_AUTO_422491195439",
         "select[5]": "UF_AUTO_219922666303",
+        "select[5]": "UF_AUTO_343721853755",
+        "select[5]": "UF_AUTO_513701476131",
         "select[6]": "STATUS",
         "select[7]": "START_DATE_PLAN",
         "select[8]": "END_DATE_PLAN",
@@ -103,49 +105,85 @@ def export_appointments():
     })
     last_task_export_time = datetime.now()
     for task in tasks:
-        if task.get("startDatePlan") in [None, "", "0"]:
-            continue
-        startDatetime = dateutil.parser.parse(task.get("startDatePlan"))
-        endDatetime = dateutil.parser.parse(task.get("endDatePlan"))
-        if task.get("etermin_id") not in [None, "", "0"]:
-            post_data = {
-                "id": task.get("etermin_id"),
-                "start": startDatetime.strftime("%Y-%m-%d %H:%M:%S"),
-                "end": endDatetime.strftime("%Y-%m-%d %H:%M:%S")
-            }
-            print("export task update etermin", task["id"])
-            response = put("/api/appointment", post_data=post_data)
-            if response.get("status", "") != "success":
-                print("etermin-error:", response)
-        else:
-            if str(task.get("responsibleid")) != "90" and "90" not in task.get("accomplices", []):
-                continue
-            deal_data, contact_data, company_data = get_linked_data_by_task(task)
-            if deal_data is None or deal_data.get("etermin_id") not in [None, "", "0"]:
-                continue
-            post_data = {
-                "start": startDatetime.strftime("%Y-%m-%d %H:%M:%S"),
-                "end": endDatetime.strftime("%Y-%m-%d %H:%M:%S"),
-                "calendarid": 93100,
-                "sendemail": False
-            }
-            if company_data is not None:
-                post_data["street"] = company_data["street"]
-                post_data["zip"] = company_data["zip"]
-                post_data["city"] = company_data["city"]
-            if contact_data is not None:
-                post_data["firstname"] = contact_data["first_name"]
-                post_data["lastname"] = contact_data["last_name"]
-                post_data["street"] = contact_data["street"]
-                post_data["zip"] = contact_data["zip"]
-                post_data["city"] = contact_data["city"]
-            print("export task etermin", task["id"])
-            response = post("/api/appointment", post_data=post_data)
-            if "cid" in response:
-                update_task(task["id"], {"etermin_id": response["cid"]})
-            else:
-                print("etermin-error:", response)
+        export_appointments(task)
     config = get_settings("external/etermin")
     if config is not None:
         config["last_task_export_time"] = last_task_export_time.astimezone().isoformat()
     set_settings("external/etermin", config)
+
+
+def export_appointment(task):
+    if task.get("startDatePlan") in [None, "", "0"]:
+        return
+    if task.get("mfr_appointments") in [0, "", None]:
+        print("no mfr_appointments")
+        return
+    appointments = json.loads(task.get("mfr_appointments"))
+    if task.get("etermin_appointments") not in [0, "", None]:
+        old_etermin_appointments = json.loads(task.get("etermin_appointments"))
+    else:
+        old_etermin_appointments = []
+    etermin_appointments = []
+    i = 0
+    for appointment in appointments:
+        etermin_appointment = {
+            "start": appointment.get("StartDateTime"),
+            "end": appointment.get("EndDateTime"),
+            "bitrix_user_ids": appointment.get("bitrix_user_ids")
+        }
+        if i < len(old_etermin_appointments):
+            if "etermin_id" in old_etermin_appointments[i]:
+                etermin_appointment["etermin_id"] = old_etermin_appointments[i]["etermin_id"]
+        if i == 0:
+            etermin_appointment["etermin_id"] = task.get("etermin_id")
+        etermin_appointments.append(etermin_appointment)
+        i = i + 1
+    i = 0
+    if task.get("etermin_appointments") != json.dumps(etermin_appointments) and len(etermin_appointments) > 0:
+        for etermin_appointment in etermin_appointments:
+            start_datetime = dateutil.parser.parse(etermin_appointment["start"]).strftime("%Y-%m-%d %H:%M:%S")
+            end_datetime = dateutil.parser.parse(etermin_appointment["end"]).strftime("%Y-%m-%d %H:%M:%S")
+            if etermin_appointment.get("etermin_id") not in [None, "", "0"]:
+                post_data = {
+                    "id": etermin_appointment.get("etermin_id"),
+                    "start": start_datetime,
+                    "end": end_datetime
+                }
+                print("export task update etermin", task["id"])
+                response = put("/api/appointment", post_data=post_data)
+                if response.get("status", "") != "success":
+                    print("etermin-error:", response)
+            else:
+                if "90" not in etermin_appointment.get("bitrix_user_ids"):
+                    continue
+                deal_data, contact_data, company_data = get_linked_data_by_task(task)
+                if deal_data is None or deal_data.get("etermin_id") not in [None, "", "0"]:
+                    continue
+                post_data = {
+                    "start": start_datetime,
+                    "end": end_datetime,
+                    "calendarid": 93100,
+                    "sendemail": False
+                }
+                if company_data is not None:
+                    post_data["street"] = company_data["street"]
+                    post_data["zip"] = company_data["zip"]
+                    post_data["city"] = company_data["city"]
+                if contact_data is not None:
+                    post_data["firstname"] = contact_data["first_name"]
+                    post_data["lastname"] = contact_data["last_name"]
+                    post_data["street"] = contact_data["street"]
+                    post_data["zip"] = contact_data["zip"]
+                    post_data["city"] = contact_data["city"]
+                print("export task etermin", task["id"])
+                response = post("/api/appointment", post_data=post_data)
+                if response is not None and "cid" in response:
+                    etermin_appointment["etermin_id"] = response["cid"]
+                else:
+                    print("post_data:", post_data)
+                    print("etermin-error:", response)
+        print(json.dumps(etermin_appointments, indent=2))
+        update_task(task["id"], {
+            "etermin_id": etermin_appointments[0]["etermin_id"],
+            "etermin_appointments": json.dumps(etermin_appointments)
+        })

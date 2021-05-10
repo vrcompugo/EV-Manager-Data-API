@@ -40,7 +40,10 @@ def get_task(id, with_comments=False):
         "select[11]": "ACCOMPLICES",
         "select[12]": "SUBORDINATE",
         "select[13]": "AUDITORS",
-        "select[14]": "DEADLINE"
+        "select[14]": "DEADLINE",
+        "select[15]": "UF_AUTO_219922666303",
+        "select[16]": "UF_AUTO_343721853755",
+        "select[17]": "UF_AUTO_513701476131"
     })
     if "result" in data:
         task_data = convert_config_values(data["result"]["task"])
@@ -80,8 +83,13 @@ def update_task(id, data, domain=None):
         update_data["fields[UF_AUTO_422491195439]"] = update_data["fields[ufAuto422491195439]"]
     if "fields[ufAuto219922666303]" in update_data:
         update_data["fields[UF_AUTO_219922666303]"] = update_data["fields[ufAuto219922666303]"]
+    if "fields[ufAuto343721853755]" in update_data:
+        update_data["fields[UF_AUTO_343721853755]"] = update_data["fields[ufAuto343721853755]"]
+    if "fields[ufAuto513701476131]" in update_data:
+        update_data["fields[UF_AUTO_513701476131]"] = update_data["fields[ufAuto513701476131]"]
     response = post("tasks.task.update", update_data, domain=domain)
     if "result" in response and response["result"]:
+        print(json.dumps(response, indent=2))
         return response["result"]
     else:
         print(json.dumps(response, indent=2))
