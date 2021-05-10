@@ -105,7 +105,7 @@ def export_appointments():
     })
     last_task_export_time = datetime.now()
     for task in tasks:
-        export_appointments(task)
+        export_appointment(task)
     config = get_settings("external/etermin")
     if config is not None:
         config["last_task_export_time"] = last_task_export_time.astimezone().isoformat()
