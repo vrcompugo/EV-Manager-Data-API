@@ -240,8 +240,8 @@ def run_cron_folder_creation():
         post_data = {}
         for folder in config["folders"]:
             time.sleep(1)
-            if contact.get(folder["key"]) in [None, "", "0", 0]:
-                subpath = f"Kunde {contact['id']}"
+            subpath = f"Kunde {contact['id']}"
+            if contact.get(folder["key"]) != f"{folder['base_url']}/{subpath}":
                 new_folder_id = create_folder_path(folder["folder_id"], subpath)
                 if new_folder_id is not None:
                     if folder["key"] == "drive_myportal_folder":
@@ -249,7 +249,7 @@ def run_cron_folder_creation():
                         create_folder_path(new_folder_id, "Data Sheets")
                         create_folder_path(new_folder_id, "Protocols")
                         create_folder_path(new_folder_id, "Various")
-                    post_data[folder["key"]] = f"{folder['base_url']}{subpath}"
+                    post_data[folder["key"]] = f"{folder['base_url']}/{subpath}"
         if len(post_data) > 0:
             update_contact(contact["id"], post_data)
 
@@ -296,17 +296,6 @@ def run_cron_folder_creation():
                 create_folder_path(drive_cloud_folder["folder_id"], deal_path)
                 update_deal(deal["id"], {"drive_cloud_folder": f"{drive_cloud_folder['base_url']}{deal_path}"})
                 time.sleep(1)
-
-    '''drive_firstcall_folder = next((item for item in config["folders"] if item["key"] == "drive_firstcall_folder"), None)
-    if drive_firstcall_folder is not None:
-        deals = get_deals({"FILTER[>DATE_CREATE]": str(last_import)})
-        for deal in deals:
-            deal = get_deal(deal["id"])
-            if deal.get("drive_firstcall_folder") in [None, "", "0", 0]:
-                deal_path = get_deal_path(deal, "")
-                create_folder_path(drive_firstcall_folder["folder_id"], deal_path)
-                update_deal(deal["id"], {"drive_firstcall_folder": f"{drive_firstcall_folder['base_url']}{deal_path}"})
-                time.sleep(1)'''
 
     config = get_settings("external/bitrix24/folder_creation")
     if config is not None:
