@@ -86,20 +86,24 @@ def export_appointments():
         return None
     last_task_export_time = config.get("last_task_export_time", "2021-01-01")
     tasks = get_tasks({
-        "select[0]": "ID",
-        "select[1]": "TITLE",
-        "select[2]": "CONTACT_ID",
-        "select[3]": "COMPANY_ID",
-        "select[4]": "UF_AUTO_422491195439",
-        "select[5]": "UF_AUTO_219922666303",
-        "select[5]": "UF_AUTO_343721853755",
-        "select[5]": "UF_AUTO_513701476131",
-        "select[6]": "STATUS",
-        "select[7]": "START_DATE_PLAN",
-        "select[8]": "END_DATE_PLAN",
-        "select[9]": "UF_CRM_TASK",
+        "select[0]": "TITLE",
+        "select[1]": "DESCRIPTION",
+        "select[2]": "UF_CRM_TASK",
+        "select[3]": "CONTACT_ID",
+        "select[4]": "COMPANY_ID",
+        "select[5]": "TIME_ESTIMATE",
+        "select[6]": "UF_AUTO_422491195439",
+        "select[7]": "STATUS",
+        "select[8]": "START_DATE_PLAN",
+        "select[9]": "END_DATE_PLAN",
         "select[10]": "RESPONSIBLE_ID",
         "select[11]": "ACCOMPLICES",
+        "select[12]": "SUBORDINATE",
+        "select[13]": "AUDITORS",
+        "select[14]": "DEADLINE",
+        "select[15]": "UF_AUTO_219922666303",
+        "select[16]": "UF_AUTO_343721853755",
+        "select[17]": "UF_AUTO_513701476131"
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
@@ -114,6 +118,7 @@ def export_appointments():
 
 def export_appointment(task):
     if task.get("startDatePlan") in [None, "", "0"]:
+        print("no start date")
         return
     if task.get("mfr_appointments") in [0, "", None]:
         print("no mfr_appointments")
