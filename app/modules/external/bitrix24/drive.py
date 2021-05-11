@@ -241,7 +241,8 @@ def run_cron_folder_creation():
         for folder in config["folders"]:
             time.sleep(1)
             subpath = f"Kunde {contact['id']}"
-            if contact.get(folder["key"]) != f"{folder['base_url']}/{subpath}":
+            base_url = folder['base_url'].strip("/")
+            if contact.get(folder["key"]) != f"{base_url}/{subpath}":
                 new_folder_id = create_folder_path(folder["folder_id"], subpath)
                 if new_folder_id is not None:
                     if folder["key"] == "drive_myportal_folder":
@@ -249,7 +250,7 @@ def run_cron_folder_creation():
                         create_folder_path(new_folder_id, "Data Sheets")
                         create_folder_path(new_folder_id, "Protocols")
                         create_folder_path(new_folder_id, "Various")
-                    post_data[folder["key"]] = f"{folder['base_url']}/{subpath}"
+                    post_data[folder["key"]] = f"{base_url}/{subpath}"
         if len(post_data) > 0:
             update_contact(contact["id"], post_data)
 
