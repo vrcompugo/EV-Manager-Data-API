@@ -221,7 +221,7 @@ def run_cron_folder_creation():
 
     contacts = get_contacts({
         "ORDER[DATE_CREATE]": "DESC",
-        "FILTER[>DATE_CREATE]": last_import,
+        "FILTER[>DATE_MODIFY]": last_import,
         "SELECT[0]": "ID",
         "SELECT[1]": "UF_CRM_1612518385676",
         "SELECT[2]": "UF_CRM_1612533349639",
