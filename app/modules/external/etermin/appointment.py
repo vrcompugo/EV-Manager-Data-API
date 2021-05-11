@@ -103,7 +103,7 @@ def export_appointments():
         "select[14]": "DEADLINE",
         "select[15]": "UF_AUTO_219922666303",
         "select[16]": "UF_AUTO_343721853755",
-        "select[17]": "UF_AUTO_513701476131"
+        "select[17]": "UF_AUTO_513701476131",
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
