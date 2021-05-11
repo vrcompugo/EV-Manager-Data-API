@@ -614,8 +614,13 @@ def get_insign_data(lead_id):
         history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
         data = json.loads(json.dumps(history.data))
         sessionId = get_insign_session(data)
+        try:
+            email = data["contact"]["email"][0]["VALUE"]
+        except Exception as e:
+            email = "platzhalter@energie360.de"
+        public_url = get_public_url(sessionId, email)
         return Response(
-            json.dumps({"status": "success", "data": {"url": get_public_url(sessionId, data["contact"]["email"][0]["VALUE"])}}),
+            json.dumps({"status": "success", "data": {"url": public_url}}),
             status=200,
             mimetype='application/json')
     return Response(
