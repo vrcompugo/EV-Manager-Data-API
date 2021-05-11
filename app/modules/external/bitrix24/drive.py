@@ -161,6 +161,18 @@ def add_subfolder(parent_id, subfolder_name):
     return None
 
 
+def rename_folder(folder_id, new_name):
+    data = post("disk.folder.rename", {
+        "id": folder_id,
+        "newName": new_name
+    })
+    if "result" in data:
+        return data["result"]
+    else:
+        print("error rename folder:", data)
+    return None
+
+
 def add_file(folder_id, data):
 
     if data.get("bitrix_file_id", None) is not None:
@@ -315,54 +327,31 @@ def get_deal_path(deal, path):
 
 
 def run_legacy_folder_creation():
-    from .contact import convert_config_values
-    config = get_settings("external/bitrix24/folder_creation")
-    print("folder_creation")
-    if config is None or "folders" not in config:
-        print("no config for folder_creation")
-        return None
-
     payload = {
-        "ORDER[DATE_CREATE]": "DESC",
-        "SELECT[0]": "ID",
-        "SELECT[1]": "UF_CRM_1612518385676",
-        "SELECT[2]": "UF_CRM_1612533349639",
-        "SELECT[3]": "UF_CRM_1612533369175",
-        "SELECT[4]": "UF_CRM_1612533388171",
-        "SELECT[5]": "UF_CRM_1612533409927",
-        "SELECT[6]": "UF_CRM_1612533423669",
-        "SELECT[7]": "UF_CRM_1612533445604",
-        "SELECT[8]": "UF_CRM_1612533596622",
-        "SELECT[9]": "UF_CRM_1612533461553",
-        "SELECT[10]": "UF_CRM_1612533480143",
-        "SELECT[11]": "UF_CRM_1612533500465"
+        "id": 649168,
+        "start": 0
     }
-    payload["start"] = 0
     while payload["start"] is not None:
-        data = post("crm.contact.list", payload)
+        data = post("disk.folder.getchildren", payload)
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
-            print("batch", payload["start"])
-            for item in data["result"]:
-                contact = convert_config_values(item)
-                post_data = {}
-                for folder in config["folders"]:
-                    if contact.get(folder["key"]) in [None, "", "0", 0]:
-                        time.sleep(10)
-                        subpath = f"Kunde {contact['id']}"
-                        new_folder_id = create_folder_path(folder["folder_id"], subpath)
-                        if new_folder_id is not None:
-                            if folder["key"] == "drive_myportal_folder":
-                                create_folder_path(new_folder_id, "Documents")
-                                time.sleep(10)
-                                create_folder_path(new_folder_id, "Data Sheets")
-                                time.sleep(10)
-                                create_folder_path(new_folder_id, "Protocols")
-                                time.sleep(10)
-                                create_folder_path(new_folder_id, "Various")
-                                time.sleep(10)
-                            post_data[folder["key"]] = f"{folder['base_url']}{subpath}"
-                if len(post_data) > 0:
-                    update_contact(contact["id"], post_data)
-                    print("update", contact["id"])
-                    time.sleep(60)
+            for folder in data["result"]:
+                print(folder["NAME"])
+                subfolders = get_folder(folder["ID"])
+                for subfolder in subfolders:
+                    if subfolder["NAME"] == "Documents":
+                        rename_folder(subfolder["ID"], "Vertragsunterlagen")
+                        time.sleep(4)
+                    if subfolder["NAME"] == "Data Sheets":
+                        rename_folder(subfolder["ID"], "Datenblätter")
+                        time.sleep(4)
+                    if subfolder["NAME"] == "Protocols":
+                        rename_folder(subfolder["ID"], "Protokolle")
+                        time.sleep(4)
+                    if subfolder["NAME"] == "Various":
+                        rename_folder(subfolder["ID"], "Verschiedenes")
+                        time.sleep(4)
+        else:
+            print("error3:", data)
+            payload["start"] = None
+            return None
