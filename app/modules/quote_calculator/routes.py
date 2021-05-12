@@ -574,17 +574,10 @@ def get_insign_callback(token):
                 "filename": file["displayname"],
                 "file_content": file_content
             })'''
-            file_id = None
-            if file["displayname"] == "Verkaufsunterlagen":
-                file_id = add_file(token_data["upload_folder_id_electric"], {
-                    "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
-                    "file_content": file_content
-                })
-            else:
-                file_id = add_file(token_data["upload_folder_id_contract"], {
-                    "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
-                    "file_content": file_content
-                })
+            file_id = add_file(token_data["upload_folder_id_contract"], {
+                "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
+                "file_content": file_content
+            })
             if file_id is not None:
                 collection_files.append({
                     "id": file_id,
