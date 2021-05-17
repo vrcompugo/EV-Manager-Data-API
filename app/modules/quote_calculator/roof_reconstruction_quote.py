@@ -47,6 +47,12 @@ def get_roof_reconstruction_products(data):
             quantity=trash_management_quantity,
             products=data["roof_reconstruction_quote"]["products"]
         )
+        add_direct_product(
+            label="Baustellen Einrichtung",
+            category=f"Dachsanierung online Bogen",
+            quantity=1,
+            products=data["roof_reconstruction_quote"]["products"]
+        )
 
         if "remove_snowstop" in data["data"]["reconstruction_extra_options"]:
             quantity = 1
