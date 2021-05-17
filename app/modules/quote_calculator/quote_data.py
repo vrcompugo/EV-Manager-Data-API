@@ -323,6 +323,22 @@ def calculate_products(data):
             quantity=1,
             products=data["products"]
         )
+        add_direct_product(
+            label="E.MW (energie-monitoring-wireless)",
+            category="Extra Pakete",
+            quantity=1,
+            products=data["products"]
+        )
+        if "emw" in data["data"]["extra_options"] or "emw" in data["data"]["extra_options_zero"]:
+            quantity = 0
+            if "emw" in data["data"]["extra_options"]:
+                quantity = 1
+            add_direct_product(
+                label="E.MW (energie-monitoring-wireless) upgrade",
+                category="Extra Pakete",
+                quantity=quantity,
+                products=data["products"]
+            )
     except Exception as e:
         trace_output = traceback.format_exc()
         print(trace_output)
