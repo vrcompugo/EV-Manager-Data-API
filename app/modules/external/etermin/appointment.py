@@ -117,6 +117,7 @@ def export_appointments():
 
 
 def export_appointment(task):
+    print("export task ", task)
     if task.get("startDatePlan") in [None, "", "0"]:
         print("no start date")
         return
