@@ -1,3 +1,4 @@
+import base64
 from io import BytesIO
 
 from flask_cors.core import try_match
@@ -106,6 +107,7 @@ def import_by_id(service_request_id):
             if json.dumps(buffer_data.data.get(field)) != json.dumps(response.get(field)):
                 changes_found = True
                 break
+        changes_found = True
         if changes_found is False:
             print("no import needed")
             return
@@ -186,8 +188,8 @@ def import_by_id(service_request_id):
         new_support_users_list = persistent_users.data + list(set(supporting_users) - set(persistent_users.data))
         if set(task_data["accomplices"]) != set(new_support_users_list):
             update_data["ACCOMPLICES"] = new_support_users_list
-        if len(update_data.keys()) > 0:
-            update_data["mfr_appointments"] = json.dumps(local_appointments)
+        if len(update_data.keys()) > 0 or True:
+            update_data["mfr_appointments"] = base64.b64encode(json.dumps(local_appointments).encode('utf-8')).decode('utf-8')
     if len(update_data.keys()) > 0:
         print(task_id, json.dumps(update_data, indent=2))
         update_task(task_id, update_data)

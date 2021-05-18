@@ -1,4 +1,5 @@
 from operator import index
+import base64
 import re
 import time
 import json
@@ -117,16 +118,22 @@ def export_appointments():
 
 
 def export_appointment(task):
-    print("export task ", task)
+    print("export task ", task.get("id"))
     if task.get("startDatePlan") in [None, "", "0"]:
         print("no start date")
         return
     if task.get("mfr_appointments") in [0, "", None]:
         print("no mfr_appointments")
         return
-    appointments = json.loads(task.get("mfr_appointments"))
+    if task.get("mfr_appointments")[:1] in ["{", "["]:
+        appointments = json.loads(task.get("mfr_appointments"))
+    else:
+        appointments = json.loads(base64.b64decode(task.get("mfr_appointments").encode('utf-8')).decode('utf-8'))
     if task.get("etermin_appointments") not in [0, "", None]:
-        old_etermin_appointments = json.loads(task.get("etermin_appointments"))
+        if task.get("etermin_appointments")[:1] in ["{", "["]:
+            old_etermin_appointments = json.loads(task.get("etermin_appointments"))
+        else:
+            old_etermin_appointments = json.loads(base64.b64decode(task.get("etermin_appointments").encode('utf-8')).decode('utf-8'))
     else:
         old_etermin_appointments = []
     etermin_appointments = []
@@ -145,7 +152,7 @@ def export_appointment(task):
         etermin_appointments.append(etermin_appointment)
         i = i + 1
     i = 0
-    if task.get("etermin_appointments") != json.dumps(etermin_appointments) and len(etermin_appointments) > 0:
+    if json.dumps(old_etermin_appointments) != json.dumps(etermin_appointments) and len(etermin_appointments) > 0:
         for etermin_appointment in etermin_appointments:
             start_datetime = dateutil.parser.parse(etermin_appointment["start"]).strftime("%Y-%m-%d %H:%M:%S")
             end_datetime = dateutil.parser.parse(etermin_appointment["end"]).strftime("%Y-%m-%d %H:%M:%S")
@@ -191,5 +198,5 @@ def export_appointment(task):
         print(json.dumps(etermin_appointments, indent=2))
         update_task(task["id"], {
             "etermin_id": etermin_appointments[0]["etermin_id"],
-            "etermin_appointments": json.dumps(etermin_appointments)
+            "etermin_appointments": base64.b64encode(json.dumps(etermin_appointments).encode('utf-8')).decode('utf-8')
         })
