@@ -11,7 +11,7 @@ from app.modules.auth.jwt_parser import decode_jwt, encode_jwt, encode_shared_jw
 from app.modules.external.bitrix24.lead import get_lead, update_lead
 from app.modules.external.bitrix24.deal import get_deal
 from app.modules.external.bitrix24.quote import get_quote, add_quote, update_quote_products
-from app.modules.external.bitrix24.drive import get_file, add_file, get_public_link, create_folder_path
+from app.modules.external.bitrix24.drive import get_file, add_file, get_folder_id, get_public_link, create_folder_path
 from app.modules.external.bitrix24.products import reload_products
 from app.modules.external.bitrix24.contact import add_contact
 from app.modules.settings import get_settings
@@ -555,6 +555,8 @@ def genrate_pdf(data, generate_function, lead_id, pdf_id_key, label, subfolder_i
 @blueprint.route("/insign/callback/<token>", methods=['GET', 'POST'])
 def get_insign_callback(token):
     from app.modules.external.insign.signature import download_file
+
+    config = get_settings("external/bitrix24/folder_creation")
     token_data = decode_jwt(token)
     session_id = request.args.get("sessionid")
     event_type = request.args.get("eventid")
@@ -564,7 +566,10 @@ def get_insign_callback(token):
             '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
             status=200,
             mimetype='application/json')
+
+    myprotal_folder = next((item for item in config["folders"] if item["key"] == "drive_myportal_folder"), None)
     lead = get_lead(token_data["unique_identifier"])
+    customer_folder_id = get_folder_id(myprotal_folder["folder_id"], path=f"Kunde {lead['contact_id']}/Vertragsunterlagen")
     collection_files = []
     for file in token_data.get("documents", []):
         file_content = download_file(sessionId=session_id, file_id=file["id"])
@@ -574,6 +579,10 @@ def get_insign_callback(token):
                 "filename": file["displayname"],
                 "file_content": file_content
             })'''
+            add_file(customer_folder_id, {
+                "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
+                "file_content": file_content
+            })
             file_id = add_file(token_data["upload_folder_id_contract"], {
                 "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                 "file_content": file_content
