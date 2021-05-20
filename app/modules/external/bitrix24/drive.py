@@ -326,6 +326,39 @@ def get_deal_path(deal, path):
     return f"{new_path}Vorgang {deal['unique_identifier']}/{path}"
 
 
+def run_cron_heating_folder_creation():
+    config = get_settings("external/bitrix24/folder_creation")
+    print("heating_folder_creation")
+    if config is None or "folders" not in config:
+        print("no config for heating_folder_creation")
+        return None
+    last_import = "2021-01-01"
+    import_time = datetime.now()
+    if "last_heating_run_time" in config:
+        last_import = config["last_heating_run_time"]
+
+    deals = get_deals({
+        "FILTER[>DATE_MODIFY]": last_import,
+        "FILTER[CATEGORY_ID]": 9,
+        "SELECT[0]": "*",
+        "SELECT[1]": "ID",
+        "SELECT[2]": "UF_CRM_60A60FF556B0C"
+    })
+    for deal in deals:
+        print("deal", deal["id"])
+        if deal.get("upload_link_heatingcontract") in [None, "", 0]:
+            deal_path = f"Auftrag {deal['id']}"
+            folder_id = create_folder_path(1321602, deal_path)
+            update_deal(deal["id"], {
+                "folder_id_heatingcontract": folder_id,
+                "upload_link_heatingcontract": f"https://keso.bitrix24.de/docs/path/Heizungsupload/{deal_path}"
+            })
+    config = get_settings("external/bitrix24/folder_creation")
+    if config is not None:
+        config["last_heating_run_time"] = import_time.astimezone().isoformat()
+    set_settings("external/bitrix24/folder_creation", config)
+
+
 def run_legacy_folder_creation():
     payload = {
         "id": 649168,

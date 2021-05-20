@@ -105,3 +105,10 @@ def cron(section=None):
             run_cron_folder_creation()
         except Exception as e:
             error_handler()
+
+    if section == "productive" or section == "heating_folder_creation":
+        from app.modules.external.bitrix24.drive import run_cron_heating_folder_creation
+        try:
+            run_cron_heating_folder_creation()
+        except Exception as e:
+            error_handler()
