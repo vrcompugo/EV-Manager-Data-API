@@ -74,6 +74,7 @@ def quote_calculator_defaults(lead_id):
             data["data"]["upload_link_invoices"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter"
             data["data"]["upload_folder_id_contract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen")
             data["data"]["upload_link_contract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen"
+        if "upload_link_heatingcontract" not in data["data"] or data["data"]["upload_link_heatingcontract"].find(f"Vorgang {lead['unique_identifier']}") < 0:
             data["data"]["upload_folder_id_heatingcontract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Heizungsangebote")
             data["data"]["upload_link_heatingcontract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Heizungsangebote"
 
