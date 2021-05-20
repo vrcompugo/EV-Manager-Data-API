@@ -189,8 +189,7 @@ def quote_calculator_update(lead_id):
         "upload_link_electric": data["data"]["upload_link_electric"],
         "upload_link_heating": data["data"]["upload_link_heating"],
         "upload_link_invoices": data["data"]["upload_link_invoices"],
-        "upload_link_contract": data["data"]["upload_link_contract"],
-        "upload_link_heatingcontract": data["data"]["upload_link_heatingcontract"],
+        "upload_link_contract": data["data"]["upload_link_contract"]
     }
     if contact_id is not None:
         update_data["contact_id"] = contact_id
