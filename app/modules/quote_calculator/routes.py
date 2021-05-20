@@ -74,6 +74,8 @@ def quote_calculator_defaults(lead_id):
             data["data"]["upload_link_invoices"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter"
             data["data"]["upload_folder_id_contract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen")
             data["data"]["upload_link_contract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen"
+            data["data"]["upload_folder_id_heatingcontract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Heizungsangebote")
+            data["data"]["upload_link_heatingcontract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Heizungsangebote"
 
             update_data = {
                 "unique_identifier": str(lead_id),
@@ -82,6 +84,7 @@ def quote_calculator_defaults(lead_id):
                 "upload_link_heating": data["data"]["upload_link_heating"],
                 "upload_link_invoices": data["data"]["upload_link_invoices"],
                 "upload_link_contract": data["data"]["upload_link_contract"],
+                "upload_link_heatingcontract": data["data"]["upload_link_heatingcontract"]
             }
             update_lead(lead_id, update_data)
         if "upload_link_firstcall" not in data["data"] or data["data"]["upload_link_firstcall"].find(f"Vorgang {lead['unique_identifier']}") < 0:
@@ -171,6 +174,8 @@ def quote_calculator_update(lead_id):
     data["data"]["upload_link_invoices"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter"
     data["data"]["upload_folder_id_contract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen")
     data["data"]["upload_link_contract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen"
+    data["data"]["upload_folder_id_heatingcontract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Heizungsangebote")
+    data["data"]["upload_link_heatingcontract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Heizungsangebote"
     history = QuoteHistory(
         lead_id=lead_id,
         datetime=datetime.datetime.now(),
@@ -189,7 +194,8 @@ def quote_calculator_update(lead_id):
         "upload_link_electric": data["data"]["upload_link_electric"],
         "upload_link_heating": data["data"]["upload_link_heating"],
         "upload_link_invoices": data["data"]["upload_link_invoices"],
-        "upload_link_contract": data["data"]["upload_link_contract"]
+        "upload_link_contract": data["data"]["upload_link_contract"],
+        "upload_link_heatingcontract": data["data"]["upload_link_heatingcontract"],
     }
     if contact_id is not None:
         update_data["contact_id"] = contact_id

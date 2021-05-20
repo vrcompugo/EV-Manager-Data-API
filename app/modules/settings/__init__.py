@@ -209,6 +209,7 @@ def get_settings(section=None, domain_raw=None):
                     "upload_link_invoices": "UF_CRM_1603982179",
                     "upload_link_contract": "UF_CRM_1603982205",
                     "upload_link_firstcall": "UF_CRM_1618302626914",
+                    "upload_link_heatingcontract": "UF_CRM_1621495505",
                     "salutation": "HONORIFIC",
                     "first_name": "NAME",
                     "street": "UF_CRM_5DD4020221169",
