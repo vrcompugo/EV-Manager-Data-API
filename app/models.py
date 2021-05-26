@@ -21,3 +21,4 @@ from app.modules.power_meter.models.power_meter import PowerMeter, PowerMeterSch
 from app.modules.power_meter.models.power_meter_measurement import PowerMeterMeasurement, PowerMeterMeasurementSchema
 from app.modules.external.mfr.models.task_persistent_users import TaskPersistentUsers
 from app.modules.external.mfr.models.mfr_import_buffer import MfrImportBuffer
+from app.modules.external.mfr.models.mfr_export_buffer import MfrExportBuffer

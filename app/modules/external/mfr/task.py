@@ -25,6 +25,7 @@ from .contact import export_by_bitrix_id as export_contact_by_bitrix_id
 from .company import export_by_bitrix_id as export_company_by_bitrix_id
 from .models.task_persistent_users import TaskPersistentUsers
 from .models.mfr_import_buffer import MfrImportBuffer
+from .models.mfr_export_buffer import MfrExportBuffer
 
 
 def get_export_data(task_data, contact_data, deal_data, company_data):
@@ -219,6 +220,20 @@ def run_cron_export():
 def export_by_bitrix_id(bitrix_id):
     print("export task ", bitrix_id)
     task_data = get_task(bitrix_id)
+    task_buffer = MfrExportBuffer.query.filter(MfrExportBuffer.task_id == bitrix_id).first()
+    if task_buffer is None:
+        task_buffer = MfrExportBuffer(task_id=bitrix_id)
+        task_buffer.data = {}
+        db.session.add(task_buffer)
+    if json.dumps(task_buffer) == json.dumps(task_buffer.data):
+        print("no_change")
+    else:
+        print(json.dumps(task_buffer, indent=2))
+        print(json.dumps(task_buffer.data, indent=2))
+    task_buffer.last_change = datetime.now()
+    task_buffer.data = task_data
+    db.session.commit()
+
     deal_data, contact_data, company_data = get_linked_data_by_task(task_data)
     if contact_data is not None and contact_data.get("mfr_id") in [None, "", "0"]:
         export_contact_by_bitrix_id(contact_data["id"])
@@ -236,7 +251,6 @@ def export_by_bitrix_id(bitrix_id):
         documents = post_data["documents"]
         del post_data["documents"]
     if task_data.get("mfr_id", None) in ["", None, 0]:
-        print(json.dumps(post_data, indent=2))
         response = post("/ServiceRequests", post_data=post_data)
         if response.get("Id") not in ["", None, 0]:
             task_data['mfr_id'] = response.get("Id")
