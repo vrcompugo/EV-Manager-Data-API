@@ -218,17 +218,18 @@ def run_cron_export():
 
 
 def export_by_bitrix_id(bitrix_id):
-    print("export task ", bitrix_id)
+    print("export mfr task ", bitrix_id)
     task_data = get_task(bitrix_id)
     task_buffer = MfrExportBuffer.query.filter(MfrExportBuffer.task_id == bitrix_id).first()
     if task_buffer is None:
         task_buffer = MfrExportBuffer(task_id=bitrix_id)
         task_buffer.data = {}
         db.session.add(task_buffer)
-    if json.dumps(task_buffer) == json.dumps(task_buffer.data):
+    if json.dumps(task_data) == json.dumps(task_buffer.data):
         print("no_change")
+        return
     else:
-        print(json.dumps(task_buffer, indent=2))
+        print(json.dumps(task_data, indent=2))
         print(json.dumps(task_buffer.data, indent=2))
     task_buffer.last_change = datetime.now()
     task_buffer.data = task_data
