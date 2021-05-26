@@ -16,6 +16,7 @@ from app.modules.quote_calculator.models.quote_history import QuoteHistory
 from app.modules.external.models.transaction_log import TransactionLog
 from app.modules.external.bitrix24.models.department import BitrixDepartment
 from app.modules.external.bitrix24.models.drive_folder import BitrixDriveFolder
+from app.modules.external.bitrix24.models.user_cache import UserCache
 from app.modules.power_meter.models.power_meter import PowerMeter, PowerMeterSchema
 from app.modules.power_meter.models.power_meter_measurement import PowerMeterMeasurement, PowerMeterMeasurementSchema
 from app.modules.external.mfr.models.task_persistent_users import TaskPersistentUsers

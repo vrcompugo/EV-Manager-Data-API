@@ -5,6 +5,11 @@ from app.utils.error_handler import error_handler
 
 
 def cron(section=None):
+    if section == "productive" or section == "user_cache_refresh":
+        from app.modules.external.bitrix24.user import cron_refresh_users
+        print("cron", "user_cache_refresh")
+        cron_refresh_users()
+
     if section == "productive" or section == "import_leads_aroundhome":
         from app.modules.external.aroundhome.deal import run_cron_import
         print("cron", "import_leads_aroundhome")
