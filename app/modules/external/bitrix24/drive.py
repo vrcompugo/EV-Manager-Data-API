@@ -152,10 +152,6 @@ def add_subfolder(parent_id, subfolder_name):
         return data["result"]
     else:
         if data["error"] == "DISK_OBJ_22000":
-            print({
-                "id": parent_id,
-                "data[NAME]": subfolder_name
-            })
             return {"ID": get_folder_id(parent_id, subfolder_name)}
         print("error new folder:", data)
     return None
@@ -249,9 +245,9 @@ def run_cron_folder_creation():
     })
 
     for contact in contacts:
+        print("contact:", contact["id"])
         post_data = {}
         for folder in config["folders"]:
-            time.sleep(1)
             subpath = f"Kunde {contact['id']}"
             base_url = folder['base_url'].strip("/")
             if contact.get(folder["key"]) != f"{base_url}/{subpath}":
@@ -270,6 +266,7 @@ def run_cron_folder_creation():
     if drive_insurance_folder is not None:
         deals_insurance = get_deals({"FILTER[CATEGORY_ID]": "70", "FILTER[>DATE_CREATE]": str(last_import)})
         for deal in deals_insurance:
+            print("deal:", deal["id"])
             deal = get_deal(deal["id"])
             if deal.get("drive_insurance_folder") in [None, "", "0", 0]:
                 deal_path = get_deal_path(deal, "")
@@ -278,6 +275,7 @@ def run_cron_folder_creation():
                 time.sleep(1)
         deals_insurance_external = get_deals({"FILTER[CATEGORY_ID]": "110", "FILTER[>DATE_CREATE]": str(last_import)})
         for deal in deals_insurance_external:
+            print("deal:", deal["id"])
             deal = get_deal(deal["id"])
             if deal.get("drive_insurance_folder") in [None, "", "0", 0]:
                 deal_path = get_deal_path(deal, "")
@@ -290,6 +288,7 @@ def run_cron_folder_creation():
     if drive_rental_folder is not None and drive_rental_folder2 is not None:
         deals_rental = get_deals({"FILTER[CATEGORY_ID]": "168", "FILTER[>DATE_CREATE]": str(last_import)})
         for deal in deals_rental:
+            print("deal:", deal["id"])
             deal = get_deal(deal["id"])
             if deal.get("drive_rental_contract_folder") in [None, "", "0", 0]:
                 deal_path = get_deal_path(deal, "")
@@ -303,6 +302,7 @@ def run_cron_folder_creation():
     if drive_cloud_folder is not None:
         deals_cloud = get_deals({"FILTER[CATEGORY_ID]": "15", "FILTER[>DATE_CREATE]": str(last_import)})
         for deal in deals_cloud:
+            print("deal:", deal["id"])
             deal = get_deal(deal["id"])
             if deal.get("drive_cloud_folder") in [None, "", "0", 0]:
                 deal_path = get_deal_path(deal, "")
