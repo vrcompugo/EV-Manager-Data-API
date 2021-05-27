@@ -145,10 +145,10 @@ def calculate_cloud(data):
             power_to_kwp_factor = power_to_kwp_factor * 1.34
         result["power_usage"] = data["power_usage"]
         result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor_kwp / 1000
-        #if "name" not in user or user["name"].lower() not in ["aev", "eeg", "bsh"]:
-        #    if "extra_options" in data:
-        #        if "solaredge" not in data["extra_options"]:
-        #            result["min_kwp_light"] = result["min_kwp_light"] + 0.44
+        if "name" not in user or user["name"].lower() not in ["aev", "eeg", "bsh"]:
+            if "extra_options" in data:
+                if "solaredge" not in data["extra_options"]:
+                    result["min_kwp_light"] = result["min_kwp_light"] + 0.44
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
         result["storage_usage"] = data["power_usage"]
         if data["pv_kwp"] > 0:
