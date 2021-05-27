@@ -324,7 +324,7 @@ def generate_datasheet_pdf(lead_id, data):
                     add_pdf_by_drive_id(merger, 436158, cached=True)
                 else:
                     add_pdf_by_drive_id(merger, 436128, cached=True)
-            pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec v2.1") == 0), None)
+            pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec lithium speicher") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 443354, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec v3") == 0), None)
@@ -333,6 +333,12 @@ def generate_datasheet_pdf(lead_id, data):
         add_pdf_by_drive_id(merger, 436112, cached=True)  # zebra_zertifgikat
         add_pdf_by_drive_id(merger, 436106, cached=True)  # Testsieger Garantiebedingunegn
         add_pdf_by_drive_id(merger, 436102, cached=True)  # Kapazitätsversprechen
+        if "solaredge" in data["data"]["extra_options"]:
+            add_pdf_by_drive_id(merger, 1352450, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352450/?&ncc=1&filename=three-phase-inverter-setapp-ds.pdf
+            add_pdf_by_drive_id(merger, 1352452, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352452/?&ncc=1&filename=power-optimizer-datasheet.pdf
+            if data["data"].get("pv_kwp", 0) > 30:
+                add_pdf_by_drive_id(merger, 1352456, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352456/?&ncc=1&filename=three-phase-inverter-setapp-datasheet-30.pdf
+                add_pdf_by_drive_id(merger, 1352454, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352454/?&ncc=1&filename=power-optimizer-datasheet-30.pdf
         if "tax_consult" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, 436100, cached=True)
 
