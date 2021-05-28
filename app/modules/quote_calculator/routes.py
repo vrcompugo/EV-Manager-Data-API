@@ -33,6 +33,41 @@ def route_reload_products():
     return {"status": "success"}
 
 
+@blueprint.route("/history/<history_id>", methods=['PUT'])
+def edit_history(history_id):
+    auth_info = get_auth_info()
+    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+        history = QuoteHistory.query.filter(QuoteHistory.id == int(history_id)).first()
+        if history is not None:
+            data = request.json
+            history.label = data.get("label")
+            db.session.commit()
+            return {"status": "success", "data": {
+                "id": history.id,
+                "datetime": history.datetime,
+                "label": history.label
+            }}
+        return {"status": "failed", "data": {}, "message": "history not found"}
+    return {"status": "failed", "data": {}, "message": "auth failed"}
+
+
+@blueprint.route("/history/<history_id>/push", methods=['POST'])
+def push_history(history_id):
+    auth_info = get_auth_info()
+    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+        history = QuoteHistory.query.filter(QuoteHistory.id == int(history_id)).first()
+        if history is not None:
+            history.datetime = datetime.datetime.now()
+            db.session.commit()
+            return {"status": "success", "data": {
+                "id": history.id,
+                "datetime": history.datetime,
+                "label": history.label
+            }}
+        return {"status": "failed", "data": {}, "message": "history not found"}
+    return {"status": "failed", "data": {}, "message": "auth failed"}
+
+
 @blueprint.route("/<lead_id>", methods=['GET', 'POST'])
 def quote_calculator_defaults(lead_id):
     auth_info = get_auth_info()
@@ -91,6 +126,15 @@ def quote_calculator_defaults(lead_id):
                 "upload_link_firstcall": data["data"]["upload_link_firstcall"]
             }
             update_lead(lead_id, update_data)
+        histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).all()
+        data["histories"] = []
+        for history in histories:
+            data["histories"].append({
+                "id": history.id,
+                "datetime": str(history.datetime),
+                "label": history.label
+            })
+
         return Response(
             json.dumps({"status": "success", "data": data}),
             status=200,
