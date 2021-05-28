@@ -171,7 +171,10 @@ def get_settings(section=None, domain_raw=None):
                     "upload_link_firstcall": "UF_CRM_1618302925",
                     "upload_link_heatingcontract": "UF_CRM_60A60FF556B0C",
                     "folder_id_heatingcontract": "UF_CRM_1621504031",
-                    "aev_reseller": "UF_CRM_1615824273"
+                    "aev_reseller": "UF_CRM_1615824273",
+                    "contract_number": "UF_CRM_1596704551167",
+                    "fakturia_contract_number": "UF_CRM_1622107557802",
+                    "cloud_delivery_begin": "UF_CRM_1578322109"
                 }
             },
             "quote": {

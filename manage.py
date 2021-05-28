@@ -54,9 +54,8 @@ def test_akjsdb():
 
 @manager.command
 def test_akjsdb2():
-    from app.modules.external.etermin.appointment import export_appointment
-    from app.modules.external.bitrix24.task import get_task
-    export_appointment(get_task("86534"))
+    from app.modules.external.fakturia.contract import export_cloud_deal
+    export_cloud_deal(9948)
 
 
 @manager.command
