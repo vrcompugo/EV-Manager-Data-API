@@ -3,7 +3,7 @@ from app.exceptions import ApiException
 
 def calculate_commission_data(quote_data, data, quote_key=""):
     if quote_key == "pv_quote":
-        if False and data["data"].get(f"{quote_key}_special_offer_technik_service", False) is True and "technik_service_packet" in data["data"]["extra_options"]:
+        if data["data"].get(f"{quote_key}_special_offer_technik_service", False) is True and "technik_service_packet" in data["data"]["extra_options"]:
             technik_and_service_produkt = {
                 "NAME": "Sonderaktion Technik und Service Paket",
                 "DESCRIPTION": f"",
