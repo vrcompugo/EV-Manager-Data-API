@@ -122,3 +122,4 @@ def get_commission_rate(quote_data, data, quote_key):
         return 4.25
     if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
         return 3.75
+    return 2
