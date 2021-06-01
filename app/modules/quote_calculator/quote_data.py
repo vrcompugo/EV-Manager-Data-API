@@ -236,6 +236,20 @@ def calculate_products(data):
             quantity = 0
             if "wwwp" in data["data"]["extra_options"]:
                 quantity = 1
+            if data["data"]["extra_options_wwwp_variant"] == "NIBE L":
+                add_direct_product(
+                    label="Brauchwasser-Wärmepumpe NIBE L",
+                    category="Extra Pakete",
+                    quantity=quantity,
+                    products=data["products"]
+                )
+            if data["data"]["extra_options_wwwp_variant"] == "NIBE XL":
+                add_direct_product(
+                    label="Brauchwasser-Wärmepumpe NIBE XL",
+                    category="Extra Pakete",
+                    quantity=quantity,
+                    products=data["products"]
+                )
             if data["data"]["extra_options_wwwp_variant"] == "ecoSTAR taglio 100":
                 add_direct_product(
                     label="Wärmepumpe (100 l) 100",

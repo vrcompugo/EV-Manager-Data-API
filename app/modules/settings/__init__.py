@@ -40,7 +40,8 @@ def get_settings(section=None, domain_raw=None):
             "glas_glas": 445,
             "senec_v3": 437,
             "senec_guarantee": 441,
-            "symo": 433
+            "symo": 433,
+            "nibe_wp": 1378554  # https://keso.bitrix24.de/disk/downloadFile/1378554/?&ncc=1&filename=Nibe+Brauchwasser+Wa%CC%88rmepumpe.pdf,
         }
         return data
     if full_section == "keso.bitrix24.de/offer/summary_pdf":

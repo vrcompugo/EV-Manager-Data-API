@@ -300,7 +300,7 @@ def generate_datasheet_pdf(lead_id, data):
         if "emergency_power_box" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, 438048, cached=True)
         if "wwwp" in data["data"]["extra_options"]:
-            add_pdf_by_drive_id(merger, 436218, cached=True)
+            add_pdf_by_drive_id(merger, config["nibe_wp"], cached=True)
         if "wallbox" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, 436174, cached=True)  # senec wallbox
 
