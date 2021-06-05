@@ -109,6 +109,8 @@ def export_appointments():
         "filter[TITLE]": "%[mfr]%"
     })
     last_task_export_time = datetime.now()
+    if tasks is None:
+        return
     for task in tasks:
         export_appointment(task)
     config = get_settings("external/etermin")
