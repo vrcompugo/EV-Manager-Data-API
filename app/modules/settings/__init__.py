@@ -229,7 +229,14 @@ def get_settings(section=None, domain_raw=None):
                     "zip": "UF_CRM_5DD4020242167",
                     "city": "UF_CRM_5DD4020239456",
                     "aev_reseller": "UF_CRM_1615824261",
-                    "collection_url": "UF_CRM_1620134803"
+                    "collection_url": "UF_CRM_1620134803",
+                    "zoom_appointment": "UF_CRM_1604498002",
+                    "zoom_link": "UF_CRM_ZOOM_MEET_LINK",
+                    "pv_quote_sum_net": "UF_CRM_1576184005",
+                    "heating_quote_sum_net": "UF_CRM_1594627322",
+                    "bluegen_quote_sum_net": "UF_CRM_1623241899",
+                    "roof_reconstruction_quote_sum_net": "UF_CRM_1623241922",
+                    "pv_kwp": "UF_CRM_1623246805"
                 }
             },
             "company": {

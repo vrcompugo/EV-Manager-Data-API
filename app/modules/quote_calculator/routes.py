@@ -638,9 +638,34 @@ def get_insign_callback(token):
         jwt = encode_shared_jwt(data={
             "files": collection_files
         }, expire_minutes=343200)
-        update_lead(token_data["unique_identifier"], {
-            "collection_url": f"https://kunden.energie360.de/files/collection?token={jwt['token']}"
-        })
+        lead_data = {
+            "collection_url": f"https://kunden.energie360.de/files/collection?token={jwt['token']}",
+            "zoom_appointment": str(datetime.datetime.now()),
+            "zoom_link": "1"
+        }
+        if "pv_quote_sum_net" in token_data:
+            if token_data["pv_quote_sum_net"] is None:
+                lead_data["pv_quote_sum_net"] = 0
+            else:
+                lead_data["pv_quote_sum_net"] = f'{token_data["pv_quote_sum_net"]}|EUR'
+        if "heating_quote_sum_net" in token_data:
+            if token_data["heating_quote_sum_net"] is None:
+                lead_data["heating_quote_sum_net"] = 0
+            else:
+                lead_data["heating_quote_sum_net"] = f'{token_data["heating_quote_sum_net"]}|EUR'
+        if "bluegen_quote_sum_net" in token_data:
+            if token_data["bluegen_quote_sum_net"] is None:
+                lead_data["bluegen_quote_sum_net"] = 0
+            else:
+                lead_data["bluegen_quote_sum_net"] = f'{token_data["bluegen_quote_sum_net"]}|EUR'
+        if "roof_reconstruction_quote_sum_net" in token_data:
+            if token_data["bluegen_quote_sum_net"] is None:
+                lead_data["roof_reconstruction_quote_sum_net"] = 0
+            else:
+                lead_data["roof_reconstruction_quote_sum_net"] = f'{token_data["roof_reconstruction_quote_sum_net"]}|EUR'
+        if "pv_kwp" in token_data:
+            lead_data["pv_kwp"] = token_data["pv_kwp"]
+        update_lead(token_data["unique_identifier"], lead_data)
 
     return Response(
             '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
@@ -770,7 +795,6 @@ def get_insign_session(data):
         }
     if "calculated" in data:
         token_data["pv_kwp"] = data["calculated"].get("pv_kwp")
-    print("asd", token_data)
     token = encode_jwt(token_data, 172800)
     return get_session_id({
         "displayname": data["number"],
