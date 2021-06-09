@@ -58,26 +58,26 @@ def get_heating_products(data):
                 extra_quantity = data["data"]["heating_quote_sqm"] - 400
             add_direct_product(
                 label=product_name,
-                category=f"online WP (Neu)",
+                category=f"Online - Heizung - WP",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
             if extra_quantity > 0:
                 add_direct_product(
                     label="Erweiterung Heizfläche",
-                    category=f"online WP (Neu)",
+                    category=f"Online - Heizung - WP",
                     quantity=extra_quantity,
                     products=data["heating_quote"]["products"]
                 )
             add_direct_product(
                 label="Beantragung der BAFA Förderung (Bafa)",
-                category=f"online WP (Neu)",
+                category=f"Online - Heizung - WP",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
             add_direct_product(
                 label="Inbetriebnahme",
-                category=f"online WP (Neu)",
+                category=f"Online - Heizung - WP",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
@@ -88,21 +88,21 @@ def get_heating_products(data):
 
                 add_direct_product(
                     label="grössere Warmwasser Anforderung",
-                    category=f"online WP (Neu)",
+                    category=f"Online - Heizung - Extra Optionen - WP",
                     quantity=quantity,
                     products=data["heating_quote"]["products"],
                     data=data["data"]
                 )
             add_direct_product(
                 label="Hydraulischer Abgleich",
-                category=f"online WP (Neu)",
+                category=f"Online - Heizung - WP",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
             if "no_drain" in data["data"].get("heating_quote_extra_options", []):
                 add_direct_product(
                     label="Kein Ablauf im Raum der WP vorhanden",
-                    category=f"online WP (Neu)",
+                    category=f"Online - Heizung - Extra Optionen - WP",
                     quantity=1,
                     products=data["heating_quote"]["products"]
                 )
@@ -127,12 +127,11 @@ def get_heating_products(data):
             if data["data"]["new_heating_type"] == "oil":
                 add_direct_product(
                     label="Öl Heizung",
-                    category=f"Heizung - {label_type}",
+                    category=f"Online - Heizung - Öl",
                     quantity=1,
                     products=data["heating_quote"]["products"],
                     data=data
                 )
-            print(data["heating_quote_sqm"])
             product_name = "HANSA Gas Pega"
             if data["data"]["new_heating_type"] == "gas":
                 product_name = "HANSA Gas"
@@ -140,7 +139,7 @@ def get_heating_products(data):
                     product_name = "HANSA Gas Pega"
                 add_direct_product(
                     label=product_name,
-                    category=f"Heizung - {label_type}",
+                    category=f"Online - Heizung - Gas",
                     quantity=1,
                     products=data["heating_quote"]["products"],
                     data=data
@@ -148,10 +147,10 @@ def get_heating_products(data):
 
             if data["data"]["new_heating_type"] in ["oil", "gas"] and product_name != "HANSA Gas":
                 product_name = "Brauchwasserspeicher"
-                category_name = "Heizung - Optionen für Heizung Gas/Öl"
+                category_name = "Online - Heizung - Zubehör"
                 if "connect_existing_solarthermie" in data["data"].get("heating_quote_extra_options", []) or "new_solarthermie" in data["data"].get("heating_quote_extra_options", []):
                     product_name = "Schichtenspeicher"
-                    category_name = "Solarthermie online"
+                    category_name = "Online - Heizung - Solarthermie"
                 people = data["data"].get("heating_quote_people", 1)
                 if people in ["", 0, None]:
                     people = 1
@@ -166,21 +165,21 @@ def get_heating_products(data):
             if "heating_quote_radiator_type" in data["data"] and data["data"]["heating_quote_radiator_type"] == "mixed":
                 add_direct_product(
                     label=f"2ter Heizkreis {label_type}",
-                    category=f"Heizung - {label_type}",
+                    category=f"Online - Heizung - {label_type}",
                     quantity=1,
                     products=data["heating_quote"]["products"]
                 )
 
             add_direct_product(
                 label=f"Systemtrenner Auslaufventil {label_type}",
-                category=f"Heizung - {label_type}",
+                category=f"Online - Heizung - {label_type}",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
 
             add_direct_product(
                 label=f"Hydraulischer Abgleich {label_type}",
-                category=f"Heizung - {label_type}",
+                category=f"Online - Heizung - {label_type}",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
@@ -191,7 +190,7 @@ def get_heating_products(data):
                 quantitiy = int(quantitiy)
             add_direct_product(
                 label=f"Hydraulischer Abgleich {label_type} II",
-                category=f"Heizung - {label_type}",
+                category=f"Online - Heizung - {label_type}",
                 quantity=quantitiy,
                 products=data["heating_quote"]["products"]
             )
@@ -199,7 +198,7 @@ def get_heating_products(data):
         if "bufferstorage" in data["data"].get("heating_quote_extra_options", []) or data["heating_quote_sqm"] >= 350:
             add_direct_product(
                 label="Heizungspufferspeicher",
-                category=f"Heizung - Optionen für Heizung Gas/Öl",
+                category=f"Online - Heizung - Extra Optionen",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
@@ -207,7 +206,7 @@ def get_heating_products(data):
         if "remove_existing_solarthermie" in data["data"].get("heating_quote_extra_options", []):
             add_direct_product(
                 label="vorhandene Solarthermie demontieren",
-                category=f"Optionen Heizung online",
+                category=f"Online - Heizung - Extra Optionen",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
@@ -215,7 +214,7 @@ def get_heating_products(data):
         if "connect_existing_solarthermie" in data["data"].get("heating_quote_extra_options", []):
             add_direct_product(
                 label="vorhandene Solarthermie mit einbinden",
-                category=f"Optionen Heizung online",
+                category=f"Online - Heizung - Extra Optionen",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
@@ -227,7 +226,7 @@ def get_heating_products(data):
                 label = "Solarthermie Set (11)"
             add_direct_product(
                 label=label,
-                category=f"Solarthermie online",
+                category=f"Online - Heizung - Solarthermie",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
@@ -235,7 +234,7 @@ def get_heating_products(data):
         if "deconstruct_old_heater" in data["data"].get("heating_quote_extra_options", []):
             add_direct_product(
                 label='Ausbau der "alten" Heizung ohne Tanks',
-                category=f"Optionen Heizung online",
+                category=f"Online - Heizung - Extra Optionen",
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
