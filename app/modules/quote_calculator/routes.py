@@ -604,7 +604,6 @@ def get_insign_callback(token):
     token_data = decode_jwt(token)
     session_id = request.args.get("sessionid")
     event_type = request.args.get("eventid")
-    print(json.dumps(token_data))
     if event_type != "EXTERNBEARBEITUNGFERTIG":
         return Response(
             '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
@@ -758,16 +757,21 @@ def get_insign_session(data):
             "id": data["pdf_contract_summary_part4_file_id"],
             "displayname": "Wärmepumpenfragebogen"
         })
-    token = encode_jwt(
-        {
+    token_data = {
             "unique_identifier": data["id"],
             "number": data["number"],
+            "pv_quote_sum_net": data["total_net"],
+            "heating_quote_sum_net": data["heating_quote"].get("total_net"),
+            "bluegen_quote_sum_net": data["bluegen_quote"].get("total_net"),
+            "roof_reconstruction_quote_sum_net": data["roof_reconstruction_quote"].get("total_net"),
+            "pv_kwp": None,
             "documents": documents,
             "upload_folder_id_electric": data["data"]["upload_folder_id_electric"],
             "upload_folder_id_contract": data["data"]["upload_folder_id_contract"]
-        },
-        172800
-    )
+        }
+    if "calculated" in data:
+        token_data["pv_kwp"] = data["calculated"].get("pv_kwp")
+    token = encode_jwt(token_data, 172800)
     return get_session_id({
         "displayname": data["number"],
         "foruser": data["assigned_by_id"] + " " + data["assigned_user"]["EMAIL"],
