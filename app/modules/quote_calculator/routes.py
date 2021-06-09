@@ -558,8 +558,7 @@ def quote_calculator_contract_summary_pdf(lead_id):
     genrate_pdf(data, generate_contract_summary_part2_pdf, lead_id, "pdf_contract_summary_part2_file_id", "Abtrettung.pdf", subfolder_id)
     genrate_pdf(data, generate_contract_summary_part3_pdf, lead_id, "pdf_contract_summary_part3_file_id", "Contracting.pdf", subfolder_id)
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
-        if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
-            genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Wärmepumpenfragebogen.pdf", subfolder_id)
+        genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Heizungsfragebogen.pdf", subfolder_id)
     genrate_pdf(data, generate_contract_summary_pdf, lead_id, "pdf_contract_summary_file_id", "Vertragsunterlagen.pdf", subfolder_id)
     data["pdf_contract_summary_link"] = get_public_link(data["pdf_contract_summary_file_id"])
 
@@ -755,7 +754,7 @@ def get_insign_session(data):
     if "pdf_contract_summary_part4_file_id" in data:
         documents.append({
             "id": data["pdf_contract_summary_part4_file_id"],
-            "displayname": "Wärmepumpenfragebogen"
+            "displayname": "Heizungsfragebogen"
         })
     token_data = {
             "unique_identifier": data["id"],

@@ -411,8 +411,7 @@ def generate_contract_summary_pdf(lead_id, data):
     merger = PdfFileMerger()
 
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
-        if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
-            add_pdf_by_drive_id(merger, 443348, cached=True)  # Wärmepumpenfragebogen
+            add_pdf_by_drive_id(merger, 1413474, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1413474/?&ncc=1&filename=Aufnahmebogen-Heizung_15052020_DE.pdf
     add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
     add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
     add_pdf_by_drive_id(merger, 523230, cached=True)  # Abtretungsformular
@@ -437,7 +436,7 @@ def generate_contract_summary_part3_pdf(lead_id, data):
 
 
 def generate_contract_summary_part4_pdf(lead_id, data):
-    return get_file_content_cached(443348)  # Wärmepumpenfragebogen
+    return get_file_content_cached(1413474)  # https://keso.bitrix24.de/disk/downloadFile/1413474/?&ncc=1&filename=Aufnahmebogen-Heizung_15052020_DE.pdf
 
 
 def generate_order_confirmation_pdf(lead_id, data):
