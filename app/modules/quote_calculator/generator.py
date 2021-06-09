@@ -158,7 +158,7 @@ def generate_roof_reconstruction_pdf(lead_id, data, return_string=False, order_c
                 data["foreword"] = foreword_product["DESCRIPTION"]
                 data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
 
-            appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
+            appendix_product = get_product("Nachtext Angebot 8 Tage Dach", "Texte")
             if appendix_product is not None:
                 data["appendix"] = appendix_product["DESCRIPTION"]
                 data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
@@ -207,7 +207,7 @@ def generate_heating_pdf(lead_id, data, return_string=False, order_confirmation=
                 data["foreword"] = foreword_product["DESCRIPTION"]
                 data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
 
-            appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
+            appendix_product = get_product("Nachtext Angebot 8 Tage Heizung", "Texte")
             if appendix_product is not None:
                 data["appendix"] = appendix_product["DESCRIPTION"]
                 data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
