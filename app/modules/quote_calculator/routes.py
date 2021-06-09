@@ -760,7 +760,7 @@ def get_insign_session(data):
     token_data = {
             "unique_identifier": data["id"],
             "number": data["number"],
-            "pv_quote_sum_net": data["total_net"],
+            "pv_quote_sum_net": data.get("total_net"),
             "heating_quote_sum_net": data["heating_quote"].get("total_net"),
             "bluegen_quote_sum_net": data["bluegen_quote"].get("total_net"),
             "roof_reconstruction_quote_sum_net": data["roof_reconstruction_quote"].get("total_net"),
@@ -771,6 +771,7 @@ def get_insign_session(data):
         }
     if "calculated" in data:
         token_data["pv_kwp"] = data["calculated"].get("pv_kwp")
+    print("asd", token_data)
     token = encode_jwt(token_data, 172800)
     return get_session_id({
         "displayname": data["number"],
