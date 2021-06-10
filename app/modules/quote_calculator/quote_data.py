@@ -69,7 +69,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
                 "direction": "west_east"
             }],
             "consumers": [],
-            "extra_options": ["technik_service_packet"],
+            "extra_options": ["technik_service_packet", "solaredge"],
             "extra_options_zero": [],
             "reconstruction_extra_options": [],
             "heating_quote_extra_options": [],
