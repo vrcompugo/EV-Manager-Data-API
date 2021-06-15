@@ -80,6 +80,14 @@ def get_settings(section=None, domain_raw=None):
                     "4054": "enpal_mvt",
                     "4056": "enpal_verbau",
                     "4074": "additional_electric"
+                },
+                "cloud_type": {
+                    "234": "Zero",
+                    "2438": "eCloud",
+                    "2440": "Wärmecloud",
+                    "262": "Spezial",
+                    "4154": "Consumer",
+                    "3598": "keine Auswahl"
                 }
             },
             "product": {
@@ -181,7 +189,15 @@ def get_settings(section=None, domain_raw=None):
                     "upload_link_firstcall": "UF_CRM_1618302925",
                     "upload_link_heatingcontract": "UF_CRM_60A60FF556B0C",
                     "folder_id_heatingcontract": "UF_CRM_1621504031",
-                    "aev_reseller": "UF_CRM_1615824273"
+                    "aev_reseller": "UF_CRM_1615824273",
+                    "cloud_number": "UF_CRM_1596703818172",
+                    "cloud_contract_number": "UF_CRM_1596704551167",
+                    "is_cloud_consumer": "UF_CRM_1597755099494",
+                    "is_cloud_ecloud": "UF_CRM_1610466268",
+                    "is_cloud_heatcloud": "UF_CRM_1610466287",
+                    "cloud_type": "UF_CRM_1573027328",
+                    "cloud_delivery_start": "UF_CRM_1578322109",
+                    "fakturia_data": "UF_CRM_1623743780"
                 }
             },
             "quote": {

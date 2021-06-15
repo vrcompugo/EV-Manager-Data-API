@@ -24,8 +24,13 @@ def convert_config_values(data_raw):
         if external_field in data:
             data[local_field] = data[external_field]
         if local_field in data and local_field in config["select_lists"]:
-            if data[local_field] in config["select_lists"][local_field]:
-                data[local_field] = config["select_lists"][local_field][data[local_field]]
+            if isinstance(data[local_field], list):
+                for index in range(len(data[local_field])):
+                    if str(data[local_field][index]) in config["select_lists"][local_field]:
+                        data[local_field][index] = config["select_lists"][local_field][str(data[local_field][index])]
+            else:
+                if data[local_field] in config["select_lists"][local_field]:
+                    data[local_field] = config["select_lists"][local_field][data[local_field]]
 
     return data
 

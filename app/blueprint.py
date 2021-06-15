@@ -87,11 +87,13 @@ api.add_namespace(settings_ns, path='/settings')
 
 def register_blueprints(app):
     from app.modules.bitrix24.bitrix24_routes import bitrix24_bp
+    from app.modules.fakturia.routes import blueprint as fakturia_bp
     from app.modules.quote_calculator.routes import blueprint as quote_calculator_bp
     from app.modules.order_confirmation.routes import blueprint as order_confirmation_bp
     from app.modules.user.user_routes import blueprint as users_bp
     app.register_blueprint(blueprint)
     app.register_blueprint(bitrix24_bp, url_prefix="/bitrix24")
     app.register_blueprint(users_bp, url_prefix="/users")
+    app.register_blueprint(fakturia_bp, url_prefix="/fakturia")
     app.register_blueprint(quote_calculator_bp, url_prefix="/quote_calculator")
     app.register_blueprint(order_confirmation_bp, url_prefix="/order_confirmation")

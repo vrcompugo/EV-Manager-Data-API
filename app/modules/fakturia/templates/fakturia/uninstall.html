@@ -1,0 +1,22 @@
+<html>
+<head></head>
+<body>
+  uninstall
+  <script src="//api.bitrix24.com/api/v1/"></script>
+  <script>
+    BX24.init(function(){
+      BX24.callMethod(
+        "placement.unbind",
+        {
+          "PLACEMENT": "CRM_DEAL_DETAIL_TAB",
+          "HANDLER": "https://{{ domain }}/fakturia",
+        },
+        function(result) {
+          BX24.installFinish();
+        }
+      );
+
+  });
+  </script>
+</body>
+</html>
