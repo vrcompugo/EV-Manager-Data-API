@@ -1,8 +1,9 @@
-from app.modules.external.bitrix24.deal import update_deal
 import json
 import os
 from flask import Blueprint, request, render_template
 
+from app import db
+from app.modules.external.bitrix24.deal import update_deal
 from app.modules.auth import get_auth_info
 from app.modules.auth.jwt_parser import encode_jwt
 from app.modules.external.fakturia.deal import export_cloud_deal, get_contract_data_by_deal, assign_subdeal_to_item, add_item_list, delete_item_list, update_item_list_item
@@ -29,6 +30,28 @@ def export_deal_route(deal_id):
         return {"status": "failed", "data": {}, "message": "auth failed"}
     data = export_cloud_deal(deal_id)
     if data is not None:
+        return {"status": "success", "data": data}
+    return {"status": "failed", "data": {}, "message": "history not found"}
+
+
+@blueprint.route("/<deal_id>/create_contract_number", methods=['POST'])
+def create_contract_number_route(deal_id):
+    from app.modules.importer.sources.bitrix24.order import run_export_fields
+    from app.modules.importer.sources.bitrix24.order import run_import as order_import
+    from app.modules.order.order_services import generate_contract_number
+
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return {"status": "failed", "data": {}, "message": "auth failed"}
+    order = order_import(remote_id=deal_id)
+    if order is None:
+        return {"status": "failed", "data": {}, "message": "import failed"}
+    contract_number = generate_contract_number(order)
+    if contract_number is not None:
+        order.contract_number = contract_number
+        db.session.commit()
+        run_export_fields(local_id=order.id, fields=["contract_number"])
+        data = get_contract_data_by_deal(deal_id)
         return {"status": "success", "data": data}
     return {"status": "failed", "data": {}, "message": "history not found"}
 

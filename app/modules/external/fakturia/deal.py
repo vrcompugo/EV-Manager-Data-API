@@ -34,10 +34,13 @@ def get_contract_data_by_deal(deal_id):
                 if data is None:
                     data = initilize_faktura_data(master_deal[0])
             else:
-                deals = get_deals_normalized({
-                    "category_id": 15,
-                    "cloud_contract_number": f'{cloud_contract_number}'
-                })
+                if cloud_contract_number in [None, ""]:
+                    deals = [deal]
+                else:
+                    deals = get_deals_normalized({
+                        "category_id": 15,
+                        "cloud_contract_number": f'{cloud_contract_number}'
+                    })
                 maindeal = None
                 for subdeal in deals:
                     if _is_lightcloud_deal(subdeal):
@@ -69,10 +72,13 @@ def get_contract_data_by_deal(deal_id):
         deal["item_lists"] = data["item_lists"]
         deal["link"] = f"https://keso.bitrix24.de/crm/deal/details/{deal['id']}/"
         deal["cloud_contract_number"] = cloud_contract_number
-        unassigend_deals = get_deals_normalized({
-            "category_id": 15,
-            "cloud_contract_number": f'{cloud_contract_number}'
-        })
+        if cloud_contract_number in [None, ""]:
+            unassigend_deals = []
+        else:
+            unassigend_deals = get_deals_normalized({
+                "category_id": 15,
+                "cloud_contract_number": f'{cloud_contract_number}'
+            })
         for index, unassigend_deal in enumerate(unassigend_deals):
             unassigend_deals[index]["link"] = f"https://keso.bitrix24.de/crm/deal/details/{unassigend_deal['id']}/"
         for list in deal["item_lists"]:
@@ -89,8 +95,10 @@ def get_contract_data_by_deal(deal_id):
             "bic": deal.get("bic").replace(" ", ""),
             "owner": f"{contact.get('name')} {contact.get('last_name')}",
             "delivery_begin": delivery_begin,
-            "contract_number": int(cloud_contract_number.replace("C", ""))
+            "contract_number": ""
         }
+        if cloud_contract_number not in [None, "", "0", 0]:
+            deal["fakturia"]["contract_number"] = int(cloud_contract_number.replace("C", ""))
         deal["fakturia"]["items_to_update"] = []
         if deal.get('fakturia_contract_number') not in [None, "None", "", "0", 0]:
             item_index = 0
@@ -292,6 +300,8 @@ def store_json_data(data):
 
 
 def normalize_contract_number(cloud_contract_number):
+    if cloud_contract_number in [None, "None", "", 0, "0"]:
+        return None
     number = re.findall(r'C[0-9]+', cloud_contract_number)
     if len(number) > 0:
         return number[0]
