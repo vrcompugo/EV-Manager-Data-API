@@ -200,7 +200,14 @@ def get_settings(section=None, domain_raw=None):
                     "fakturia_data": "UF_CRM_1623743780",
                     "contract_number": "UF_CRM_1596704551167",
                     "fakturia_contract_number": "UF_CRM_1622107557802",
-                    "cloud_delivery_begin": "UF_CRM_1578322109"
+                    "cloud_delivery_begin": "UF_CRM_1578322109",
+                    "is_cloud_master_deal": "UF_CRM_1623835472",
+                    "iban": "UF_CRM_1582292567",
+                    "bic": "UF_CRM_1582292579",
+                    "bank": "UF_CRM_1607947258",
+                    "lightcloud_usage": "UF_CRM_1597757913754",
+                    "heatcloud_usage": "UF_CRM_1597757931782",
+                    "ecloud_usage": "UF_CRM_1607944188"
                 }
             },
             "quote": {
@@ -289,7 +296,10 @@ def get_settings(section=None, domain_raw=None):
                     "drive_remote_care_folder": "UF_CRM_1612533596622",
                     "drive_rental_contract_folder": "UF_CRM_1612533461553",
                     "drive_rental_documents_folder": "UF_CRM_1612533480143",
-                    "drive_cloud_folder": "UF_CRM_1612533500465"
+                    "drive_cloud_folder": "UF_CRM_1612533500465",
+                    "fakturia_iban": "UF_CRM_1624003459",
+                    "fakturia_bic": "UF_CRM_1624003474",
+                    "fakturia_owner": "UF_CRM_1624003488",
                 }
             },
             "timeline_comment": {

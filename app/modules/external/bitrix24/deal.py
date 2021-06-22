@@ -51,6 +51,19 @@ def get_deals(payload):
     return result
 
 
+def get_deals_normalized(filters):
+    config = get_settings("external/bitrix24")
+    payload = {"SELECT[0]": "*"}
+    for field in config["deal"]["fields"].values():
+        payload[f"SELECT[{len(payload)}]"] = field
+    for filter in filters.keys():
+        if filter in config['deal']['fields']:
+            payload[f"FILTER[{config['deal']['fields'][filter]}]"] = filters[filter]
+        else:
+            payload[f"FILTER[{filter.upper()}]"] = filters[filter]
+    return get_deals(payload)
+
+
 def get_deal(id):
     data = post("crm.deal.get", {
         "ID": id

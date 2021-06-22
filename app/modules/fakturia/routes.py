@@ -1,10 +1,11 @@
+from app.modules.external.bitrix24.deal import update_deal
 import json
 import os
 from flask import Blueprint, request, render_template
 
 from app.modules.auth import get_auth_info
 from app.modules.auth.jwt_parser import encode_jwt
-from app.modules.external.fakturia.deal import get_contract_data_by_deal
+from app.modules.external.fakturia.deal import export_cloud_deal, get_contract_data_by_deal, assign_subdeal_to_item, add_item_list, delete_item_list, update_item_list_item
 
 
 blueprint = Blueprint("fakturia", __name__, template_folder='templates')
@@ -15,6 +16,82 @@ def get_deal_data(deal_id):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
         return {"status": "failed", "data": {}, "message": "auth failed"}
+    data = get_contract_data_by_deal(deal_id)
+    if data is not None:
+        return {"status": "success", "data": data}
+    return {"status": "failed", "data": {}, "message": "history not found"}
+
+
+@blueprint.route("/<deal_id>/export", methods=['POST'])
+def export_deal_route(deal_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return {"status": "failed", "data": {}, "message": "auth failed"}
+    data = export_cloud_deal(deal_id)
+    if data is not None:
+        return {"status": "success", "data": data}
+    return {"status": "failed", "data": {}, "message": "history not found"}
+
+
+@blueprint.route("/<deal_id>/to_master", methods=['POST'])
+def set_master_deal(deal_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return {"status": "failed", "data": {}, "message": "auth failed"}
+    update_deal(deal_id, {
+        "is_cloud_master_deal": 1
+    })
+    data = get_contract_data_by_deal(deal_id)
+    if data is not None:
+        return {"status": "success", "data": data}
+    return {"status": "failed", "data": {}, "message": "history not found"}
+
+
+@blueprint.route("/<deal_id>/item", methods=['POST'])
+def add_item_list_route(deal_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return {"status": "failed", "data": {}, "message": "auth failed"}
+    data = request.json
+    data = add_item_list(deal_id, data)
+    if data is not None:
+        return {"status": "success", "data": data}
+    return {"status": "failed", "data": {}, "message": "history not found"}
+
+
+@blueprint.route("/<deal_id>/item/<list_index>/<index>", methods=['PUT'])
+def store_item_list_route(deal_id, list_index, index):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return {"status": "failed", "data": {}, "message": "auth failed"}
+    data = request.json
+    data = update_item_list_item(deal_id, list_index, index, data)
+    if data is not None:
+        return {"status": "success", "data": data}
+    return {"status": "failed", "data": {}, "message": "history not found"}
+
+
+@blueprint.route("/<deal_id>/item/<list_index>", methods=['DELETE'])
+def delete_item_list_route(deal_id, list_index):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return {"status": "failed", "data": {}, "message": "auth failed"}
+    data = request.json
+    data = delete_item_list(deal_id, list_index)
+    if data is not None:
+        return {"status": "success", "data": data}
+    return {"status": "failed", "data": {}, "message": "history not found"}
+
+
+@blueprint.route("/<deal_id>/item/<item_index>/deal", methods=['POST'])
+def assign_subdeal_item(deal_id, item_index):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return {"status": "failed", "data": {}, "message": "auth failed"}
+    sub_deal_id = request.json.get("sub_deal_id")
+    if sub_deal_id in [None, "", "0", 0]:
+        return {"status": "failed", "data": {}, "message": "no subdeal"}
+    assign_subdeal_to_item(deal_id, item_index, sub_deal_id)
     data = get_contract_data_by_deal(deal_id)
     if data is not None:
         return {"status": "success", "data": data}
