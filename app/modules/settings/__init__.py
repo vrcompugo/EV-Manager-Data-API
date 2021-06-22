@@ -197,7 +197,10 @@ def get_settings(section=None, domain_raw=None):
                     "is_cloud_heatcloud": "UF_CRM_1610466287",
                     "cloud_type": "UF_CRM_1573027328",
                     "cloud_delivery_start": "UF_CRM_1578322109",
-                    "fakturia_data": "UF_CRM_1623743780"
+                    "fakturia_data": "UF_CRM_1623743780",
+                    "contract_number": "UF_CRM_1596704551167",
+                    "fakturia_contract_number": "UF_CRM_1622107557802",
+                    "cloud_delivery_begin": "UF_CRM_1578322109"
                 }
             },
             "quote": {
