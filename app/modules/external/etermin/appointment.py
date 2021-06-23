@@ -190,6 +190,7 @@ def export_appointment(task):
                     post_data["street"] = contact_data["street"]
                     post_data["zip"] = contact_data["zip"]
                     post_data["city"] = contact_data["city"]
+                post_data["location"] = f'{post_data["street"]}, {post_data["zip"]} {post_data["city"]}'
                 print("export task etermin", task["id"])
                 response = post("/api/appointment", post_data=post_data)
                 if response is not None and "cid" in response:
