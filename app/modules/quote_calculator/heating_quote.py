@@ -36,26 +36,32 @@ def get_heating_products(data):
             data["data"]["heating_quote_people"] = int(data["data"]["heating_quote_people"])
         data["heating_quote_sqm"] = int(data["data"]["heating_quote_sqm"])
         data["data"]["heating_quote_sqm"] = int(data["data"]["heating_quote_sqm"])
-        if data["data"]["new_heating_type"] == "heatpump":
+        if data["data"]["new_heating_type"] in ["heatpump", "hybrid_gas"]:
             extra_quantity = 0
             product_name = ""
-            if 0 < data["data"]["heating_quote_sqm"] <= 120:
-                product_name = "Luft/Wasser-Wärmepumpe (Bestand 120)"
-            if 120 < data["data"]["heating_quote_sqm"] <= 200:
-                product_name = "Luft/Wasser-Wärmepumpe (Bestand 200)"
-            if 200 < data["data"]["heating_quote_sqm"] <= 250:
-                product_name = "Luft/Wasser-Wärmepumpe (Bestand 250)"
-            if 250 < data["data"]["heating_quote_sqm"]:
-                product_name = "Luft/Wasser-Wärmepumpe (Bestand 400)"
-            if "heating_quote_house_build" in data["data"] and data["data"]["heating_quote_house_build"] == "2016 und neuer":
-                if 0 < data["data"]["heating_quote_sqm"] <= 200:
-                    product_name = "Luft/Wasser-Wärmepumpe (Neubau 200)"
-                if 200 < data["data"]["heating_quote_sqm"] <= 300:
-                    product_name = "Luft/Wasser-Wärmepumpe (Neubau 300)"
-                if 300 < data["data"]["heating_quote_sqm"]:
-                    product_name = "Luft/Wasser-Wärmepumpe (Neubau 400)"
-            if 400 < data["data"]["heating_quote_sqm"]:
-                extra_quantity = data["data"]["heating_quote_sqm"] - 400
+            if data["data"]["new_heating_type"] == "hybrid_gas":
+                if 0 < data["data"]["heating_quote_sqm"] <= 220:
+                    product_name = "Hybrid Anlage GasTherme & Wärmepumpe"
+                if 220 < data["data"]["heating_quote_sqm"] <= 370:
+                    product_name = "Hybrid Anlage GasTherme & Wärmepumpe XL"
+            else:
+                if 0 < data["data"]["heating_quote_sqm"] <= 120:
+                    product_name = "Luft/Wasser-Wärmepumpe (Bestand 120)"
+                if 120 < data["data"]["heating_quote_sqm"] <= 200:
+                    product_name = "Luft/Wasser-Wärmepumpe (Bestand 200)"
+                if 200 < data["data"]["heating_quote_sqm"] <= 250:
+                    product_name = "Luft/Wasser-Wärmepumpe (Bestand 250)"
+                if 250 < data["data"]["heating_quote_sqm"]:
+                    product_name = "Luft/Wasser-Wärmepumpe (Bestand 400)"
+                if "heating_quote_house_build" in data["data"] and data["data"]["heating_quote_house_build"] == "2016 und neuer":
+                    if 0 < data["data"]["heating_quote_sqm"] <= 200:
+                        product_name = "Luft/Wasser-Wärmepumpe (Neubau 200)"
+                    if 200 < data["data"]["heating_quote_sqm"] <= 300:
+                        product_name = "Luft/Wasser-Wärmepumpe (Neubau 300)"
+                    if 300 < data["data"]["heating_quote_sqm"]:
+                        product_name = "Luft/Wasser-Wärmepumpe (Neubau 400)"
+                if 400 < data["data"]["heating_quote_sqm"]:
+                    extra_quantity = data["data"]["heating_quote_sqm"] - 400
             add_direct_product(
                 label=product_name,
                 category=f"Online - Heizung - WP",
