@@ -54,7 +54,7 @@ def test_akjsdb():
 @manager.command
 def test_special():
     from app.models import OfferV2, Order, ImportIdAssociation
-    offers = OfferV2.query.filter(OfferV2.is_sent._is(True)).all()
+    offers = OfferV2.query.filter(OfferV2.is_sent.is_(True)).all()
     for offer in offers:
         orders = Order.query.filter(Order.offer_id == offer.id).all()
         for order in orders:
