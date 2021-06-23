@@ -8,6 +8,7 @@ from app.models import OfferV2
 from app.modules.external.bitrix24.deal import get_deal, get_deals, get_deals_normalized, update_deal
 from app.modules.external.bitrix24.contact import get_contact, update_contact
 from app.modules.settings import get_settings
+from app.utils.ml_stripper import MLStripper
 
 from ._connector import post, put, get
 
@@ -344,7 +345,7 @@ def get_export_data(deal, contact):
                 "quantity": 1,
                 "extraDescription": item["description"],
                 "name": item["label"],
-                "description": item["description"],
+                "description": "",
                 "unit": "MONTH",
                 "validFrom": item_list["start"],
                 "ccQuantityChange": False,
@@ -410,7 +411,6 @@ def export_cloud_deal(deal_id):
         print(contact["id"], "customer wrong iban", contact.get("fakturia_iban"), deal["fakturia"]["iban"])
         return deal
     export_data, subscriptionItemsPrices = get_export_data(deal, contact)
-    print(json.dumps(export_data, indent=2))
     if export_data is not None:
         if deal.get("fakturia_contract_number") in ["", None, 0, "0"]:
             contract_data = post(f"/Contracts", post_data=export_data)
@@ -420,13 +420,34 @@ def export_cloud_deal(deal_id):
                 update_deal(deal_id, {
                     "fakturia_contract_number": contract_data["contractNumber"]
                 })
+                for index, item in enumerate(contract_data.get("subscription").get("subscriptionItems")):
+                    response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}/customPrices", post_data=subscriptionItemsPrices[index])
+                    print(json.dumps(response_item, indent=2))
             else:
                 print("contract error", json.dumps(contract_data, indent=2))
         else:
             contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data)
-            print(json.dumps(contract_data, indent=2))
-        if contract_data is not None and "contractNumber" in contract_data:
             for index, item in enumerate(contract_data.get("subscription").get("subscriptionItems")):
-                response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}/customPrices", post_data=subscriptionItemsPrices[index])
-                print(json.dumps(response_item, indent=2))
+                description = export_data["subscription"]["subscriptionItems"][index]["extraDescription"]\
+                    .replace("\n", "")\
+                    .replace("\r", "")\
+                    .replace("<br>", "\n")\
+                    .replace("<br />", "\n")\
+                    .replace("<br/>", "\n")\
+                    .replace("&nbsp;", " ")\
+                    .replace("–", "-")
+                s = MLStripper()
+                if index == 0:
+                     description = "Mit der C.Cloud.ZERO - NULL Risiko\nGenial einfach - einfach genial\nDie sicherste Cloud Deutschlands.\nStrom verbrauchen, wann immer Sie ihn brauchen.\n\nTarif: cCloud-Zero\nKündigungsfrist: 2 Monate zum Jahresende\nVertragslaufzeit: 12 Jahre\ngarantierte Zero-a"
+                s.feed(description)
+                post_data = export_data["subscription"]["subscriptionItems"][index]
+                post_data["extraDescription"] = s.get_data()
+                response_item = put(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}", post_data=post_data)
+                if index == 0:
+                    print(description)
+                    print(json.dumps(post_data, indent=2))
+                    if "accountNumber" not in response_item:
+                        print(json.dumps(response_item, indent=2))
+                    else:
+                        print("stored")
     return deal
