@@ -51,11 +51,20 @@ def test_akjsdb():
     print(json.dumps(cron_refresh_users(), indent=2))
 
 
-
 @manager.command
-def test_akjsdb2():
-    from app.modules.external.fakturia.contract import export_cloud_deal
-    export_cloud_deal(9948)
+def test_special():
+    from app.models import OfferV2, Order, ImportIdAssociation
+    offers = OfferV2.query.filter(OfferV2.is_sent._is(True)).all()
+    for offer in offers:
+        orders = Order.query.filter(Order.offer_id == offer.id).all()
+        for order in orders:
+            link = ImportIdAssociation.query\
+                .filter(ImportIdAssociation.local_id == order.id)\
+                .filter(ImportIdAssociation.source == 'bitrix24')\
+                .filter(ImportIdAssociation.model == 'Order')\
+                .first()
+            if link is None:
+                print("order", order.id)
 
 
 @manager.command
