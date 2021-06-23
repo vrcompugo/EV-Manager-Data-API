@@ -1,3 +1,4 @@
+from app.exceptions import ApiException
 import datetime
 import json
 from app.modules.external.bitrix24.deal import get_deal
@@ -115,5 +116,23 @@ def cron(section=None):
         from app.modules.external.bitrix24.drive import run_cron_heating_folder_creation
         try:
             run_cron_heating_folder_creation()
+        except Exception as e:
+            error_handler()
+
+    if section == "productive" or section == "find_stuck_orders":
+        from app.models import OfferV2, Order, ImportIdAssociation
+        try:
+            offers = OfferV2.query.filter(OfferV2.is_sent.is_(True)).all()
+            for offer in offers:
+                orders = Order.query.filter(Order.offer_id == offer.id).all()
+                for order in orders:
+                    link = ImportIdAssociation.query\
+                        .filter(ImportIdAssociation.local_id == order.id)\
+                        .filter(ImportIdAssociation.source == 'bitrix24')\
+                        .filter(ImportIdAssociation.model == 'Order')\
+                        .first()
+                    if link is None:
+                        print("order", order.id)
+                        raise Exception("stuck order found")
         except Exception as e:
             error_handler()
