@@ -74,6 +74,8 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
             folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_roof").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
         if str(deal_data.get("category_id")) == "32":
             folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_electric").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
+        if str(deal_data.get("category_id")) == "9":
+            folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_heating").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
         if folder_id is not None:
             files = get_folder(folder_id)
             data["documents"] = files
