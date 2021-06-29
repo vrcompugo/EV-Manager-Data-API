@@ -57,8 +57,9 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "datetime": str(datetime.datetime.now()),
         "data": {
             "emove_tarif": "none",
-            "price_increase_rate": 5.75,
-            "inflation_rate": 2.5,
+            "price_increase_rate": 3.75,
+            "inflation_rate": 1.2,
+            "runtime": 30,
             "financing_rate": 3.79,
             "module_type": default_module_type,
             "investment_type": "financing",

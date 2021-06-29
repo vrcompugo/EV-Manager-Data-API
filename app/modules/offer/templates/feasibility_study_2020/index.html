@@ -13,7 +13,7 @@
 </head>
 <body>
 
-  {% set total_pages = 19 %}
+  {% set total_pages = 24 %}
 
   {% if offer.reseller.document_style == "bsh" %}
     {% set total_pages = total_pages - 7 %}
@@ -29,6 +29,10 @@
   {% if data.emove %}
     {% set total_pages = total_pages + 1 %}
   {% endif %}
+  {% if data.cloud_runtime != 2 %}
+    {% set total_pages = total_pages + 1 %}
+  {% endif %}
+
 
 
   {% if offer.reseller.document_style == "bsh" %}
@@ -80,10 +84,12 @@
   </div>
 
   {% if offer.reseller.document_style != "bsh" %}
-    {% set current_page = current_page + 1 %}
-    <div class="page">
-      {% include('feasibility_study_2020/pages/page_pv_system.html') %}
-    </div>
+    {% if data.cloud_runtime != 2 %}
+      {% set current_page = current_page + 1 %}
+      <div class="page">
+        {% include('feasibility_study_2020/pages/page_pv_system.html') %}
+      </div>
+    {% endif %}
   {% endif %}
 
   {% set current_page = current_page + 1 %}

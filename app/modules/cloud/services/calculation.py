@@ -188,7 +188,7 @@ def calculate_cloud(data):
                 result["cloud_price_light"] = 69
             if 14000 < data["power_usage"] <= 20000:
                 result["cloud_price_light"] = 99
-            if "name" in user and user["name"].lower() == "bsh":
+            if "name" not in user or user["name"].lower() not in ["aev", "eeg"]:
                 result["cloud_price_light"] = data["power_usage"] * 0.4755 / 10 / 12
         result["conventional_price_light"] = (data["power_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
 
