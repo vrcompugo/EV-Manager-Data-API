@@ -31,6 +31,7 @@ def convert_config_values(data_raw):
         if contact_data is not None:
             data["email"] = contact_data["email"]
             data["contact"] = {
+                "salutation": contact_data["salutation"],
                 "name": contact_data["first_name"],
                 "first_name": contact_data["first_name"],
                 "last_name": contact_data["last_name"],
