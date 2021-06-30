@@ -106,15 +106,15 @@ def delete_item_list_route(deal_id, list_index):
     return {"status": "failed", "data": {}, "message": "history not found"}
 
 
-@blueprint.route("/<deal_id>/item/<item_index>/deal", methods=['POST'])
-def assign_subdeal_item(deal_id, item_index):
+@blueprint.route("/<deal_id>/item/<list_index>/<item_index>/deal", methods=['POST'])
+def assign_subdeal_item(deal_id, list_index, item_index):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
         return {"status": "failed", "data": {}, "message": "auth failed"}
     sub_deal_id = request.json.get("sub_deal_id")
     if sub_deal_id in [None, "", "0", 0]:
         return {"status": "failed", "data": {}, "message": "no subdeal"}
-    assign_subdeal_to_item(deal_id, item_index, sub_deal_id)
+    assign_subdeal_to_item(deal_id, list_index, item_index, sub_deal_id)
     data = get_contract_data_by_deal(deal_id)
     if data is not None:
         return {"status": "success", "data": data}

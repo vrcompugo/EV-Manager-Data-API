@@ -11,6 +11,7 @@ from app.modules.settings import get_settings
 from app.utils.ml_stripper import MLStripper
 
 from ._connector import post, put, get
+from .customer import export_contact
 
 
 def get_contract_data_by_deal(deal_id):
@@ -82,9 +83,11 @@ def get_contract_data_by_deal(deal_id):
             })
         for index, unassigend_deal in enumerate(unassigend_deals):
             unassigend_deals[index]["link"] = f"https://keso.bitrix24.de/crm/deal/details/{unassigend_deal['id']}/"
+        if len(deal["item_lists"]) > 0:
+            deal["item_lists"][0]["start"] = delivery_begin
         for list in deal["item_lists"]:
             for item in list["items"]:
-                deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if item["deal"] is not None and subdeal["id"] == item["deal"]["id"]), None)
+                deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if item.get("deal") is not None and subdeal["id"] == item["deal"]["id"]), None)
                 if deal_index is not None:
                     item["deal"]["link"] = unassigend_deals[deal_index]['link']
                     del unassigend_deals[deal_index]
@@ -101,15 +104,6 @@ def get_contract_data_by_deal(deal_id):
         if cloud_contract_number not in [None, "", "0", 0]:
             deal["fakturia"]["contract_number"] = int(cloud_contract_number.replace("C", ""))
         deal["fakturia"]["items_to_update"] = []
-        if deal.get('fakturia_contract_number') not in [None, "None", "", "0", 0]:
-            item_index = 0
-            fakturia_data = get(f"/Contracts/{deal.get('fakturia_contract_number')}")
-            for item_list in deal.get("item_lists"):
-                for item in item_list["items"]:
-                    if item_index >= len(fakturia_data["subscription"]["subscriptionItems"]):
-                        deal["fakturia"]["items_to_update"].append(item)
-                    item_index = item_index + 1
-            print(json.dumps(deal["fakturia"]["items_to_update"], indent=2))
         return deal
     return None
 
@@ -196,19 +190,19 @@ def add_item_list(deal_id, newData):
         print("no list")
         return data
     last_start = None
-    new_start = None
-    last_list = data["item_lists"][len(data["item_lists"]) - 1]
-    if last_list.get("start") not in [None, "", "0000-00-00"]:
+    new_start = datetime.datetime.strptime(newData["newItemsList"].get("start"), '%Y-%m-%d')
+    last_list = None
+    if len(data["item_lists"]) > 0:
+        last_list = data["item_lists"][len(data["item_lists"]) - 1]
+    if last_list is not None and last_list.get("start") not in [None, "", "0000-00-00"]:
         if newData["newItemsList"].get("start") in [None, "", "0000-00-00"]:
             print("start date needed")
             return data
-        print(last_list.get("start"))
         last_start = datetime.datetime.strptime(last_list.get("start"), '%Y-%m-%d')
-        new_start = datetime.datetime.strptime(newData["newItemsList"].get("start"), '%Y-%m-%d')
         if last_start > datetime.datetime.now() and last_start >= new_start:
             print("new start needs to be later then last start")
             return data
-        new_start = new_start.strftime('%Y-%m-%d')
+    new_start = new_start.strftime('%Y-%m-%d')
     data["item_lists"].append({
         "start": new_start,
         "items": newData["newItemsList"].get("items")
@@ -222,9 +216,10 @@ def add_item_list(deal_id, newData):
 def delete_item_list(deal_id, list_index):
     list_index = int(list_index)
     data = get_contract_data_by_deal(deal_id)
-    start = datetime.datetime.strptime(data["item_lists"][list_index].get("start"), '%Y-%m-%d')
-    if start < datetime.datetime.now():
-        return data
+    if data["item_lists"][list_index].get("start") not in [None, "None", "0", 0]:
+        start = datetime.datetime.strptime(data["item_lists"][list_index].get("start"), '%Y-%m-%d')
+        if start < datetime.datetime.now():
+            return data
     del data["item_lists"][list_index]
     update_deal(deal_id, {
         "fakturia_data": store_json_data({"item_lists": data["item_lists"]})
@@ -244,7 +239,8 @@ def update_item_list_item(deal_id, list_index, index, inputData):
     return data
 
 
-def assign_subdeal_to_item(deal_id, item_index, subdeal_id):
+def assign_subdeal_to_item(deal_id, list_index, item_index, subdeal_id):
+    list_index = int(list_index)
     item_index = int(item_index)
     deal = get_deal(deal_id)
     if str(deal.get("is_cloud_master_deal")) != "1":
@@ -255,35 +251,35 @@ def assign_subdeal_to_item(deal_id, item_index, subdeal_id):
     subdeal = get_deal(subdeal_id)
     if subdeal is None:
         return False
-    if data["items"][item_index]["type"] == "lightcloud":
+    if data["item_lists"][list_index]["items"][item_index]["type"] == "lightcloud":
         update_deal(subdeal.get("id"), {
             "is_cloud_consumer": "0",
             "is_cloud_ecloud": "0",
             "is_cloud_heatcloud": "0",
             "cloud_type": ["Zero"]
         })
-    if data["items"][item_index]["type"] == "consumer":
+    if data["item_lists"][list_index]["items"][item_index]["type"] == "consumer":
         update_deal(subdeal.get("id"), {
             "is_cloud_consumer": "1",
             "is_cloud_ecloud": "0",
             "is_cloud_heatcloud": "0",
             "cloud_type": ["Consumer"]
         })
-    if data["items"][item_index]["type"] == "heatcloud":
+    if data["item_lists"][list_index]["items"][item_index]["type"] == "heatcloud":
         update_deal(subdeal.get("id"), {
             "is_cloud_consumer": "1",
             "is_cloud_ecloud": "0",
             "is_cloud_heatcloud": "1",
             "cloud_type": ["Wärmecloud"]
         })
-    if data["items"][item_index]["type"] == "ecloud":
+    if data["item_lists"][list_index]["items"][item_index]["type"] == "ecloud":
         update_deal(subdeal.get("id"), {
             "is_cloud_consumer": "0",
             "is_cloud_ecloud": "1",
             "is_cloud_heatcloud": "0",
             "cloud_type": ["eCloud"]
         })
-    data["items"][item_index]["deal"] = subdeal
+    data["item_lists"][list_index]["items"][item_index]["deal"] = subdeal
     update_deal(deal.get("id"), {
         "fakturia_data": store_json_data(data)
     })
@@ -339,26 +335,27 @@ def get_export_data(deal, contact):
     subscriptionItems = []
     subscriptionItemsPrices = []
     for item_list in deal.get("item_lists"):
+        item_list["sum"] = 0
         for item in item_list["items"]:
-            item_data = {
-                "itemNumber": item["type"],
-                "quantity": 1,
-                "extraDescription": item["description"],
-                "name": item["label"],
-                "description": "",
-                "unit": "MONTH",
-                "validFrom": item_list["start"],
-                "ccQuantityChange": False,
-                "status": "ACTIVE",
-                "activityType": "DEFAULT_PERFORMANCE"
-            }
-            subscriptionItems.append(item_data)
-            subscriptionItemsPrices.append({
-                "cost": float(item["total_price"]),
-                "currency": "EUR",
-                "validFrom": "",
-                "minimumQuantity": 1
-            })
+            item_list["sum"] = item_list["sum"] + float(item["total_price"])
+        item_data = {
+            "itemNumber": "vorauszahlung",
+            "quantity": 1,
+            "extraDescription": f"für Vertrag: {deal.get('cloud_contract_number')}",
+            "description": "",
+            "unit": "MONTH",
+            "validFrom": item_list["start"],
+            "ccQuantityChange": False,
+            "status": "ACTIVE",
+            "activityType": "DEFAULT_PERFORMANCE"
+        }
+        subscriptionItems.append(item_data)
+        subscriptionItemsPrices.append({
+            "cost": round(item_list["sum"] / 1.19, 4),
+            "currency": "EUR",
+            "validFrom": "",
+            "minimumQuantity": 1
+        })
     data = {
         "customerNumber": contact.get("fakturia_number"),
         "projectName": "Cloud Verträge",
@@ -371,7 +368,7 @@ def get_export_data(deal, contact):
             "continueUnit": "DAY",
             "billedInAdvance": True,
             "subscriptionItems": subscriptionItems,
-            "status": "DRAFT"
+            "status": "ACTIVE"
         },
         "contractNumber": deal["fakturia"].get("contract_number"),
         "name": deal.get("cloud_contract_number"),
@@ -381,7 +378,7 @@ def get_export_data(deal, contact):
         "duePeriod": 0,
         "dueUnit": "DAY",
         "paymentMethod": "SEPA_DEBIT",
-        "contractStatus": "DRAFT",
+        "contractStatus": "ACTIVE",
         "trialPeriod": 0,
         "trialUnit": "DAY",
         "trialPeriodEndAction": "CONTINUE",
@@ -410,8 +407,10 @@ def export_cloud_deal(deal_id):
     if contact.get("fakturia_iban") != deal["fakturia"]["iban"]:
         print(contact["id"], "customer wrong iban", contact.get("fakturia_iban"), deal["fakturia"]["iban"])
         return deal
+    export_contact(contact, force=True)
     export_data, subscriptionItemsPrices = get_export_data(deal, contact)
     if export_data is not None:
+        contract_data = None
         if deal.get("fakturia_contract_number") in ["", None, 0, "0"]:
             contract_data = post(f"/Contracts", post_data=export_data)
             if contract_data is not None and "contractNumber" in contract_data:
@@ -427,27 +426,7 @@ def export_cloud_deal(deal_id):
                 print("contract error", json.dumps(contract_data, indent=2))
         else:
             contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data)
-            for index, item in enumerate(contract_data.get("subscription").get("subscriptionItems")):
-                description = export_data["subscription"]["subscriptionItems"][index]["extraDescription"]\
-                    .replace("\n", "")\
-                    .replace("\r", "")\
-                    .replace("<br>", "\n")\
-                    .replace("<br />", "\n")\
-                    .replace("<br/>", "\n")\
-                    .replace("&nbsp;", " ")\
-                    .replace("–", "-")
-                s = MLStripper()
-                if index == 0:
-                     description = "Mit der C.Cloud.ZERO - NULL Risiko\nGenial einfach - einfach genial\nDie sicherste Cloud Deutschlands.\nStrom verbrauchen, wann immer Sie ihn brauchen.\n\nTarif: cCloud-Zero\nKündigungsfrist: 2 Monate zum Jahresende\nVertragslaufzeit: 12 Jahre\ngarantierte Zero-a"
-                s.feed(description)
-                post_data = export_data["subscription"]["subscriptionItems"][index]
-                post_data["extraDescription"] = s.get_data()
-                response_item = put(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}", post_data=post_data)
-                if index == 0:
-                    print(description)
-                    print(json.dumps(post_data, indent=2))
-                    if "accountNumber" not in response_item:
-                        print(json.dumps(response_item, indent=2))
-                    else:
-                        print("stored")
+        if contract_data.get("contractStatus") == "DRAFT":
+            response_activation = post(f"/Contracts/{deal.get('fakturia_contract_number')}/activate")
+            print(json.dumps(response_activation, indent=2))
     return deal

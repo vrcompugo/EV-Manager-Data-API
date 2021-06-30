@@ -23,6 +23,9 @@ def get_export_data(contact, company):
         "taxRegion": "NATIONAL",
         "duePeriod": "14",
         "dueUnit": "DAY",
+        "bankAccountIban": contact["fakturia_iban"],
+        "bankAccountBic": contact["fakturia_bic"],
+        "bankAccountOwner": contact["fakturia_owner"],
         "postalAddress": {
             "addressLine1": f"{contact['street']} {contact['street_nb']}",
             "zipCode": contact['zip'],
@@ -69,7 +72,7 @@ def run_cron_export():
     set_settings("external/fakturia", config)
 
 
-def export_contact(contact):
+def export_contact(contact, force=False):
     company = None
     if contact.get("company_id", 0) is not None and int(contact.get("company_id", 0)) > 0:
         company = get_bitrix_company(int(contact.get("company_id")))
@@ -87,5 +90,9 @@ def export_contact(contact):
         else:
             print(json.dumps(customer_data, indent=2))
     else:
-        print(contact["id"], "no export")
-        # customer_data = put(f"/Customers/{contact.get('fakturia_number')}", post_data=export_data)
+        if force:
+            customer_data = put(f"/Customers/{contact.get('fakturia_number')}", post_data=export_data)
+            print(json.dumps(customer_data, indent=2))
+        else:
+            print(contact["id"], "no export")
+
