@@ -172,7 +172,9 @@ def export_appointment(task):
                 if "90" not in etermin_appointment.get("bitrix_user_ids"):
                     continue
                 deal_data, contact_data, company_data = get_linked_data_by_task(task)
-                if deal_data is None or deal_data.get("etermin_id") not in [None, "", "0"]:
+                if deal_data is not None and deal_data.get("etermin_id") not in [None, "", "0"]:
+                    continue
+                if deal_data is None and contact_data is None:
                     continue
                 post_data = {
                     "start": start_datetime,
@@ -198,7 +200,6 @@ def export_appointment(task):
                 else:
                     print("post_data:", post_data)
                     print("etermin-error:", response)
-        print(json.dumps(etermin_appointments, indent=2))
         update_task(task["id"], {
             "etermin_id": etermin_appointments[0]["etermin_id"],
             "etermin_appointments": base64.b64encode(json.dumps(etermin_appointments).encode('utf-8')).decode('utf-8')

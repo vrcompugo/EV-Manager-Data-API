@@ -47,8 +47,8 @@ def test_insign():
 
 @manager.command
 def test_akjsdb():
-    from app.modules.external.bitrix24.user import cron_refresh_users
-    print(json.dumps(cron_refresh_users(), indent=2))
+    from app.modules.external.mfr.task import export_by_bitrix_id
+    print(json.dumps(export_by_bitrix_id(102948), indent=2))
 
 
 @manager.command
