@@ -23,6 +23,12 @@
   .page_monthly_lightcloud table td:last-child {
     padding-right: 2.4em;
   }
+  .page_monthly_lightcloud .zero-logo {
+    position: absolute;
+    width: 150px;
+    top: 2em;
+    left: 3em;
+  }
 </style>
 
 {% if data.lightcloud.price_tomorrow / data.lightcloud.max_value < 0.60 %}
@@ -33,7 +39,7 @@
 
 <div class="page_monthly_lightcloud">
   {% include('feasibility_study_2020/elements/logos.html') %}
-
+  <img class="zero-logo" src="{{ data.base_url }}/static/zero-logo.jpg" />
   <div class="headline">
     Profitieren Sie heute und in Zukunft<br>
     {% if offer.reseller.document_style == "bsh" %}

@@ -5,6 +5,7 @@ from flask import render_template
 
 from app.models import OfferV2
 from app.utils.jinja_filters import numberformat
+from app.modules.settings import get_settings as get_new_settings
 from app.modules.settings.settings_services import get_one_item as get_settings
 from app.modules.auth.auth_services import get_logged_in_user
 
@@ -429,6 +430,7 @@ def factors_by_direction(direction):
 
 
 def get_cloud_products(data=None, offer=None):
+    config_general = get_new_settings(section="general")
     settings = get_settings("pv-settings")
     if settings is None:
         return None
@@ -468,7 +470,7 @@ def get_cloud_products(data=None, offer=None):
     light_cloud_usage = int(data["calculated"]["power_usage"])
     lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
     cloud_label = "cCloud-Zero"
-    cloud_description = "Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
+    cloud_description = f"<div style='float:right'><img style='width: 120px' src='{config_general['base_url']}static/zero-logo.jpg' /></div>Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
     cloud_tarif = "cCloud-Zero"
     if "document_style" in data["data"]:
         if data["data"]["document_style"] == "bsh":

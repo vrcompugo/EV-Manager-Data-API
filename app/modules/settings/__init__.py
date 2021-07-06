@@ -207,7 +207,8 @@ def get_settings(section=None, domain_raw=None):
                     "bank": "UF_CRM_1607947258",
                     "lightcloud_usage": "UF_CRM_1597757913754",
                     "heatcloud_usage": "UF_CRM_1597757931782",
-                    "ecloud_usage": "UF_CRM_1607944188"
+                    "ecloud_usage": "UF_CRM_1607944188",
+                    "sepa_mandate_since": "UF_CRM_1625467644466",
                 }
             },
             "quote": {
