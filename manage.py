@@ -1,5 +1,6 @@
 import os
 import json
+from time import sleep
 import unittest
 from flask_migrate import Migrate, MigrateCommand, upgrade
 from flask_script import Manager, prompt_bool
@@ -59,13 +60,14 @@ def import_mfr_tasks():
     tasks = get_tasks({
         "select[0]": "*",
         "select[1]": "UF_AUTO_422491195439",
-        "filter[>CHANGED_DATE]": "2021-06-01",
+        "filter[>CHANGED_DATE]": "2021-06-25",
         "filter[TITLE]": "%[mfr]%"
     })
     for task in tasks:
         if task.get("mfr_id") not in [None, "", "0", 0]:
             print("import", task.get("mfr_id"))
             import_by_id(task.get("mfr_id"))
+            sleep(2)
 
 
 
