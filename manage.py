@@ -52,6 +52,25 @@ def test_akjsdb():
 
 
 @manager.command
+def import_mfr_tasks():
+    from app.modules.external.bitrix24.task import get_tasks
+    from app.modules.external.mfr.task import import_by_id
+    print("import mfr tasks")
+    tasks = get_tasks({
+        "select[0]": "*",
+        "select[1]": "UF_AUTO_422491195439",
+        "filter[>CHANGED_DATE]": "2021-06-01",
+        "filter[TITLE]": "%[mfr]%"
+    })
+    for task in tasks:
+        if task.get("mfr_id") not in [None, "", "0", 0]:
+            print("import", task.get("mfr_id"))
+            import_by_id(task.get("mfr_id"))
+
+
+
+
+@manager.command
 def test_special():
     from app.models import OfferV2, Order, ImportIdAssociation
     offers = OfferV2.query.filter(OfferV2.is_sent.is_(True)).all()
