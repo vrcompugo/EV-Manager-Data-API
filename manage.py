@@ -75,6 +75,7 @@ def import_mfr_tasks():
 @manager.command
 def test_special():
     from app.models import OfferV2, Order, ImportIdAssociation
+    from app.modules.importer.sources.bitrix24.order import run_export as run_order_export
     offers = OfferV2.query.filter(OfferV2.is_sent.is_(True)).all()
     for offer in offers:
         orders = Order.query.filter(Order.offer_id == offer.id).all()
@@ -86,6 +87,8 @@ def test_special():
                 .first()
             if link is None:
                 print("order", order.id)
+                run_order_export(local_id=order.id)
+
 
 
 @manager.command
