@@ -412,7 +412,10 @@ def generate_contract_summary_pdf(lead_id, data):
 
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
             add_pdf_by_drive_id(merger, 1413474, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1413474/?&ncc=1&filename=Aufnahmebogen-Heizung_15052020_DE.pdf
-    add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
+    if "data" in data and data["data"].get("is_commercial") is True:
+        add_pdf_by_drive_id(merger, 1598546, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1598546/?&ncc=1&filename=Verkaufsunterlagen+Gewerbe.pdf
+    else:
+        add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
     add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
     add_pdf_by_drive_id(merger, 523230, cached=True)  # Abtretungsformular
 
@@ -424,6 +427,8 @@ def generate_contract_summary_pdf(lead_id, data):
 
 
 def generate_contract_summary_part1_pdf(lead_id, data):
+    if "data" in data and data["data"].get("is_commercial") is True:
+        return get_file_content_cached(1598546)  # https://keso.bitrix24.de/disk/downloadFile/1598546/?&ncc=1&filename=Verkaufsunterlagen+Gewerbe.pdf
     return get_file_content_cached(443352)  # Verkaufsunterlagen
 
 

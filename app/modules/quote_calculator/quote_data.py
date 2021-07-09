@@ -287,8 +287,10 @@ def calculate_products(data):
             if "new_power_closet" in data["data"]["extra_options"]:
                 quantity = 1
             product_label = "Neuer Zählerschrank"
-            if kwp > 24.9:
+            if kwp >= 25:
                 product_label = "Neuer Zählerschrank (ZS)"
+            if kwp >= 40:
+                product_label = "Neuer Zählerschrank (ZS) Wandler fähig"
             add_direct_product(
                 label=product_label,
                 category="Extra Pakete",
