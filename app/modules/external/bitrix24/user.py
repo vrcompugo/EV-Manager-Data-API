@@ -52,16 +52,21 @@ def get_users_per_department(department_id):
             break
         result.append(user_cached.data)
     if refresh is True:
-        data = post("user.get", {
-            "FILTER[UF_DEPARTMENT]": department_id
-        })
-        if "result" in data and len(data["result"]) > 0:
-            for user in data["result"]:
-                get_user(user["ID"])
-            return data["result"]
-        else:
-            print("error get user per dep:", data)
-            return None
+        payload = {
+            "FILTER[UF_DEPARTMENT]": department_id,
+            "start": 0
+        }
+        while payload["start"] is not None:
+            data = post("user.get", payload)
+            if "result" in data and len(data["result"]) > 0:
+                payload["start"] = data["next"] if "next" in data else None
+                for user in data["result"]:
+                    get_user(user["ID"])
+                result = result + data["result"]
+            else:
+                print("error3:", data)
+                payload["start"] = None
+                return None
     return result
 
 
