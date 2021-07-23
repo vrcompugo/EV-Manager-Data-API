@@ -29,6 +29,8 @@ def store_log_event(msg):
 
 
 def recursive_dictification(item):
+    if not hasattr(item, '__dict__'):
+        return item
     data = vars(item)
     if isinstance(data, dict):
         for index, value in enumerate(data):
