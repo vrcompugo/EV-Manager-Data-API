@@ -90,7 +90,6 @@ def convert_datetime(value, zone="Europe/Berlin"):
 
 def import_by_id(service_request_id):
     print("mfr import", service_request_id)
-    config = get_settings("external/bitrix24")
     config_folders = get_settings("external/bitrix24/folder_creation")
     drive_abnahmen_folder = next((item for item in config_folders["folders"] if item["key"] == "drive_abnahmen_folder"), None)
     response = get(f"/ServiceRequests({service_request_id}L)?$expand=ServiceObjects,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={

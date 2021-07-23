@@ -1,6 +1,6 @@
 import json
 from azure.servicebus import ServiceBusClient, ServiceBusReceivedMessage
-from .task import import_by_id
+from .task import import_by_id, log_mfr_event
 
 
 def run_mfr_amqp_messaging_subscriptor():
@@ -16,5 +16,11 @@ def run_mfr_amqp_messaging_subscriptor():
                     if service_request_id not in ["", "0"]:
                         try:
                             import_by_id(service_request_id)
+                            store_log_event(msg)
                         except Exception as e:
                             print(e)
+
+
+def store_log_event(msg):
+    msg_dict = vars(msg)
+    print(msg_dict)
