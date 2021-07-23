@@ -23,5 +23,14 @@ def run_mfr_amqp_messaging_subscriptor():
 
 
 def store_log_event(msg):
-    msg_dict = vars(msg)
+    msg_dict = recursive_dictification(msg)
+
     print(msg_dict)
+
+
+def recursive_dictification(item):
+    data = vars(item)
+    for index, value in enumerate(data):
+        if isinstance(value, dict):
+            data[index] = recursive_dictification(value)
+    return data
