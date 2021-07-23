@@ -33,6 +33,6 @@ def recursive_dictification(item):
         return item
     data = vars(item)
     if isinstance(data, dict):
-        for index, value in enumerate(data):
-            data[index] = recursive_dictification(value)
+        for value in data:
+            value = recursive_dictification(value)
     return data
