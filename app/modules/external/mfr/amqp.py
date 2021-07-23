@@ -32,7 +32,8 @@ def recursive_dictification(item):
     if not hasattr(item, '__dict__'):
         return item
     data = vars(item)
+    new_data = {}
     if isinstance(data, dict):
-        for value in data:
-            value = recursive_dictification(value)
+        for key, value in data.items():
+            new_data[key] = recursive_dictification(value)
     return data
