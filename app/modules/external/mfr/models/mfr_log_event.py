@@ -7,4 +7,4 @@ class MfrLogEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     service_request_id = db.Column(db.String(200))
     last_change = db.Column(db.DateTime)
-    data = db.Column(db.JSON)
+    processed = db.Column(db.Boolean)

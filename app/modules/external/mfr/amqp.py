@@ -1,4 +1,5 @@
-import json
+from datetime import datetime
+from app import db
 from azure.servicebus import ServiceBusClient, ServiceBusReceivedMessage
 from app.models import MfrLogEvent
 from .task import import_by_id
@@ -17,23 +18,12 @@ def run_mfr_amqp_messaging_subscriptor():
                     if service_request_id not in ["", "0"]:
                         try:
                             import_by_id(service_request_id)
-                            store_log_event(msg)
+                            store_log_event(service_request_id)
                         except Exception as e:
                             print(e)
 
 
-def store_log_event(msg):
-    msg_dict = recursive_dictification(msg)
-
-    print(msg_dict)
-
-
-def recursive_dictification(item):
-    if not hasattr(item, '__dict__'):
-        return item
-    data = vars(item)
-    new_data = {}
-    if isinstance(data, dict):
-        for key, value in data.items():
-            new_data[key] = recursive_dictification(value)
-    return data
+def store_log_event(service_request_id):
+    event = MfrLogEvent(service_request_id=service_request_id, last_change=datetime.now(), processed=False)
+    db.session.add(event)
+    db.session.commit()
