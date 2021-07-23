@@ -2,6 +2,7 @@ from datetime import datetime
 from app import db
 from azure.servicebus import ServiceBusClient, ServiceBusReceivedMessage
 from app.models import MfrLogEvent
+from app.utils.error_handler import error_handler
 from .task import import_by_id
 
 
@@ -17,9 +18,10 @@ def run_mfr_amqp_messaging_subscriptor():
                     service_request_id = str(msg.message._application_properties.get(b"ServiceRequestId", None))
                     if service_request_id not in ["", "0"]:
                         try:
+                            print(service_request_id)
                             store_log_event(service_request_id)
                         except Exception as e:
-                            print(e)
+                            error_handler()
 
 
 def store_log_event(service_request_id):
@@ -36,4 +38,4 @@ def run_cron_import():
             event.processed = True
             db.session.commit()
         except Exception as e:
-            print(e)
+            error_handler()
