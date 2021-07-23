@@ -17,7 +17,6 @@ def run_mfr_amqp_messaging_subscriptor():
                     service_request_id = str(msg.message._application_properties.get(b"ServiceRequestId", None))
                     if service_request_id not in ["", "0"]:
                         try:
-                            import_by_id(service_request_id)
                             store_log_event(service_request_id)
                         except Exception as e:
                             print(e)
@@ -27,3 +26,14 @@ def store_log_event(service_request_id):
     event = MfrLogEvent(service_request_id=service_request_id, last_change=datetime.now(), processed=False)
     db.session.add(event)
     db.session.commit()
+
+
+def run_cron_import():
+    events = MfrLogEvent.query.filter(MfrLogEvent.processed.is_(False)).all()
+    for event in events:
+        try:
+            import_by_id(event.service_request_id)
+            event.processed = True
+            db.session.commit()
+        except Exception as e:
+            print(e)
