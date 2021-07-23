@@ -117,6 +117,8 @@ def import_by_id(service_request_id):
     db.session.commit()
 
     task_id = response["ExternalId"]
+    if task_id.find("-") > 0:
+        task_id = task_id[0:task_id.find("-")]
     task_data = get_task(task_id)
     if task_data is None:
         return
