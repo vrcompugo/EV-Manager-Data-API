@@ -30,7 +30,7 @@ def store_log_event(msg):
 
 def recursive_dictification(item):
     data = vars(item)
-    for index, value in enumerate(data):
-        if isinstance(value, object):
+    if isinstance(data, dict):
+        for index, value in enumerate(data):
             data[index] = recursive_dictification(value)
     return data
