@@ -1,6 +1,7 @@
 import json
 from azure.servicebus import ServiceBusClient, ServiceBusReceivedMessage
-from .task import import_by_id, log_mfr_event
+from app.models import MfrLogEvent
+from .task import import_by_id
 
 
 def run_mfr_amqp_messaging_subscriptor():
