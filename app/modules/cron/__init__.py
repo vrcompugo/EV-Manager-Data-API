@@ -136,3 +136,10 @@ def cron(section=None):
                         raise Exception("stuck order found")
         except Exception as e:
             error_handler()
+
+    if section == "productive" or section == "mfr_import":
+        from app.modules.external.mfr.amqp import run_cron_import
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
