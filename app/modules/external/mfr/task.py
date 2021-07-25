@@ -175,8 +175,8 @@ def import_by_id(service_request_id):
                                 new_leading = contact.get("Email")
             bitrix_user_ids = []
             for contact in appointment.get("Contacts"):
-                if contact.get("Email") in contacts:
-                    bitrix_user_ids.append(contacts[contact.get("Email") ]["user"]["ID"])
+                if contact.get("Email") in contacts and contacts[contact.get("Email")]["user"] is not None:
+                    bitrix_user_ids.append(contacts[contact.get("Email")]["user"]["ID"])
             local_appointments.append({
                 "StartDateTime": convert_datetime(appointment["StartDateTime"]) + "+02:00",
                 "EndDateTime": convert_datetime(appointment["EndDateTime"]) + "+02:00",
