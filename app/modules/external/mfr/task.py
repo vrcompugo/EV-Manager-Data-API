@@ -110,7 +110,6 @@ def import_by_id(service_request_id):
             if json.dumps(buffer_data.data.get(field)) != json.dumps(response.get(field)):
                 changes_found = True
                 break
-        changes_found = True
         if changes_found is False:
             print("no import needed")
             return
@@ -224,6 +223,8 @@ def run_cron_export():
         })
         if "result" in comments:
             task["comments"] = comments["result"]
+        else:
+            task["comments"] = []
         export_by_bitrix_id(task_data=task)
     config = get_settings("external/mfr")
     if config is not None:
@@ -243,7 +244,14 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         task_buffer = MfrExportBuffer(task_id=bitrix_id)
         task_buffer.data = {}
         db.session.add(task_buffer)
-    if json.dumps(task_data) == json.dumps(task_buffer.data):
+    changes_found = False
+    important_fields = ["comments", "description"]
+    for field in important_fields:
+        if json.dumps(task_buffer.data.get(field)) != json.dumps(task_data.get(field)):
+            changes_found = True
+            print(field)
+            break
+    if changes_found is False:
         print("no_change")
         return
     else:
