@@ -218,6 +218,11 @@ def run_cron_export():
     })
     last_task_export_time = datetime.now()
     for task in tasks:
+        comments = post("task.commentitem.getlist", {
+            "taskId": task.get("id")
+        })
+        if "result" in comments:
+            task["comments"] = comments["result"]
         export_by_bitrix_id(task_data=task)
     config = get_settings("external/mfr")
     if config is not None:
