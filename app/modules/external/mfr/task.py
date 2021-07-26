@@ -177,6 +177,8 @@ def import_by_id(service_request_id):
             for contact in appointment.get("Contacts"):
                 if contact.get("Email") in contacts and contacts[contact.get("Email")]["user"] is not None:
                     bitrix_user_ids.append(contacts[contact.get("Email")]["user"]["ID"])
+                else:
+                    print("email problem: ", contact.get("Email"))
             local_appointments.append({
                 "StartDateTime": convert_datetime(appointment["StartDateTime"]) + "+02:00",
                 "EndDateTime": convert_datetime(appointment["EndDateTime"]) + "+02:00",
@@ -190,6 +192,8 @@ def import_by_id(service_request_id):
         for contact in contacts.keys():
             if contact in contacts and contacts[contact]["user"] is not None:
                 supporting_users.append(contacts[contact]["user"]["ID"])
+            else:
+                print("email problem: ", contact)
         new_support_users_list = persistent_users.data + list(set(supporting_users) - set(persistent_users.data))
         if set(task_data["accomplices"]) != set(new_support_users_list):
             update_data["ACCOMPLICES"] = new_support_users_list
