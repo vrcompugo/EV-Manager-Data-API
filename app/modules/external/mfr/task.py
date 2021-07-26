@@ -188,7 +188,8 @@ def import_by_id(service_request_id):
             del contacts[new_leading]
         supporting_users = []
         for contact in contacts.keys():
-            supporting_users.append(contacts[contact]["user"]["ID"])
+            if contacts[contact]["user"] is not None:
+                supporting_users.append(contacts[contact]["user"]["ID"])
         new_support_users_list = persistent_users.data + list(set(supporting_users) - set(persistent_users.data))
         if set(task_data["accomplices"]) != set(new_support_users_list):
             update_data["ACCOMPLICES"] = new_support_users_list
