@@ -247,7 +247,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         print("no_change")
         return
     else:
-        pass
+        print("change detected")
         # print(json.dumps(task_data, indent=2))
         # print(json.dumps(task_buffer.data, indent=2))
     task_buffer.last_change = datetime.now()
