@@ -19,6 +19,7 @@ from app import db
 from app.modules.external.bitrix24.task import get_task, update_task, get_tasks
 from app.modules.external.bitrix24.drive import add_file, create_folder_path, get_file_content, get_folder_id, get_folder
 from app.modules.settings import get_settings, set_settings
+from app.modules.external.bitrix24._connector import post as post_bitrix
 
 from ._connector import get, post, put, get_download
 from .contact import export_by_bitrix_id as export_contact_by_bitrix_id
@@ -218,7 +219,7 @@ def run_cron_export():
     })
     last_task_export_time = datetime.now()
     for task in tasks:
-        comments = post("task.commentitem.getlist", {
+        comments = post_bitrix("task.commentitem.getlist", {
             "taskId": task.get("id")
         })
         if "result" in comments:
