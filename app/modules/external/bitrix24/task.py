@@ -60,6 +60,12 @@ def get_task(id, with_comments=False):
 
 def get_tasks(payload):
     payload["start"] = 0
+    if "select" in payload and payload["select"] == "full":
+        del payload["select"]
+        config = get_settings(section="external/bitrix24")
+        payload["select[0]"] = "*"
+        for index, field in enumerate(config["task"]["fields"]):
+            payload[f"select[{index + 1}]"] = "UF_AUTO_" + config["task"]["fields"][field].replace("ufAuto", "")
     result = []
     while payload["start"] is not None:
         data = post("tasks.task.list", payload)

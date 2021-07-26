@@ -212,22 +212,25 @@ def run_cron_export():
         return None
     last_task_export_time = config.get("last_task_export_time", "2021-01-01")
     tasks = get_tasks({
-        "select[0]": "ID",
+        "select": "full",
         "filter[>VIEWED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
     last_task_export_time = datetime.now()
     for task in tasks:
-        export_by_bitrix_id(task["id"])
+        export_by_bitrix_id(task_data=task)
     config = get_settings("external/mfr")
     if config is not None:
         config["last_task_export_time"] = last_task_export_time.astimezone().isoformat()
     set_settings("external/mfr", config)
 
 
-def export_by_bitrix_id(bitrix_id):
-    print("export mfr task ", bitrix_id)
-    task_data = get_task(bitrix_id)
+def export_by_bitrix_id(bitrix_id, task_data=None):
+    if task_data is None:
+        print("export mfr task ", bitrix_id)
+        task_data = get_task(bitrix_id)
+    else:
+        print("export mfr task ", task_data.get("id"))
     task_buffer = MfrExportBuffer.query.filter(MfrExportBuffer.task_id == str(bitrix_id)).first()
     if task_buffer is None:
         task_buffer = MfrExportBuffer(task_id=bitrix_id)
