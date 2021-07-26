@@ -226,7 +226,7 @@ def run_cron_export():
             task["comments"] = comments["result"]
         else:
             task["comments"] = []
-        print(task.get("viewed_date"))
+        print(json.dumps(task, indent=2))
         export_by_bitrix_id(task_data=task)
     config = get_settings("external/mfr")
     if config is not None:
