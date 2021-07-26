@@ -216,6 +216,7 @@ def run_cron_export():
         "filter[>VIEWED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
+    print("time: ", last_task_export_time)
     last_task_export_time = datetime.now()
     for task in tasks:
         comments = post_bitrix("task.commentitem.getlist", {
@@ -225,6 +226,7 @@ def run_cron_export():
             task["comments"] = comments["result"]
         else:
             task["comments"] = []
+        print(task.get("viewed_date"))
         export_by_bitrix_id(task_data=task)
     config = get_settings("external/mfr")
     if config is not None:
