@@ -230,7 +230,7 @@ def run_cron_export():
     set_settings("external/mfr", config)
 
 
-def export_by_bitrix_id(bitrix_id, task_data=None):
+def export_by_bitrix_id(bitrix_id=None, task_data=None):
     if task_data is None:
         print("export mfr task ", bitrix_id)
         task_data = get_task(bitrix_id)
