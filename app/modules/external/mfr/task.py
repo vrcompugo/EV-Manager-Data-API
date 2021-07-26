@@ -232,7 +232,7 @@ def run_cron_export():
 
 
 def export_by_bitrix_id(bitrix_id=None, task_data=None):
-    if task_data is not None:
+    if task_data is None:
         print("export mfr task ", bitrix_id)
         task_data = get_task(bitrix_id)
     else:
