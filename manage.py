@@ -58,10 +58,10 @@ def import_mfr_tasks():
     print("import mfr tasks")
     tasks = get_tasks({
         "select": "full",
-        "filter[>VIEWED_DATE]": "2021-07-26",
+        "filter[>ACTIVITY_DATE]": "2021-07-26",
         "filter[TITLE]": "%[mfr]%"
     })
-    print(json.dumps(tasks, indent=2))
+    print(len(tasks))
 
 
 

@@ -213,7 +213,7 @@ def run_cron_export():
     last_task_export_time = config.get("last_task_export_time", "2021-01-01")
     tasks = get_tasks({
         "select": "full",
-        "filter[>VIEWED_DATE]": last_task_export_time,
+        "filter[>ACTIVITY_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
     print("time: ", last_task_export_time)
