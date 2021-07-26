@@ -95,7 +95,6 @@ def update_task(id, data, domain=None):
         update_data["fields[UF_AUTO_513701476131]"] = update_data["fields[ufAuto513701476131]"]
     response = post("tasks.task.update", update_data, domain=domain)
     if "result" in response and response["result"]:
-        print(json.dumps(response, indent=2))
         return response["result"]
     else:
         print(json.dumps(response, indent=2))
