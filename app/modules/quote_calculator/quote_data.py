@@ -230,6 +230,12 @@ def calculate_products(data):
                 quantity=quantity,
                 products=data["products"]
             )
+            if "technik_service_packet_summer_extra" in data["data"]["extra_options"]:
+                product = get_product(label="Service, Technik & Garantie Paket SOMMER-AKTION", category="Extra Pakete")
+                if product is not None:
+                    product["quantity"] = 1
+                    product["PRICE"] = -float(product["PRICE"])
+                    data["products"].append(product)
         if "tax_consult" in data["data"]["extra_options"] or "tax_consult" in data["data"]["extra_options_zero"]:
             quantity = 0
             if "tax_consult" in data["data"]["extra_options"]:
