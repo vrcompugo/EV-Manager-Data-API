@@ -101,8 +101,18 @@
   {% endif %}
   <br>
   <br>
-  <div style="color: #fefefe; border-bottom: 1px solid #000; width: 300px;">__main_sig__</div>
-  Ort, Datum Unterschrift Kunde
+  <div class="layout horizontal">
+    <div class="flex">
+      <div style="color: #fefefe; border-bottom: 1px solid #000; width: 300px;">__main_sig__</div>
+      Ort, Datum Unterschrift Kunde
+    </div>
+    {% if not data.has_special_condition %}
+      <div class="flex">
+        <div style="color: #fefefe; border-bottom: 1px solid #000; width: 300px;">__main_sig__</div>
+        Ort, Datum Unterschrift Mitarbeiter Energie360
+      </div>
+    {% endif%}
+  </div>
 
 </body>
 </html>

@@ -85,6 +85,7 @@ def quote_calculator_defaults(lead_id):
                 data["data"]["financing_rate"] = 3.79
             if "extra_options_zero" not in data["data"]:
                 data["data"]["extra_options_zero"] = []
+            data["quote_datetime"] = data["datetime"]
         else:
             post_data = None
             try:
@@ -134,7 +135,6 @@ def quote_calculator_defaults(lead_id):
                 "datetime": str(history.datetime),
                 "label": history.label
             })
-
         return Response(
             json.dumps({"status": "success", "data": data}),
             status=200,
@@ -299,6 +299,7 @@ def quote_calculator_update(lead_id):
             "special_conditions": data["data"].get("special_conditions_bluegen_quote", "")
         })
         update_quote_products(quote["id"], data["bluegen_quote"])
+    data["quote_datetime"] = data["datetime"]
 
     return {"status": "success", "data": data}
 
@@ -519,7 +520,9 @@ def quote_calculator_summary_pdf(lead_id):
 
     history.data = data
     db.session.commit()
-    update_lead(lead_id, {"pdf_summary_link": data["pdf_summary_link"]})
+    update_lead(lead_id, {
+        "pdf_summary_link": data["pdf_summary_link"]
+    })
 
     return Response(
         json.dumps({"status": "success", "data": data}),
@@ -539,7 +542,15 @@ def quote_calculator_quote_summary_pdf(lead_id):
 
     history.data = data
     db.session.commit()
-    update_lead(lead_id, {"pdf_quote_summary_link": data["pdf_quote_summary_link"]})
+    update_lead(lead_id, {
+        "automatic_checked": 0 if data["has_special_condition"] is True else 1,
+        "info_roof": data["data"].get("extra_notes"),
+        "info_electric": data["data"].get("extra_notes"),
+        "info_heating": data["data"].get("extra_notes"),
+        "construction_week": data["construction_week"],
+        "construction_year": data["construction_year"],
+        "pdf_quote_summary_link": data["pdf_quote_summary_link"]
+    })
 
     return Response(
         json.dumps({"status": "success", "data": data}),
@@ -665,6 +676,8 @@ def get_insign_callback(token):
                 lead_data["roof_reconstruction_quote_sum_net"] = f'{token_data["roof_reconstruction_quote_sum_net"]}|EUR'
         if "pv_kwp" in token_data:
             lead_data["pv_kwp"] = token_data["pv_kwp"]
+        if lead.get("automatic_checked") in ["1", True, 1]:
+            lead_data["order_confirmation_date"] = str(datetime.datetime.now())
         update_lead(token_data["unique_identifier"], lead_data)
 
     return Response(

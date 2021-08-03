@@ -93,19 +93,36 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "appendix": "",
         "roof_reconstruction_quote": {
             "calculated": {},
-            "products": []
+            "products": [],
+            "has_special_condition": True
         },
         "heating_quote": {
             "calculated": {},
-            "products": []
+            "products": [],
+            "has_special_condition": True
         },
         "bluegen_quote": {
             "calculated": {},
-            "products": []
+            "products": [],
+            "has_special_condition": True
         },
         "products": [],
-        "contact": lead_data["contact"]
+        "contact": lead_data["contact"],
+        "has_special_condition": True,
+        "construction_week": "",
+        "construction_year": ""
     }
+    if data.get("special_conditions_pv_quote") in [None, ""] and data.get("special_conditions_heating_quote") in [None, ""] and data.get("special_conditions_roof_reconstruction_quote") in [None, ""]:
+        return_data["has_special_condition"] = False
+        return_data["roof_reconstruction_quote"]["has_special_condition"] = False
+        return_data["heating_quote"]["has_special_condition"] = False
+        return_data["bluegen_quote"]["has_special_condition"] = False
+        if data.get("has_roof_reconstruction_quote") is True:
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=13)
+        else:
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=9)
+        return_data["construction_week"] = int(delivery_date.strftime("%U"))
+        return_data["construction_year"] = int(delivery_date.strftime("%Y"))
     if lead_data["assigned_by_id"] is not None and lead_data["assigned_by_id"] != "":
         return_data["assigned_user"] = get_user(lead_data["assigned_by_id"])
     reseller_link = find_association("Reseller", remote_id=lead_data["assigned_by_id"])
@@ -343,7 +360,7 @@ def calculate_products(data):
             quantity=1,
             products=data["products"]
         )
-        add_direct_product(
+        '''add_direct_product(
             label="E.MW (energie-monitoring-wireless)",
             category="Extra Pakete",
             quantity=1,
@@ -358,7 +375,7 @@ def calculate_products(data):
                 category="Extra Pakete",
                 quantity=quantity,
                 products=data["products"]
-            )
+            )'''
     except Exception as e:
         trace_output = traceback.format_exc()
         print(trace_output)

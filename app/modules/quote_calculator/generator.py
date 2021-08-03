@@ -108,9 +108,12 @@ def generate_quote_pdf(lead_id, data, return_string=False, order_confirmation=Fa
             if foreword_product is not None:
                 data["foreword"] = foreword_product["DESCRIPTION"]
                 data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
-            appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
+            if data.get("has_special_condition", True) is False:
+                appendix_product = get_product("Nachtext Angebot 8 Tage (ohne Kommentar)", "Texte")
+            else:
+                appendix_product = get_product("Nachtext Angebot 8 Tage", "Texte")
             if appendix_product is not None:
-                data["appendix"] = appendix_product["DESCRIPTION"]
+                data["appendix"] = appendix_product["DESCRIPTION"].replace("[[delivery_week_year]]", f'{data["construction_week"]}/{data["construction_year"]}')
                 data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
 
         header_content = render_template(
@@ -158,9 +161,13 @@ def generate_roof_reconstruction_pdf(lead_id, data, return_string=False, order_c
                 data["foreword"] = foreword_product["DESCRIPTION"]
                 data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
 
-            appendix_product = get_product("Nachtext Angebot 8 Tage Dach", "Texte")
+            if data.get("has_special_condition", True) is False:
+                appendix_product = get_product("Nachtext Angebot 8 Tage Dach (ohne Kommentar)", "Texte")
+            else:
+                appendix_product = get_product("Nachtext Angebot 8 Tage Dach", "Texte")
             if appendix_product is not None:
-                data["appendix"] = appendix_product["DESCRIPTION"]
+                delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=12)
+                data["appendix"] = appendix_product["DESCRIPTION"].replace("[[delivery_week_year]]", delivery_date.strftime("%U/%Y"))
                 data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
         header_content = render_template(
             "quote_calculator/generator/header.html",
@@ -207,9 +214,13 @@ def generate_heating_pdf(lead_id, data, return_string=False, order_confirmation=
                 data["foreword"] = foreword_product["DESCRIPTION"]
                 data["foreword_type"] = foreword_product["DESCRIPTION_TYPE"]
 
-            appendix_product = get_product("Nachtext Angebot 8 Tage Heizung", "Texte")
+            if data.get("has_special_condition", True) is False:
+                appendix_product = get_product("Nachtext Angebot 8 Tage Heizung (ohne Kommentar)", "Texte")
+            else:
+                appendix_product = get_product("Nachtext Angebot 8 Tage Heizung", "Texte")
             if appendix_product is not None:
-                data["appendix"] = appendix_product["DESCRIPTION"]
+                delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=8)
+                data["appendix"] = appendix_product["DESCRIPTION"].replace("[[delivery_week_year]]", delivery_date.strftime("%U/%Y"))
                 data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
         header_content = render_template(
             "quote_calculator/generator/header.html",

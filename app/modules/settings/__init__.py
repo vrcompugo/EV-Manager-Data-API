@@ -263,7 +263,14 @@ def get_settings(section=None, domain_raw=None):
                     "heating_quote_sum_net": "UF_CRM_1594627322",
                     "bluegen_quote_sum_net": "UF_CRM_1623241899",
                     "roof_reconstruction_quote_sum_net": "UF_CRM_1623241922",
-                    "pv_kwp": "UF_CRM_1623246805"
+                    "pv_kwp": "UF_CRM_1623246805",
+                    "automatic_checked": "UF_CRM_1627383502",
+                    "info_roof": "UF_CRM_1627383573",
+                    "info_electric": "UF_CRM_1627383557",
+                    "info_heating": "UF_CRM_1627383545",
+                    "construction_week": "UF_CRM_1627383698",
+                    "construction_year": "UF_CRM_1627384966",
+                    "order_confirmation_date": "UF_CRM_1627383773"
                 }
             },
             "company": {
