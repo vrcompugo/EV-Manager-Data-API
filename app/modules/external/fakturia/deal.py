@@ -103,6 +103,11 @@ def get_contract_data_by_deal(deal_id):
         }
         if cloud_contract_number not in [None, "", "0", 0]:
             deal["fakturia"]["contract_number"] = int(cloud_contract_number.replace("C", ""))
+            contract_data = get(f"/Invoices", parameters={
+                "contractNumber": "asd",
+                "extendedData": True
+            })
+            print("asd", json.dumps(contract_data, indent=2))
         deal["fakturia"]["items_to_update"] = []
         return deal
     return None

@@ -145,12 +145,17 @@ def calculate_cloud(data):
         if "name" in user and user["name"].lower() in ["aev", "eeg"]:
             power_to_kwp_factor = power_to_kwp_factor * 1.34
         result["power_usage"] = data["power_usage"]
+        result["min_kwp_refresh"] = 0
         result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor_kwp / 1000
         if "name" not in user or user["name"].lower() not in ["aev", "eeg", "bsh"]:
             if "extra_options" in data:
                 if "solaredge" not in data["extra_options"]:
                     result["min_kwp_light"] = result["min_kwp_light"] + 0.44
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
+        if data.get("has_old_pv") not in [None, ""] and data.get("has_old_pv") is True:
+            result["storage_size"] = result["storage_size"] + 2.5
+            if data.get("old_pv_kwp") not in [None, "", "0"]:
+                result["min_kwp_refresh"] = float(data.get("old_pv_kwp")) * 450 / 1002
         result["storage_usage"] = data["power_usage"]
         if data["pv_kwp"] > 0:
             storage_usage_by_kwp = data["pv_kwp"] * 1000 / power_to_kwp_factor / direction_factor_kwp
@@ -285,6 +290,23 @@ def calculate_cloud(data):
     if 0 < data["pv_kwp"] < result["min_kwp_emove"]:
         result["invalid_form"] = True
         result["errors"].append("eMove Tarife sind nür möglich sofern diese mindestens durch die Anlage abgedeckt sind.")
+    if result["min_kwp_refresh"] <= result["min_kwp_light"]:
+        result["min_kwp_light"] = result["min_kwp_light"] - result["min_kwp_refresh"]
+    else:
+        if result["min_kwp_refresh"] <= result["min_kwp_light"] + result["min_kwp_heatcloud"]:
+            result["min_kwp_heatcloud"] = result["min_kwp_heatcloud"] - (result["min_kwp_refresh"] - result["min_kwp_light"])
+            result["min_kwp_light"] = 0
+        else:
+            if result["min_kwp_refresh"] <= result["min_kwp_light"] + result["min_kwp_heatcloud"] + result["min_kwp_ecloud"]:
+                result["min_kwp_ecloud"] = result["min_kwp_ecloud"] - (result["min_kwp_refresh"] - result["min_kwp_light"] - result["min_kwp_heatcloud"])
+                result["min_kwp_light"] = 0
+                result["min_kwp_heatcloud"] = 0
+            else:
+                if result["min_kwp_refresh"] <= result["min_kwp_light"] + result["min_kwp_heatcloud"] + result["min_kwp_ecloud"] + result["min_kwp_consumer"]:
+                    result["min_kwp_consumer"] = result["min_kwp_consumer"] - (result["min_kwp_refresh"] - result["min_kwp_light"] - result["min_kwp_heatcloud"] - result["min_kwp_ecloud"])
+                    result["min_kwp_light"] = 0
+                    result["min_kwp_heatcloud"] = 0
+                    result["min_kwp_ecloud"] = 0
 
     result["min_kwp"] = (result["min_kwp_light"]
                          + result["min_kwp_heatcloud"]
