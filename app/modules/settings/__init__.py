@@ -88,6 +88,124 @@ def get_settings(section=None, domain_raw=None):
                     "262": "Spezial",
                     "4154": "Consumer",
                     "3598": "keine Auswahl"
+                },
+                "quote_type": {
+                    "": "nicht ausgewählt",
+                    "3912": "Photovoltaik",
+                    "3914": "Photovoltaik und Dachsanierung",
+                    "3916": "Dachsanierung",
+                    "3932": "keine Auswahl",
+                },
+                "quote_type2": {
+                    "4366": "Cloud/PV",
+                    "4368": "Dachsanierung",
+                    "4370": "Heizung",
+                    "4372": "BlueGen",
+                },
+                "quote_type3": {
+                    "": "nicht ausgewählt",
+                    "3918": "keine Auswahl",
+                    "3920": "Heizung Öl",
+                    "3922": "Heizung Gas",
+                    "3924": "Heizung WP",
+                    "3926": "Heizung BWWP",
+                    "3928": "Heizung Sonstiges",
+                },
+                "storage_size": {
+                    "154": "Senec 2,5 Li",
+                    "156": "Senec 5.0 Li",
+                    "158": "Senec 7,5 Li",
+                    "160": "Senec 10.0 Li",
+                    "164": "Senec 20.0 Li",
+                    "1638": "keine Auswahl"
+                },
+                "inverter_type": {
+                    "166": "WR im SENEC",
+                    "168": "Solar Edge (Optimierer laut Auslegung)",
+                    "238": "Fremdwechselrichter (Fronius bevorzugt) oder 10 Jahre Garantie WR",
+                    "1910": "keine Auswahl"
+                },
+                "pv_module": {
+                    "176": "400 Watt Amerisolar black",
+                    "4100": "380 Watt Amerisolar Black",
+                    "2484": "320 Watt Amerisolar black",
+                    "178": "Triple Black Module",
+                    "240": "Sondermodul",
+                    "1906": "keine Auswahl",
+                    "174": "400 Watt Amerisolar blau",
+                    "170": "280 Watt Amerisolar"
+                },
+                "extra_packages": {
+                    "180": "Technik & Service (Anschlussgarantie, Technikpaket, Portal)",
+                    "182": "Technik & Service MAX (Anschl. Garantie/Technikpaket & SOBmax)",
+                    "242": "Complete (Wartung und Versicherung für 1 Jahr inkl.)",
+                    "184": "EEG All-in-One (Anschlussgarantie, Technikpaket, SOB, 24 Monate Versicherung)",
+                    "2558": "AEV Paket (Anschlussgarantie, Technikpaket, 24 Monate Versicherung)",
+                    "1696": "keine Auswahl"
+                },
+                "extra_packages2": {
+                    "4168": "ENW (Brick)",
+                    "186": "Wallbox 11 kW (SENEC) mit Kabel",
+                    "4374": "Wallbox 22 kW (SENEC) mit Kabel",
+                    "4148": "Senec Wechselrichtergarantie 20 Jahre",
+                    "198": "Zählerschrank",
+                    "4218": "Wärme Cloud Paket (zusätzlicher Zählerplatz für Wärme)",
+                    "2488": "Notstrombox",
+                    "2492": "Steuerpaket 1",
+                    "244": "keine Auswahl",
+                    "188": "SOB Max 40",
+                    "190": "SOB Max 100",
+                    "192": "SOB Max 500",
+                    "194": "SOB Max 1000",
+                    "196": "SOB Cockpit"
+                },
+                "bwwp": {
+                    "246": "keine Auswahl",
+                    "4194": "Nibe 160",
+                    "4196": "Nibe 210",
+                    "200": "Taglio 100",
+                    "202": "Taglio 180",
+                    "204": "ecoStar WT",
+                    "206": "ecoStar 2.2 (zzgl. Pufferspeicher)"
+                },
+                "hwp": {
+                    "1698": "keine Auswahl",
+                    "4206": "Nibe WP",
+                    "4208": "Nibe Hybrid",
+                    "4134": "Ja",
+                    "208": "ecoStar 4.4",
+                    "210": "Waterkotte bis 9 kW (Bestand)",
+                    "212": "Waterkotte bis 14 kW (Bestand)",
+                    "216": "Waterkotte bis 22 kW (Bestand)",
+                    "214": "Waterkotte bis 42 kW (Bestand)",
+                    "218": "Wärmepumpe bis 8,1 kW (Neubau bis 180 pm)",
+                    "248": "Wärmepumpe bis 8,1 kW (Neubau bis 250 pm)",
+                    "250": "Wärmepumpe laut Aufnahmebogen zusammenstellen",
+                    "252": "Inbetriebnahme",
+                    "254": "Demontage und Entsorgung alte Heizung",
+                    "256": "hydraulischer Abgleich"
+                },
+                "emove_packet": {
+					"": "nicht ausgewählt",
+					"2428": "emove Tarif Hybrid",
+					"2430": "emove.drive I",
+					"2432": "emove.drive II",
+					"2434": "emove.drive III",
+					"2446": "emove.drive ALL",
+					"2436": "none"
+                },
+                "solar_edge_guarantee_extend": {
+                    "2528": "Ja",
+                    "2530": "Nein"
+                },
+                "dz4_customer": {
+                    "": "nicht ausgewählt",
+                    "4320": "kein DZ-4 Kunde",
+                    "4322": "Ja, wurde geändert"
+                },
+                "tax_consultant": {
+                    "2516": "Ja",
+                    "2518": "Nein",
                 }
             },
             "product": {
@@ -209,6 +327,23 @@ def get_settings(section=None, domain_raw=None):
                     "heatcloud_usage": "UF_CRM_1597757931782",
                     "ecloud_usage": "UF_CRM_1607944188",
                     "sepa_mandate_since": "UF_CRM_1625467644466",
+                    "storage_size": "UF_CRM_1573026960",
+                    "inverter_type": "UF_CRM_1573027006",
+                    "pv_module": "UF_CRM_1573027042",
+                    "extra_packages": "UF_CRM_1573027085",
+                    "extra_packages2": "UF_CRM_1573027121",
+                    "bwwp": "UF_CRM_1573027184",
+                    "hwp": "UF_CRM_1573027213",
+                    "first_call_notes": "UF_CRM_1573029988665",
+                    "construction_date": "UF_CRM_1573047800",
+                    "count_modules": "UF_CRM_1579521015",
+                    "emove_packet": "UF_CRM_1594062176",
+                    "solar_edge_guarantee_extend": "UF_CRM_1601045329",
+                    "quote_type": "UF_CRM_1612352327",
+                    "quote_type2": "UF_CRM_1628242113",
+                    "quote_type3": "UF_CRM_1612353277",
+                    "dz4_customer": "UF_CRM_1627486165",
+                    "tax_consultant": "UF_CRM_1600782915"
                 }
             },
             "quote": {

@@ -1,9 +1,15 @@
+from enum import unique
 import json
+import datetime
+import math
 
-from app.modules.settings import get_settings
+from sqlalchemy.sql.sqltypes import Date
+
+from app.modules.settings import get_settings, set_settings
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.user import get_user
 from app.utils.dict_func import flatten_dict
+from app.modules.quote_calculator.models.quote_history import QuoteHistory
 
 from ._connector import get, post
 from ._field_values import convert_field_euro_from_remote, convert_field_select_from_remote
@@ -38,6 +44,12 @@ def convert_config_values(data_raw):
 def get_deals(payload):
     payload["start"] = 0
     result = []
+    if "SELECT" in payload and payload["SELECT"] == "full":
+        del payload["SELECT"]
+        config = get_settings(section="external/bitrix24")
+        payload["SELECT[0]"] = "*"
+        for index, field in enumerate(config["deal"]["fields"]):
+            payload[f"SELECT[{index + 1}]"] = config["deal"]["fields"][field]
     while payload["start"] is not None:
         data = post("crm.deal.list", payload)
         if "result" in data:
@@ -150,3 +162,129 @@ def update_deal(id, data, domain=None):
         return True
     else:
         return False
+
+
+def run_cron_add_missing_values():
+    print("add_missing_deal_values")
+    config = get_settings("external/bitrix/add_deals_missing_values")
+    if config is None:
+        print("no config for add_deals_missing_values")
+        return None
+
+    last_import_datetime = datetime.now()
+    payload = {
+        "SELECT": "full",
+        "filter[CATEGORY_ID]": 0,
+        "filter[STAGE_ID]": "NEW",
+    }
+    if "last_import_datetime" in config:
+        payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]
+    deals = get_deals(payload)
+    if len(deals) > 0:
+        for deal in deals:
+            if "unique_identifier" in deal:
+                history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal["unique_identifier"]).order_by(QuoteHistory.datetime.desc()).first()
+                if history is None:
+                    continue
+                print(json.dumps(history.data, indent=2))
+
+                cloud_type = ["Zero"]
+                if history.data["calculated"]["min_kwp_ecloud"] > 0:
+                    cloud_type.append("eCloud")
+                if history.data["calculated"]["min_kwp_heatcloud"] > 0:
+                    cloud_type.append("Wärmecloud")
+                if history.data["calculated"]["min_kwp_consumer"] > 0:
+                    cloud_type.append("Consumer")
+
+                stack_count = math.ceil((history.data["calculated"]["storage_size"] - 2.5) / 2.5)
+                stack_count = stack_count * 2.5 + 2.5
+                storage_size = [f"Senec {stack_count} Li"]
+                if stack_count in [2.5, 7.5]:
+                    stack_count = str(stack_count).replace('.', ',')
+                    storage_size = [f"Senec {stack_count} Li"]
+
+                update_data = {
+                    "cloud_type": cloud_type,
+                    "storage_size": storage_size,
+                    "inverter_type": ["WR im SENEC"],
+                    "extra_packages": [],
+                    "extra_packages2": [],
+                    "quote_type2": [],
+                    "tax_consultant": "Nein",
+                    "bwwp": ["keine Auswahl"],
+                    "pv_module": ["keine Auswahl"],
+                    "count_modules": 0,
+                    "emove_packet": "none"
+                }
+                if history.data["data"].get("has_pv_quote") is True:
+                    if "solaredge" in history.data["data"]["extra_options"]:
+                        update_data["inverter_type"] = ["Solar Edge (Optimierer laut Auslegung)"]
+                    if "technik_service_packet" in history.data["data"]["extra_options"]:
+                        update_data["extra_packages"] = ["Technik & Service (Anschlussgarantie, Technikpaket, Portal)"]
+                    if "wallbox" in history.data["data"]["extra_options"]:
+                        if history.data["data"].get("extra_options_wallbox_variant") == "22kW":
+                            update_data["extra_packages2"].append("Wallbox 22 kW (SENEC) mit Kabel")
+                        else:
+                            update_data["extra_packages2"].append("Wallbox 11 kW (SENEC) mit Kabel")
+                    if "new_power_closet" in history.data["data"]["extra_options"]:
+                        update_data["extra_packages2"].append("Zählerschrank")
+                    if "emergency_power_box" in history.data["data"]["extra_options"]:
+                        update_data["extra_packages2"].append("Notstrombox")
+                    if "tax_consult" in history.data["data"]["extra_options"]:
+                        update_data["tax_consultant"] = "Ja"
+                    if "wwwp" in history.data["data"]["extra_options"]:
+                        if history.data["data"]["extra_options_wwwp_variant"] == "NIBE L":
+                            update_data["bwwp"] = ["Nibe 160"]
+                        if history.data["data"]["extra_options_wwwp_variant"] == "NIBE XL":
+                            update_data["bwwp"] = ["Nibe 210"]
+
+                    if "module_kwp" in history.data["data"]:
+                        for value in [280, 320, 380, 400]:
+                            if history.data["data"]["module_kwp"]["kWp"] * 1000 == value:
+                                update_data["pv_module"] = [f"{value} Watt Amerisolar black"]
+                                if value == 280:
+                                    update_data["pv_module"] = [f"{value} Watt Amerisolar"]
+                                if value == 380:
+                                    update_data["pv_module"] = [f"{value} Watt Amerisolar Black"]
+
+                    update_data["construction_date"] = datetime.datetime.strptime(f'{history.data["construction_year"]}-01-01', "%Y-%m-%d")
+                    update_data["construction_date"] = str(update_data["construction_date"] + datetime.timedelta(weeks=int(history.data["construction_week"])))
+
+                    update_data["count_modules"] = history.data["data"]["pv_count_modules"]
+
+                    update_data["emove_packet"] = history.data["data"]["emove_tarif"]
+
+                update_data["quote_type"] = "keine Auswahl"
+                update_data["quote_type3"] = "keine Auswahl"
+                if history.data["data"].get("has_pv_quote") is True and history.data["data"].get("has_roof_reconstruction_quote") is True:
+                    update_data["quote_type"] = "Photovoltaik und Dachsanierung"
+                else:
+                    if history.data["data"].get("has_pv_quote") is True:
+                        update_data["quote_type"] = "Photovoltaik"
+                    if history.data["data"].get("has_roof_reconstruction_quote") is True:
+                        update_data["quote_type"] = "Dachsanierung"
+                if history.data["data"].get("has_pv_quote") is True:
+                    update_data["quote_type2"].append("Cloud/PV")
+                if history.data["data"].get("has_heating_quote") is True:
+                    update_data["quote_type2"].append("Heizung")
+                    if history.data["data"].get("new_heating_type") == "gas":
+                        update_data["quote_type3"] = ["Heizung Gas"]
+                    if history.data["data"].get("new_heating_type") == "oli":
+                        update_data["quote_type3"] = ["Heizung Öl"]
+                    if history.data["data"].get("new_heating_type") in ["hybrid_gas", "heatpump"]:
+                        update_data["quote_type3"] = ["Heizung WP"]
+
+                if history.data["data"].get("has_roof_reconstruction_quote") is True:
+                    update_data["quote_type2"].append("Dachsanierung")
+                if history.data["data"].get("has_bluegen_quote") is True:
+                    update_data["quote_type2"].append("BlueGen")
+                update_data["dz4_customer"] = "kein DZ-4 Kunde"
+                if history.data.get("has_special_condition") is False:
+                    update_data["stage_id"] = "15"
+
+                update_deal(deal["id"], update_data)
+
+        config = get_settings("external/bitrix/add_deals_missing_values")
+        if config is not None:
+            config["last_import_datetime"] = last_import_datetime.astimezone().isoformat()
+        set_settings("external/bitrix/add_deals_missing_values", config)

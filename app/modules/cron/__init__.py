@@ -57,6 +57,13 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "productive" or section == "add_missing_deal_values":
+        from app.modules.external.bitrix24.deal import run_cron_add_missing_values
+        try:
+            run_cron_add_missing_values()
+        except Exception as e:
+            error_handler()
+
     if section == "productive":
         from app.modules.importer.sources.bitrix24.reseller import run_import
         try:
