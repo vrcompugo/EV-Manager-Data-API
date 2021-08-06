@@ -112,7 +112,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "construction_week": "",
         "construction_year": ""
     }
-    if data.get("special_conditions_pv_quote") in [None, ""] and data.get("special_conditions_heating_quote") in [None, ""] and data.get("special_conditions_roof_reconstruction_quote") in [None, ""]:
+    if data is not None and data.get("special_conditions_pv_quote") in [None, ""] and data.get("special_conditions_heating_quote") in [None, ""] and data.get("special_conditions_roof_reconstruction_quote") in [None, ""]:
         return_data["has_special_condition"] = False
         return_data["roof_reconstruction_quote"]["has_special_condition"] = False
         return_data["heating_quote"]["has_special_condition"] = False

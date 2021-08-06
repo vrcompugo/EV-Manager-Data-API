@@ -93,6 +93,7 @@ def quote_calculator_defaults(lead_id):
             except Exception as e:
                 pass
             data = calculate_quote(lead_id, post_data)
+            data["quote_datetime"] = str(datetime.datetime.now())
 
         lead = get_lead(lead_id)
         if "unique_identifier" not in lead or lead["unique_identifier"] is None or lead["unique_identifier"] == "":
