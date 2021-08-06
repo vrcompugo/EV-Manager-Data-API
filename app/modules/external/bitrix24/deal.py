@@ -171,7 +171,7 @@ def run_cron_add_missing_values():
         print("no config for add_deals_missing_values")
         return None
 
-    last_import_datetime = datetime.now()
+    last_import_datetime = datetime.datetime.now()
     payload = {
         "SELECT": "full",
         "filter[CATEGORY_ID]": 0,
