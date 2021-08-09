@@ -83,6 +83,12 @@
       </tr>
     </tbody>
   </table>
+  {% if data.calculated.pv_kwp > 99 %}
+    <div class="warning">
+      Achtung! Ob die Anschlussleistung reicht oder eine kostenpflichtige Trafo Station benötigt wird muss mit dem zuständigen Netzbetreiber erörtert werden. Netzverstärkungen sind nicht im Angebot enthalten
+    </div>
+    <br><br>
+  {% endif%}
   {% if data.data.special_conditions_pv_quote %}
     <div style="border: 1px solid #ccc; padding: 1em; margin: 1.5em 0;">
       <b>Zusatzvereinbarungen</b><br>
