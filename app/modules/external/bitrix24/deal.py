@@ -214,11 +214,13 @@ def run_cron_add_missing_values():
                     "bwwp": ["keine Auswahl"],
                     "pv_module": ["keine Auswahl"],
                     "count_modules": 0,
-                    "emove_packet": "none"
+                    "emove_packet": "none",
+                    "hwp": ["keine Auswahl"]
                 }
                 if history.data["data"].get("has_pv_quote") is True:
                     if "solaredge" in history.data["data"]["extra_options"]:
                         update_data["inverter_type"] = ["Solar Edge (Optimierer laut Auslegung)"]
+                        update_data["storage_model"] = ["Senec Home 2.1"]
                     if "technik_service_packet" in history.data["data"]["extra_options"]:
                         update_data["extra_packages"] = ["Technik & Service (Anschlussgarantie, Technikpaket, Portal)"]
                     if "wallbox" in history.data["data"]["extra_options"]:
@@ -246,9 +248,9 @@ def run_cron_add_missing_values():
                                     update_data["pv_module"] = [f"{value} Watt Amerisolar"]
                                 if value == 380:
                                     update_data["pv_module"] = [f"{value} Watt Amerisolar Black"]
-
-                    update_data["construction_date"] = datetime.datetime.strptime(f'{history.data["construction_year"]}-01-01', "%Y-%m-%d")
-                    update_data["construction_date"] = str(update_data["construction_date"] + datetime.timedelta(weeks=int(history.data["construction_week"])))
+                    if history.data["construction_year"] not in [None, "", "0", 0]:
+                        update_data["construction_date"] = datetime.datetime.strptime(f'{history.data["construction_year"]}-01-01', "%Y-%m-%d")
+                        update_data["construction_date"] = str(update_data["construction_date"] + datetime.timedelta(weeks=int(history.data["construction_week"])))
 
                     update_data["count_modules"] = history.data["data"]["pv_count_modules"]
 
@@ -273,6 +275,7 @@ def run_cron_add_missing_values():
                         update_data["quote_type3"] = ["Heizung Öl"]
                     if history.data["data"].get("new_heating_type") in ["hybrid_gas", "heatpump"]:
                         update_data["quote_type3"] = ["Heizung WP"]
+                        update_data["hwp"] = ["Ja"]
 
                 if history.data["data"].get("has_roof_reconstruction_quote") is True:
                     update_data["quote_type2"].append("Dachsanierung")

@@ -206,6 +206,13 @@ def get_settings(section=None, domain_raw=None):
                 "tax_consultant": {
                     "2516": "Ja",
                     "2518": "Nein",
+                },
+                "storage_model": {
+                    "264": "Senec Home 2.1",
+                    "266": "Senec Uno Hybrid",
+                    "268": "Senec Duo Hybrid",
+                    "3624": "Blei",
+                    "272": "kein Speicher"
                 }
             },
             "product": {
@@ -343,7 +350,8 @@ def get_settings(section=None, domain_raw=None):
                     "quote_type2": "UF_CRM_1628242113",
                     "quote_type3": "UF_CRM_1612353277",
                     "dz4_customer": "UF_CRM_1627486165",
-                    "tax_consultant": "UF_CRM_1600782915"
+                    "tax_consultant": "UF_CRM_1600782915",
+                    "storage_model": "UF_CRM_1573029656"
                 }
             },
             "quote": {
