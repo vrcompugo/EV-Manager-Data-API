@@ -62,6 +62,7 @@ def calculate_cloud(data):
         "heater_usage": 0,
         "ecloud_usage": 0,
         "consumer_usage": 0,
+        "refresh_usage": 0,
         "conventional_price_light": 0,
         "conventional_price_heatcloud": 0,
         "conventional_price_ecloud": 0,
@@ -156,6 +157,7 @@ def calculate_cloud(data):
             result["storage_size"] = result["storage_size"] + 2.5
             if data.get("old_pv_kwp") not in [None, "", "0"]:
                 result["min_kwp_refresh"] = float(data.get("old_pv_kwp")) * 450 / 1002
+                result["refresh_usage"] = ((result["min_kwp_refresh"] * 1000) / power_to_kwp_factor / direction_factor_kwp)
         result["storage_usage"] = data["power_usage"]
         if data["pv_kwp"] > 0:
             storage_usage_by_kwp = data["pv_kwp"] * 1000 / power_to_kwp_factor / direction_factor_kwp
@@ -176,6 +178,9 @@ def calculate_cloud(data):
             if "min_storage_size_overwrite" in data and data["min_storage_size_overwrite"] != "":
                 if int(data["min_storage_size_overwrite"]) > result["storage_size"]:
                     result["storage_size"] = data["min_storage_size_overwrite"]
+        if "overwrite_storage_size" in data and data["overwrite_storage_size"] != "":
+            if int(data["overwrite_storage_size"]) > result["storage_size"]:
+                result["storage_size"] = int(data["overwrite_storage_size"])
 
         result["cloud_price_light"] = result["cloud_price_light"] + list(filter(
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
@@ -577,6 +582,12 @@ def get_cloud_products(data=None, offer=None):
         offer_data["items"].append(monthly_price_product_base(
             description=emove_description,
             single_price=(0 if wish_price else data["calculated"]["cloud_price_emove"])))
+    if data["calculated"]["refresh_usage"] > 0:
+        offer_data["items"].append(monthly_price_product_base(
+            description=("<b>Cloud Refresh</b><br>"
+                         + f"Durch die Cloud Refresh abgedeckter Anteil am Jahresverbrauch (a): {int(data['calculated']['refresh_usage'])} kWh<br>\n"
+                         + f"<small>Bei Ausfall der Altanlage...</small>"),
+            single_price=0))
     if data["calculated"]["cloud_price_extra"] > 0:
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>Minderverbau</b><br>"
