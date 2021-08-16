@@ -5,7 +5,7 @@ import datetime
 
 from app import db
 from app.models import OfferV2
-from app.modules.external.bitrix24.deal import get_deal, get_deals, get_deals_normalized, update_deal
+from app.modules.external.bitrix24.deal import get_deal, get_deals, get_deals_normalized, update_deal, set_default_data
 from app.modules.external.bitrix24.contact import get_contact, update_contact
 from app.modules.settings import get_settings
 from app.utils.ml_stripper import MLStripper
@@ -22,6 +22,9 @@ def get_contract_data_by_deal(deal_id):
             return {"status": "failed", "data": {"error": "Nur in Cloud Pipeline verfügbar"}, "message": ""}
         data = None
         cloud_contract_number = normalize_contract_number(deal.get("cloud_contract_number"))
+        deal = set_default_data(deal)
+        if deal is None:
+            return None
         if deal.get("is_cloud_master_deal") == "1":
             data = load_json_data(deal.get("fakturia_data"))
         else:
@@ -103,11 +106,11 @@ def get_contract_data_by_deal(deal_id):
         }
         if cloud_contract_number not in [None, "", "0", 0]:
             deal["fakturia"]["contract_number"] = int(cloud_contract_number.replace("C", ""))
-            contract_data = get(f"/Invoices", parameters={
-                "contractNumber": "asd",
+            deal["fakturia"]["invoices"] = get(f"/Invoices", parameters={
+                "contractNumber": deal["fakturia"]["contract_number"],
                 "extendedData": True
             })
-            print("asd", json.dumps(contract_data, indent=2))
+            print("asd", json.dumps(deal["fakturia"]["invoices"], indent=2))
         deal["fakturia"]["items_to_update"] = []
         return deal
     return None

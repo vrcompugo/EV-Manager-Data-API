@@ -291,3 +291,18 @@ def run_cron_add_missing_values():
         if config is not None:
             config["last_import_datetime"] = last_import_datetime.astimezone().isoformat()
         set_settings("external/bitrix/add_deals_missing_values", config)
+
+
+def set_default_data(deal):
+    if deal.get("cloud_number") not in [None, "", "0", 0]:
+        return None
+    if deal.get("unique_identifier") in [None, "None", "0", 0, ""]:
+        return None
+    history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal.get("unique_identifier")).order_by(QuoteHistory.datetime.desc()).first()
+    if history is None:
+        return None
+    if history.data.get("data").get("cloud_number") in [None, "None", "0", 0, ""]:
+        return None
+    deal["cloud_number"] = history.data.get("data").get("cloud_number")
+    update_deal(deal["id"], {"cloud_number": deal["cloud_number"]})
+    return deal
