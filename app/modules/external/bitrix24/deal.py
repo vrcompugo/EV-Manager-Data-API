@@ -295,7 +295,7 @@ def run_cron_add_missing_values():
 
 def set_default_data(deal):
     if deal.get("cloud_number") not in [None, "", "0", 0]:
-        return None
+        return deal
     if deal.get("unique_identifier") in [None, "None", "0", 0, ""]:
         return None
     history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal.get("unique_identifier")).order_by(QuoteHistory.datetime.desc()).first()
