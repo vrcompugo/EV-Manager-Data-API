@@ -28,6 +28,8 @@ def get_contract_data_by_deal(deal_id):
         if deal.get("is_cloud_master_deal") == "1" and deal.get("fakturia_data") not in [None, ""]:
             data = load_json_data(deal.get("fakturia_data"))
         else:
+            if cloud_contract_number in [None, ""]:
+                return deal
             master_deal = get_deals_normalized({
                 "category_id": 15,
                 "cloud_contract_number": f'{cloud_contract_number}',
@@ -39,13 +41,10 @@ def get_contract_data_by_deal(deal_id):
                 if data is None:
                     data = initilize_faktura_data(master_deal[0])
             else:
-                if cloud_contract_number in [None, ""]:
-                    deals = [deal]
-                else:
-                    deals = get_deals_normalized({
-                        "category_id": 15,
-                        "cloud_contract_number": f'{cloud_contract_number}'
-                    })
+                deals = get_deals_normalized({
+                    "category_id": 15,
+                    "cloud_contract_number": f'{cloud_contract_number}'
+                })
                 maindeal = None
                 for subdeal in deals:
                     if _is_lightcloud_deal(subdeal):
