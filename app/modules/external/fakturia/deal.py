@@ -151,15 +151,15 @@ def initilize_faktura_data(deal):
             if item.label in ["BSH-Cloud", "cCloud-Zero", "EEG-Cloud"]:
                 deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if _is_lightcloud_deal(subdeal)), None)
                 item_data["type"] = "lightcloud"
-                item_data["usage"] = float(deal.get("lightcloud_usage")) if deal.get("lightcloud_usage") is not None else None
+                item_data["usage"] = float(deal.get("lightcloud_usage")) if deal.get("lightcloud_usage") not in [None, ""] else None
             if item.description[:17] == "<b>Wärmecloud</b>":
                 deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if _is_heatcloud_deal(subdeal)), None)
                 item_data["type"] = "heatcloud"
-                item_data["usage"] = float(deal.get("heatcloud_usage")) if deal.get("heatcloud_usage") is not None else None
+                item_data["usage"] = float(deal.get("heatcloud_usage")) if deal.get("heatcloud_usage") not in [None, ""] else None
             if item.description[:13] == "<b>eCloud</b>":
                 deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if _is_ecloud_deal(subdeal)), None)
                 item_data["type"] = "ecloud"
-                item_data["usage"] = float(deal.get("ecloud_usage")) if deal.get("ecloud_usage") is not None else None
+                item_data["usage"] = float(deal.get("ecloud_usage")) if deal.get("ecloud_usage") not in [None, ""] else None
             if item.description[:15] == "<b>Consumer</b>":
                 deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if _is_consumer_deal(subdeal)), None)
                 item_data["type"] = "consumer"
