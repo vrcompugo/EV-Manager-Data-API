@@ -95,10 +95,14 @@ def get_contract_data_by_deal(deal_id):
                     del unassigend_deals[deal_index]
         deal["unassigend_deals"] = unassigend_deals
         contact = get_contact(deal["contact_id"])
+        if deal.get("iban") not in [None]:
+            iban = deal.get("iban").replace(" ", "")
+        if deal.get("bic") not in [None]:
+            bic = deal.get("bic").replace(" ", "")
         deal["fakturia"] = {
             "customer_number": contact.get("fakturia_number"),
-            "iban": deal.get("iban").replace(" ", ""),
-            "bic": deal.get("bic").replace(" ", ""),
+            "iban": iban,
+            "bic": bic,
             "owner": f"{contact.get('name')} {contact.get('last_name')}",
             "delivery_begin": delivery_begin,
             "contract_number": ""
