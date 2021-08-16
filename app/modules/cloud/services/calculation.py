@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+import json
 from functools import reduce
 from flask import render_template
 
@@ -246,6 +247,7 @@ def calculate_cloud(data):
                 lambda item: item['from'] <= int(consumer["usage"]) and int(consumer["usage"]) <= item['to'],
                 settings["data"]["cloud_settings"]["cloud_user_consumer_prices"][str(user_id_for_prices)]
             ))
+            consumer["price"] = consumer_price[0]["value"]
             if len(consumer_price) > 0:
                 result["cloud_price_consumer"] = result["cloud_price_consumer"] + consumer_price[0]["value"]
         result["consumer_usage"] = consumer_usage
@@ -263,7 +265,6 @@ def calculate_cloud(data):
                     + result["consumer_usage"] * data["conventional_power_cost_per_kwh"] / 100
                 ) / 12
             )
-
     result["conventional_price_emove"] = 0
     result["emove_usage"] = 0
     if "emove_tarif" in data:
@@ -555,11 +556,13 @@ def get_cloud_products(data=None, offer=None):
                          + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Gaspreisentwicklung derzeit {numberformat(data['calculated']['ecloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_ecloud"])))
     if data["calculated"]["cloud_price_consumer"] > 0:
-        offer_data["items"].append(monthly_price_product_base(
-            description=("<b>Consumer</b><br>"
-                         + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['consumer_usage']} kWh<br>\n"
-                         + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
-            single_price=(0 if wish_price else data["calculated"]["cloud_price_consumer"])))
+        for (index, consumer) in enumerate(data["data"]["consumers"]):
+            offer_data["items"].append(monthly_price_product_base(
+                description=(f"<b>Consumer {index + 1}</b><br>"
+                            + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {consumer['usage']} kWh<br>\n"
+                            + f"Adresse: {consumer['address'].get('street')} {consumer['address'].get('street_nb')}, {consumer['address'].get('zip')} {consumer['address'].get('city')}<br>\n"
+                            + f"<small>Bei Mehrverbauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
+                single_price=(0 if wish_price else consumer["price"])))
     if data["calculated"]["cloud_price_emove"] > 0:
         emove_description = ("<b>eMove</b><br>"
                              + f"Tarif: {data['data']['emove_tarif']}")
