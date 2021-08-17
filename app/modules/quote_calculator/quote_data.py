@@ -219,6 +219,13 @@ def calculate_products(data):
                 quantity=1,
                 products=data["products"]
             )
+        if "min_kwp_refresh" in data["calculated"] and int(data["calculated"]["min_kwp_refresh"]) > 0:
+            add_direct_product(
+                label="Integrierung der Bestand-PV-Anlage in das neue Cloud Konzept",
+                category="Extra Pakete",
+                quantity=1,
+                products=data["products"]
+            )
         technik_and_service_produkt = None
         if "technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]:
             quantity = 0

@@ -1,3 +1,4 @@
+from app.exceptions import ApiException
 from calendar import month
 import re
 import json
@@ -199,7 +200,7 @@ def add_item_list(deal_id, newData):
     data = get_contract_data_by_deal(deal_id)
     if "newItemsList" not in newData:
         print("no list")
-        return data
+        raise ApiException('newItemsList_not_found', 'Produktliste nicht gefunden')
     last_start = None
     new_start = datetime.datetime.strptime(newData["newItemsList"].get("start"), '%Y-%m-%d')
     last_list = None
@@ -255,13 +256,13 @@ def assign_subdeal_to_item(deal_id, list_index, item_index, subdeal_id):
     item_index = int(item_index)
     deal = get_deal(deal_id)
     if str(deal.get("is_cloud_master_deal")) != "1":
-        return False
+        raise ApiException('not-master', 'Aktueller Auftrag ist nicht der Hauptauftrag')
     data = load_json_data(deal.get("fakturia_data"))
     if "item_lists" not in data or len(data["item_lists"]) <= item_index:
-        return False
+        raise ApiException('no-item', 'Keine Produktliste definiert')
     subdeal = get_deal(subdeal_id)
     if subdeal is None:
-        return False
+        raise ApiException('subdeal_not_found', 'Unterauftrag nicht gefunden')
     if data["item_lists"][list_index]["items"][item_index]["type"] == "lightcloud":
         update_deal(subdeal.get("id"), {
             "is_cloud_consumer": "0",
@@ -410,11 +411,12 @@ def get_export_data(deal, contact):
 
 def export_cloud_deal(deal_id):
     print("export deal:", deal_id)
+    raise ApiException('no-customer', 'Kunde nicht bei Fakturia registriert')
     deal = get_contract_data_by_deal(deal_id)
     contact = get_contact(deal.get("contact_id"))
     if contact.get("fakturia_number") in ["", None, "0", 0]:
         print(contact["id"], "no customer number")
-        return deal
+        raise ApiException('no-customer', 'Kunde nicht bei Fakturia registriert')
     if contact.get("fakturia_iban") in [None, "None", ""]:
         update_contact(contact["id"], {
             "fakturia_iban": deal["fakturia"]["iban"],
@@ -424,7 +426,7 @@ def export_cloud_deal(deal_id):
         contact["fakturia_iban"] = deal["fakturia"]["iban"]
     if contact.get("fakturia_iban") != deal["fakturia"]["iban"]:
         print(contact["id"], "customer wrong iban", contact.get("fakturia_iban"), deal["fakturia"]["iban"])
-        return deal
+        raise ApiException('wrong-iban', 'Kunden IBAN stimmt nicht mit Auftrags IBAN übrein')
     export_contact(contact, force=True)
     export_data, subscriptionItemsPrices = get_export_data(deal, contact)
     if export_data is not None:
@@ -442,6 +444,7 @@ def export_cloud_deal(deal_id):
                     print(json.dumps(response_item, indent=2))
             else:
                 print("contract error", json.dumps(contract_data, indent=2))
+                raise ApiException('fakturia-error', 'Fehler beim Übertragen an Fakturia', data=contract_data)
         else:
             contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data)
         if contract_data.get("contractStatus") == "DRAFT":

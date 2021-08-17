@@ -3,6 +3,7 @@ import os
 from flask import Blueprint, request, render_template
 
 from app import db
+from app.decorators import api_response
 from app.modules.external.bitrix24.deal import update_deal
 from app.modules.auth import get_auth_info
 from app.modules.auth.jwt_parser import encode_jwt
@@ -13,6 +14,7 @@ blueprint = Blueprint("fakturia", __name__, template_folder='templates')
 
 
 @blueprint.route("/<deal_id>", methods=['GET'])
+@api_response
 def get_deal_data(deal_id):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -24,6 +26,7 @@ def get_deal_data(deal_id):
 
 
 @blueprint.route("/<deal_id>/export", methods=['POST'])
+@api_response
 def export_deal_route(deal_id):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -35,6 +38,7 @@ def export_deal_route(deal_id):
 
 
 @blueprint.route("/<deal_id>/create_contract_number", methods=['POST'])
+@api_response
 def create_contract_number_route(deal_id):
     from app.modules.importer.sources.bitrix24.order import run_export_fields
     from app.modules.importer.sources.bitrix24.order import run_import as order_import
@@ -57,6 +61,7 @@ def create_contract_number_route(deal_id):
 
 
 @blueprint.route("/<deal_id>/to_master", methods=['POST'])
+@api_response
 def set_master_deal(deal_id):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -71,6 +76,7 @@ def set_master_deal(deal_id):
 
 
 @blueprint.route("/<deal_id>/item", methods=['POST'])
+@api_response
 def add_item_list_route(deal_id):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -83,6 +89,7 @@ def add_item_list_route(deal_id):
 
 
 @blueprint.route("/<deal_id>/item/<list_index>/<index>", methods=['PUT'])
+@api_response
 def store_item_list_route(deal_id, list_index, index):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -95,6 +102,7 @@ def store_item_list_route(deal_id, list_index, index):
 
 
 @blueprint.route("/<deal_id>/item/<list_index>", methods=['DELETE'])
+@api_response
 def delete_item_list_route(deal_id, list_index):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -107,6 +115,7 @@ def delete_item_list_route(deal_id, list_index):
 
 
 @blueprint.route("/<deal_id>/item/<list_index>/<item_index>/deal", methods=['POST'])
+@api_response
 def assign_subdeal_item(deal_id, list_index, item_index):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
