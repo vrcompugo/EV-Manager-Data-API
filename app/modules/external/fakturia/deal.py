@@ -1,3 +1,4 @@
+from calendar import month
 import re
 import json
 import base64
@@ -113,7 +114,6 @@ def get_contract_data_by_deal(deal_id):
                 "contractNumber": deal["fakturia"]["contract_number"],
                 "extendedData": True
             })
-            print("asd", json.dumps(deal["fakturia"]["invoices"], indent=2))
         deal["fakturia"]["items_to_update"] = []
         return deal
     return None
@@ -398,6 +398,13 @@ def get_export_data(deal, contact):
         "taxConfig": "AUTOMATIC",
         "documentDeliveryMode": "EMAIL"
     }
+    issue_date = datetime.datetime.strptime(data["issueDate"], '%Y-%m-%d')
+    if issue_date > datetime.datetime.now():
+        if issue_date.day > 15:
+            next_billing_date = issue_date + datetime.timedelta(days=20)
+            data["nextBilling"] = next_billing_date.strftime("%Y-%m-01")
+        else:
+            data["nextBilling"] = issue_date.strftime("%Y-%m-15")
     return data, subscriptionItemsPrices
 
 
