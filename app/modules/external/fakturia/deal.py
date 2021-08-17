@@ -258,7 +258,7 @@ def assign_subdeal_to_item(deal_id, list_index, item_index, subdeal_id):
     if str(deal.get("is_cloud_master_deal")) != "1":
         raise ApiException('not-master', 'Aktueller Auftrag ist nicht der Hauptauftrag')
     data = load_json_data(deal.get("fakturia_data"))
-    if "item_lists" not in data or len(data["item_lists"]) <= item_index:
+    if "item_lists" not in data or len(data["item_lists"]) <= list_index:
         raise ApiException('no-item', 'Keine Produktliste definiert')
     subdeal = get_deal(subdeal_id)
     if subdeal is None:
