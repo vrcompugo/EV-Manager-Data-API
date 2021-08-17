@@ -86,13 +86,31 @@ def export_contact(contact, force=False):
             update_bitrix_contact(contact["id"], {
                 "fakturia_number": customer_data["customerNumber"]
             })
+            # create sepa mandete
+            if contact.get("sepa_mandate_since") not in [None, "None", ""]:
+                post(f"/Customers/{contact.get('fakturia_number')}/SepaDebitMandates", post_data={
+                    "debitType": "BASIS_LASTSCHRIFT",
+                    "mandateType": "RECUR",
+                    "status": "ACTIVE",
+                    "created": datetime.now().strftime("%Y-%m-%d"),
+                    "issueDate": contact.get('sepa_mandate_since')
+                })
             print(contact["id"])
         else:
             print(json.dumps(customer_data, indent=2))
     else:
         if force:
             customer_data = put(f"/Customers/{contact.get('fakturia_number')}", post_data=export_data)
-            print(json.dumps(customer_data, indent=2))
+            if contact.get("sepa_mandate_since") not in [None, "None", ""]:
+                mandates = get(f"/Customers/{contact.get('fakturia_number')}/SepaDebitMandates")
+                if mandates is not None and len(mandates) == 0:
+                    post(f"/Customers/{contact.get('fakturia_number')}/SepaDebitMandates", post_data={
+                        "debitType": "BASIS_LASTSCHRIFT",
+                        "mandateType": "RECUR",
+                        "status": "ACTIVE",
+                        "created": datetime.now().strftime("%Y-%m-%d"),
+                        "issueDate": contact.get('sepa_mandate_since')[:10]
+                    })
         else:
             print(contact["id"], "no export")
 

@@ -429,6 +429,13 @@ def export_cloud_deal(deal_id):
             "fakturia_owner": deal["fakturia"]["owner"],
         })
         contact["fakturia_iban"] = deal["fakturia"]["iban"]
+    if deal.get("sepa_mandate_since") in [None, "None", ""]:
+        raise ApiException('wrong-sepa', 'SEPA Mandatsdatum fehlt')
+    if contact.get("sepa_mandate_since") in [None, "None", ""]:
+        update_contact(contact["id"], {
+            "sepa_mandate_since": deal.get("sepa_mandate_since")
+        })
+        contact["sepa_mandate_since"] = deal.get("sepa_mandate_since")
     if contact.get("fakturia_iban") != deal["fakturia"]["iban"]:
         print(contact["id"], "customer wrong iban", contact.get("fakturia_iban"), deal["fakturia"]["iban"])
         raise ApiException('wrong-iban', 'Kunden IBAN stimmt nicht mit Auftrags IBAN übrein')
@@ -452,7 +459,7 @@ def export_cloud_deal(deal_id):
                 raise ApiException('fakturia-error', 'Fehler beim Übertragen an Fakturia', data={"export_data": export_data, "response": contract_data})
         else:
             contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data)
-        if contract_data.get("contractStatus") == "DRAFT":
+        if contract_data is not None and contract_data.get("contractStatus") == "DRAFT":
             response_activation = post(f"/Contracts/{deal.get('fakturia_contract_number')}/activate")
             print(json.dumps(response_activation, indent=2))
     return deal
