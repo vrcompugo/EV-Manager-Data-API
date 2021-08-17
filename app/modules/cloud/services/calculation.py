@@ -183,7 +183,7 @@ def calculate_cloud(data):
             if int(data["overwrite_storage_size"]) > result["storage_size"]:
                 result["storage_size"] = int(data["overwrite_storage_size"])
         if result["storage_size"] > 70 and str(user["id"]) != "13":
-            return None
+            result["storage_size"] = 70
         result["cloud_price_light"] = result["cloud_price_light"] + list(filter(
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_prices"][str(user_id_for_prices)]
