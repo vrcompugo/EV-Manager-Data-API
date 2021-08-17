@@ -361,13 +361,16 @@ def get_export_data(deal, contact):
             "status": "ACTIVE",
             "activityType": "DEFAULT_PERFORMANCE"
         }
-        subscriptionItems.append(item_data)
+        cost = round(item_list["sum"] / 1.19, 4)
+        if cost < 0:
+            item_data["activityType"] = "REVERSE_PERFORMANCE_OTHER"
         subscriptionItemsPrices.append({
-            "cost": round(item_list["sum"] / 1.19, 4),
+            "cost": cost,
             "currency": "EUR",
             "validFrom": "",
             "minimumQuantity": 1
         })
+        subscriptionItems.append(item_data)
     data = {
         "customerNumber": contact.get("fakturia_number"),
         "projectName": "Cloud Verträge",
@@ -405,7 +408,10 @@ def get_export_data(deal, contact):
             next_billing_date = issue_date + datetime.timedelta(days=20)
             data["nextBilling"] = next_billing_date.strftime("%Y-%m-01")
         else:
-            data["nextBilling"] = issue_date.strftime("%Y-%m-15")
+            if issue_date.day == 1:
+                data["nextBilling"] = issue_date.strftime("%Y-%m-01")
+            else:
+                data["nextBilling"] = issue_date.strftime("%Y-%m-15")
     return data, subscriptionItemsPrices
 
 
