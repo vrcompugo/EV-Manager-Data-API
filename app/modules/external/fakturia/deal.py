@@ -442,8 +442,8 @@ def export_cloud_deal(deal_id):
                     response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}/customPrices", post_data=subscriptionItemsPrices[index])
                     print(json.dumps(response_item, indent=2))
             else:
-                print("contract error", json.dumps(contract_data, indent=2))
-                raise ApiException('fakturia-error', 'Fehler beim Übertragen an Fakturia', data=contract_data)
+                print("contract error", json.dumps(export_data, indent=2), json.dumps(contract_data, indent=2))
+                raise ApiException('fakturia-error', 'Fehler beim Übertragen an Fakturia', data={"export_data": export_data, "response": contract_data})
         else:
             contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data)
         if contract_data.get("contractStatus") == "DRAFT":
