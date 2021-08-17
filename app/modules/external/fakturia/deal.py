@@ -411,7 +411,6 @@ def get_export_data(deal, contact):
 
 def export_cloud_deal(deal_id):
     print("export deal:", deal_id)
-    raise ApiException('no-customer', 'Kunde nicht bei Fakturia registriert')
     deal = get_contract_data_by_deal(deal_id)
     contact = get_contact(deal.get("contact_id"))
     if contact.get("fakturia_number") in ["", None, "0", 0]:
