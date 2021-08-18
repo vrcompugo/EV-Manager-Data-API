@@ -79,6 +79,7 @@ def export_contact(contact, force=False):
     export_data = get_export_data(contact, company)
 
     if contact.get("fakturia_number") in ["", None] and "email" in export_data:
+        print(json.dumps(customer_data, indent=2))
         customer_data = post(f"/Customers", post_data=export_data)
         if customer_data is not None and "customerNumber" in customer_data:
             contact["fakturia_number"] = customer_data["customerNumber"]

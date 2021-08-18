@@ -429,6 +429,8 @@ def export_cloud_deal(deal_id):
             "fakturia_owner": deal["fakturia"]["owner"],
         })
         contact["fakturia_iban"] = deal["fakturia"]["iban"]
+        contact["fakturia_bic"] = deal["fakturia"]["bic"]
+        contact["fakturia_owner"] = deal["fakturia"]["owner"]
     if deal.get("sepa_mandate_since") in [None, "None", ""]:
         raise ApiException('wrong-sepa', 'SEPA Mandatsdatum fehlt')
     if contact.get("sepa_mandate_since") in [None, "None", ""]:
