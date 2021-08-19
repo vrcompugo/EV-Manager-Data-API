@@ -299,6 +299,7 @@ def assign_subdeal_to_item(deal_id, list_index, item_index, subdeal_id):
 
 
 def load_json_data(field_data):
+    print(field_data)
     if field_data in [None, "", "0", 0]:
         return None
     return json.loads(base64.b64decode(field_data.encode('utf-8')).decode('utf-8'))
