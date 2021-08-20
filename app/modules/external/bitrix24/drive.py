@@ -359,6 +359,55 @@ def run_cron_heating_folder_creation():
     set_settings("external/bitrix24/folder_creation", config)
 
 
+def run_cron_external_company_folder_creation():
+    config = get_settings("external/bitrix24/folder_creation")
+    print("external_company_folder_creation")
+    if config is None or "folders" not in config:
+        print("no config for external_company_folder_creation")
+        return None
+    last_import = "2021-01-01"
+    import_time = datetime.now()
+    if "last_external_company_run_time" in config:
+        last_import = config["last_external_company_run_time"]
+
+    deals = get_deals({
+        "FILTER[>DATE_MODIFY]": last_import,
+        "FILTER[CATEGORY_ID]": 142,
+        "SELECT": "full"
+    })
+    for deal in deals:
+        print("deal", deal["id"])
+        if deal.get("upload_link_roof") in [None, "", 0]:
+            deal_path = f"Extern {deal['id']}"
+            link_path = f"https://keso.bitrix24.de/docs/path/Auftragsordner/{deal_path}"
+            data = {}
+            data["upload_folder_id_roof"] = create_folder_path(parent_folder_id=442678, path=f"{deal_path}/Uploads/Dachbilder")
+            data["upload_link_roof"] = f"{link_path}/Uploads/Dachbilder"
+            data["upload_folder_id_roof_extra"] = create_folder_path(parent_folder_id=442678, path=f"{deal_path}/Uploads/Weitere Dachbilder")
+            data["upload_link_roof_extra"] = f"{link_path}/Uploads/Weitere Dachbilder"
+            data["upload_folder_id_electric"] = create_folder_path(parent_folder_id=442678, path=f"{deal_path}/Uploads/Elektrik-Bilder")
+            data["upload_link_electric"] = f"{link_path}/Uploads/Elektrik-Bilder"
+            data["upload_folder_id_heating"] = create_folder_path(parent_folder_id=442678, path=f"{deal_path}/Uploads/Heizungsbilder")
+            data["upload_link_heating"] = f"{link_path}/Uploads/Heizungsbilder"
+            data["upload_folder_id_invoices"] = create_folder_path(parent_folder_id=442678, path=f"{deal_path}/Uploads/Rechnung vom bisherigem Anbieter")
+            data["upload_link_invoices"] = f"{link_path}/Uploads/Rechnung vom bisherigem Anbieter"
+            data["upload_folder_id_contract"] = create_folder_path(parent_folder_id=442678, path=f"{deal_path}/Uploads/Vertragsunterlagen")
+            data["upload_link_contract"] = f"{link_path}/Uploads/Vertragsunterlagen"
+
+            update_data = {
+                "upload_link_roof": data["upload_link_roof"],
+                "upload_link_electric": data["upload_link_electric"],
+                "upload_link_heating": data["upload_link_heating"],
+                "upload_link_invoices": data["upload_link_invoices"],
+                "upload_link_contract": data["upload_link_contract"]
+            }
+            update_deal(deal["id"], update_data)
+    config = get_settings("external/bitrix24/folder_creation")
+    if config is not None:
+        config["last_external_company_run_time"] = import_time.astimezone().isoformat()
+    set_settings("external/bitrix24/folder_creation", config)
+
+
 def run_legacy_folder_creation():
     payload = {
         "id": 649168,

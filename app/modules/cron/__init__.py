@@ -126,6 +126,13 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "productive" or section == "external_company_folder_creation":
+        from app.modules.external.bitrix24.drive import run_cron_external_company_folder_creation
+        try:
+            run_cron_external_company_folder_creation()
+        except Exception as e:
+            error_handler()
+
     if section == "productive" or section == "find_stuck_orders":
         from app.models import OfferV2, Order, ImportIdAssociation
         try:
