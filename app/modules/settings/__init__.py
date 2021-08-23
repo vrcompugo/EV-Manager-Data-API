@@ -213,6 +213,16 @@ def get_settings(section=None, domain_raw=None):
                     "268": "Senec Duo Hybrid",
                     "3624": "Blei",
                     "272": "kein Speicher"
+                },
+                "has_emove_package": {
+                    "": "nicht ausgewählt",
+                    "4118": "Ja",
+                    "4120": "Nein"
+                },
+                "is_negative_cloud": {
+                    "": "nicht ausgewählt",
+                    "3036": "Ja",
+                    "3038": "Nein"
                 }
             },
             "product": {
@@ -351,7 +361,17 @@ def get_settings(section=None, domain_raw=None):
                     "quote_type3": "UF_CRM_1612353277",
                     "dz4_customer": "UF_CRM_1627486165",
                     "tax_consultant": "UF_CRM_1600782915",
-                    "storage_model": "UF_CRM_1573029656"
+                    "storage_model": "UF_CRM_1573029656",
+                    "cloud_monthly_cost": "UF_CRM_1612265225",
+                    "cloud_yearly_usage": "UF_CRM_1585822072",
+                    "has_emove_package": "UF_CRM_1620741780",
+                    "emove_usage_inhouse": "UF_CRM_1620741150",
+                    "emove_usage_outside": "UF_CRM_1620740831",
+                    "is_negative_cloud": "UF_CRM_1607944340",
+                    "cloud_runtime": "UF_CRM_1597758014166",
+                    "counter_main": "UF_CRM_1585821761",
+                    "counter_heatcloud": "UF_CRM_1597757955687",
+                    "counter_ecloud": "UF_CRM_1611239704"
                 }
             },
             "quote": {

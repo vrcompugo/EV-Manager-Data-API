@@ -202,23 +202,30 @@ def add_item_list(deal_id, newData):
         print("no list")
         raise ApiException('newItemsList_not_found', 'Produktliste nicht gefunden')
     last_start = None
-    new_start = datetime.datetime.strptime(newData["newItemsList"].get("start"), '%Y-%m-%d')
+    new_start = None
+    if newData["newItemsList"].get("start") not in [None, "", "0000-00-00"]:
+        new_start = datetime.datetime.strptime(newData["newItemsList"].get("start"), '%Y-%m-%d')
     last_list = None
     if len(data["item_lists"]) > 0:
         last_list = data["item_lists"][len(data["item_lists"]) - 1]
     if last_list is not None and last_list.get("start") not in [None, "", "0000-00-00"]:
-        if newData["newItemsList"].get("start") in [None, "", "0000-00-00"]:
-            print("start date needed")
-            return data
         last_start = datetime.datetime.strptime(last_list.get("start"), '%Y-%m-%d')
-        if last_start > datetime.datetime.now() and last_start >= new_start:
-            print("new start needs to be later then last start")
-            return data
-    new_start = new_start.strftime('%Y-%m-%d')
-    data["item_lists"].append({
-        "start": new_start,
-        "items": newData["newItemsList"].get("items")
-    })
+    if new_start is not None:
+        new_start = new_start.strftime('%Y-%m-%d')
+        if new_start < datetime.datetime.now():
+            raise ApiException('newItemsList_not_found', 'Startdatum muss neuer sein als das aktuelle Datum')
+        if last_start is not None and new_start < last_start:
+            raise ApiException('newItemsList_not_found', 'Startdatum muss neuer sein als das letzte Startdatum')
+    if new_start is None and len(data["item_lists"]) == 1:
+        data["item_lists"][0] = {
+            "start": new_start,
+            "items": newData["newItemsList"].get("items")
+        }
+    else:
+        data["item_lists"].append({
+            "start": new_start,
+            "items": newData["newItemsList"].get("items")
+        })
     update_deal(deal_id, {
         "fakturia_data": store_json_data({"item_lists": data["item_lists"]})
     })
