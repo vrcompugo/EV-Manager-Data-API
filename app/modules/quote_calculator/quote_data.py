@@ -118,9 +118,9 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         return_data["heating_quote"]["has_special_condition"] = False
         return_data["bluegen_quote"]["has_special_condition"] = False
         if data.get("has_roof_reconstruction_quote") is True:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=13)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=12)
         else:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=9)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=8)
         return_data["construction_week"] = int(delivery_date.strftime("%U"))
         return_data["construction_year"] = int(delivery_date.strftime("%Y"))
     if lead_data["assigned_by_id"] is not None and lead_data["assigned_by_id"] != "":
