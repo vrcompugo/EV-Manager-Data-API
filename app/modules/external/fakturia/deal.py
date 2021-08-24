@@ -411,15 +411,14 @@ def get_export_data(deal, contact):
         "documentDeliveryMode": "EMAIL"
     }
     issue_date = datetime.datetime.strptime(data["issueDate"], '%Y-%m-%d')
-    if issue_date > datetime.datetime.now():
-        if issue_date.day > 15:
-            next_billing_date = issue_date + datetime.timedelta(days=20)
-            data["nextBilling"] = next_billing_date.strftime("%Y-%m-01")
+    if issue_date.day > 15:
+        next_billing_date = issue_date + datetime.timedelta(days=20)
+        data["issueDate"] = next_billing_date.strftime("%Y-%m-01")
+    else:
+        if issue_date.day == 1:
+            data["issueDate"] = issue_date.strftime("%Y-%m-01")
         else:
-            if issue_date.day == 1:
-                data["nextBilling"] = issue_date.strftime("%Y-%m-01")
-            else:
-                data["nextBilling"] = issue_date.strftime("%Y-%m-15")
+            data["issueDate"] = issue_date.strftime("%Y-%m-15")
     return data, subscriptionItemsPrices
 
 
