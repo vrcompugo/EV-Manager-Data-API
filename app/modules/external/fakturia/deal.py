@@ -1,3 +1,4 @@
+from app.modules.external.bitrix24.products import get_product
 from app.exceptions import ApiException
 from calendar import month
 import re
@@ -19,105 +20,189 @@ from .customer import export_contact
 def get_contract_data_by_deal(deal_id):
     config = get_settings("external/bitrix24")
     deal = get_deal(deal_id)
-    if deal is not None:
-        if deal.get("category_id") != "15":
-            return {"status": "failed", "data": {"error": "Nur in Cloud Pipeline verfügbar"}, "message": ""}
-        data = None
-        cloud_contract_number = normalize_contract_number(deal.get("cloud_contract_number"))
-        deal = set_default_data(deal)
-        if deal is None:
-            return {"status": "failed", "data": {"error": "Cloud Nummer konnten nicht gefunden werden"}, "message": ""}
-        if deal.get("is_cloud_master_deal") == "1" and deal.get("fakturia_data") not in [None, ""]:
-            data = load_json_data(deal.get("fakturia_data"))
-        else:
-            if cloud_contract_number in [None, ""]:
-                return deal
-            master_deal = get_deals_normalized({
-                "category_id": 15,
-                "cloud_contract_number": f'{cloud_contract_number}',
-                "is_cloud_master_deal": 1
-            })
-            if master_deal is not None and len(master_deal) > 0:
-                deal = master_deal[0]
-                data = load_json_data(deal.get("fakturia_data"))
-                if data is None:
-                    data = initilize_faktura_data(master_deal[0])
-            else:
-                deals = get_deals_normalized({
-                    "category_id": 15,
-                    "cloud_contract_number": f'{cloud_contract_number}'
-                })
-                maindeal = None
-                for subdeal in deals:
-                    if _is_lightcloud_deal(subdeal):
-                        if maindeal is not None:
-                            maindeal = None
-                            break
-                        maindeal = subdeal
-                if maindeal is not None:
-                    update_deal(maindeal.get("id"), {
-                        "is_cloud_master_deal": 1
-                    })
-                    deal = maindeal
-                    data = initilize_faktura_data(maindeal)
-                else:
-                    return {"deals": deals}
-        if data is None:
-            return {"status": "failed", "data": {"error": "Vertragsdaten konnten nicht gefunden werden"}, "message": ""}
-        delivery_begin = None
-        if deal.get("cloud_delivery_begin") not in [None, "", "None"]:
-            delivery_begin = deal.get("cloud_delivery_begin")[0:deal.get("cloud_delivery_begin").find("T")]
-        if "items" in data:
-            data["item_lists"] = [
-                {
-                    "start": delivery_begin,
-                    "end": None,
-                    "items": data["items"]
-                }
-            ]
-        deal["item_lists"] = data["item_lists"]
-        deal["link"] = f"https://keso.bitrix24.de/crm/deal/details/{deal['id']}/"
-        deal["cloud_contract_number"] = cloud_contract_number
+    if deal is None:
+        raise ApiException('deal not found', 'Auftrag nicht gefunden')
+    if deal.get("category_id") not in ["15", "68"]:
+        return {"status": "failed", "data": {"error": "Nur in Cloud Pipeline verfügbar"}, "message": ""}
+    if deal.get("category_id") == "15":
+        return get_cloud_contract_data_by_deal(deal)
+    if deal.get("category_id") == "68":
+        return get_service_contract_data_by_deal(deal)
+
+
+def get_service_contract_data_by_deal(deal):
+    from app.modules.importer.sources.bitrix24.order import run_import as order_import
+    from app.modules.order.order_services import generate_contract_number
+
+    contract_number = normalize_contract_number(deal.get("service_contract_number"))
+    if contract_number in [None, ""]:
+        order = order_import(remote_id=deal["id"])
+        if order is None:
+            return {"status": "failed", "data": {}, "message": "import failed"}
+        contract_number = generate_contract_number(order, number_prefix="")
+        if contract_number not in [None, ""]:
+            order.contract_number = contract_number
+            db.session.commit()
+        deal["service_contract_number"] = contract_number
+        update_deal(id=deal["id"], data={
+            "service_contract_number": contract_number
+        })
+    if contract_number in [None, ""]:
+        raise ApiException('contract_number_failed', 'Vertragsnummer konnte nicht erzeugt werden')
+    data = load_json_data(deal.get("fakturia_data"))
+    if data is None:
+        data = initilize_service_contract_data(deal)
+    if data is None:
+        raise ApiException('init_failed', 'Initialisierung fehlgeschlagen')
+    deal["item_lists"] = data["item_lists"]
+    deal["link"] = f"https://keso.bitrix24.de/crm/deal/details/{deal['id']}/"
+    delivery_begin = None
+    if deal.get("activation_date") not in [None, "", "None"]:
+        delivery_begin = deal.get("activation_date")[0:deal.get("activation_date").find("T")]
+    if len(deal["item_lists"]) > 0:
+        deal["item_lists"][0]["start"] = delivery_begin
+        deal["item_lists"][0]["items"][0]["deal"]["link"] = deal["link"]
+    contact = get_contact(deal["contact_id"])
+    if deal.get("iban") not in [None]:
+        iban = deal.get("iban").replace(" ", "")
+    if deal.get("bic") not in [None]:
+        bic = deal.get("bic").replace(" ", "")
+    deal["fakturia"] = {
+        "customer_number": contact.get("fakturia_number"),
+        "iban": iban,
+        "bic": bic,
+        "owner": f"{contact.get('name')} {contact.get('last_name')}",
+        "delivery_begin": delivery_begin,
+        "contract_number": ""
+    }
+    if contract_number not in [None, "", "0", 0]:
+        deal["fakturia"]["contract_number"] = int(contract_number)
+        deal["fakturia"]["invoices"] = get(f"/Invoices", parameters={
+            "contractNumber": deal["fakturia"]["contract_number"],
+            "extendedData": True
+        })
+    return deal
+
+
+def initilize_service_contract_data(deal):
+    data = {
+        "item_lists": [
+            {
+                "start": None,
+                "end": None,
+                "items": [{
+                    "type": "service",
+                    "label": "Remote Care Jahres Beitrag",
+                    "description": "Contracting Vertrag\n - Remote Care - Online Überwachung PV Anlage",
+                    "tax_rate": 19,
+                    "total_price": 72,
+                    "total_price_net": 60.5042,
+                    "deal": deal
+                }]
+            }
+        ]
+    }
+    update_deal(deal.get("id"), {
+        "fakturia_data": store_json_data(data)
+    })
+    return data
+
+
+def get_cloud_contract_data_by_deal(deal):
+    cloud_contract_number = normalize_contract_number(deal.get("cloud_contract_number"))
+    deal = set_default_data(deal)
+    if deal is None:
+        return {"status": "failed", "data": {"error": "Cloud Nummer konnten nicht gefunden werden"}, "message": ""}
+    if deal.get("is_cloud_master_deal") == "1" and deal.get("fakturia_data") not in [None, ""]:
+        data = load_json_data(deal.get("fakturia_data"))
+    else:
         if cloud_contract_number in [None, ""]:
-            unassigend_deals = []
+            return deal
+        master_deal = get_deals_normalized({
+            "category_id": 15,
+            "cloud_contract_number": f'{cloud_contract_number}',
+            "is_cloud_master_deal": 1
+        })
+        if master_deal is not None and len(master_deal) > 0:
+            deal = master_deal[0]
+            data = load_json_data(deal.get("fakturia_data"))
+            if data is None:
+                data = initilize_faktura_data(master_deal[0])
         else:
-            unassigend_deals = get_deals_normalized({
+            deals = get_deals_normalized({
                 "category_id": 15,
                 "cloud_contract_number": f'{cloud_contract_number}'
             })
-        for index, unassigend_deal in enumerate(unassigend_deals):
-            unassigend_deals[index]["link"] = f"https://keso.bitrix24.de/crm/deal/details/{unassigend_deal['id']}/"
-        if len(deal["item_lists"]) > 0:
-            deal["item_lists"][0]["start"] = delivery_begin
-        for list in deal["item_lists"]:
-            for item in list["items"]:
-                deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if item.get("deal") is not None and subdeal["id"] == item["deal"]["id"]), None)
-                if deal_index is not None:
-                    item["deal"]["link"] = unassigend_deals[deal_index]['link']
-                    del unassigend_deals[deal_index]
-        deal["unassigend_deals"] = unassigend_deals
-        contact = get_contact(deal["contact_id"])
-        if deal.get("iban") not in [None]:
-            iban = deal.get("iban").replace(" ", "")
-        if deal.get("bic") not in [None]:
-            bic = deal.get("bic").replace(" ", "")
-        deal["fakturia"] = {
-            "customer_number": contact.get("fakturia_number"),
-            "iban": iban,
-            "bic": bic,
-            "owner": f"{contact.get('name')} {contact.get('last_name')}",
-            "delivery_begin": delivery_begin,
-            "contract_number": ""
-        }
-        if cloud_contract_number not in [None, "", "0", 0]:
-            deal["fakturia"]["contract_number"] = int(cloud_contract_number.replace("C", ""))
-            deal["fakturia"]["invoices"] = get(f"/Invoices", parameters={
-                "contractNumber": deal["fakturia"]["contract_number"],
-                "extendedData": True
-            })
-        deal["fakturia"]["items_to_update"] = []
-        return deal
-    return None
+            maindeal = None
+            for subdeal in deals:
+                if _is_lightcloud_deal(subdeal):
+                    if maindeal is not None:
+                        maindeal = None
+                        break
+                    maindeal = subdeal
+            if maindeal is not None:
+                update_deal(maindeal.get("id"), {
+                    "is_cloud_master_deal": 1
+                })
+                deal = maindeal
+                data = initilize_faktura_data(maindeal)
+            else:
+                return {"deals": deals}
+    if data is None:
+        return {"status": "failed", "data": {"error": "Vertragsdaten konnten nicht gefunden werden"}, "message": ""}
+    delivery_begin = None
+    if deal.get("cloud_delivery_begin") not in [None, "", "None"]:
+        delivery_begin = deal.get("cloud_delivery_begin")[0:deal.get("cloud_delivery_begin").find("T")]
+    if "items" in data:
+        data["item_lists"] = [
+            {
+                "start": delivery_begin,
+                "end": None,
+                "items": data["items"]
+            }
+        ]
+    deal["item_lists"] = data["item_lists"]
+    deal["link"] = f"https://keso.bitrix24.de/crm/deal/details/{deal['id']}/"
+    deal["cloud_contract_number"] = cloud_contract_number
+    if cloud_contract_number in [None, ""]:
+        unassigend_deals = []
+    else:
+        unassigend_deals = get_deals_normalized({
+            "category_id": 15,
+            "cloud_contract_number": f'{cloud_contract_number}'
+        })
+    for index, unassigend_deal in enumerate(unassigend_deals):
+        unassigend_deals[index]["link"] = f"https://keso.bitrix24.de/crm/deal/details/{unassigend_deal['id']}/"
+    if len(deal["item_lists"]) > 0:
+        deal["item_lists"][0]["start"] = delivery_begin
+    for list in deal["item_lists"]:
+        for item in list["items"]:
+            deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if item.get("deal") is not None and subdeal["id"] == item["deal"]["id"]), None)
+            if deal_index is not None:
+                item["deal"]["link"] = unassigend_deals[deal_index]['link']
+                del unassigend_deals[deal_index]
+    deal["unassigend_deals"] = unassigend_deals
+    contact = get_contact(deal["contact_id"])
+    if deal.get("iban") not in [None]:
+        iban = deal.get("iban").replace(" ", "")
+    if deal.get("bic") not in [None]:
+        bic = deal.get("bic").replace(" ", "")
+    deal["fakturia"] = {
+        "customer_number": contact.get("fakturia_number"),
+        "iban": iban,
+        "bic": bic,
+        "owner": f"{contact.get('name')} {contact.get('last_name')}",
+        "delivery_begin": delivery_begin,
+        "contract_number": ""
+    }
+    if cloud_contract_number not in [None, "", "0", 0]:
+        deal["fakturia"]["contract_number"] = int(cloud_contract_number.replace("C", ""))
+        deal["fakturia"]["invoices"] = get(f"/Invoices", parameters={
+            "contractNumber": deal["fakturia"]["contract_number"],
+            "extendedData": True
+        })
+    deal["fakturia"]["items_to_update"] = []
+    return deal
 
 
 def initilize_faktura_data(deal):
@@ -306,7 +391,6 @@ def assign_subdeal_to_item(deal_id, list_index, item_index, subdeal_id):
 
 
 def load_json_data(field_data):
-    print(field_data)
     if field_data in [None, "", "0", 0]:
         return None
     return json.loads(base64.b64decode(field_data.encode('utf-8')).decode('utf-8'))
@@ -372,6 +456,7 @@ def get_export_data(deal, contact):
         cost = round(item_list["sum"] / 1.19, 4)
         if cost < 0:
             item_data["activityType"] = "REVERSE_PERFORMANCE_OTHER"
+            cost = cost * -1
         subscriptionItemsPrices.append({
             "cost": cost,
             "currency": "EUR",
