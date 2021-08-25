@@ -605,7 +605,7 @@ def export_deal(deal_id):
     if export_data is not None:
         contract_data = None
         if deal.get("fakturia_contract_number") in ["", None, 0, "0"]:
-            contract_data = post(f"/Contracts", post_data=export_data, api_key=api_key)
+            contract_data = post(f"/Contracts", post_data=export_data, token=api_key)
             if contract_data is not None and "contractNumber" in contract_data:
                 print(json.dumps(contract_data, indent=2))
                 deal["fakturia_contract_number"] = contract_data["contractNumber"]
@@ -614,13 +614,13 @@ def export_deal(deal_id):
                 })
                 for index, item in enumerate(contract_data.get("subscription").get("subscriptionItems")):
                     if len(subscriptionItemsPrices) > index:
-                        response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}/customPrices", post_data=subscriptionItemsPrices[index], api_key=api_key)
+                        response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}/customPrices", post_data=subscriptionItemsPrices[index], token=api_key)
                         print(json.dumps(response_item, indent=2))
             else:
                 print("contract error", json.dumps(export_data, indent=2), json.dumps(contract_data, indent=2))
                 raise ApiException('fakturia-error', 'Fehler beim Übertragen an Fakturia', data={"export_data": export_data, "response": contract_data})
         else:
-            contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data, api_key=api_key)
+            contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data, token=api_key)
         if contract_data is not None and contract_data.get("contractStatus") == "DRAFT":
             response_activation = post(f"/Contracts/{deal.get('fakturia_contract_number')}/activate")
             print(json.dumps(response_activation, indent=2))
