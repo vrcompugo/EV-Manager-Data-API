@@ -68,11 +68,14 @@ def get_items(tree, sort, offset, limit, fields):
     return get_items_by_model(Order, OrderSchema, tree, sort, offset, limit, fields)
 
 
-def generate_contract_number(order: Order):
-    if order.category != "Cloud Verträge":
+def generate_contract_number(order: Order, number_prefix=None):
+    if order.category != "Cloud Verträge" and number_prefix is None:
         return None
     if order.contract_number not in [None, "", "X"]:
         return order.contract_number
     customer_counter = 300000 + order.id
-    customer_number_prefix = "C" + order.datetime.strftime("%y%m")
+    if number_prefix is None:
+        customer_number_prefix = "C" + order.datetime.strftime("%y%m")
+    else:
+        customer_number_prefix = number_prefix + order.datetime.strftime("%y%m")
     return f"{customer_number_prefix}{customer_counter}"

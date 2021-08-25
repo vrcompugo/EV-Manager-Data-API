@@ -4,9 +4,10 @@ import base64
 from app.modules.settings import get_settings
 
 
-def get(url, parameters=None):
+def get(url, parameters=None, token=None):
     config = get_settings("external/fakturia")
-    token = config["api-key"]
+    if token is None:
+        token = config["api-key"]
 
     if token is not None:
         response = requests.get(
@@ -21,10 +22,11 @@ def get(url, parameters=None):
     return {}
 
 
-def post(url, post_data=None, files=None):
+def post(url, post_data=None, files=None, token=None):
 
     config = get_settings("external/fakturia")
-    token = config["api-key"]
+    if token is None:
+        token = config["api-key"]
 
     response = requests.post(
         config["url"] + url,
@@ -41,10 +43,11 @@ def post(url, post_data=None, files=None):
         print("error1", response.text)
 
 
-def put(url, post_data=None, files=None):
+def put(url, post_data=None, files=None, token=None):
 
     config = get_settings("external/fakturia")
-    token = config["api-key"]
+    if token is None:
+        token = config["api-key"]
 
     response = requests.put(
         config["url"] + url,

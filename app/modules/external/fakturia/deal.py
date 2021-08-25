@@ -18,7 +18,6 @@ from .customer import export_contact
 
 
 def get_contract_data_by_deal(deal_id):
-    config = get_settings("external/bitrix24")
     deal = get_deal(deal_id)
     if deal is None:
         raise ApiException('deal not found', 'Auftrag nicht gefunden')
@@ -59,6 +58,13 @@ def get_service_contract_data_by_deal(deal):
     delivery_begin = None
     if deal.get("activation_date") not in [None, "", "None"]:
         delivery_begin = deal.get("activation_date")[0:deal.get("activation_date").find("T")]
+        deal["sepa_mandate_since"] = delivery_begin
+        update_deal(id=deal["id"], data={
+            "sepa_mandate_since": delivery_begin
+        })
+        delivery_begin = datetime.datetime.strptime(delivery_begin, "%Y-%m-%d")
+        year = delivery_begin.year + 1
+        delivery_begin = str(year) + delivery_begin.strftime("-%m-%d")
     if len(deal["item_lists"]) > 0:
         deal["item_lists"][0]["start"] = delivery_begin
         deal["item_lists"][0]["items"][0]["deal"]["link"] = deal["link"]
@@ -67,6 +73,7 @@ def get_service_contract_data_by_deal(deal):
         iban = deal.get("iban").replace(" ", "")
     if deal.get("bic") not in [None]:
         bic = deal.get("bic").replace(" ", "")
+
     deal["fakturia"] = {
         "customer_number": contact.get("fakturia_number"),
         "iban": iban,
@@ -436,6 +443,62 @@ def _is_consumer_deal(deal):
 
 
 def get_export_data(deal, contact):
+    if deal["category_id"] == "15":
+        return get_export_data_cloud(deal, contact)
+    if deal["category_id"] == "68":
+        return get_export_data_service(deal, contact)
+    return None, None, None
+
+
+def get_export_data_service(deal, contact):
+    config = get_settings("external/fakturia")
+    subscriptionItemsPrices = []
+    data = {
+        "customerNumber": contact.get("fakturia_number"),
+        "projectName": "Contracting Vertrag PV",
+        "subscription": {
+            "termPeriod": 1,
+            "termUnit": "YEAR",
+            "noticePeriod": 0,
+            "noticeUnit": "DAY",
+            "continuePeriod": 0,
+            "continueUnit": "DAY",
+            "billedInAdvance": True,
+            "subscriptionItems": [{
+                "itemNumber": "CV-RC 00092021",
+                "quantity": 1,
+                "extraDescription": "",
+                "description": "",
+                "unit": "YEAR",
+                "validFrom": deal["fakturia"].get("delivery_begin"),
+                "ccQuantityChange": False,
+                "status": "ACTIVE",
+                "activityType": "DEFAULT_PERFORMANCE"
+            }],
+            "status": "ACTIVE"
+        },
+        "contractNumber": deal["fakturia"].get("contract_number"),
+        "name": deal["fakturia"].get("contract_number"),
+        "issueDate": deal["fakturia"].get("delivery_begin"),
+        "recur": 1,
+        "recurUnit": "YEAR",
+        "duePeriod": 0,
+        "dueUnit": "DAY",
+        "paymentMethod": "SEPA_DEBIT",
+        "contractStatus": "ACTIVE",
+        "trialPeriod": 0,
+        "trialUnit": "DAY",
+        "trialPeriodEndAction": "CONTINUE",
+        "hasTrialperiod": False,
+        "ccDisallowTermination": True,
+        "taxConfig": "AUTOMATIC",
+        "documentDeliveryMode": "EMAIL"
+    }
+    return data, subscriptionItemsPrices, config.get("api-key-contracting")
+
+
+def get_export_data_cloud(deal, contact):
+    is_negative = False
     subscriptionItems = []
     subscriptionItemsPrices = []
     for item_list in deal.get("item_lists"):
@@ -457,6 +520,7 @@ def get_export_data(deal, contact):
         if cost < 0:
             item_data["activityType"] = "REVERSE_PERFORMANCE_OTHER"
             cost = cost * -1
+            is_negative = True
         subscriptionItemsPrices.append({
             "cost": cost,
             "currency": "EUR",
@@ -485,7 +549,7 @@ def get_export_data(deal, contact):
         "recurUnit": "MONTH",
         "duePeriod": 0,
         "dueUnit": "DAY",
-        "paymentMethod": "SEPA_DEBIT",
+        "paymentMethod": "BANKTRANSFER" if is_negative else "SEPA_DEBIT",
         "contractStatus": "ACTIVE",
         "trialPeriod": 0,
         "trialUnit": "DAY",
@@ -504,10 +568,10 @@ def get_export_data(deal, contact):
             data["issueDate"] = issue_date.strftime("%Y-%m-01")
         else:
             data["issueDate"] = issue_date.strftime("%Y-%m-15")
-    return data, subscriptionItemsPrices
+    return data, subscriptionItemsPrices, None
 
 
-def export_cloud_deal(deal_id):
+def export_deal(deal_id):
     print("export deal:", deal_id)
     deal = get_contract_data_by_deal(deal_id)
     contact = get_contact(deal.get("contact_id"))
@@ -537,11 +601,11 @@ def export_cloud_deal(deal_id):
         print(contact["id"], "customer wrong iban", contact.get("fakturia_iban"), deal["fakturia"]["iban"])
         raise ApiException('wrong-iban', 'Kunden IBAN stimmt nicht mit Auftrags IBAN übrein')
     export_contact(contact, force=True)
-    export_data, subscriptionItemsPrices = get_export_data(deal, contact)
+    export_data, subscriptionItemsPrices, api_key = get_export_data(deal, contact)
     if export_data is not None:
         contract_data = None
         if deal.get("fakturia_contract_number") in ["", None, 0, "0"]:
-            contract_data = post(f"/Contracts", post_data=export_data)
+            contract_data = post(f"/Contracts", post_data=export_data, api_key=api_key)
             if contract_data is not None and "contractNumber" in contract_data:
                 print(json.dumps(contract_data, indent=2))
                 deal["fakturia_contract_number"] = contract_data["contractNumber"]
@@ -549,13 +613,14 @@ def export_cloud_deal(deal_id):
                     "fakturia_contract_number": contract_data["contractNumber"]
                 })
                 for index, item in enumerate(contract_data.get("subscription").get("subscriptionItems")):
-                    response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}/customPrices", post_data=subscriptionItemsPrices[index])
-                    print(json.dumps(response_item, indent=2))
+                    if len(subscriptionItemsPrices) > index:
+                        response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{item.get('uuid')}/customPrices", post_data=subscriptionItemsPrices[index], api_key=api_key)
+                        print(json.dumps(response_item, indent=2))
             else:
                 print("contract error", json.dumps(export_data, indent=2), json.dumps(contract_data, indent=2))
                 raise ApiException('fakturia-error', 'Fehler beim Übertragen an Fakturia', data={"export_data": export_data, "response": contract_data})
         else:
-            contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data)
+            contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data, api_key=api_key)
         if contract_data is not None and contract_data.get("contractStatus") == "DRAFT":
             response_activation = post(f"/Contracts/{deal.get('fakturia_contract_number')}/activate")
             print(json.dumps(response_activation, indent=2))
