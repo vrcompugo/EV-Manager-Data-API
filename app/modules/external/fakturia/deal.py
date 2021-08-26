@@ -104,7 +104,7 @@ def initilize_service_contract_data(deal):
                     "tax_rate": 19,
                     "total_price": 72,
                     "total_price_net": 60.5042,
-                    "deal": deal
+                    "deal": {"id": deal["id"]}
                 }]
             }
         ]
