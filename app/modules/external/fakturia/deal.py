@@ -37,15 +37,15 @@ def get_service_contract_data_by_deal(deal):
     if contract_number in [None, ""]:
         order = order_import(remote_id=deal["id"])
         if order is None:
-            return {"status": "failed", "data": {}, "message": "import failed"}
+            raise ApiException('order import failed', 'Order Import failed')
         contract_number = generate_contract_number(order, number_prefix="")
         if contract_number not in [None, ""]:
             order.contract_number = contract_number
             db.session.commit()
-        deal["service_contract_number"] = contract_number
-        update_deal(id=deal["id"], data={
-            "service_contract_number": contract_number
-        })
+            deal["service_contract_number"] = contract_number
+            update_deal(id=deal["id"], data={
+                "service_contract_number": contract_number
+            })
     if contract_number in [None, ""]:
         raise ApiException('contract_number_failed', 'Vertragsnummer konnte nicht erzeugt werden')
     data = load_json_data(deal.get("fakturia_data"))
@@ -494,6 +494,15 @@ def get_export_data_service(deal, contact):
         "taxConfig": "AUTOMATIC",
         "documentDeliveryMode": "EMAIL"
     }
+    issue_date = datetime.datetime.strptime(data["issueDate"], '%Y-%m-%d')
+    if issue_date.day > 15:
+        next_billing_date = issue_date + datetime.timedelta(days=20)
+        data["issueDate"] = next_billing_date.strftime("%Y-%m-01")
+    else:
+        if issue_date.day == 1:
+            data["issueDate"] = issue_date.strftime("%Y-%m-01")
+        else:
+            data["issueDate"] = issue_date.strftime("%Y-%m-15")
     return data, subscriptionItemsPrices, config.get("api-key-contracting")
 
 

@@ -303,6 +303,21 @@ def set_default_data(deal):
         return None
     if history.data.get("data").get("cloud_number") in [None, "None", "0", 0, ""]:
         return None
-    deal["cloud_number"] = history.data.get("data").get("cloud_number")
-    update_deal(deal["id"], {"cloud_number": deal["cloud_number"]})
-    return deal
+    update_data = {}
+    update_data["cloud_number"] = history.data.get("data").get("cloud_number")
+    '''
+                    "lightcloud_usage": "UF_CRM_1597757913754",
+                    "heatcloud_usage": "UF_CRM_1597757931782",
+                    "ecloud_usage": "UF_CRM_1607944188",
+                    "cloud_monthly_cost": "UF_CRM_1612265225",
+                    "cloud_yearly_usage": "UF_CRM_1585822072",
+                    "has_emove_package": "UF_CRM_1620741780",
+                    "emove_usage_inhouse": "UF_CRM_1620741150",
+                    "emove_usage_outside": "UF_CRM_1620740831",
+                    "is_negative_cloud": "UF_CRM_1607944340",
+                    "cloud_runtime": "UF_CRM_1597758014166",
+                    "counter_main": "UF_CRM_1585821761",
+                    "counter_heatcloud": "UF_CRM_1597757955687",
+                    "counter_ecloud": "UF_CRM_1611239704"'''
+    update_deal(deal["id"], update_data)
+    return get_deal(deal["id"])
