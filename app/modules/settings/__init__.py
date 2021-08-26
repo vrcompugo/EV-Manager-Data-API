@@ -374,7 +374,8 @@ def get_settings(section=None, domain_raw=None):
                     "counter_ecloud": "UF_CRM_1611239704",
                     "service_contract_number": "UF_CRM_1629883807207",
                     "insurance_contract_number": "UF_CRM_1629884046755",
-                    "activation_date": "UF_CRM_1578322311"
+                    "activation_date": "UF_CRM_1578322311",
+                    "pv_kwp": "UF_CRM_1578671105"
                 }
             },
             "quote": {

@@ -21,12 +21,54 @@ def get_contract_data_by_deal(deal_id):
     deal = get_deal(deal_id)
     if deal is None:
         raise ApiException('deal not found', 'Auftrag nicht gefunden')
-    if deal.get("category_id") not in ["15", "68"]:
+    if deal.get("category_id") not in ["15", "68", "70"]:
         return {"status": "failed", "data": {"error": "Nur in Cloud Pipeline verfügbar"}, "message": ""}
     if deal.get("category_id") == "15":
         return get_cloud_contract_data_by_deal(deal)
     if deal.get("category_id") == "68":
         return get_service_contract_data_by_deal(deal)
+    if deal.get("category_id") == "70":
+        return get_insurance_contract_data_by_deal(deal)
+
+
+def get_insurance_contract_data_by_deal(deal):
+    deal = get_service_contract_data_by_deal(deal)
+    if "item_lists" in deal:
+        if len(deal["item_lists"]) > 0 and deal["item_lists"][0]["items"][0]["type"] != "insurance":
+            price = 0
+            if 0 <= float(deal.get("pv_kwp")) < 10:
+                price = 99
+            if 10 <= float(deal.get("pv_kwp")) <= 19:
+                price = 149
+            if 19 < float(deal.get("pv_kwp")) < 30:
+                price = 179
+            if 30 <= float(deal.get("pv_kwp")) < 70:
+                price = 369
+            if 70 <= float(deal.get("pv_kwp")):
+                price = float(deal.get("pv_kwp")) * 5.5
+            data = {
+                "item_lists": [
+                    {
+                        "start": None,
+                        "end": None,
+                        "items": [{
+                            "type": "insurance",
+                            "label": "PV Versicherung",
+                            "description": "Contracting Vertrag - Photovoltaik Versicherung",
+                            "tax_rate": 19,
+                            "total_price": price,
+                            "total_price_net": price / 1.19,
+                            "deal": {"id": deal["id"], "title": deal["title"]}
+                        }]
+                    }
+                ]
+            }
+            deal["item_lists"] = data["item_lists"]
+            update_deal(deal.get("id"), {
+                "fakturia_data": store_json_data(data)
+            })
+    return deal
+
 
 
 def get_service_contract_data_by_deal(deal):
@@ -453,6 +495,33 @@ def get_export_data(deal, contact):
 def get_export_data_service(deal, contact):
     config = get_settings("external/fakturia")
     subscriptionItemsPrices = []
+    subscriptionItems = []
+    for item_list in deal.get("item_lists"):
+        for item in item_list["items"]:
+            if item_list["start"] in [None, "", "0000-00-00"]:
+                item_list["start"] = deal["fakturia"].get("delivery_begin")
+            item_data = {
+                "quantity": 1,
+                "extraDescription": "",
+                "description": "",
+                "unit": "YEAR",
+                "validFrom": item_list["start"],
+                "ccQuantityChange": False,
+                "status": "ACTIVE",
+                "activityType": "DEFAULT_PERFORMANCE"
+            }
+            if item["type"] == "service":
+                item_data["itemNumber"] = "CV-RC 00092021"
+            if item["type"] == "service":
+                item_data["itemNumber"] = "CV-0092020"
+                cost = round(float(item["total_price"]) / 1.19, 4)
+                subscriptionItemsPrices.append({
+                    "cost": cost,
+                    "currency": "EUR",
+                    "validFrom": "",
+                    "minimumQuantity": 1
+                })
+            subscriptionItems.append(item_data)
     data = {
         "customerNumber": contact.get("fakturia_number"),
         "projectName": "Contracting Vertrag PV",
@@ -464,17 +533,7 @@ def get_export_data_service(deal, contact):
             "continuePeriod": 0,
             "continueUnit": "DAY",
             "billedInAdvance": True,
-            "subscriptionItems": [{
-                "itemNumber": "CV-RC 00092021",
-                "quantity": 1,
-                "extraDescription": "",
-                "description": "",
-                "unit": "YEAR",
-                "validFrom": deal["fakturia"].get("delivery_begin"),
-                "ccQuantityChange": False,
-                "status": "ACTIVE",
-                "activityType": "DEFAULT_PERFORMANCE"
-            }],
+            "subscriptionItems": subscriptionItems,
             "status": "ACTIVE"
         },
         "contractNumber": deal["fakturia"].get("contract_number"),
