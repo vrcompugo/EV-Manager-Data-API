@@ -206,7 +206,7 @@ def run_cron_add_missing_values():
                 update_data = {
                     "cloud_type": cloud_type,
                     "storage_size": storage_size,
-                    "inverter_type": ["WR im SENEC"],
+                    "inverter_type": ["Fremdwechselrichter (Fronius bevorzugt) oder 10 Jahre Garantie WR"],
                     "extra_packages": [],
                     "extra_packages2": [],
                     "quote_type2": [],
