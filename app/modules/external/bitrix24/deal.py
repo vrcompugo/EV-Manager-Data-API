@@ -217,10 +217,11 @@ def run_cron_add_missing_values():
                     "emove_packet": "none",
                     "hwp": ["keine Auswahl"]
                 }
+                update_data["storage_model"] = ["Senec Home 2.1"]
+                update_data["extra_packages2"].append("Senec Wechselrichtergarantie 20 Jahre")
                 if history.data["data"].get("has_pv_quote") is True:
                     if "solaredge" in history.data["data"]["extra_options"]:
                         update_data["inverter_type"] = ["Solar Edge (Optimierer laut Auslegung)"]
-                        update_data["storage_model"] = ["Senec Home 2.1"]
                     if "technik_service_packet" in history.data["data"]["extra_options"]:
                         update_data["extra_packages"] = ["Technik & Service (Anschlussgarantie, Technikpaket, Portal)"]
                     if "wallbox" in history.data["data"]["extra_options"]:
