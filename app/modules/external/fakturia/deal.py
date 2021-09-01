@@ -730,3 +730,18 @@ def run_cron_export():
             update_deal(deal["id"], {
                 "stage_id": "C70:7"
             })
+    deals = get_deals({
+        "FILTER[CATEGORY_ID]": "68",
+        "FILTER[STAGE_ID]": "C68:NEW",
+        "SELECT": "full"
+    })
+    for deal in deals:
+        if deal.get("iban") not in [None, "", "None"]:
+            if deal.get("fakturia_contract_number") in [None, "", "None"]:
+                export_deal(deal["id"])
+                deal = get_deal(deal["id"])
+        if deal.get("fakturia_contract_number") not in [None, "", "None"]:
+            print(deal.get("fakturia_contract_number"))
+            update_deal(deal["id"], {
+                "stage_id": "C68:PREPARATION"
+            })
