@@ -489,8 +489,14 @@ def get_export_data(deal, contact):
         return get_export_data_cloud(deal, contact)
     if deal["category_id"] == "68":
         return get_export_data_service(deal, contact)
+    if deal["category_id"] == "70":
+        return get_export_data_insurance(deal, contact)
     return None, None, None
 
+
+def get_export_data_insurance(deal, contact):
+    data, subscriptionItemsPrices, api_key = get_export_data_service(deal, contact)
+    return data, subscriptionItemsPrices, api_key
 
 def get_export_data_service(deal, contact):
     config = get_settings("external/fakturia")
@@ -512,7 +518,7 @@ def get_export_data_service(deal, contact):
             }
             if item["type"] == "service":
                 item_data["itemNumber"] = "CV-RC 00092021"
-            if item["type"] == "service":
+            if item["type"] == "insurance":
                 item_data["itemNumber"] = "CV-0092020"
                 cost = round(float(item["total_price"]) / 1.19, 4)
                 subscriptionItemsPrices.append({
