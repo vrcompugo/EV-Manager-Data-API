@@ -699,3 +699,34 @@ def export_deal(deal_id):
             response_activation = post(f"/Contracts/{deal.get('fakturia_contract_number')}/activate")
             print(json.dumps(response_activation, indent=2))
     return deal
+
+
+def run_cron_export():
+    deals = get_deals({
+        "FILTER[CATEGORY_ID]": 70,
+        "FILTER[STAGE_ID]": "C70:3",
+        "SELECT": "full"
+    })
+    for deal in deals:
+        if deal.get("iban") not in [None, "", "None"]:
+            contracting_deals = get_deals({
+                "FILTER[CATEGORY_ID]": 68,
+                "FILTER[STAGE_ID]": "C68:NEW",
+                "FILTER[UF_CRM_5FA43F983EBAB]": deal.get("unique_identifier"),
+                "SELECT": "full"
+            })
+            if len(contracting_deals) > 0:
+                if contracting_deals[0].get("iban") in [None, "", "None"]:
+                    update_deal(contracting_deals[0]["id"], {
+                        "iban": deal.get("iban"),
+                        "bic": deal.get("bic"),
+                        "bank": deal.get("bank")
+                    })
+            if deal.get("fakturia_contract_number") in [None, "", "None"]:
+                export_deal(deal["id"])
+                deal = get_deal(deal["id"])
+        if deal.get("fakturia_contract_number") not in [None, "", "None"]:
+            print(deal.get("fakturia_contract_number"))
+            update_deal(deal["id"], {
+                "stage_id": "C70:7"
+            })
