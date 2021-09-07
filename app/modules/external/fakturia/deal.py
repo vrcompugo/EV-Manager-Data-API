@@ -344,18 +344,23 @@ def add_item_list(deal_id, newData):
         last_list = data["item_lists"][len(data["item_lists"]) - 1]
     if last_list is not None and last_list.get("start") not in [None, "", "0000-00-00"]:
         last_start = datetime.datetime.strptime(last_list.get("start"), '%Y-%m-%d')
+    if last_start is None:
+        if "fakturia" in newData and "delivery_begin" in newData["fakturia"] and newData["fakturia"]["delivery_begin"] not in [None, "None", ""]:
+            last_start = datetime.datetime.strptime(newData["fakturia"]["delivery_begin"], '%Y-%m-%d')
     if new_start is not None:
-        new_start = new_start.strftime('%Y-%m-%d')
         if new_start < datetime.datetime.now():
             raise ApiException('newItemsList_not_found', 'Startdatum muss neuer sein als das aktuelle Datum')
         if last_start is not None and new_start < last_start:
             raise ApiException('newItemsList_not_found', 'Startdatum muss neuer sein als das letzte Startdatum')
     if new_start is None and len(data["item_lists"]) == 1:
+        if last_start < datetime.datetime.now():
+            raise ApiException('newItemsList_not_found', 'Startdatum muss neuer sein als das letzte Startdatum')
         data["item_lists"][0] = {
             "start": new_start,
             "items": newData["newItemsList"].get("items")
         }
     else:
+        new_start = new_start.strftime('%Y-%m-%d')
         data["item_lists"].append({
             "start": new_start,
             "items": newData["newItemsList"].get("items")
@@ -556,7 +561,7 @@ def get_export_data_service(deal, contact):
         "trialPeriodEndAction": "CONTINUE",
         "hasTrialperiod": False,
         "ccDisallowTermination": True,
-        "taxConfig": "AUTOMATIC",
+        "taxConfig": "APPLY_ALWAYS",
         "documentDeliveryMode": "EMAIL"
     }
     issue_date = datetime.datetime.strptime(data["issueDate"], '%Y-%m-%d')
@@ -630,7 +635,7 @@ def get_export_data_cloud(deal, contact):
         "trialPeriodEndAction": "CONTINUE",
         "hasTrialperiod": False,
         "ccDisallowTermination": True,
-        "taxConfig": "AUTOMATIC",
+        "taxConfig": "APPLY_ALWAYS",
         "documentDeliveryMode": "EMAIL"
     }
     issue_date = datetime.datetime.strptime(data["issueDate"], '%Y-%m-%d')
@@ -676,12 +681,12 @@ def export_deal(deal_id):
         raise ApiException('wrong-iban', 'Kunden IBAN stimmt nicht mit Auftrags IBAN übrein')
     export_contact(contact, force=True)
     export_data, subscriptionItemsPrices, api_key = get_export_data(deal, contact)
+    print(json.dumps(export_data, indent=2))
     if export_data is not None:
         contract_data = None
         if deal.get("fakturia_contract_number") in ["", None, 0, "0"]:
             contract_data = post(f"/Contracts", post_data=export_data, token=api_key)
             if contract_data is not None and "contractNumber" in contract_data:
-                print(json.dumps(contract_data, indent=2))
                 deal["fakturia_contract_number"] = contract_data["contractNumber"]
                 update_deal(deal_id, {
                     "fakturia_contract_number": contract_data["contractNumber"]
