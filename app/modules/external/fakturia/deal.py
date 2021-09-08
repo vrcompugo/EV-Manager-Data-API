@@ -580,7 +580,7 @@ def get_export_data_cloud(deal, contact):
     is_negative = False
     subscriptionItems = []
     subscriptionItemsPrices = []
-    for item_list in deal.get("item_lists"):
+    for index, item_list in  enumerate(deal.get("item_lists")):
         item_list["sum"] = 0
         for item in item_list["items"]:
             item_list["sum"] = item_list["sum"] + float(item["total_price"])
@@ -595,6 +595,8 @@ def get_export_data_cloud(deal, contact):
             "status": "ACTIVE",
             "activityType": "DEFAULT_PERFORMANCE"
         }
+        if index < len(deal.get("item_lists")) - 1:
+            item_data["validTo"] = deal.get("item_lists")[index + 1]["start"]
         cost = round(item_list["sum"] / 1.19, 4)
         if cost < 0:
             item_data["activityType"] = "REVERSE_PERFORMANCE_OTHER"
@@ -700,6 +702,19 @@ def export_deal(deal_id):
                 raise ApiException('fakturia-error', 'Fehler beim Übertragen an Fakturia', data={"export_data": export_data, "response": contract_data})
         else:
             contract_data = put(f"/Contracts/{deal.get('fakturia_contract_number')}", post_data=export_data, token=api_key)
+            if contract_data is not None and "contractNumber" in contract_data:
+                for index, item in enumerate(export_data.get("subscription").get("subscriptionItems")):
+                    if len(contract_data.get("subscription").get("subscriptionItems")) <= index:
+                        response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems", post_data=item, token=api_key)
+                        print(json.dumps(response_item, indent=2))
+                        if len(subscriptionItemsPrices) > index:
+                            response_item = post(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{contract_data.get('subscription').get('subscriptionItems')[index].get('uuid')}/customPrices", post_data=subscriptionItemsPrices[index], token=api_key)
+                            print(json.dumps(response_item, indent=2))
+                    else:
+                        print(item)
+                        response_item = put(f"/Contracts/{deal.get('fakturia_contract_number')}/Subscription/SubscriptionItems/{contract_data.get('subscription').get('subscriptionItems')[index].get('uuid')}", post_data=item, token=api_key)
+                        print(json.dumps(response_item, indent=2))
+
         if contract_data is not None and contract_data.get("contractStatus") == "DRAFT":
             response_activation = post(f"/Contracts/{deal.get('fakturia_contract_number')}/activate")
             print(json.dumps(response_activation, indent=2))

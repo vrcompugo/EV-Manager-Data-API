@@ -375,7 +375,8 @@ def get_settings(section=None, domain_raw=None):
                     "service_contract_number": "UF_CRM_1629883807207",
                     "insurance_contract_number": "UF_CRM_1629884046755",
                     "activation_date": "UF_CRM_1578322311",
-                    "pv_kwp": "UF_CRM_1578671105"
+                    "pv_kwp": "UF_CRM_1578671105",
+                    "automatic_checked": "UF_CRM_1627383418"
                 }
             },
             "quote": {
