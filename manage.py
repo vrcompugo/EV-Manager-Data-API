@@ -41,18 +41,6 @@ def update_role_permissions():
 
 
 @manager.command
-def test_insign():
-    from app.modules.external.insign.signature import cli_command
-    cli_command()
-
-
-@manager.command
-def test_akjsdb():
-    from app.modules.external.mfr.task import export_by_bitrix_id
-    print(json.dumps(export_by_bitrix_id(102948), indent=2))
-
-
-@manager.command
 def import_mfr_tasks():
     from app.modules.external.bitrix24.task import get_tasks
     print("import mfr tasks")
