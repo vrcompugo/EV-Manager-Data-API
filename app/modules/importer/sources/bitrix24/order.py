@@ -414,27 +414,27 @@ def run_export(local_id=None, remote_id=None):
         print("run export order update", link.remote_id)
         post_data["id"] = link.remote_id
         response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
-    if "consumers" in order.data:
-        for i, consumer in enumerate(order.data["consumers"]):
-            link = find_association(f"OrderC{i}", local_id=local_id)
-            post_data = filter_export_input_cloud(consumer_data_base, order, consumer_index=i)
-            if link is None:
-                response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
-                if "result" in response:
-                    associate_item(f"OrderC{i}", local_id=local_id, remote_id=response["result"])
-            else:
-                post_data["id"] = link.remote_id
-                response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
-    if "ecloud_usage" in order.data and order.data["ecloud_usage"] != "" and order.data["ecloud_usage"] is not None and int(order.data["ecloud_usage"]) > 0:
-        link = find_association("OrderECloud", local_id=local_id)
-        post_data = filter_export_input_ecloud(consumer_data_base, order)
-        if link is None:
-            response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
-            if "result" in response:
-                associate_item("OrderECloud", local_id=local_id, remote_id=response["result"])
-        else:
-            post_data["id"] = link.remote_id
-            response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
+    # if "consumers" in order.data:
+    #     for i, consumer in enumerate(order.data["consumers"]):
+    #         link = find_association(f"OrderC{i}", local_id=local_id)
+    #         post_data = filter_export_input_cloud(consumer_data_base, order, consumer_index=i)
+    #        if link is None:
+    #            response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
+    #            if "result" in response:
+    #                associate_item(f"OrderC{i}", local_id=local_id, remote_id=response["result"])
+    #        else:
+    #            post_data["id"] = link.remote_id
+    #            response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
+    #if "ecloud_usage" in order.data and order.data["ecloud_usage"] != "" and order.data["ecloud_usage"] is not None and int(order.data["ecloud_usage"]) > 0:
+    #    link = find_association("OrderECloud", local_id=local_id)
+    #    post_data = filter_export_input_ecloud(consumer_data_base, order)
+    #    if link is None:
+    #        response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
+    #        if "result" in response:
+    #            associate_item("OrderECloud", local_id=local_id, remote_id=response["result"])
+    #    else:
+    #        post_data["id"] = link.remote_id
+    #        response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
 
 
 def run_export_fields(local_id=None, remote_id=None, fields=[]):
