@@ -216,6 +216,15 @@ def run_cron_export():
         "filter[>ACTIVITY_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     })
+    tasks2 = get_tasks({
+        "select": "full",
+        "filter[>CHANGED_DATE]": last_task_export_time,
+        "filter[TITLE]": "%[mfr]%"
+    })
+    for task in tasks2:
+        found = next((item for item in tasks if item.get("id") == task.get("id")), None)
+        if found is None:
+            tasks.append(task)
     print("time: ", last_task_export_time)
     last_task_export_time = datetime.now()
     for task in tasks:
