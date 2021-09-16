@@ -1,4 +1,5 @@
 from app.exceptions import ApiException
+from app.modules.auth import get_auth_info
 
 
 def calculate_commission_data(quote_data, data, quote_key=""):
@@ -43,14 +44,18 @@ def calculate_commission_data(quote_data, data, quote_key=""):
     quote_data["calculated"]["after_increase_total_net"] = quote_data["subtotal_net"]
     if data["data"].get(f"{quote_key}_discount_euro", None) is not None and data["data"].get(f"{quote_key}_discount_euro", None) != "" and float(data["data"][f"{quote_key}_discount_euro"]) > 0:
         data["data"][f"{quote_key}_discount_percent"] = round((float(data["data"][f"{quote_key}_discount_euro"]) / quote_data["subtotal_net"]) * 100, 2)
-        if quote_key == "pv_quote":
-            if data["data"][f"{quote_key}_discount_percent"] > 15:
-                data["data"][f"{quote_key}_discount_percent"] = 15
-                data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
+        auth_info = get_auth_info()
+        if auth_info is not None and "user" in auth_info and "id" in auth_info["user"] and auth_info["user"]["id"] == "1":
+            print(auth_info)
         else:
-            if data["data"][f"{quote_key}_discount_percent"] > 5:
-                data["data"][f"{quote_key}_discount_percent"] = 5
-                data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
+            if quote_key == "pv_quote":
+                if data["data"][f"{quote_key}_discount_percent"] > 15:
+                    data["data"][f"{quote_key}_discount_percent"] = 15
+                    data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
+            else:
+                if data["data"][f"{quote_key}_discount_percent"] > 5:
+                    data["data"][f"{quote_key}_discount_percent"] = 5
+                    data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
         quote_data["products"].append({
             "NAME": "Nachlass",
             "DESCRIPTION": f"",
