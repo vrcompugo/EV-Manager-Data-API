@@ -56,8 +56,8 @@ def get_insurance_contract_data_by_deal(deal):
                             "label": "PV Versicherung",
                             "description": "Contracting Vertrag - Photovoltaik Versicherung",
                             "tax_rate": 19,
-                            "total_price": price,
-                            "total_price_net": price / 1.19,
+                            "total_price": price * 1.19,
+                            "total_price_net": price,
                             "deal": {"id": deal["id"], "title": deal["title"]}
                         }]
                     }
@@ -144,8 +144,8 @@ def initilize_service_contract_data(deal):
                     "label": "Remote Care Jahres Beitrag",
                     "description": "Contracting Vertrag\n - Remote Care - Online Überwachung PV Anlage",
                     "tax_rate": 19,
-                    "total_price": 72,
-                    "total_price_net": 60.5042,
+                    "total_price": 72 * 1.19,
+                    "total_price_net": 72,
                     "deal": {"id": deal["id"], "title": deal["title"]}
                 }]
             }
