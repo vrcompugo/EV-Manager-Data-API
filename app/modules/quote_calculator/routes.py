@@ -870,11 +870,6 @@ def get_insign_session(data):
                 "id": f"BIC{suffix}",
                 "text": data["data"].get("bic")
             })
-        if "data" in data and "birthdate" in data["data"]:
-            sales_document["preFilledFields"].append({
-                "id": f"Geburtsdatum{suffix}",
-                "text": data["data"].get("birthdate")
-            })
         if "data" in data and "power_meter_number" in data["data"]:
             sales_document["preFilledFields"].append({
                 "id": f"Zähler Nummer{suffix}",
@@ -889,6 +884,11 @@ def get_insign_session(data):
         sales_document["preFilledFields"].append({
             "id": f"Wärme Zählernummer",
             "text": data["data"].get("heatcloud_power_meter_number")
+        })
+    if "data" in data and "birthdate" in data["data"]:
+        sales_document["preFilledFields"].append({
+            "id": f"Geburtsdatum",
+            "text": data["data"].get("birthdate")
         })
     if "contact" in data and "zip" in data["contact"]:
         abtrettung_document["preFilledFields"].append({
@@ -918,6 +918,10 @@ def get_insign_session(data):
         abtrettung_document["preFilledFields"].append({
             "id": f"Nachname",
             "text": data["contact"].get("lastname")
+        })
+        sales_document["preFilledFields"].append({
+            "id": f"Wohnort",
+            "text": data["contact"].get("city")
         })
     documents.append(sales_document)
     documents.append(abtrettung_document)
