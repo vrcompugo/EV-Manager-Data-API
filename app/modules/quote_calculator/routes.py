@@ -305,6 +305,51 @@ def quote_calculator_update(lead_id):
     return {"status": "success", "data": data}
 
 
+@blueprint.route("/<lead_id>/extra_data", methods=['PUT'])
+def quote_calculator_extra_data_update(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
+            status=501,
+            mimetype='application/json')
+    post_data = None
+    try:
+        post_data = request.json
+    except Exception as e:
+        pass
+    lead_id = int(lead_id)
+    if lead_id <= 0:
+        return Response(
+            '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
+            status=404,
+            mimetype='application/json')
+    history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    history.data = json.loads(json.dumps(history.data))
+    if "power_meter_number" in post_data:
+        history.data["data"]["power_meter_number"] = post_data["power_meter_number"]
+    if "heatcloud_power_meter_number" in post_data:
+        history.data["data"]["heatcloud_power_meter_number"] = post_data["heatcloud_power_meter_number"]
+    if "is_new_building" in post_data:
+        history.data["data"]["is_new_building"] = post_data["is_new_building"]
+        if post_data["is_new_building"] is True:
+            history.data["data"]["power_meter_number"] = "NEUBAU"
+            history.data["data"]["heatcloud_power_meter_number"] = "NEUBAU"
+    if "birthdate" in post_data:
+        history.data["data"]["birthdate"] = post_data["birthdate"]
+    if "iban" in post_data:
+        history.data["data"]["iban"] = post_data["iban"]
+    if "bic" in post_data:
+        history.data["data"]["bic"] = post_data["bic"]
+    if "bankname" in post_data:
+        history.data["data"]["bankname"] = post_data["bankname"]
+    for index, consumer in enumerate(post_data["consumers"]):
+        if "power_meter_number" in consumer:
+            history.data["data"]["consumers"][index]["power_meter_number"] = consumer["power_meter_number"]
+    db.session.commit()
+    return {"status": "success", "data": history.data}
+
+
 @blueprint.route("/<lead_id>/cloud_pdfs", methods=['PUT'])
 def quote_calculator_cloud_pdfs(lead_id):
     from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
@@ -778,18 +823,105 @@ def get_insign_session(data):
             "signatures": signatures
         })
 
-    documents.append({
+    sales_document = {
         "id": data["pdf_contract_summary_part1_file_id"],
-        "displayname": "Verkaufsunterlagen"
-    })
-    documents.append({
-        "id": data["pdf_contract_summary_part2_file_id"],
-        "displayname": "Abtretungsformular"
-    })
-    documents.append({
+        "displayname": "Verkaufsunterlagen",
+        "preFilledFields": []
+    }
+    contracting_document = {
         "id": data["pdf_contract_summary_part3_file_id"],
-        "displayname": "Contractigvertrag"
-    })
+        "displayname": "Contractigvertrag",
+        "preFilledFields": []
+    }
+    abtrettung_document = {
+        "id": data["pdf_contract_summary_part2_file_id"],
+        "displayname": "Abtretungsformular",
+        "preFilledFields": []
+    }
+    for n in range(0,7):
+        suffix = f"#{n}"
+        if "contact" in data and "zip" in data["contact"]:
+            contracting_document["preFilledFields"].append({
+                "id": f"Name und Vorname{suffix}",
+                "text": data["contact"].get("firstname") + " " + data["contact"].get("lastname")
+            })
+            contracting_document["preFilledFields"].append({
+                "id": f"PLZ, Ort{suffix}",
+                "text": data["contact"].get("zip") + " " + data["contact"].get("city")
+            })
+            sales_document["preFilledFields"].append({
+                "id": f"Name und Vorname{suffix}",
+                "text": data["contact"].get("firstname") + " " + data["contact"].get("lastname")
+            })
+            sales_document["preFilledFields"].append({
+                "id": f"PLZ, Ort{suffix}",
+                "text": data["contact"].get("zip") + " " + data["contact"].get("city")
+            })
+            sales_document["preFilledFields"].append({
+                "id": f"Wohnort{suffix}",
+                "text": data["contact"].get("city")
+            })
+        if "data" in data and "iban" in data["data"]:
+            contracting_document["preFilledFields"].append({
+                "id": f"IBAN{suffix}",
+                "text": data["data"].get("iban")
+            })
+            contracting_document["preFilledFields"].append({
+                "id": f"BIC{suffix}",
+                "text": data["data"].get("bic")
+            })
+        if "data" in data and "birthdate" in data["data"]:
+            sales_document["preFilledFields"].append({
+                "id": f"Geburtsdatum{suffix}",
+                "text": data["data"].get("birthdate")
+            })
+        if "data" in data and "power_meter_number" in data["data"]:
+            sales_document["preFilledFields"].append({
+                "id": f"Zähler Nummer{suffix}",
+                "text": data["data"].get("power_meter_number")
+            })
+        if "data" in data and "heatcloud_power_meter_number" in data["data"]:
+            sales_document["preFilledFields"].append({
+                "id": f"Wärme Zählernummer{suffix}",
+                "text": data["data"].get("heatcloud_power_meter_number")
+            })
+    if "data" in data and "heatcloud_power_meter_number" in data["data"]:
+        sales_document["preFilledFields"].append({
+            "id": f"Wärme Zählernummer",
+            "text": data["data"].get("heatcloud_power_meter_number")
+        })
+    if "contact" in data and "zip" in data["contact"]:
+        abtrettung_document["preFilledFields"].append({
+            "id": f"Ort",
+            "text": data["contact"].get("city")
+        })
+        abtrettung_document["preFilledFields"].append({
+            "id": f"PLZ",
+            "text": data["contact"].get("zip")
+        })
+        abtrettung_document["preFilledFields"].append({
+            "id": f"PLZ, Ort",
+            "text": data["contact"].get("zip") + " " + data["contact"].get("city")
+        })
+        abtrettung_document["preFilledFields"].append({
+            "id": f"Strasse",
+            "text": data["contact"].get("street")
+        })
+        abtrettung_document["preFilledFields"].append({
+            "id": f"Hausnummer",
+            "text": data["contact"].get("street_nb")
+        })
+        abtrettung_document["preFilledFields"].append({
+            "id": f"Vorname",
+            "text": data["contact"].get("firstname")
+        })
+        abtrettung_document["preFilledFields"].append({
+            "id": f"Nachname",
+            "text": data["contact"].get("lastname")
+        })
+    documents.append(sales_document)
+    documents.append(abtrettung_document)
+    documents.append(contracting_document)
     if "pdf_contract_summary_part4_file_id" in data:
         documents.append({
             "id": data["pdf_contract_summary_part4_file_id"],
@@ -817,11 +949,7 @@ def get_insign_session(data):
         "userFullName": f'{data["assigned_user"]["NAME"]} {data["assigned_user"]["LAST_NAME"]}',
         "userEmail": data["assigned_user"]["EMAIL"],
         "serverSidecallbackURL": f"https://api.korbacher-energiezentrum.de/quote_calculator/insign/callback/{token['token']}",
-        "documents": documents,
-        "deliveryConfig": {
-            "emailEmpfaengerBCC": 'bcc@hbb-werbung.de',
-            "empfaengerBCCExtern": 'bcc@hbb-werbung.de',
-        }
+        "documents": documents
     })
 
 
