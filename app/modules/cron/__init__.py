@@ -50,10 +50,10 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "aev_lead_convert":
-        from app.modules.external.bitrix24.lead import run_aev_lead_convert
+    if section == "productive" or section == "bennemann_lead_convert":
+        from app.modules.external.bitrix24.lead import run_bennemann_lead_convert
         try:
-            run_aev_lead_convert()
+            run_bennemann_lead_convert()
         except Exception as e:
             error_handler()
 

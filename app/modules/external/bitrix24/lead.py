@@ -4,7 +4,7 @@ import json
 from app.modules.settings import get_settings, set_settings
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.user import get_user
-from app.modules.external.bitrix24.deal import add_deal, get_deals
+from app.modules.external.bitrix24.deal import add_deal, get_deals, update_deal
 from app.utils.dict_func import flatten_dict
 
 from ._connector import get, post
@@ -235,3 +235,31 @@ def run_aev_lead_convert():
         if config is not None:
             config["last_import"] = now.astimezone().isoformat()
         set_settings("external/bitrix24/aev_lead_convert", config)
+
+
+def run_bennemann_lead_convert():
+    config = get_settings("external/bitrix24/bennemann_lead_convert")
+    print("bennemann_lead_convert")
+    if config is None:
+        print("no config for bennemann_lead_convert import")
+        return None
+    now = datetime.now()
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
+        "FILTER[CATEGORY_ID]": "180"
+    })
+    if deals is not None:
+        for deal in deals:
+            if deal.get("unique_identifier") in [None, "", "None", "0"]:
+                lead_data = deal
+                lead_data["status_id"] = "16"
+                lead = add_lead(deal)
+                if lead is not None and "id" in lead:
+                    update_deal(deal.get("id"), {
+                        "unique_identifier": lead.get("id")
+                    })
+        config = get_settings("external/bitrix24/bennemann_lead_convert")
+        if config is not None:
+            config["last_import"] = now.astimezone().isoformat()
+        set_settings("external/bitrix24/bennemann_lead_convert", config)
