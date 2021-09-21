@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 from app import db
-from app.modules.external.bitrix24.contact import update_contact as update_bitrix_contact
+from app.modules.external.bitrix24.contact import get_contacts, update_contact as update_bitrix_contact
 from app.modules.settings import set_settings, get_settings
 from app.modules.external.bitrix24.contact import get_contact as get_bitrix_contact, get_contacts_by_changedate as get_bitrix_contacts_by_changedate
 from app.modules.external.bitrix24.company import get_company as get_bitrix_company
@@ -59,12 +59,11 @@ def run_cron_export():
         return None
 
     import_time = datetime.now()
-    if "last_contact_export_time" not in config:
-        contacts = get_bitrix_contacts_by_changedate("2021-01-20 00:00:00")
-    else:
-        contacts = get_bitrix_contacts_by_changedate(config["last_contact_export_time"])
+    contacts = get_contacts({
+        "SELECT": "full",
+        "FILTER[>DATE_MODIFY]": str(config.get("last_contact_export_time", "2021-01-20 00:00:00"))
+    })
     for contact in contacts:
-        contact = get_bitrix_contact(contact["id"])
         export_contact(contact)
     config = get_settings("external/fakturia")
     if config is not None:
@@ -76,9 +75,12 @@ def export_contact(contact, force=False):
     company = None
     if contact.get("company_id", 0) is not None and int(contact.get("company_id", 0)) > 0:
         company = get_bitrix_company(int(contact.get("company_id")))
-    export_data = get_export_data(contact, company)
 
-    if contact.get("fakturia_number") in ["", None] and "email" in export_data:
+    if contact.get("fakturia_number") in ["", None]:
+        export_data = get_export_data(contact, company)
+        if export_data is None or "email" not in export_data:
+            print("no export data")
+            return
         customer_data = post(f"/Customers", post_data=export_data)
         print(json.dumps(customer_data, indent=2))
         if customer_data is not None and "customerNumber" in customer_data:
@@ -101,6 +103,7 @@ def export_contact(contact, force=False):
             print(json.dumps(customer_data, indent=2))
     else:
         if force:
+            export_data = get_export_data(contact, company)
             customer_data = put(f"/Customers/{contact.get('fakturia_number')}", post_data=export_data)
             if contact.get("sepa_mandate_since") not in [None, "None", ""]:
                 mandates = get(f"/Customers/{contact.get('fakturia_number')}/SepaDebitMandates")
