@@ -234,12 +234,12 @@ def run_cron_folder_creation():
     })
 
     for contact in contacts:
-        print("contact:", contact["id"])
         post_data = {}
         for folder in config["folders"]:
             subpath = f"Kunde {contact['id']}"
             base_url = folder['base_url'].strip("/")
             if contact.get(folder["key"]) != f"{base_url}/{subpath}":
+                print("folderlink", contact.get(folder["key"]), f"{base_url}/{subpath}")
                 new_folder_id = create_folder_path(folder["folder_id"], subpath)
                 if new_folder_id is not None:
                     if folder["key"] == "drive_myportal_folder":
@@ -249,6 +249,7 @@ def run_cron_folder_creation():
                         create_folder_path(new_folder_id, "Verschiedenes")
                     post_data[folder["key"]] = f"{base_url}/{subpath}"
         if len(post_data) > 0:
+            print("update contact:", contact["id"])
             update_contact(contact["id"], post_data)
 
     drive_insurance_folder = next((item for item in config["folders"] if item["key"] == "drive_insurance_folder"), None)
