@@ -122,6 +122,7 @@ def add_contact(data, domain=None):
 
 def update_contact(id, data, domain=None):
     update_data = {"id": id}
+    print("update_contact_run", id)
     config = get_settings(section="external/bitrix24", domain_raw=domain)
     fields = config["contact"]["fields"]
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
