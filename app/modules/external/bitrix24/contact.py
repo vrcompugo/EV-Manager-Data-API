@@ -68,6 +68,12 @@ def get_contacts_by_changedate(changedate):
 def get_contacts(payload):
     payload["start"] = 0
     result = []
+    if "SELECT" in payload and payload["SELECT"] == "full":
+        del payload["SELECT"]
+        config = get_settings(section="external/bitrix24")
+        payload["SELECT[0]"] = "*"
+        for index, field in enumerate(config["contact"]["fields"]):
+            payload[f"SELECT[{index + 1}]"] = config["contact"]["fields"][field]
     while payload["start"] is not None:
         data = post("crm.contact.list", payload)
         if "result" in data:
