@@ -116,5 +116,5 @@ def export_contact(contact, force=False):
                         "issueDate": contact.get('sepa_mandate_since')[:10]
                     })
         else:
-            print(contact["id"], "no export", contact.get("DATE_MODIFY"))
+            print(contact["id"], "no export", contact.get("date_modify"))
 
