@@ -252,6 +252,9 @@ def run_bennemann_lead_convert():
     if deals is not None:
         for deal in deals:
             if deal.get("unique_identifier") in [None, "", "None", "0"]:
+                contact = get_contact(deal.get("contact_id"))
+                if contact.get("email") in [None, ""] or len(contact.get("email")) == 0:
+                    continue
                 lead_data = deal
                 lead_data["status_id"] = "16"
                 lead = add_lead(deal)
