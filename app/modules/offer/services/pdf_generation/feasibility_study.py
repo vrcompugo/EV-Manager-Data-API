@@ -297,6 +297,7 @@ def calculate_feasibility_study(offer: OfferV2):
     if data["loan_interest_rate"] > 0:
         if offer.reseller is not None and offer.reseller.document_style == "bsh":
             data["loan_calculation"] = loan_calculation_gross(data["pv_offer_total"] * 1.19, data["loan_upfront"], data["loan_interest_rate"], data["loan_runtime"])
+            print(data["loan_calculation"])
         else:
             data["loan_calculation"] = loan_calculation(data["pv_offer_total"], data["loan_upfront"], data["loan_interest_rate"], data["loan_runtime"])
         data["yearly_loan_payment"] = data["loan_calculation"]["yearly_payment"]
