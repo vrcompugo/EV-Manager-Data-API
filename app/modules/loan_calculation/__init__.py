@@ -53,7 +53,6 @@ def loan_calculation_gross(total_amount_gross, upfront_payment, interest_rate, r
     rest_loan = loan_amount
     for n in range(runtime_in_months):
         interest = rest_loan * (interest_rate / 12 / 100)
-        print(n, interest)
         data["interest_cost"] = data["interest_cost"] + interest
         rest_loan = rest_loan + interest - data["monthly_payment_with_tax"]
     data["total_cost"] = data["interest_cost"] + loan_amount
