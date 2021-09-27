@@ -191,26 +191,39 @@
             </td>
             <td class="align-right"><b>{{ data.loan_total | currencyformat("de", 0) }}</b></td>
           </tr>
+          {% if offer.reseller.document_style == "bsh" %}
+          <tr>
+            <td>
+              Cloud Gebühren<br>
+              + Wartung <small>({{ data.maintainance_cost_yearly }} €/Jahr)<br></small>
+              + Versicherung <small>({{ data.insurance_cost_yearly }} €/Jahr)<br></small>
+              + Reparaturrücklagen <small>(10% der Anschaffungskosten)</small>
+              {% if data.eeg_direct_usage_cost > 0 %}
+                <br>+ verminderte EEG Umlage nach §61 EEG
+              {% endif %}
+            </td>
+            <td class="align-right">
+              {{ data.cloud_subscription_total | currencyformat("de", 0) }}<br>
+              {{ data.maintainance_cost_total | currencyformat("de", 0) }}<br>
+              {{ data.insurance_cost_total | currencyformat("de", 0) }}<br>
+              {{ data.repair_cost_total | currencyformat("de", 0) }}<br>
+              {% if data.eeg_direct_usage_cost > 0 %}
+                {{ data.eeg_direct_usage_cost | currencyformat("de", 0) }}<br>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
           <tr>
             <td>
               Cloud Gebühren
-              {% if offer.reseller.document_style == "bsh" %}
-                <br>
-                + Wartung <small>({{ data.maintainance_cost_yearly }} €/Jahr)<br></small>
-                + Versicherung <small>({{ data.insurance_cost_yearly }} €/Jahr)<br></small>
-                + Reparaturrücklagen <small>(10% der Anschaffungskosten)</small>
-                {% if data.eeg_direct_usage_cost > 0 %}
-                <br>+ verminderte EEG Umlage nach §61 EEG
-                {% endif %}
-              {% else %}
-                <br>
-                <small>
-                    inkl. Remote Care | Versicherung und Rücklagen
-                </small>
-              {% endif %}
+              <br>
+              <small>
+                  inkl. Remote Care | Versicherung und Rücklagen
+              </small>
             </td>
             <td class="align-right"><b>{{ data.cloud_total | currencyformat("de", 0) }}</b></td>
           </tr>
+          {% endif %}
           <tr class="highlight" {% if data.loan_calculation and data.loan_calculation.upfront_payment > 0 %} style="background-color: #fff;" {% endif %}>
             <td>Gesamtkosten</td>
             <td class="align-right"><b>{{ data.cost_total | currencyformat("de", 0) }}</b></td>
