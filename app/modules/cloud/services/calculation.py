@@ -449,6 +449,9 @@ def factors_by_direction(direction):
     if direction == "north":
         direction_factor_kwp = 1.30
         direction_factor_production = 0.65
+    if direction == "north_west_east":
+        direction_factor_kwp = 1.17
+        direction_factor_production = 0.72
     if direction == "west_east":
         direction_factor_kwp = 1.05
         direction_factor_production = 0.8
