@@ -52,8 +52,6 @@ def import_mfr_tasks():
     print(len(tasks))
 
 
-
-
 @manager.command
 def test_special():
     from app.models import OfferV2, Order, ImportIdAssociation
