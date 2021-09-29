@@ -896,9 +896,15 @@ def get_insign_session(data):
             "id": f"IBAN",
             "text": data["data"].get("iban")
         })
+    if "data" in data and "bic" in data["data"]:
         contracting_document["preFilledFields"].append({
             "id": f"BIC",
             "text": data["data"].get("bic")
+        })
+    if "data" in data and "main_malo_id" in data["data"]:
+        abtrettung_document["preFilledFields"].append({
+            "id": f"malo id",
+            "text": data["data"].get("main_malo_id")
         })
     if "data" in data and "heatcloud_power_meter_number" in data["data"]:
         sales_document["preFilledFields"].append({
