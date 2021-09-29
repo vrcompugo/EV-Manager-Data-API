@@ -336,6 +336,7 @@ def quote_calculator_extra_data_update(lead_id):
         history.data["data"]["is_new_building"] = post_data["is_new_building"]
         if post_data["is_new_building"] is True:
             history.data["data"]["power_meter_number"] = "NEUBAU"
+            history.data["data"]["main_malo_id"] = "NEUBAU"
             history.data["data"]["heatcloud_power_meter_number"] = "NEUBAU"
     if "birthdate" in post_data:
         history.data["data"]["birthdate"] = post_data["birthdate"]
