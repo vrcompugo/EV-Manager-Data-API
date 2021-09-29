@@ -226,6 +226,12 @@ def quote_calculator_update(lead_id):
     db.session.flush()
     history_data = json.loads(json.dumps(history.data))
     history_data["number"] = f"AG-{lead_id}/{history.id}"
+    if "is_new_building" in post_data:
+        history.data["data"]["is_new_building"] = post_data["is_new_building"]
+        if post_data["is_new_building"] is True:
+            history.data["data"]["power_meter_number"] = "NEUBAU"
+            history.data["data"]["main_malo_id"] = "NEUBAU"
+            history.data["data"]["heatcloud_power_meter_number"] = "NEUBAU"
     history.data = history_data
     db.session.commit()
     update_data = {
