@@ -164,3 +164,10 @@ def cron(section=None):
             run_cron_import()
         except Exception as e:
             error_handler()
+
+    if section == "productive" or section == "split_cloud_contract":
+        from app.modules.cloud.services.deal import cron_split_cloud_contract
+        try:
+            cron_split_cloud_contract()
+        except Exception as e:
+            error_handler()
