@@ -328,6 +328,8 @@ def quote_calculator_extra_data_update(lead_id):
     history.data = json.loads(json.dumps(history.data))
     if "power_meter_number" in post_data:
         history.data["data"]["power_meter_number"] = post_data["power_meter_number"]
+    if "main_malo_id" in post_data:
+        history.data["data"]["main_malo_id"] = post_data["main_malo_id"]
     if "heatcloud_power_meter_number" in post_data:
         history.data["data"]["heatcloud_power_meter_number"] = post_data["heatcloud_power_meter_number"]
     if "is_new_building" in post_data:
@@ -346,6 +348,8 @@ def quote_calculator_extra_data_update(lead_id):
     for index, consumer in enumerate(post_data["consumers"]):
         if "power_meter_number" in consumer:
             history.data["data"]["consumers"][index]["power_meter_number"] = consumer["power_meter_number"]
+        if "malo_id" in consumer:
+            history.data["data"]["consumers"][index]["malo_id"] = consumer["malo_id"]
     db.session.commit()
     return {"status": "success", "data": history.data}
 
