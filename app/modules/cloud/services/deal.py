@@ -7,7 +7,6 @@ from app.modules.offer.models.offer_v2 import OfferV2
 
 
 def cron_split_cloud_contract():
-    return
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "15",
@@ -27,6 +26,7 @@ def cron_split_cloud_contract():
             copy_deal = json.loads(json.dumps(deal))
             del copy_deal["fakturia_data"]
             del copy_deal["is_cloud_master_deal"]
+            copy_deal["stage_id"] = "C15:21"
             if item.get("type") == "heatcloud":
                 copy_deal["is_cloud_heatcloud"] = "1"
                 copy_deal["cloud_type"] = ["Wärmecloud"]
