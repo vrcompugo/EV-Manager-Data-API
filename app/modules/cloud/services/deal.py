@@ -13,6 +13,8 @@ def cron_split_cloud_contract():
         "FILTER[STAGE_ID]": "C15:17",
     })
     for deal in deals:
+        if deal.get("is_cloud_master_deal") not in [1, "1", True, "true"]:
+            continue
         fakturia_data = load_json_data(deal.get("fakturia_data"))
         if fakturia_data is None or "item_lists" not in fakturia_data:
             continue
