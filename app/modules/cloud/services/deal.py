@@ -7,6 +7,7 @@ from app.modules.offer.models.offer_v2 import OfferV2
 
 
 def cron_split_cloud_contract():
+    return
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "15",
