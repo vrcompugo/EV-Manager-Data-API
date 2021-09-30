@@ -30,7 +30,7 @@ def cron_split_cloud_contract():
             del copy_deal["is_cloud_master_deal"]
             copy_deal["stage_id"] = "C15:21"
             if item.get("type") == "heatcloud":
-                copy_deal["title"] = normalize_contract_number(deal.get("cloud_contract_number")) + "w1 " + copy_deal["title"]
+                copy_deal["title"] = normalize_contract_number(deal.get("cloud_contract_number")) + "w1 | " + copy_deal["title"]
                 copy_deal["is_cloud_heatcloud"] = "1"
                 copy_deal["cloud_type"] = ["Wärmecloud"]
                 copy_deal["counter_main"] = offer.data["heatcloud_power_meter_number"]
@@ -38,7 +38,7 @@ def cron_split_cloud_contract():
             if item.get("type") == "consumer":
                 copy_deal["is_cloud_consumer"] = "1"
                 copy_deal["cloud_type"] = ["Consumer"]
-                copy_deal["title"] = normalize_contract_number(deal.get("cloud_contract_number")) + f"c{consumer_index + 1} " + copy_deal["title"]
+                copy_deal["title"] = normalize_contract_number(deal.get("cloud_contract_number")) + f"c{consumer_index + 1} | " + copy_deal["title"]
                 copy_deal["counter_main"] = offer.data["consumers"][consumer_index].get("power_meter_number")
                 copy_deal["malo_id"] = offer.data["consumers"][consumer_index].get("malo_id")
                 copy_deal["cloud_street"] = offer.data["consumers"][consumer_index].get("address").get("street")
@@ -50,7 +50,7 @@ def cron_split_cloud_contract():
             if item.get("type") == "ecloud":
                 copy_deal["is_cloud_ecloud"] = "1"
                 copy_deal["cloud_type"] = ["eCloud"]
-                copy_deal["title"] = normalize_contract_number(deal.get("cloud_contract_number")) + f"ecG " + copy_deal["title"]
+                copy_deal["title"] = normalize_contract_number(deal.get("cloud_contract_number")) + f"ecG | " + copy_deal["title"]
                 add_deals.append(copy_deal)
         for copy_deal_data in add_deals:
             add_deal(copy_deal_data)
