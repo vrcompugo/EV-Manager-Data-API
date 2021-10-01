@@ -239,8 +239,8 @@ def calculate_products(data):
                 quantity=quantity,
                 products=data["products"]
             )
-            if "technik_service_packet_summer_extra" in data["data"]["extra_options"]:
-                product = get_product(label="Service, Technik & Garantie Paket SOMMER-AKTION", category="Extra Pakete")
+            if "technik_service_packet_autumn_extra" in data["data"]["extra_options"]:
+                product = get_product(label="Service, Technik & Garantie Paket Herbst Highlight", category="Extra Pakete")
                 if product is not None:
                     product["quantity"] = 1
                     product["PRICE"] = -float(product["PRICE"])
