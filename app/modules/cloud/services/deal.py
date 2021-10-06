@@ -18,10 +18,8 @@ def cron_split_cloud_contract():
         if deal.get("is_cloud_master_deal") not in [1, "1", True, "true"]:
             continue
         fakturia_data = load_json_data(deal.get("fakturia_data"))
-        print(deal.get("id"), fakturia_data)
         if fakturia_data is None or "item_lists" not in fakturia_data:
             continue
-        print(deal.get("id"), deal.get("cloud_number"))
         offer = OfferV2.query.options(db.subqueryload("items")).filter(OfferV2.number == deal.get("cloud_number")).first()
         if offer is None:
             continue

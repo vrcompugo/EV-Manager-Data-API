@@ -1,6 +1,6 @@
 import json
 import os
-from flask import Blueprint, request, render_template
+from flask import Blueprint, request, render_template, make_response
 
 from app import db
 from app.exceptions import ApiException
@@ -36,6 +36,26 @@ def export_deal_route(deal_id):
     data = export_deal(deal_id)
     if data is not None:
         return {"status": "success", "data": data}
+    return {"status": "failed", "data": {}, "message": "history not found"}
+
+
+@blueprint.route("/<deal_id>/sherpa_export", methods=['GET'])
+@api_response
+def export_deal_sherpa_route(deal_id):
+    from app.modules.importer.sources.bitrix24.order import run_import as order_import
+    from app.modules.order.sherpa import generate_sherpa_file
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return {"status": "failed", "data": {}, "message": "auth failed"}
+    order = order_import(remote_id=deal_id)
+    if order is None:
+        return {"status": "failed", "data": {}, "message": "import failed"}
+    sherpa_file = generate_sherpa_file(order)
+    if sherpa_file is not None:
+        response = make_response(sherpa_file)
+        response.headers['Content-Type'] = 'application/excel'
+        response.headers['Content-Disposition'] = f'filename={order.contract_number}.xlsx'
+        return response
     return {"status": "failed", "data": {}, "message": "history not found"}
 
 
