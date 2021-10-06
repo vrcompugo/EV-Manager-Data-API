@@ -78,8 +78,15 @@ def get_import_data(raw):
         data["timeline_comment"]["comment"] = data["timeline_comment"]["comment"] + "Verbrauch: " + str(raw['lead']["powerConsumption"]) + "\n"
     if "survey" in raw['lead']:
         for item in raw['lead']["survey"]["data"]:
-            data["timeline_comment"]["comment"] = data["timeline_comment"]["comment"] \
-                + item["question"] + " " + item["answer"] + "\n"
+            if isinstance(item, str):
+                data["timeline_comment"]["comment"] = data["timeline_comment"]["comment"] \
+                    + item + "\n"
+            elif isinstance(item, list):
+                data["timeline_comment"]["comment"] = data["timeline_comment"]["comment"] \
+                    + " ".join(item) + "\n"
+            else:
+                data["timeline_comment"]["comment"] = data["timeline_comment"]["comment"] \
+                    + item["question"] + " " + item["answer"] + "\n"
     return data
 
 
