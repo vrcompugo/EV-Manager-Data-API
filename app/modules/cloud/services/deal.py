@@ -7,6 +7,7 @@ from app.modules.offer.models.offer_v2 import OfferV2
 
 
 def cron_split_cloud_contract():
+    print(split_cloud_contract)
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "15",
@@ -21,6 +22,7 @@ def cron_split_cloud_contract():
         offer = OfferV2.query.options(db.subqueryload("items")).filter(OfferV2.number == deal.get("cloud_number")).first()
         if offer is None:
             continue
+        print(deal.get("id"))
         consumer_index = 0
         last_list = fakturia_data["item_lists"][len(fakturia_data["item_lists"]) - 1]
         add_deals = []
