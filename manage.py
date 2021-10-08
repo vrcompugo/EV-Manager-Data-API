@@ -41,6 +41,18 @@ def update_role_permissions():
 
 
 @manager.command
+def sign_date_test():
+    import datetime
+    from app.modules.external.bitrix24.lead import update_lead, get_lead
+    print("sign_date_test")
+    lead_data = {}
+    lead_data["order_sign_date"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-01:00")
+    # lead_data["order_sign_date"] = str(datetime.datetime.now())
+    print(lead_data)
+    update_lead("30162", lead_data)
+
+
+@manager.command
 def import_mfr_tasks():
     from app.modules.external.bitrix24.task import get_tasks
     print("import mfr tasks")

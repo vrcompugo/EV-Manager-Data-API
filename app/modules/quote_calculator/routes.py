@@ -735,7 +735,7 @@ def get_insign_callback(token):
             lead_data["pv_kwp"] = token_data["pv_kwp"]
         if lead.get("automatic_checked") in ["1", True, 1]:
             lead_data["order_confirmation_date"] = str(datetime.datetime.now())
-        lead_data["order_sign_date"] = str(datetime.datetime.now())
+        lead_data["order_sign_date"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-01:00")
         update_lead(token_data["unique_identifier"], lead_data)
 
     return Response(
