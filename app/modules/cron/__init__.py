@@ -9,32 +9,50 @@ def cron(section=None):
     if section == "productive" or section == "user_cache_refresh":
         from app.modules.external.bitrix24.user import cron_refresh_users
         print("cron", "user_cache_refresh")
-        cron_refresh_users()
+        try:
+            cron_refresh_users()
+        except Exception as e:
+            error_handler()
 
     if section == "productive" or section == "import_leads_aroundhome":
         from app.modules.external.aroundhome.deal import run_cron_import
         print("cron", "import_leads_aroundhome")
-        run_cron_import()
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
 
     if section == "productive" or section == "import_leads_daa":
         from app.modules.external.daa.deal import run_cron_import
         print("cron", "import_leads_daa")
-        run_cron_import()
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
 
     if section == "productive" or section == "import_leads_hausfrage":
         from app.modules.external.hausfrage.deal import run_cron_import
         print("cron", "import_leads_hausfrage")
-        run_cron_import()
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
 
     if section == "productive" or section == "import_leads_senec":
         from app.modules.external.senec.deal import run_cron_import
         print("cron", "import_leads_senec")
-        run_cron_import()
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
 
     if section == "productive" or section == "import_leads_wattfox":
         from app.modules.external.wattfox.deal import run_cron_import
         print("cron", "import_leads_wattfox")
-        run_cron_import()
+        try:
+            run_cron_import()
+        except Exception as e:
+            error_handler()
 
     if section == "productive" or section == "import_power_meter_values":
         from app.modules.external.smartme.powermeter_measurement import run_cron_import
@@ -171,3 +189,11 @@ def cron(section=None):
             cron_split_cloud_contract()
         except Exception as e:
             error_handler()
+
+    if section == "productive" or section == "mein_portal_initial_documents":
+        from app.modules.cloud.services.deal import cron_mein_portal_initial_documents
+        try:
+            cron_mein_portal_initial_documents()
+        except Exception as e:
+            error_handler()
+
