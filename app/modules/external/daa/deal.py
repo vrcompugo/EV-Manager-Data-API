@@ -104,7 +104,7 @@ def run_cron_import():
                 contact = add_contact(data["contact"])
                 if contact is False:
                     data["contact"]["comment"] = data["contact"]["email"][0]["VALUE"]
-                    del data["contact"]["email"]
+                    data["contact"]["email"] = []
                     contact = add_contact(data["contact"])
                     if contact is False:
                         print("add contact failed", data["contact"])
