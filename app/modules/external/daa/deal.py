@@ -103,8 +103,12 @@ def run_cron_import():
                 data["lead"]["status_id"] = "NEW"
                 contact = add_contact(data["contact"])
                 if contact is False:
-                    print("add contact failed", data["contact"])
-                    raise Exception("add contact failed: " + json.dumps(data["contact"]))
+                    data["contact"]["comment"] = data["contact"]["email"][0]["VALUE"]
+                    del data["contact"]["email"]
+                    contact = add_contact(data["contact"])
+                    if contact is False:
+                        print("add contact failed", data["contact"])
+                        raise Exception("add contact failed: " + json.dumps(data["contact"]))
 
                 data["lead"]["contact_id"] = contact["id"]
 
