@@ -103,7 +103,7 @@ def run_cron_import():
                 data["lead"]["status_id"] = "NEW"
                 contact = add_contact(data["contact"])
                 if contact is False:
-                    data["contact"]["comment"] = data["contact"]["email"][0]["VALUE"]
+                    data["contact"]["important_note"] = data["contact"]["email"][0]["VALUE"]
                     data["contact"]["email"] = []
                     contact = add_contact(data["contact"])
                     if contact is False:

@@ -482,7 +482,8 @@ def get_settings(section=None, domain_raw=None):
                     "fakturia_iban": "UF_CRM_1624003459",
                     "fakturia_bic": "UF_CRM_1624003474",
                     "fakturia_owner": "UF_CRM_1624003488",
-                    "sepa_mandate_since": "UF_CRM_1629210645"
+                    "sepa_mandate_since": "UF_CRM_1629210645",
+                    "important_note": "UF_CRM_1573021516"
                 }
             },
             "timeline_comment": {
