@@ -180,9 +180,10 @@ def add_file(folder_id, data):
     else:
         existing_file = None
         children = get_folder(folder_id, data["filename"])
-        for child in children:
-            if child["NAME"] == data["filename"]:
-                existing_file = child
+        if children is not None:
+            for child in children:
+                if child["NAME"] == data["filename"]:
+                    existing_file = child
         if existing_file is None:
             response = post("disk.folder.uploadfile", {
                 "id": folder_id,
