@@ -1,0 +1,398 @@
+openapi: "3.0.0"
+info:
+  description: "API-Documentation for the data exchange regarding energie360 and EnBW"
+  version: "1.0.0"
+  title: "Energy Contract Exchange"
+  termsOfService: ""
+  contact:
+    email: "a.hedderich@hbb-werbung.de"
+servers:
+  - url: "https://api.korbacher-energiezentrum.de.ah.hbbx.de"
+    description: Development server (volatile build)
+  - url: "https://api.energie360.de/"
+    description: Production server (uses live data)
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - "Authentication"
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthSuccess"
+      summary: "User Login Resource"
+      operationId: "post_user_login"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthCredentials"
+      security: []
+  /ContractExchange/Contracts:
+    get:
+      tags:
+        - "Contracts"
+      summary: "Get new contracts from energie360 to process by EnBW"
+      description: ""
+      parameters:
+      - in: "query"
+        name: "cycle_id"
+        description: "Optional cycleId to request an already processed batch again"
+        required: false
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  current_cycle_id:
+                    type: integer
+                  next_cycle_id:
+                    type: integer
+                  contracts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Contract"
+    put:
+      tags:
+        - "Contracts"
+      summary: "Update Contract Status"
+      description: ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContractUpdate"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contract"
+
+  /ContractExchange/Contracts/{contract_number}:
+    get:
+      tags:
+        - "Contracts"
+      summary: "Get single contract data for test purposes"
+      description: ""
+      parameters:
+        - name: contract_number
+          in: path
+          description: EnBW Contract Number
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contract"
+  /ContractExchange/Contracts/{contract_number}/Invoices:
+    post:
+      tags:
+        - "Contracts"
+      summary: "Send Invoice Data"
+      description: ""
+      parameters:
+        - name: contract_number
+          in: path
+          description: EnBW Contract Number
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Invoice"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+  /ContractExchange/Contracts/{contract_number}/Invoices/{invoice_number}:
+    get:
+      tags:
+        - "Contracts"
+      summary: "Get single invoice data for test purposes"
+      description: ""
+      parameters:
+        - name: contract_number
+          in: path
+          description: EnBW Contract Number
+          required: true
+          schema:
+            type: string
+        - name: invoice_number
+          in: path
+          description: EnBW Invoice Number
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+
+  /ContractExchange/Contracts/{contract_number}/Invoices/{invoice_number}/Attachments:
+    post:
+      tags:
+        - "Contracts"
+      summary: "Send invoice related document files in PDF format"
+      description: ""
+      parameters:
+        - name: contract_number
+          in: path
+          description: EnBW Contract Number
+          required: true
+          schema:
+            type: string
+        - name: invoice_number
+          in: path
+          description: EnBW Invoice Number
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contract"
+
+
+
+
+components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    AuthSuccess:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthToken'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    AuthCredentials:
+      required:
+        - "password"
+        - "username"
+      properties:
+        username:
+          type: "string"
+          description: "user username"
+        password:
+          type: "string"
+          description: "user password"
+      type: "object"
+    Contract:
+      type: "object"
+      properties:
+        contract_number:
+          type: "string"
+        enbw_contract_number:
+          type: "string"
+        email:
+          type: "string"
+          format: "email"
+        malo_id:
+          type: "string"
+        powermeter_number:
+          type: "string"
+        powermeter_method:
+          type: "string"
+          enum: ["SLP"]
+        prepayment:
+          type: "number"
+        prepayment_cycle:
+          type: "string"
+          enum:
+            - "monthly"
+            - "quarterly"
+            - "bi-annual"
+            - "annually"
+        yearly_usage:
+          type: "integer"
+        network_operator_name:
+          type: "string"
+        network_operator_code:
+          type: "string"
+        billing_address:
+          $ref: "#/components/schemas/Address"
+        delivery_address:
+          $ref: "#/components/schemas/Address"
+        payment_info:
+          $ref: "#/components/schemas/PaymentInfo"
+    Invoice:
+      type: "object"
+      properties:
+        number:
+          type: "string"
+        attachments:
+          type: "array"
+          items:
+            type: "string"
+            format: "url"
+        subtotal_net:
+          type: number
+        discount_net:
+          type: number
+        tax_rate:
+          type: integer
+        tax_amount:
+          type: number
+        total:
+          type: number
+    ContractUpdate:
+      type: "object"
+      properties:
+        operation:
+          type: "string"
+          enum:
+            - "price_change"
+            - "confirmation"
+            - "error"
+        data:
+          oneOf:
+            - $ref: "#/components/schemas/ContractUpdateConfirmation"
+            - $ref: "#/components/schemas/ContractUpdatePriceChange"
+            - $ref: "#/components/schemas/ContractUpdateError"
+    ContractUpdateConfirmation:
+      type: "object"
+      properties:
+        delivery_begin:
+          type: "string"
+          format: "date"
+        enbw_contract_number:
+          type: "string"
+    ContractUpdatePriceChange:
+      type: "object"
+      properties:
+        old_price:
+          type: "number"
+        new_price:
+          type: "number"
+    ContractUpdateError:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+          enum:
+            - "unkown"
+            - "..."
+        message:
+          type: "string"
+    Address:
+      type: object
+      properties:
+        company:
+          type: string
+        salutation:
+          type: string
+          enum:
+            - mr
+            - ms
+        title:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        street:
+          type: string
+        street_nb:
+          type: string
+        zip:
+          type: string
+        city:
+          type: string
+    PaymentInfo:
+      type: object
+      properties:
+        payment_type:
+          type: string
+          enum:
+            - debit
+            - invoice
+        account_owner:
+          $ref: "#/components/schemas/Address"
+        iban:
+          type: string
+        bic:
+          type: string
+        bankname:
+          type: string
+    AuthToken:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              description: JWT token
+            roles:
+              type: array
+              items:
+                type: string
+    Error:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+          enum: ["error"]
+        code:
+          type: "string"
+        message:
+          type: "string"
+        data:
+          type: "object"
+          description: "additional Data for diagnose"
+
+
+security:
+  - jwt: []

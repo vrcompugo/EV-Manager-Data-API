@@ -34,7 +34,7 @@
         <th class="table--th">Pos.</th>
         <th class="table--th">Anzahl</th>
         <th class="table--th">Einheit</th>
-        <th class="table--th">Bezeichnung</th>
+        <th class="table--th" {% if data.data.only_show_total_price %}colspan="2"{% endif %}>Bezeichnung</th>
         {% if not data.data.only_show_total_price %}
           <th class="table--th">Einzelpreis</th>
           <th class="table--th">Gesamtpreis</th>
@@ -48,7 +48,7 @@
           <td class="align-right align-top">{{ index.index }}</td>
           <td class="align-right align-top empty-on-split">{{ item.quantity | numberformat("de", digits=None) }}</td>
           <td class="border-right align-top empty-on-split">{{ item.quantity_unit }}</td>
-          <td class="border-right align-top description">
+          <td class="border-right align-top description" {% if data.data.only_show_total_price and item.total_price >= 0 %}colspan="2"{% endif %}>
             <div>
               <b>{{ item.NAME }}</b><br>
               {% if item.DESCRIPTION_TYPE == "html" %}
@@ -61,6 +61,10 @@
           {% if not data.data.only_show_total_price %}
             <td class="border-right align-right align-top empty-on-split" style="white-space: nowrap;">{{ item.PRICE | currencyformat }}</td>
             <td class="border-right align-right align-top empty-on-split" style="white-space: nowrap;">{{ item.total_price | currencyformat }}</td>
+          {% else %}
+            {% if item.total_price < 0 %}
+              <td class="border-right align-right align-top empty-on-split" style="white-space: nowrap;">{{ item.total_price | currencyformat }}</td>
+            {% endif%}
           {% endif%}
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
