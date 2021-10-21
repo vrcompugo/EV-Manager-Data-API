@@ -240,6 +240,8 @@ def calculate_feasibility_study(offer: OfferV2):
         "cost_total": None,
         "cost_benefit": None
     }
+    if offer.reseller is None or offer.reseller.document_style in [None, ""]:
+        data["conventional_gas_cost_per_kwh"] = 0.099
     if loan_interest_rate is not None:
         data["loan_interest_rate"] = loan_interest_rate
     data["conventional_base_cost_per_kwh"] = cloud_calulation["conventional_power_cost_per_kwh"] * 100

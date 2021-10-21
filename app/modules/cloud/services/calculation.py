@@ -25,6 +25,8 @@ def calculate_cloud(data):
     user_id_for_prices = user["id"]
     if user_id_for_prices not in [113, 120, 121, 123]:
         user_id_for_prices = 1
+    if user_id_for_prices == 1:
+        settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"] = 0.099
     if data.get("assigned_user") is not None:
         if 330 in data["assigned_user"]["UF_DEPARTMENT"] or "330" in data["assigned_user"]["UF_DEPARTMENT"]:
             user = {"id": 120, "name": "bsh"}
