@@ -353,8 +353,7 @@ def add_item_list(deal_id, newData):
         if last_start is not None and new_start < last_start:
             raise ApiException('newItemsList_not_found', 'Startdatum muss neuer sein als das letzte Startdatum')
     if new_start is None and len(data["item_lists"]) == 1:
-        print(json.dumps(data.get("fakturia_contract_number")))
-        if last_start < datetime.datetime.now() and data.get("fakturia_contract_number") not in [None, "", "0"]:
+        if last_start is not None and last_start < datetime.datetime.now() and data.get("fakturia_contract_number") not in [None, "", "0"]:
             raise ApiException('newItemsList_not_found', 'Startdatum muss neuer sein als das letzte Startdatum')
         data["item_lists"][0] = {
             "start": new_start,
