@@ -57,6 +57,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "datetime": str(datetime.datetime.now()),
         "data": {
             "emove_tarif": "none",
+            "bluegen_cell_count": 1,
             "price_increase_rate": 4,
             "inflation_rate": 1.5,
             "runtime": 30,
@@ -73,7 +74,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
             "extra_options": ["technik_service_packet", "solaredge"],
             "extra_options_zero": [],
             "reconstruction_extra_options": [],
-            "heating_quote_extra_options": [],
+            "heating_quote_extra_options": ["renewable_ready", "multistorage_freshwater"],
             "extra_offers": [],
             "address": {}
         },

@@ -20,10 +20,25 @@ def get_bluegen_products(data):
         if "bluegen_cell_count" in data["data"] and data["data"]["bluegen_cell_count"] is not None and data["data"]["bluegen_cell_count"] != "":
             quantity_bluegen_cell = int(data["data"]["bluegen_cell_count"])
 
+        if data["data"].get("bluegen_type") == "electa300":
+            add_direct_product(
+                label="Brennstoffzellenheizung eLecta300",
+                category="Brennstoffzelle",
+                quantity=quantity_bluegen_cell,
+                products=data["bluegen_quote"]["products"]
+            )
+        else:
+            add_direct_product(
+                label="BlueGen Brennstoffzelle",
+                category="Brennstoffzelle",
+                quantity=quantity_bluegen_cell,
+                products=data["bluegen_quote"]["products"]
+            )
+
         add_direct_product(
-            label="BlueGen Brennstoffzelle",
+            label="Brennstoffzellen Förder-SERVICE",
             category="Brennstoffzelle",
-            quantity=quantity_bluegen_cell,
+            quantity=1,
             products=data["bluegen_quote"]["products"]
         )
 

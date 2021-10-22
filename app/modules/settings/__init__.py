@@ -259,6 +259,7 @@ def get_settings(section=None, domain_raw=None):
                     "Online - Heizung - WP": 354,
                     "Online - Heizung - Gas": 350,
                     "Online - Heizung - Öl": 352,
+                    "Online - Heizung - Hybrid Gas": 380,
                     "Online - Heizung - Solarthermie": 366,
                     "Online - Heizung - Zubehör": 358,
                     "Online - Heizung - Extra Optionen": 356,

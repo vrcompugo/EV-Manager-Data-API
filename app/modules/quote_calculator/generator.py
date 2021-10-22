@@ -363,7 +363,10 @@ def generate_datasheet_pdf(lead_id, data):
         if "reconstruction_roof_type" not in data["data"] or data["data"]["reconstruction_roof_type"] != "flat":
             add_pdf_by_drive_id(merger, 436212, cached=True)
     if "has_bluegen_quote" in data["data"] and data["data"]["has_bluegen_quote"]:
-        add_pdf_by_drive_id(merger, 459672, cached=True)
+        if data["data"].get("bluegen_type") == "electa300":
+            add_pdf_by_drive_id(merger, 2172962, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2172962/?&ncc=1&filename=Prospekt_eLecta300_05_2021_web.pdf
+        else:
+            add_pdf_by_drive_id(merger, 459672, cached=True)
 
     merger.write(output_file)
     merger.close()

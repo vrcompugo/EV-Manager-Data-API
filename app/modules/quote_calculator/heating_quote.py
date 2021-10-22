@@ -40,10 +40,12 @@ def get_heating_products(data):
             extra_quantity = 0
             product_name = ""
             if data["data"]["new_heating_type"] == "hybrid_gas":
-                if 0 < data["data"]["heating_quote_sqm"] <= 220:
-                    product_name = "Hybrid Anlage GasTherme & Wärmepumpe"
-                if 220 < data["data"]["heating_quote_sqm"] <= 370:
-                    product_name = "Hybrid Anlage GasTherme & Wärmepumpe XL"
+                add_direct_product(
+                    label="Hybrid Gas/Wärmepumpen System",
+                    category=f"Online - Heizung - Hybrid Gas",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
             else:
                 if 0 < data["data"]["heating_quote_sqm"] <= 120:
                     product_name = "Luft/Wasser-Wärmepumpe (Bestand 120)"
@@ -62,12 +64,12 @@ def get_heating_products(data):
                         product_name = "Luft/Wasser-Wärmepumpe (Neubau 400)"
                 if 400 < data["data"]["heating_quote_sqm"]:
                     extra_quantity = data["data"]["heating_quote_sqm"] - 400
-            add_direct_product(
-                label=product_name,
-                category=f"Online - Heizung - WP",
-                quantity=1,
-                products=data["heating_quote"]["products"]
-            )
+                add_direct_product(
+                    label=product_name,
+                    category=f"Online - Heizung - WP",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
             if extra_quantity > 0:
                 add_direct_product(
                     label="Erweiterung Heizfläche",
@@ -81,12 +83,20 @@ def get_heating_products(data):
                 quantity=1,
                 products=data["heating_quote"]["products"]
             )
-            add_direct_product(
-                label="Inbetriebnahme",
-                category=f"Online - Heizung - WP",
-                quantity=1,
-                products=data["heating_quote"]["products"]
-            )
+            if data["data"]["new_heating_type"] == "hybrid_gas":
+                add_direct_product(
+                    label="Inbetriebnahme",
+                    category=f"Online - Heizung - Hybrid Gas",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
+            else:
+                add_direct_product(
+                    label="Inbetriebnahme",
+                    category=f"Online - Heizung - WP",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
             if "extra_warm_water" in data["data"].get("heating_quote_extra_options", []):
                 quantity = 1
                 if data["data"].get("heating_quote_extra_options_extra_warm_water_count", 0) not in [0, "", None]:
@@ -138,11 +148,8 @@ def get_heating_products(data):
                     products=data["heating_quote"]["products"],
                     data=data
                 )
-            product_name = "HANSA Gas Pega"
+            product_name = "Gasbrennwertheizung"
             if data["data"]["new_heating_type"] == "gas":
-                product_name = "HANSA Gas"
-                if data["data"]["heating_quote_people"] > 3 or data["heating_quote_sqm"] > 200:
-                    product_name = "HANSA Gas Pega"
                 add_direct_product(
                     label=product_name,
                     category=f"Online - Heizung - Gas",
@@ -151,22 +158,31 @@ def get_heating_products(data):
                     data=data
                 )
 
-            if data["data"]["new_heating_type"] in ["oil", "gas"] and product_name != "HANSA Gas":
+            if data["data"]["new_heating_type"] in ["gas"]:
+                people = data["data"].get("heating_quote_people", 1)
+                if people in ["", 0, None]:
+                    people = 1
                 product_name = "Brauchwasserspeicher"
                 category_name = "Online - Heizung - Zubehör"
                 if "connect_existing_solarthermie" in data["data"].get("heating_quote_extra_options", []) or "new_solarthermie" in data["data"].get("heating_quote_extra_options", []):
                     product_name = "Schichtenspeicher"
                     category_name = "Online - Heizung - Solarthermie"
-                people = data["data"].get("heating_quote_people", 1)
-                if people in ["", 0, None]:
-                    people = 1
-                add_direct_product(
-                    label=product_name,
-                    category=category_name,
-                    quantity=1,
-                    products=data["heating_quote"]["products"],
-                    data=people
-                )
+                    add_direct_product(
+                        label=product_name,
+                        category=category_name,
+                        quantity=1,
+                        products=data["heating_quote"]["products"],
+                        data=people
+                    )
+                else:
+                    if people > 4:
+                        add_direct_product(
+                            label=product_name,
+                            category=category_name,
+                            quantity=1,
+                            products=data["heating_quote"]["products"],
+                            data=people
+                        )
 
             if "heating_quote_radiator_type" in data["data"] and data["data"]["heating_quote_radiator_type"] == "mixed":
                 add_direct_product(
@@ -197,6 +213,46 @@ def get_heating_products(data):
             add_direct_product(
                 label=f"Hydraulischer Abgleich {label_type} II",
                 category=f"Online - Heizung - {label_type}",
+                quantity=quantitiy,
+                products=data["heating_quote"]["products"]
+            )
+
+        if data["data"]["new_heating_type"] in ["gas"]:
+            if "renewable_ready" in data["data"].get("heating_quote_extra_options", []):
+                add_direct_product(
+                    label="Renewable Ready (20% Förderung möglich)",
+                    category=f"Online - Heizung - {label_type}",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
+            if data["data"]["old_heating_type"] not in ["gas", "flat"]:
+                add_direct_product(
+                    label="Umbau (wenn kein Gas vorhanden)",
+                    category=f"Online - Heizung - {label_type}",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
+
+        if data["data"]["new_heating_type"] == "hybrid_gas":
+            if "multistorage_freshwater" in data["data"].get("heating_quote_extra_options", []):
+                add_direct_product(
+                    label="Multispeicher mit Frischwasserstation",
+                    category=f"Online - Heizung - Hybrid Gas",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
+
+        if "outside_chimney" in data["data"].get("heating_quote_extra_options", []):
+            quantitiy = data["data"].get("heating_quote_extra_options_extra_outside_chimney_height", "")
+            if quantitiy in ["", "0", 0, None]:
+                quantitiy = 1
+            else:
+                quantitiy = int(quantitiy)
+                if quantitiy < 0:
+                    quantitiy = 1
+            add_direct_product(
+                label="Aussen-Schornstein",
+                category=f"Online - Heizung - Extra Optionen",
                 quantity=quantitiy,
                 products=data["heating_quote"]["products"]
             )
