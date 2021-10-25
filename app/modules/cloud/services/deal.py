@@ -38,7 +38,7 @@ def cron_split_cloud_contract():
                 copy_deal["title"] = normalize_contract_number(deal.get("cloud_contract_number")) + "w1 | " + copy_deal["title"]
                 copy_deal["is_cloud_heatcloud"] = "1"
                 copy_deal["cloud_type"] = ["Wärmecloud"]
-                copy_deal["counter_main"] = offer.data["heatcloud_power_meter_number"]
+                copy_deal["counter_main"] = offer.data.get("heatcloud_power_meter_number")
                 add_deals.append(copy_deal)
             if item.get("type") == "consumer":
                 copy_deal["is_cloud_consumer"] = "1"
