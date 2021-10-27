@@ -313,7 +313,8 @@ def generate_datasheet_pdf(lead_id, data):
         if "wwwp" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, config["nibe_wp"], cached=True)
         if "wallbox" in data["data"]["extra_options"]:
-            add_pdf_by_drive_id(merger, 436174, cached=True)  # senec wallbox
+            # add_pdf_by_drive_id(merger, 436174, cached=True)  # senec wallbox
+            pass
 
         if "products" in data:
             pv_module = next((item for item in data["products"] if item["NAME"].find("Soluxtec Glas Glas 330 Watt") == 0), None)

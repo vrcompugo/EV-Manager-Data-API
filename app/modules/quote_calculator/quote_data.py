@@ -365,7 +365,8 @@ def calculate_products(data):
                 )
             else:
                 add_direct_product(
-                    label="Wallbox SENEC 11kW",
+                    # label="Wallbox SENEC 11kW",
+                    label="Heidelberg Energy Control. 11 kW",
                     category="Extra Pakete",
                     quantity=quantity,
                     products=data["products"]
