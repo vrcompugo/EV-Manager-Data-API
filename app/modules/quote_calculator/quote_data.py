@@ -210,11 +210,23 @@ def calculate_products(data):
             products=data["products"]
         )
         add_direct_product(
-            label="Planung & Montage",
+            label="Montage DC",
             category="PV Module",
             quantity=kwp,
             products=data["products"]
         )
+        add_direct_product(
+            label="Planung",
+            category="PV Module",
+            quantity=1,
+            products=data["products"]
+        )
+        '''add_direct_product(
+            label="Planung & Montage",
+            category="PV Module",
+            quantity=kwp,
+            products=data["products"]
+        )'''
         if "cloud_price_heatcloud" in data["calculated"] and float(data["calculated"]["cloud_price_heatcloud"]) > 0:
             add_direct_product(
                 label="Wärme Cloud Paket",
@@ -241,7 +253,7 @@ def calculate_products(data):
                 products=data["products"]
             )
             if "technik_service_packet_autumn_extra" in data["data"]["extra_options"]:
-                product = get_product(label="Service, Technik & Garantie Paket Herbst Highlight", category="Extra Pakete")
+                product = get_product(label="Service, Technik & Garantie Paket Winter Highlight", category="Extra Pakete")
                 if product is not None:
                     product["quantity"] = 1
                     product["PRICE"] = -float(product["PRICE"])
