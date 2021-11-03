@@ -11,7 +11,7 @@ from .models.user_zip_association import UserZipAssociation
 
 def auto_assign_lead_to_user(lead_id):
     lead_data = get_lead(lead_id)
-    if "assigned_by_id" not in lead_data or (lead_data["assigned_by_id"] != "106" and lead_data["assigned_by_id"] != "41"):
+    if "assigned_by_id" not in lead_data or (lead_data["assigned_by_id"] not in ["106", "41", "344"]):
         return None
     if "contact_id" not in lead_data or lead_data["contact_id"] is None or int(lead_data["contact_id"]) == 0:
         return None
