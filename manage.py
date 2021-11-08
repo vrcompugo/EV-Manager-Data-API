@@ -41,15 +41,13 @@ def update_role_permissions():
 
 
 @manager.command
-def run_auto_assign():
-    from app.modules.external.bitrix24.lead import get_leads
-    from app.modules.user import auto_assign_lead_to_user
-    leads = get_leads({
-        "FILTER[ASSIGNED_BY_ID]": 344
+def check_contacts():
+    from app.modules.external.bitrix24.contact import get_contacts
+    contacts = get_contacts({
+        "SELECT": "full",
+        "FILTER[>DATE_MODIFY]": "2021-11-08 12:00:00"
     })
-    for lead in leads:
-        print(lead.get("id"))
-        auto_assign_lead_to_user(lead.get("id"))
+    print(json.dumps(contacts, indent=2))
 
 
 @manager.command

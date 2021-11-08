@@ -72,8 +72,9 @@ def get_contacts(payload):
         del payload["SELECT"]
         config = get_settings(section="external/bitrix24")
         payload["SELECT[0]"] = "*"
+        payload["SELECT[1]"] = "EMAIL"
         for index, field in enumerate(config["contact"]["fields"]):
-            payload[f"SELECT[{index + 1}]"] = config["contact"]["fields"][field]
+            payload[f"SELECT[{index + 2}]"] = config["contact"]["fields"][field]
     while payload["start"] is not None:
         data = post("crm.contact.list", payload)
         if "result" in data:
