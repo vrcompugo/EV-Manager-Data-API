@@ -19,7 +19,7 @@ def auto_assign_lead_to_user(lead_id):
     contact_data = get_contact(lead_data["contact_id"])
     if "zip" not in contact_data or contact_data["zip"] is None or contact_data["zip"] == "":
         return None
-
+    contact_data["zip"] = contact_data["zip"].strip()
     current_cycle_index = int(datetime.datetime.now().month)
     user = UserZipAssociation.query\
         .filter(UserZipAssociation.last_assigned.is_(None))\
@@ -31,6 +31,7 @@ def auto_assign_lead_to_user(lead_id):
             UserZipAssociation.current_cycle_index != current_cycle_index,
             UserZipAssociation.current_cycle_index.is_(None)
         ))\
+        .filter(UserZipAssociation.max_leads > 0)\
         .filter(UserZipAssociation.data.contains([contact_data['zip']]))
     user = user.first()
     if user is None:
@@ -43,6 +44,7 @@ def auto_assign_lead_to_user(lead_id):
                 UserZipAssociation.current_cycle_index != current_cycle_index,
                 UserZipAssociation.current_cycle_index.is_(None)
             ))\
+            .filter(UserZipAssociation.max_leads > 0)\
             .filter(UserZipAssociation.data.contains([contact_data['zip']]))\
             .order_by(UserZipAssociation.last_assigned.asc())\
             .first()
