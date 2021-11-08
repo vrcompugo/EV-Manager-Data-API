@@ -53,7 +53,7 @@ def get_export_data(contact, company):
 
 def run_cron_export():
     config = get_settings("external/fakturia")
-    print("import leads fakturia")
+    print("export customer fakturia")
     if config is None:
         print("no config for fakturia import")
         return None
@@ -79,6 +79,7 @@ def export_contact(contact, force=False):
     if contact.get("fakturia_number") in ["", None]:
         export_data = get_export_data(contact, company)
         if export_data is None or "email" not in export_data:
+            print(contact, export_data)
             print("no export data")
             return
         customer_data = post(f"/Customers", post_data=export_data)
