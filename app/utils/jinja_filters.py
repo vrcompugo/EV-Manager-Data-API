@@ -44,11 +44,17 @@ def convert_to_datetime(value):
 
 
 def dateformat(value, format='%d.%m.%Y'):
-    return convert_to_datetime(value).strftime(format)
+    date_value = convert_to_datetime(value)
+    if date_value is None:
+        return ""
+    return date_value.strftime(format)
 
 
 def datetimeformat(value, format='%d.%m.%Y %H:%M'):
-    return convert_to_datetime(value).strftime(format)
+    date_value = convert_to_datetime(value)
+    if date_value is None:
+        return ""
+    return date_value.strftime(format)
 
 
 def numberformat(value, format='de', digits=2):
