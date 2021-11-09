@@ -22,7 +22,6 @@ def get_deal_data(deal_id):
         return {"status": "failed", "data": {}, "message": "auth failed"}
     data = get_contract_data_by_deal(deal_id)
     if data is not None:
-        print(data)
         return {"status": "success", "data": data}
     return {"status": "failed", "data": {}, "message": "history not found"}
 
