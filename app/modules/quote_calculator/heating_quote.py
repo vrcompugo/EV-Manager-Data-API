@@ -40,10 +40,20 @@ def get_heating_products(data):
             extra_quantity = 0
             product_name = ""
             if data["data"]["new_heating_type"] == "hybrid_gas":
+                if "heating_quote_house_build" in data["data"]:
+                    if data["data"]["heating_quote_house_build"] == "1940-1969":
+                        data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"] * 2
+                    if data["data"]["heating_quote_house_build"] == "1970-1979":
+                        data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"] * 1.75
+                    if data["data"]["heating_quote_house_build"] == "1980-1999":
+                        data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"] * 1.5
+                    if data["data"]["heating_quote_house_build"] == "2000-2015":
+                        data["heating_quote_sqm"] = data["data"]["heating_quote_sqm"] * 1.25
                 add_direct_product(
                     label="Hybrid Gas/Wärmepumpen System",
                     category=f"Online - Heizung - Hybrid Gas",
                     quantity=1,
+                    data=data,
                     products=data["heating_quote"]["products"]
                 )
             else:
