@@ -31,7 +31,7 @@
     {% if offer.reseller.document_style == "bsh" %}
       background-image: url("{{ data.base_url }}/static/feasibility_study_2020/house_with_pv_sun.jpg");
     {% else %}
-      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/world_in_hands.jpg");
+      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/family-4.jpg");
     {% endif %}
     background-size: cover;
     border-bottom: 12px solid #1A61AC;
@@ -86,6 +86,22 @@
     flex: 1 0 30%;
     background-image: url("{{ data.base_url }}/static/feasibility_study_2020/green_field.jpg");
     background-size: cover;
+    position: relative;
+  }
+  .page_cover .right_side ul {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(255,255,255,0.5);
+    font-size: 1.3em;
+    margin: 0;
+    padding: 9em 0 0 0;
+  }
+  .page_cover .right_side ul li {
+    padding: 0.6em 0.6em 0.6em 1.4em;
+    color: #333;
   }
 </style>
 
@@ -93,6 +109,7 @@
   {% include('feasibility_study_2020/elements/logos.html') %}
 
   <div class="banner">100% Selbstversorger - Strom und Wärme</div>
+  {% if offer.reseller.document_style == "bsh" %}
   <div class="layout horizontal">
 
     <div class="left_side">
@@ -106,7 +123,30 @@
     </div>
 
   </div>
+  {% else %}
+  <div class="layout horizontal">
+    <div class="left_side">
+      <div class="heading">
+        <div class="large">
+          Ihr persönliches<br>
+          Rundum Sorglos Angebot
+        </div>
+      </div>
+    </div>
+    <div class="right_side">
+      <ul>
+        <li>Wir gestalten Ihren Einstieg in die Unabhängigkeit.</li>
+        <li>Erfahrung seit 2009.</li>
+        <li>Qualität ist nicht verhandelbar!</li>
+        <li>Wir garantieren erstklassige
+          Qualität der von uns
+          verbauten Produkte mit
+          hervorragenden Garantien.</li>
+      </ul>
 
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 {% include('feasibility_study_2020/elements/page_counter.html') %}

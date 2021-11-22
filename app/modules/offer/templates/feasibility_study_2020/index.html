@@ -13,10 +13,10 @@
 </head>
 <body>
 
-  {% set total_pages = 24 %}
+  {% set total_pages = 26 %}
 
   {% if offer.reseller.document_style == "bsh" %}
-    {% set total_pages = total_pages - 7 %}
+    {% set total_pages = total_pages - 9 %}
   {% endif %}
 
 
@@ -148,6 +148,14 @@
     <div class="page">
       {% include('feasibility_study_2020/pages/page_cloud_interplay3.html') %}
     </div>
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_new1.html') %}
+    </div>
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_new2.html') %}
+    </div>
   {% endif %}
 
   {% if offer.reseller.document_style != "bsh" %}
@@ -211,6 +219,12 @@
     </div>
   {% endif %}
 
+  {% if offer.reseller.document_style != "bsh" %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_bank.html') %}
+    </div>
+  {% endif %}
 
 </body>
 </html>

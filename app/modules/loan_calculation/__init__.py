@@ -12,6 +12,7 @@ def loan_calculation(total_amount, upfront_payment, interest_rate, runtime_in_mo
     monthly_loan_payment = (loan_amount * interest_rate / 12 / 100) / (1 - (1 + interest_rate / 12 / 100) ** -runtime_in_months)
     data = {
         "load_amount": loan_amount,
+        "loan_amount": loan_amount,
         "upfront_payment": upfront_payment,
         "monthly_payment": round(monthly_loan_payment, 2),
         "monthly_payment_with_tax": round(monthly_loan_payment * 1.19, 2),
@@ -40,6 +41,7 @@ def loan_calculation_gross(total_amount_gross, upfront_payment, interest_rate, r
     monthly_loan_payment = (loan_amount * interest_rate / 12 / 100) / (1 - (1 + interest_rate / 12 / 100) ** -runtime_in_months)
     data = {
         "load_amount": loan_amount / 1.19,
+        "loan_amount": loan_amount / 1.19,
         "upfront_payment": upfront_payment,
         "monthly_payment": round(monthly_loan_payment / 1.19, 2),
         "monthly_payment_with_tax": round(monthly_loan_payment, 2),

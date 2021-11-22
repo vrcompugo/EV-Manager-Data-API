@@ -20,7 +20,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote
-from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf
+from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_bluegen_wi_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -388,6 +388,7 @@ def quote_calculator_cloud_pdfs(lead_id):
     folder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
     calculated = history.data["calculated"]
     data = history.data["data"]
+    data["heating_quote"] = history.data["heating_quote"]
     if "contact" in history.data:
         data["address"] = history.data["contact"]
     if "contact" in lead:
@@ -498,6 +499,7 @@ def quote_calculator_bluegen_pdf(lead_id):
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
 
     genrate_pdf(data, generate_bluegen_pdf, lead_id, "pdf_bluegen_file_id", "Bluegen-Angebot.pdf", subfolder_id)
+    genrate_pdf(data, generate_bluegen_wi_pdf, lead_id, "pdf_bluegen_wi_file_id", "Bluegen-WI.pdf", subfolder_id)
 
     history.data = data
     db.session.commit()

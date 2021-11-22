@@ -31,7 +31,7 @@
     --percent: calc(var(--value) / var(--max-value));
     --new-height: calc(var(--graph-bar-height) * var(--percent));
     background-color: #8C8B8B;
-    {% if offer.reseller.document_style == "bsh" %}
+    {% if offer and offer.reseller.document_style == "bsh" %}
       background-color: #8C8B8B;
     {% else %}
       background-color: #E53935;
@@ -84,7 +84,7 @@
     position: absolute;
     content: " ";
     background-color: #5D5C5C;
-    {% if offer.reseller.document_style == "bsh" %}
+    {% if offer and offer.reseller.document_style == "bsh" %}
       background-color: #5D5C5C;
     {% else %}
       background-color: #B71C1C;
@@ -99,7 +99,7 @@
     position: absolute;
     content: " ";
     background-color: #5D5C5C;
-    {% if offer.reseller.document_style == "bsh" %}
+    {% if offer and offer.reseller.document_style == "bsh" %}
       background-color: #5D5C5C;
     {% else %}
       background-color: #B71C1C;

@@ -1,0 +1,174 @@
+<style>
+  .page_notes .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 36px;
+    padding: 0 30px 10px 30px;
+
+  }
+  .page_notes .content {
+    padding: 0 30px ;
+    font-size: 0.75em;
+  }
+</style>
+
+
+{% set total_montly_convetional = 0 %}
+{% set total_montly_convetional_half_time = 0 %}
+{% set total_montly_convetional_full_time = 0 %}
+{% set total_montly_new = 0 %}
+{% set total_montly_half_time = 0 %}
+{% set total_montly_full_time = 0 %}
+<div class="page_notes">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div class="headline">
+    Wirtschaflichkeitsberechnung<br>
+    <small style="font-size: 0.7em;">Zusammenfassung  & Gegenüberstellung</small>
+  </div>
+  <div class="layout horizontal">
+    <div class="content flex">
+      <p>
+        <b>Energiekosten ohne Energetische Sanierung</b>
+      </p>
+      <table>
+
+        {% set total_montly_convetional = total_montly_convetional + data.bluegen_quote.calculated.lightcloud.price_today %}
+        {% set total_montly_convetional_half_time = total_montly_convetional_half_time + data.bluegen_quote.calculated.lightcloud.price_half_time %}
+        {% set total_montly_convetional_full_time = total_montly_convetional_full_time + data.bluegen_quote.calculated.lightcloud.price_full_time %}
+        <tr>
+          <td>Lichtstrom</td>
+          <td>{{ data.bluegen_quote.calculated.lightcloud.price_today | currencyformat }} mtl.</td>
+        </tr>
+        {% if data.bluegen_quote.calculated.heatcloud %}
+          {% set total_montly_convetional = total_montly_convetional + data.bluegen_quote.calculated.heatcloud.price_today %}
+          {% set total_montly_convetional_half_time = total_montly_convetional_half_time + data.bluegen_quote.calculated.heatcloud.price_half_time %}
+          {% set total_montly_convetional_full_time = total_montly_convetional_full_time + data.bluegen_quote.calculated.heatcloud.price_full_time %}
+          <tr>
+            <td>Wärmeenergie</td>
+            <td>{{ data.bluegen_quote.calculated.heatcloud.price_today | currencyformat }} mtl.</td>
+          </tr>
+        {% endif %}
+        {% if data.bluegen_quote.calculated.ecloud %}
+          {% set total_montly_convetional = total_montly_convetional + data.bluegen_quote.calculated.ecloud.price_today %}
+          {% set total_montly_convetional_half_time = total_montly_convetional_half_time + data.bluegen_quote.calculated.ecloud.price_half_time %}
+          {% set total_montly_convetional_full_time = total_montly_convetional_full_time + data.bluegen_quote.calculated.ecloud.price_full_time %}
+          <tr>
+            <td>Gasenergie</td>
+            <td>{{ data.bluegen_quote.calculated.ecloud.price_today | currencyformat }} mtl.</td>
+          </tr>
+        {% endif %}
+        {% if data.bluegen_quote.calculated.consumer %}
+          {% set total_montly_convetional = total_montly_convetional + data.bluegen_quote.calculated.consumer.price_today %}
+          {% set total_montly_convetional_half_time = total_montly_convetional_half_time + data.bluegen_quote.calculated.consumer.price_half_time %}
+          {% set total_montly_convetional_full_time = total_montly_convetional_full_time + data.bluegen_quote.calculated.consumer.price_full_time %}
+          <tr>
+            <td>Lichtstrom Nebenstelle</td>
+            <td>{{ data.bluegen_quote.calculated.consumer.price_today | currencyformat }} mtl.</td>
+          </tr>
+        {% endif %}
+        {% if data.bluegen_quote.calculated.energy and data.bluegen_quote.calculated.energy.conventional_maintenance_per_year > 0 %}
+          {% set total_montly_convetional = total_montly_convetional + (data.bluegen_quote.calculated.energy.conventional_maintenance_per_year / 12) %}
+          {% set total_montly_convetional_half_time = total_montly_convetional_half_time + (data.bluegen_quote.calculated.energy.conventional_maintenance_per_year / 12) %}
+          {% set total_montly_convetional_full_time = total_montly_convetional_full_time + (data.bluegen_quote.calculated.energy.conventional_maintenance_per_year / 12) %}
+          <tr>
+            <td>Reparatur/Wartung/Erstzteile</td>
+            <td>{{ (data.bluegen_quote.calculated.energy.conventional_maintenance_per_year / 12) | currencyformat }} mtl.</td>
+          </tr>
+        {% endif %}
+      </table>
+    </div>
+    <div class="content flex">
+      <p>
+        <b>Energiekosten nach Sanierungsvorschlag</b>
+      </p>
+      <table class="right">
+        {% set total_montly_new = total_montly_new + data.bluegen_quote.calculated.cell.price_tomorrow %}
+        {% set total_montly_half_time = total_montly_half_time + data.bluegen_quote.calculated.cell.price_half_time %}
+        {% set total_montly_full_time = total_montly_full_time + data.bluegen_quote.calculated.cell.price_full_time %}
+        <tr>
+          <td>Verbrauch Gas</td>
+          <td>{{ data.bluegen_quote.calculated.cell.price_tomorrow | currencyformat }} mtl.</td>
+        </tr>
+
+        {% if data.bluegen_quote.calculated.cell.maintainance_cost_monthly > 0 %}
+          {% set total_montly_new = total_montly_new + data.bluegen_quote.calculated.cell.maintainance_cost_monthly %}
+          {% set total_montly_half_time = total_montly_half_time + data.bluegen_quote.calculated.cell.maintainance_cost_monthly %}
+          {% set total_montly_full_time = total_montly_full_time + data.bluegen_quote.calculated.cell.maintainance_cost_monthly %}
+          <tr>
+            <td>Reparatur/Wartung/Erstzteile</td>
+            <td>{{ data.bluegen_quote.calculated.cell.maintainance_cost_monthly | currencyformat }} mtl.</td>
+          </tr>
+        {% endif %}
+        {% set total_montly_new = total_montly_new + data.bluegen_quote.calculated.loan_calculation.monthly_payment  %}
+        {% set total_montly_half_time = total_montly_half_time + data.bluegen_quote.calculated.loan_calculation.monthly_payment  %}
+        {% set total_montly_full_time = total_montly_full_time + data.bluegen_quote.calculated.loan_calculation.monthly_payment  %}
+        <tr>
+          <td>Investition (netto)</td>
+          <td>{{ data.bluegen_quote.total_net | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td>Investition (nach Förderung)</td>
+          <td>{{ data.bluegen_quote.calculated.loan_calculation.loan_amount  | currencyformat }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="layout horizontal">
+    <div class="content flex">
+
+      <p>
+        <b>Monatliche Belastung</b>
+      </p>
+      <table>
+        <tr>
+          <td>heute</td>
+          <td>in 6 Jahren</td>
+          <td>in 12 Jahren</td>
+        </tr>
+        <tr>
+          <td>{{ total_montly_convetional | currencyformat }} mtl.</td>
+          <td>{{ total_montly_convetional_half_time | currencyformat }} mtl.</td>
+          <td>{{ total_montly_convetional_full_time | currencyformat }} mtl.</td>
+        </tr>
+      </table>
+    </div>
+    <div class="content flex">
+      <p>
+        <b>Monatliche Belastung inkl. Finanzierungsrate (Zinssatz {{ data.bluegen_quote.calculated.loan_calculation.interest_rate | percentformat(2) }} pro Jahr)</b>
+      </p>
+      <table class="right">
+        <tr>
+          <td>heute</td>
+          <td>in 6 Jahren</td>
+          <td>in 12 Jahren</td>
+        </tr>
+        <tr>
+          <td>{{ total_montly_new | currencyformat }}</td>
+          <td>{{ total_montly_half_time | currencyformat }} mtl.</td>
+          <td>{{ total_montly_full_time | currencyformat }} mtl.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <br>
+  <div style="padding: 0 0 0.6em; text-align: center; font-size: 1.2em;">Durchschnittliche Kosten:</div>
+  <div style="background-color: rgb(230, 230, 230); text-align: center; font-size: 1.2em; padding: 0.4em 0;">
+    <div class="content layout horizontal ">
+      <div class="flex">
+        <div style="font-size: 1.8em">{{ ((total_montly_convetional + total_montly_convetional_half_time + total_montly_convetional_full_time) / 3) | currencyformat }}</div>
+        <div style="font-size: 0.9em">pro Monat <b>ohne</b> Energiekonzept</div>
+      </div>
+      <div class="flex">
+        <div style="font-size: 1.8em">{{ ((total_montly_new + total_montly_half_time + total_montly_full_time) / 3) | currencyformat }}</div>
+        <div style="font-size: 0.9em">pro Monat <b>mit</b> Energiekonzept</div>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <br>
+    In der hier dargestellten Beispiel Kalkulation wurde von einem 100% Nutzen des produzierten Stromes ausgegangen.
+  </div>
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

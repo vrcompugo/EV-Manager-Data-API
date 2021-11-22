@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>asd</title>
+  {% include('feasibility_study_2020/style.html') %}
+  {% include('feasibility_study_2020/elements/graph-line.html') %}
+  {% include('feasibility_study_2020/elements/table.html') %}
+  {% include('feasibility_study_2020/elements/bar.html') %}
+  {% include('feasibility_study_2020/elements/step.html') %}
+  {% include('feasibility_study_2020/elements/arrow.html') %}
+</head>
+<body>
+
+  {% set total_pages = 4 %}
+
+
+  {% set current_page = 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/bluegen-wi/pages/cover.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+      {% include('quote_calculator/generator/bluegen-wi/pages/page_monthly.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/bluegen-wi/pages/page_text.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/bluegen-wi/pages/page_bank.html') %}
+  </div>
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/bluegen-wi/pages/page_disclaimer.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/bluegen-wi/pages/page_notes.html') %}
+  </div>
+</body>
+</html>
+
+

@@ -1,0 +1,162 @@
+<style>
+  .page_monthly_lightcloud .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 38px;
+    padding: 0 16vw 10px 50px;
+  }
+  .page_monthly_lightcloud .left-side {
+    position: relative;
+    flex: 1;
+    padding-left: 50px;
+    padding-right: 1em;
+  }
+  .page_monthly_lightcloud .right-side {
+    position: relative;
+    flex: 1;
+    padding-right: 50px;
+    padding-left: 1em;
+  }
+  .page_monthly_lightcloud table td:last-child {
+    padding-right: 2.4em;
+  }
+  .page_monthly_lightcloud .zero-logo {
+    position: absolute;
+    width: 150px;
+    top: 2em;
+    left: 3em;
+  }
+</style>
+
+{% if data.bluegen_quote.calculated.cell.price_tomorrow / data.bluegen_quote.calculated.energy.max_value < 0.60 %}
+  {% set label_above = "label-above" %}
+{% else %}
+  {% set label_above = "" %}
+{% endif %}
+
+<div class="page_monthly_lightcloud">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+  <img class="zero-logo" src="{{ data.base_url }}/static/zero-logo.jpg" />
+  <div class="headline">
+    Profitieren Sie heute und in Zukunft<br>
+    von der sichersten Brennstoffzellen Lösung Deutschlands
+  </div>
+
+  <div class="layout horizontal">
+
+    <div class="left-side">
+      <div style="display: flex; justify-content: flex-start;">
+        <div class="arrow arrow--below">Energiekosten pro Monat</div>
+      </div>
+      <br>
+      <div class="graph-warpper {% if data.bluegen_quote.calculated.cell.price_tomorrow < 0 %}top{% endif %}">
+        <div class="flex graph-line" style="--max-value: {{ data.bluegen_quote.calculated.energy.max_value }}">
+          <div class="column" style="--value: {{ data.bluegen_quote.calculated.lightcloud.price_today }}">
+            <div class="bar"><span>{{ data.bluegen_quote.calculated.energy.price_today | currencyformat }}</span></div>
+            <div class="label">Heute</div>
+          </div>
+          <div class="column" style="--value: {{ data.bluegen_quote.calculated.energy.price_half_time }}">
+            <div class="bar"><span>{{ data.bluegen_quote.calculated.energy.price_half_time | currencyformat }}</div>
+            <div class="label">
+              {% if data.bluegen_quote.calculated.cell.cloud_runtime == 2 %}
+                Nächstes Jahr
+              {% else %}
+                In {{ (data.bluegen_quote.calculated.cell.cloud_runtime / 2) | numberformat("de", 0) }} Jahren
+              {% endif %}
+            </div>
+          </div>
+          <div class="column" style="--value: {{ data.bluegen_quote.calculated.energy.price_full_time }}">
+            <div class="bar"><span>{{ data.bluegen_quote.calculated.energy.price_full_time | currencyformat }}</div>
+            <div class="label">In {{ data.bluegen_quote.calculated.cell.cloud_runtime | numberformat("de", 0) }} Jahren</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="right-side">
+
+      <div style="display: flex; justify-content: flex-end;">
+        <div class="arrow arrow--left arrow--below">Kosten der Brennstoffzellen Lösung</div>
+      </div>
+      <br>
+      <div class="graph-warpper {% if data.bluegen_quote.calculated.cell.price_tomorrow < 0 %}negative{% endif %}">
+        <div class="flex graph-line graph--green {% if data.bluegen_quote.calculated.cell.price_tomorrow / data.bluegen_quote.calculated.energy.max_value > -0.17 %}move-label-up{% endif %}" style="--max-value: {{ data.bluegen_quote.calculated.energy.max_value }}">
+          <div class="column {% if data.bluegen_quote.calculated.cell.price_tomorrow < 0 %}negative{% endif %}" style="--value: {{ data.bluegen_quote.calculated.cell.price_tomorrow | abs }}">
+            <div class="bar {{ label_above }}"><span>{{ data.bluegen_quote.calculated.cell.price_tomorrow | currencyformat }}</span></div>
+            <div class="label">Heute</div>
+          </div>
+          <div class="column {% if data.bluegen_quote.calculated.cell.price_half_time < 0 %}negative{% endif %}" style="--value: {{ data.bluegen_quote.calculated.cell.price_half_time | abs }}">
+            <div class="bar {{ label_above }}"><span>{{ data.bluegen_quote.calculated.cell.price_half_time | currencyformat }}</span></div>
+            <div class="label">
+              {% if data.bluegen_quote.calculated.cell.cloud_runtime == 2 %}
+                Nächstes Jahr
+              {% else %}
+                In {{ (data.bluegen_quote.calculated.cell.cloud_runtime / 2) | numberformat("de", 0) }} Jahren
+              {% endif %}
+            </div>
+          </div>
+          <div class="column {% if data.bluegen_quote.calculated.cell.price_full_time < 0 %}negative{% endif %}" style="--value: {{ data.bluegen_quote.calculated.cell.price_full_time | abs }}">
+            <div class="bar {{ label_above }}"><span>{{ data.bluegen_quote.calculated.cell.price_full_time | currencyformat }}</span></div>
+            <div class="label">In {{ data.bluegen_quote.calculated.cell.cloud_runtime | numberformat("de", 0) }} Jahren</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="padding: 0 50px;">
+    <table cellspacing="0" class="no-flag no-highlight">
+      <tr style="background-color: #E8E8E8;">
+        <td></td>
+        <td class="align-center"><b>Heute</b><br>ohne Cloud</td>
+        <td class="align-center"><b>Morgen</b><br>mit Cloud</td>
+        <td class="align-center"><b>
+          {% if data.bluegen_quote.calculated.cell.cloud_runtime == 2 %}
+            Nächstes Jahr
+          {% else %}
+            In {{ (data.bluegen_quote.calculated.cell.cloud_runtime / 2) | numberformat("de", 0) }} Jahren
+          {% endif %}
+        </b><br>mit Cloud</td>
+        <td class="align-center"><b>In {{ data.bluegen_quote.calculated.cell.cloud_runtime | numberformat("de", 0) }} Jahren</b><br>mit Cloud</td>
+      </tr>
+      <tr>
+        <td>Energiekosten pro Monat</td>
+        <td class="align-center"><b>{{ data.bluegen_quote.calculated.energy.price_today | currencyformat }}</b></td>
+        <td class="align-center" style="text-decoration: line-through;">{{ data.bluegen_quote.calculated.energy.price_today | currencyformat }}</td>
+        <td class="align-center" style="text-decoration: line-through;">{{ data.bluegen_quote.calculated.energy.price_half_time | currencyformat }}</td>
+        <td class="align-center" style="text-decoration: line-through;">{{ data.bluegen_quote.calculated.energy.price_full_time | currencyformat }}</td>
+      </tr>
+      <tr>
+        <td>Cloudgebühr pro Monat</td>
+        <td class="align-center"></td>
+        <td class="align-center">{{ data.bluegen_quote.calculated.cell.price_tomorrow | currencyformat }}</td>
+        <td class="align-center">{{ data.bluegen_quote.calculated.cell.price_half_time | currencyformat }}</td>
+        <td class="align-center">{{ data.bluegen_quote.calculated.cell.price_full_time | currencyformat }}</td>
+      </tr>
+      <tr style="background-color: #E8E8E8;">
+        <td>Monatliche Ersparnis</td>
+        <td class="align-center"><b>0 €</b></td>
+        <td class="align-center"><b>{{ (data.bluegen_quote.calculated.energy.price_today - data.bluegen_quote.calculated.cell.price_tomorrow) | currencyformat("de", 0) }}</b></td>
+        <td class="align-center"><b>{{ (data.bluegen_quote.calculated.energy.price_half_time - data.bluegen_quote.calculated.cell.price_half_time) | currencyformat("de", 0) }}</b></td>
+        <td class="align-center"><b>{{ (data.bluegen_quote.calculated.energy.price_full_time - data.bluegen_quote.calculated.cell.price_full_time) | currencyformat("de", 0) }}</b></td>
+      </tr>
+    </table>
+
+    <div style="padding: 1em;"><b>Bei steigenden Stromkosten wächst Ihre Ersparnis</b></div>
+  </div>
+
+  <div class="layout horizontal" style="padding: 0 100px 0 190px;">
+    <small style="padding-right: 2em; font-size: 11px;">
+      Bezüglich des Netto- oder Bruttoausweises der vorliegenden
+      Angaben wird auf die Erläuterungen im Anhang verwiesen.
+    </small>
+    <small style="font-size: 11px;">
+      Haftungsausschluss: Unsere Online-Rechner werden mit größter Sorgfalt erstellt.
+      Für die Richtigkeit der Ergebnisse können wir jedoch keine Haftung übernehmen.
+    </small>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

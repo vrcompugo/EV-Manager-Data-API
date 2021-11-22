@@ -52,6 +52,10 @@ def calculate_commission_data(quote_data, data, quote_key=""):
                 if data["data"][f"{quote_key}_discount_percent"] > 15:
                     data["data"][f"{quote_key}_discount_percent"] = 15
                     data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
+            elif quote_key == "bluegen_quote":
+                if data["data"][f"{quote_key}_discount_percent"] > 4:
+                    data["data"][f"{quote_key}_discount_percent"] = 4
+                    data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
             else:
                 if data["data"][f"{quote_key}_discount_percent"] > 5:
                     data["data"][f"{quote_key}_discount_percent"] = 5
@@ -95,6 +99,8 @@ def calculate_commission_data(quote_data, data, quote_key=""):
 
 
 def get_commission_rate(quote_data, data, quote_key):
+    if quote_key == "bluegen_quote":
+        return 5
     if quote_key == "pv_quote":
         if 23 in data["assigned_user"]["UF_DEPARTMENT"]:
             if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:

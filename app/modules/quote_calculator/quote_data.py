@@ -18,7 +18,7 @@ from .conditional_products.pvmodule import add_product as add_product_pv_module
 from .conditional_products.storage import add_product as add_product_storage
 
 from .heating_quote import get_heating_calculation, get_heating_products
-from .bluegen_quote import get_bluegen_calculation, get_bluegen_products
+from .bluegen_quote import get_bluegen_calculation, get_bluegen_calculation2, get_bluegen_products
 from .roof_reconstruction_quote import get_roof_reconstruction_calculation, get_roof_reconstruction_products
 from .commission import calculate_commission_data
 
@@ -58,10 +58,10 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "data": {
             "emove_tarif": "none",
             "bluegen_cell_count": 1,
-            "price_increase_rate": 4,
-            "inflation_rate": 1.5,
+            "price_increase_rate": 5.75,
+            "inflation_rate": 1.75,
             "runtime": 30,
-            "financing_rate": 3.79,
+            "financing_rate": 2.49,
             "module_type": default_module_type,
             "investment_type": "financing",
             "price_guarantee": "12_years",
@@ -160,6 +160,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         if "has_bluegen_quote" in data and data["has_bluegen_quote"]:
             return_data["bluegen_quote"]["calculated"] = get_bluegen_calculation(return_data)
             return_data = get_bluegen_products(return_data)
+            return_data["bluegen_quote"]["calculated"] = get_bluegen_calculation2(return_data)
             if "commission_value" in return_data["bluegen_quote"]["calculated"]:
                 return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["bluegen_quote"]["calculated"]["commission_value"]
 
@@ -368,21 +369,17 @@ def calculate_products(data):
             quantity = 0
             if "wallbox" in data["data"]["extra_options"] and "wallbox" in data["data"]["extra_options"]:
                 quantity = data["data"]["extra_options_wallbox_count"]
-            if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "22kW":
-                add_direct_product(
-                    label="Wallbox SENEC 22kW",
-                    category="Extra Pakete",
-                    quantity=quantity,
-                    products=data["products"]
-                )
-            else:
-                add_direct_product(
-                    # label="Wallbox SENEC 11kW",
-                    label="Heidelberg Energy Control. 11 kW",
-                    category="Extra Pakete",
-                    quantity=quantity,
-                    products=data["products"]
-                )
+            wallbox_type = "Heidelberg ECO Home 11kW"
+            if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-22kW":
+                wallbox_type = "Wallbox SENEC 11kW bis 22 kW"
+            if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "control-11kW":
+                wallbox_type = "Heidelberg Energy Control. 11 kW"
+            add_direct_product(
+                label=wallbox_type,
+                category="Extra Pakete",
+                quantity=quantity,
+                products=data["products"]
+            )
         add_direct_product(
             label="Unser Komplettschutz",
             category="Optionen PV Anlage",

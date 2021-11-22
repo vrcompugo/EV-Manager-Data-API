@@ -301,6 +301,30 @@ def generate_bluegen_pdf(lead_id, data, return_string=False, order_confirmation=
     return None
 
 
+def generate_bluegen_wi_pdf(lead_id, data, return_string=False, order_confirmation=False):
+    config = get_settings(section="offer/pdf")
+    config_general = get_settings(section="general")
+    if data is not None:
+        data["base_url"] = "https://api.korbacher-energiezentrum.de"
+        if "datetime" not in data:
+            data["datetime"] = datetime.datetime.now()
+        content = render_template(
+            "quote_calculator/generator/bluegen-wi/index.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data
+        )
+        data["datetime"] = str(data["datetime"])
+        if return_string:
+            return content
+        pdf = gotenberg_pdf(
+            content,
+            margins=["0", "0", "0", "0"],
+            landscape=True)
+        return pdf
+    return None
+
+
 def generate_datasheet_pdf(lead_id, data):
     config = get_settings(section="offer/datasheet_pdf")
     output_file = io.BytesIO()
@@ -313,8 +337,12 @@ def generate_datasheet_pdf(lead_id, data):
         if "wwwp" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, config["nibe_wp"], cached=True)
         if "wallbox" in data["data"]["extra_options"]:
-            # add_pdf_by_drive_id(merger, 436174, cached=True)  # senec wallbox
-            pass
+            if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-22kW":
+                add_pdf_by_drive_id(merger, 436174, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/436174/?&ncc=1&filename=Senec+Wallbox.pdf
+            elif "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "control-11kW":
+                add_pdf_by_drive_id(merger, 2342388, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2342388/?&ncc=1&filename=322095_TDB_Wallbox_Energy_Control_DE_X3.pdf
+            else:
+                add_pdf_by_drive_id(merger, 2341958, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2341958/?&ncc=1&filename=322095_TDB_Wallbox_Home_Eco_DE_X3.pdf
 
         if "products" in data:
             pv_module = next((item for item in data["products"] if item["NAME"].find("Soluxtec Glas Glas 330 Watt") == 0), None)
@@ -328,7 +356,7 @@ def generate_datasheet_pdf(lead_id, data):
                 add_pdf_by_drive_id(merger, 436124, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 380 Watt Black") == 0), None)
             if pv_module is not None:
-                add_pdf_by_drive_id(merger, 1086940, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2332072/?&ncc=1&filename=AS-6M-HC_module_specification.pdf
+                add_pdf_by_drive_id(merger, 1086940, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 400 Watt") == 0), None)
             if pv_module is not None:
                 pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 400 Watt Black") == 0), None)
@@ -338,19 +366,19 @@ def generate_datasheet_pdf(lead_id, data):
                     add_pdf_by_drive_id(merger, 436128, cached=True)
             pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec lithium speicher") == 0), None)
             if pv_module is not None:
-                add_pdf_by_drive_id(merger, 443354, cached=True)
+                add_pdf_by_drive_id(merger, 2341368, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2341368/?&ncc=1&filename=Senec+Home+Datenbla%CC%88tter+v2.1.pdf
             pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec v3") == 0), None)
             if pv_module is not None:
-                add_pdf_by_drive_id(merger, 436116, cached=True)
+                add_pdf_by_drive_id(merger, 2341370, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2341370/?&ncc=1&filename=Senec+Home+Datenbla%CC%88tter+v3.pdf
         add_pdf_by_drive_id(merger, 436112, cached=True)  # zebra_zertifgikat
         add_pdf_by_drive_id(merger, 436106, cached=True)  # Testsieger Garantiebedingunegn
         add_pdf_by_drive_id(merger, 436102, cached=True)  # Kapazitätsversprechen
         if "solaredge" in data["data"]["extra_options"]:
-            add_pdf_by_drive_id(merger, 1352450, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352450/?&ncc=1&filename=three-phase-inverter-setapp-ds.pdf
-            add_pdf_by_drive_id(merger, 1352452, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352452/?&ncc=1&filename=power-optimizer-datasheet.pdf
+            add_pdf_by_drive_id(merger, 2332216, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2332216/?&ncc=1&filename=Solaredge+gesamt.pdf
             if data["data"].get("pv_kwp", 0) > 30:
-                add_pdf_by_drive_id(merger, 1352456, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352456/?&ncc=1&filename=three-phase-inverter-setapp-datasheet-30.pdf
                 add_pdf_by_drive_id(merger, 1352454, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352454/?&ncc=1&filename=power-optimizer-datasheet-30.pdf
+            else:
+                add_pdf_by_drive_id(merger, 1352452, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352452/?&ncc=1&filename=power-optimizer-datasheet.pdf
         if "tax_consult" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, 436100, cached=True)
 
@@ -358,6 +386,10 @@ def generate_datasheet_pdf(lead_id, data):
         if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
             # add_pdf_by_drive_id(merger, 436226)  # password protected Waterkotte Wärmepumpen.pdf
             add_pdf_by_drive_id(merger, 436222, cached=True)  # Nibe Wärmepumpen.pdf
+            add_pdf_by_drive_id(merger, 2353740, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2353740/?&ncc=1&filename=Nibe+F2120+Technik.pdf
+        if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "hybrid_gas":
+            add_pdf_by_drive_id(merger, 2353742, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2353742/?&ncc=1&filename=Vaillant+Gas-Brennwert+ecoTec+plus+Technik.pdf
+            add_pdf_by_drive_id(merger, 2353744, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2353744/?&ncc=1&filename=Vaillant+WP+arotherm-plus-Technische+Daten.pdf
     if "has_roof_reconstruction_quote" in data["data"] and data["data"]["has_roof_reconstruction_quote"]:
         add_pdf_by_drive_id(merger, 436216, cached=True)
         add_pdf_by_drive_id(merger, 436214, cached=True)
@@ -367,7 +399,7 @@ def generate_datasheet_pdf(lead_id, data):
         if data["data"].get("bluegen_type") == "electa300":
             add_pdf_by_drive_id(merger, 2172962, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2172962/?&ncc=1&filename=Prospekt_eLecta300_05_2021_web.pdf
         else:
-            add_pdf_by_drive_id(merger, 459672, cached=True)
+            add_pdf_by_drive_id(merger, 2356218, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2356218/?&ncc=1&filename=Brochure_Bluegen_DEU_WEB_Pagine_affiancate.pdf
 
     merger.write(output_file)
     merger.close()
@@ -388,8 +420,10 @@ def generate_summary_pdf(lead_id, data):
     add_pdf_by_drive_id(merger, data["pdf_letter_file_id"])
     if "pdf_wi_file_id" in data and data["pdf_wi_file_id"] > 0:
         add_pdf_by_drive_id(merger, data["pdf_wi_file_id"])
-    if "pdf_bluegen_file_id" in data and data["pdf_bluegen_file_id"] > 0:
-        add_pdf_by_drive_id(merger, 459782, cached=True)
+    '''if "pdf_bluegen_file_id" in data and data["pdf_bluegen_file_id"] > 0:
+        add_pdf_by_drive_id(merger, 459782, cached=True)'''
+    if "pdf_bluegen_wi_file_id" in data and data["pdf_bluegen_wi_file_id"] > 0:
+        add_pdf_by_drive_id(merger, data["pdf_bluegen_wi_file_id"])
     merger.write(output_file)
     merger.close()
     output_file.seek(0)

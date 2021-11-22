@@ -7,6 +7,10 @@
 }
 </style>
 <div class="created-at">
-  Erstellt am {{ offer.datetime | dateformat }}<br>
-  für Angebot {{ offer.number }}
+  {% if offer %}
+    Erstellt am {{ offer.datetime | dateformat }}<br>
+    für Angebot {{ offer.number }}
+  {% else %}
+    Erstellt am {{ data.datetime | dateformat }}
+  {% endif %}
 </div>

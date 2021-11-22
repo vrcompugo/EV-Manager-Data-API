@@ -69,7 +69,7 @@
     {% elif offer.reseller.document_style == "eeg" %}
       {% set heading = "EEG.Cloud Konfiguration" %}
     {% else %}
-      {% set heading = "C.Cloud Konfiguration" %}
+      {% set heading = "Cloud ZERO 4.0 Konfiguration" %}
     {% endif %}
     {% include "offer/head.html" %}
     <br>
@@ -133,7 +133,11 @@
     {% else %}
       <strong>Dieses Angebot ist ab Erstellung 14 Tage gültig aber nicht über den 15.12.2021 hinaus. Je nachdem welche Bedingung zuerst zutrifft.</strong><br>
       <br>
-      Für die Nutzung der BSH Cloud fallen monatliche Gebühren an Energie360 GmbH & Co.KG an. (Cloudgebühren) Höhe der Gebühren - je nach Stromverbrauch. Diese werden nicht über die BSH GmbH + Co. KG abgerechnet!<br>
+      <b>
+        Für die Nutzung der BSH Cloud fallen monatliche Gebühren an Energie360 GmbH & Co.KG an. (Cloudgebühren)<br>
+        Höhe der Gebühren - je nach Stromverbrauch.<br>
+        Diese werden nicht über die BSH GmbH + Co. KG abgerechnet!<br>
+      </b>
       <br>
     {% endif %}
     <small>

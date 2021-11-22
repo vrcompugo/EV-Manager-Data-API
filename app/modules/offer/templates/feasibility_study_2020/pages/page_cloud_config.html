@@ -31,7 +31,7 @@
     {% if offer.reseller.document_style == "bsh" %}
       background-image: url("{{ data.base_url }}/static/feasibility_study_2020/house_with_pv_sun.jpg");
     {% else %}
-      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/world_in_hands.jpg");
+      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/familiy-rope.jpg");
     {% endif %}
     background-size: cover;
     border-bottom: 12px solid #1A61AC;
@@ -60,7 +60,10 @@
     background: -webkit-linear-gradient(left,  rgba(155,155,155,0.5) 0%,rgba(136,155,10,0.7) 53%,rgba(136,155,10,0.7) 54%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to right,  rgba(155,155,155,0.5) 0%,rgba(136,155,10,0.7) 53%,rgba(136,155,10,0.7) 54%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4dffffff', endColorstr='#4db0ca0a',GradientType=1 ); /* IE6-9 */
-
+    {% if offer.reseller.document_style == "bsh" %}
+      flex: 1;
+      text-align: center;
+    {% endif %}
   }
   .page_cloud_config .heading::after {
     position: absolute;
@@ -91,6 +94,7 @@
 <div class="page_cloud_config">
   {% include('feasibility_study_2020/elements/logos.html') %}
 
+  {% if offer.reseller.document_style == "bsh" %}
   <div class="layout horizontal">
 
     <div class="left_side">
@@ -109,7 +113,17 @@
     </div>
 
   </div>
+  {% else %}
+  <div class="layout horizontal">
 
+    <div class="left_side">
+      <div class="heading">
+        <div class="large">Gemeinsam für Generationen die Welt verbessern.</div>
+      </div>
+    </div>
+
+  </div>
+  {% endif %}
 </div>
 
 {% include('feasibility_study_2020/elements/page_counter.html') %}

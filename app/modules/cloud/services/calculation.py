@@ -76,6 +76,17 @@ def calculate_cloud(data):
     else:
         data["conventional_power_cost_per_kwh"] = 31
     result["conventional_power_cost_per_kwh"] = data["conventional_power_cost_per_kwh"]
+
+    if data.get("has_heating_quote", False) is True:
+        result["conventional_price_heating_usage"] = float(data.get("heating_quote_usage_old", ""))
+        result["conventional_price_heating"] = 0
+        result["conventional_price_heating_usage_type"] = data.get("old_heating_type", "")
+        if data.get("old_heating_type", "") == "oil":
+            result["conventional_price_heating"] = 0.0899
+        elif data.get("old_heating_type", "") == "gas":
+            result["conventional_price_heating"] = 0.1199
+        else:
+            result["conventional_price_heating"] = 0.24
     pv_efficiancy_faktor = None
     if "name" in user and user["name"].lower() == "bsh":
         settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 2405
@@ -225,6 +236,8 @@ def calculate_cloud(data):
         if data is not None and "conventional_heat_cost_per_kwh" in data and data["conventional_heat_cost_per_kwh"] is not None and data["conventional_heat_cost_per_kwh"] != "":
             data["conventional_heat_cost_per_kwh"] = float(data["conventional_heat_cost_per_kwh"])
             result["conventional_price_heatcloud"] = (data["heater_usage"] * data["conventional_heat_cost_per_kwh"] / 100) / 12
+        if result.get("conventional_price_heating", 0) > 0:
+            result["conventional_price_heatcloud"] = result["conventional_price_heating_usage"] * result["conventional_price_heating"] / 12
 
     if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0:
         data["ecloud_usage"] = int(data["ecloud_usage"])
@@ -242,6 +255,10 @@ def calculate_cloud(data):
         if data is not None and "conventional_gas_cost_per_kwh" in data and data["conventional_gas_cost_per_kwh"] is not None and data["conventional_gas_cost_per_kwh"] != "":
             data["conventional_gas_cost_per_kwh"] = float(data["conventional_gas_cost_per_kwh"])
             result["conventional_price_ecloud"] = (data["ecloud_usage"] * data["conventional_gas_cost_per_kwh"] / 100) / 12
+        if result.get("conventional_price_heating", 0) > 0:
+            result["conventional_price_ecloud"] = result["conventional_price_heating_usage"] * result["conventional_price_heating"] / 12
+        if data.get("has_heating_quote", False) is True and data.get("new_heating_type", "") == "hybrid_gas":
+            result["conventional_price_ecloud"] = 0
     if "consumers" in data:
         consumer_usage = 0
         for consumer in data["consumers"]:
@@ -275,16 +292,16 @@ def calculate_cloud(data):
             result["min_kwp_emove"] = settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["kwp"]
             result["cloud_price_emove"] = settings["data"]["cloud_settings"]["cloud_emove"][data["emove_tarif"]]["price"]
             if data["emove_tarif"] == "emove.drive I":
-                result["conventional_price_emove"] = 8000 / 100 * 7 * 1.19 / 12
+                result["conventional_price_emove"] = 8000 / 100 * 7 * 1.72 / 12
                 result["emove_usage"] = 1500
             if data["emove_tarif"] == "emove.drive II":
-                result["conventional_price_emove"] = 12000 / 100 * 7 * 1.19 / 12
+                result["conventional_price_emove"] = 12000 / 100 * 7 * 1.72 / 12
                 result["emove_usage"] = 2000
             if data["emove_tarif"] == "emove.drive III":
-                result["conventional_price_emove"] = 20000 / 100 * 7 * 1.19 / 12
+                result["conventional_price_emove"] = 20000 / 100 * 7 * 1.72 / 12
                 result["emove_usage"] = 5000
             if data["emove_tarif"] == "emove.drive ALL":
-                result["conventional_price_emove"] = 25000 / 100 * 7 * 1.19 / 12
+                result["conventional_price_emove"] = 25000 / 100 * 7 * 1.72 / 12
                 result["emove_usage"] = 8500
 
     if "price_guarantee" in data:
@@ -441,7 +458,7 @@ def calculate_cloud(data):
         if result["cloud_price_incl_refund"] > float(data["cloud_price_wish"]) > 0 and "price_guarantee" in data and data["price_guarantee"] == "2_years":
             price_diff = result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])
             result["user_one_time_cost"] = result["user_one_time_cost"] + (result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])) * 24
-
+    print(json.dumps(result, indent=2))
     return result
 
 
@@ -503,9 +520,12 @@ def get_cloud_products(data=None, offer=None):
         guarantee_runtime = "12 Jahre"
     light_cloud_usage = int(data["calculated"]["power_usage"])
     lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
-    cloud_label = "cCloud-Zero"
-    cloud_description = f"<div style='float:right'><img style='width: 120px' src='{config_general['base_url']}static/zero-logo.jpg' /></div>Mit der C.Cloud.ZERO – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
-    cloud_tarif = "cCloud-Zero"
+    if offer is not None and offer.reseller.document_style == "bsh":
+        cloud_label = "cCloud-Zero"
+    else:
+        cloud_label = "Cloud ZERO 4.0"
+    cloud_description = f"<div style='float:right'><img style='width: 120px' src='{config_general['base_url']}static/zero-logo.jpg' /></div>Mit der {cloud_label} – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
+    cloud_tarif = cloud_label
     if "document_style" in data["data"]:
         if data["data"]["document_style"] == "bsh":
             cloud_label = "BSH-Cloud"

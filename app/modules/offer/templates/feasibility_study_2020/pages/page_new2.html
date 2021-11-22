@@ -1,0 +1,51 @@
+<style>
+  .page_map {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page_map .left-side {
+    flex: 10;
+    padding-left: 50px;
+    padding-top: 4em;
+  }
+  .page_map .headline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 36px;
+    padding: 0 100px 30px 0;
+
+  }
+  .page_map .cable-img {
+    flex: 1;
+    background: url("{{ data.base_url }}/static/feasibility_study_2020/cable.jpg") no-repeat top right;
+    background-size: contain;
+  }
+  .page_map .right-side {
+    flex: 1 0 20%;
+    padding-top: 4em;
+  }
+  .page_map ul{
+    padding-left: 1.5em;
+  }
+  .page_map ul li {
+    padding: 0.5em 0;
+  }
+</style>
+
+
+<div class="page_map">
+  {% include('feasibility_study_2020/elements/logos.html') %}
+
+  <div style="text-align: right; margin-top: -2em;">
+    <img style="width: 100vw; height: auto;" src="https://api.korbacher-energiezentrum.de.ah.hbbx.de/static/feasibility_study_2020/pagenew2.jpg" />
+    <div style="position: absolute; width: 920px; left: 150px; bottom: 6px; font-size: 0.8em; text-align: center;">
+      Es handelt sich hier um eine Beispiel Berechnung eines Haushalts mit 4500 kWh Stromverbrauch und einem Autarkiegrad von 70%.
+      Die in 12 Jahren anfallenden Gebühren, gesetzlichen Abgaben usw. kann niemand seriös voraussagen. Die tatsächliche Einsparung kann
+      abweichen.  Es wird hier eine Schematische Darstellung vereinfacht erklärt um die Cloud ZERO 4.0 verständlich und einfach darzustellen.
+    </div>
+  </div>
+
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}
+{% include('feasibility_study_2020/elements/created_at.html') %}

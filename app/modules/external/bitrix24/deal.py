@@ -225,10 +225,10 @@ def run_cron_add_missing_values():
                     if "technik_service_packet" in history.data["data"]["extra_options"]:
                         update_data["extra_packages"] = ["Technik & Service (Anschlussgarantie, Technikpaket, Portal)"]
                     if "wallbox" in history.data["data"]["extra_options"]:
-                        if history.data["data"].get("extra_options_wallbox_variant") == "22kW":
-                            update_data["extra_packages2"].append("Wallbox 22 kW (SENEC) mit Kabel")
+                        if history.data["data"].get("extra_options_wallbox_variant") == "senec-22kW":
+                            update_data["extra_packages2"].append("Wallbox SENEC 11kW bis 22 kW")
                         else:
-                            update_data["extra_packages2"].append("Wallbox 11 kW (SENEC) mit Kabel")
+                            update_data["extra_packages2"].append("Heidelberg ECO Home 11kW")
                     if "new_power_closet" in history.data["data"]["extra_options"]:
                         update_data["extra_packages2"].append("Zählerschrank")
                     if "emergency_power_box" in history.data["data"]["extra_options"]:

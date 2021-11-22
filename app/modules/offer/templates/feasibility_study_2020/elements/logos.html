@@ -44,11 +44,11 @@
 </style>
 
 <div class="logos layout horizontal">
-  {% if offer.reseller.document_style == "bsh" %}
+  {% if offer and offer.reseller.document_style == "bsh" %}
     <div class="kez bsh-logo flex">
       <img class="" src="{{ data.base_url }}/static/feasibility_study_2020/bsh-logo.jpg" />
     </div>
-  {% elif offer.reseller.document_style == "mitte" %}
+  {% elif offer and offer.reseller.document_style == "mitte" %}
     <div class="kez flex">
       <img src="{{ data.base_url }}/static/feasibility_study_2020/energie-logo.jpg" />
     </div>

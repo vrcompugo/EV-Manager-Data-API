@@ -11,6 +11,10 @@
   table tr.highlight {
     background-color: #AEBF00;
   }
+  table tr.highlight-grey {
+    background-color: #dadada;
+  }
+
   table tr.highlight td {
     font-weight: bold;
   }
@@ -34,6 +38,9 @@
   table:not(.right) tr.highlight td:first-child::before {
     background-color: #96B603;
   }
+  table:not(.right) tr.highlight-grey td:first-child::before {
+    background-color: #cacaca;
+  }
   table.right tr:nth-child(2n) td:last-child,
   table.right tr.highlight td:last-child {
     position: relative;
@@ -52,8 +59,13 @@
   table.right tr.highlight td:last-child::before {
     background-color: #96B603;
   }
+  table.right tr.highlight-grey td:last-child::before {
+    background-color: #cacaca;
+  }
   table.no-flag tr:nth-child(2n) td:first-child::before,
-  table.right.no-flag tr:nth-child(2n) td:last-child::before {
+  table.right.no-flag tr:nth-child(2n) td:last-child::before,
+  table tr.no-flag:nth-child(2n) td:first-child::before,
+  table.right tr.no-flag:nth-child(2n) td:last-child::before {
     display: none;
   }
   table tr td {
