@@ -317,6 +317,9 @@ def calculate_feasibility_study(offer: OfferV2):
         data["yearly_loan_payment"] = data["loan_calculation"]["yearly_payment"]
         data["loan_total_interest"] = data["loan_calculation"]["interest_cost"]
         data["loan_total"] = data["loan_calculation"]["total_cost"]
+    else:
+        if data.get("loan_total") is None:
+            data["loan_total"] = data["loan_amount"]
     data["conventional_usage_cost"] = data["conventional_base_cost_per_kwh"] * float(data["usage"])
 
     base = data["conventional_usage_cost"] + data["conventional_base_cost_per_year"]
