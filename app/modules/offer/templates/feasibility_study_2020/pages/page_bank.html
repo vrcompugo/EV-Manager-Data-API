@@ -130,7 +130,9 @@
             </tr>
           {% endif %}
         {% endif %}
-        {% set total_montly_new = total_montly_new + data.loan_calculation.monthly_payment  %}
+        {% if data.loan_calculation %}
+          {% set total_montly_new = total_montly_new + data.loan_calculation.monthly_payment  %}
+        {% endif %}
         <tr>
           <td>Investition</td>
           <td>{{ (data.pv_offer_total + data.heating_offer_total)| currencyformat }}</td>
@@ -165,7 +167,11 @@
     <div class="content flex">
       <table class="right">
         <tr class="highlight">
-          <td colspan="3"><b>Monatliche Belastung inkl. Finanzierungsrate (Zinssatz {{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr)</b></td>
+          {% if data.loan_calculation %}
+            <td colspan="3"><b>Monatliche Belastung inkl. Finanzierungsrate (Zinssatz {{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr)</b></td>
+          {% else %}
+            <td colspan="3"><b>Monatliche Belastung</b></td>
+          {% endif %}
         </tr>
         <tr>
           <td>heute</td>
