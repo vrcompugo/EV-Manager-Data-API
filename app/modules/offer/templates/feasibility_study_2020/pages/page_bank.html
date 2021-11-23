@@ -55,15 +55,6 @@
             <td>{{ data.ecloud.price_today | currencyformat }} mtl.</td>
           </tr>
         {% endif %}
-        {% if data.consumer %}
-          {% set total_montly_convetional = total_montly_convetional + data.consumer.price_today %}
-          {% set total_montly_convetional_half_time = total_montly_convetional_half_time + data.consumer.price_half_time %}
-          {% set total_montly_convetional_full_time = total_montly_convetional_full_time + data.consumer.price_full_time %}
-          <tr>
-            <td>Lichtstrom Nebenstelle</td>
-            <td>{{ data.consumer.price_today | currencyformat }} mtl.</td>
-          </tr>
-        {% endif %}
         {% if data.ecloud and data.ecloud.conventional_maintenance_per_year > 0 %}
           {% set total_montly_convetional = total_montly_convetional + (data.ecloud.conventional_maintenance_per_year / 12) %}
           {% set total_montly_convetional_half_time = total_montly_convetional_half_time + (data.ecloud.conventional_maintenance_per_year / 12) %}
@@ -106,13 +97,6 @@
           <tr>
             <td>Cloud - Wärmeenergie</td>
             <td>{{ data.ecloud.price_tomorrow | currencyformat }} mtl.</td>
-          </tr>
-        {% endif %}
-        {% if data.consumer %}
-          {% set total_montly_new = total_montly_new + data.consumer.price_tomorrow %}
-          <tr>
-            <td>Cloud - Consumer</td>
-            <td>{{ data.consumer.price_tomorrow | currencyformat }} mtl.</td>
           </tr>
         {% endif %}
 
