@@ -45,7 +45,7 @@ def check_contacts():
     from app.modules.external.bitrix24.contact import get_contacts
     contacts = get_contacts({
         "SELECT": "full",
-        "FILTER[>DATE_MODIFY]": "2021-11-08 12:00:00"
+        "FILTER[>DATE_MODIFY]": "2021-11-08 13:00:00"
     })
     print(json.dumps(contacts, indent=2))
 
