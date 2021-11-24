@@ -19,9 +19,9 @@ RUN chown -R appuser.appuser /usr/src/app
 
 RUN apt-get update && apt-cache search ghostscript && apt-get install -y ghostscript
 
-COPY hosts /etc/hosts
+RUN apt-get install -y nano less lookup
 
-USER appuser
+# USER appuser
 
 ENV PYTHONUNBUFFERED 1
 
