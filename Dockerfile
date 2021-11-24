@@ -19,6 +19,8 @@ RUN chown -R appuser.appuser /usr/src/app
 
 RUN apt-get update && apt-cache search ghostscript && apt-get install -y ghostscript
 
+COPY hosts /etc/hosts
+
 USER appuser
 
 ENV PYTHONUNBUFFERED 1
