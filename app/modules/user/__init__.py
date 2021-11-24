@@ -26,7 +26,7 @@ def auto_assign_lead_to_user(lead_id):
         .filter(or_(
             and_(
                 UserZipAssociation.current_cycle_index == current_cycle_index,
-                UserZipAssociation.current_cycle_count <= UserZipAssociation.max_leads
+                UserZipAssociation.current_cycle_count < UserZipAssociation.max_leads
             ),
             UserZipAssociation.current_cycle_index != current_cycle_index,
             UserZipAssociation.current_cycle_index.is_(None)
@@ -39,7 +39,7 @@ def auto_assign_lead_to_user(lead_id):
             .filter(or_(
                 and_(
                     UserZipAssociation.current_cycle_index == current_cycle_index,
-                    UserZipAssociation.current_cycle_count <= UserZipAssociation.max_leads
+                    UserZipAssociation.current_cycle_count < UserZipAssociation.max_leads
                 ),
                 UserZipAssociation.current_cycle_index != current_cycle_index,
                 UserZipAssociation.current_cycle_index.is_(None)
