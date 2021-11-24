@@ -495,9 +495,10 @@ def calculate_feasibility_study(offer: OfferV2):
             else:
                 cloud_total_extra = (cloud_calulation["cloud_price_extra"] * 12) * (1 + data["cost_increase_rate"] / 100) ** (i + 1)
             cloud_new_rate = cloud_total_light + cloud_total_consumer + cloud_total_heatcloud + cloud_total_ecloud + cloud_total_emove + cloud_total_extra
+            print("cloud", i, cloud_new_rate / 12, cloud_total_light, cloud_total_extra)
+            data["cloud_subscription_total"] = data["cloud_subscription_total"] + cloud_new_rate
             data["maintainance_cost_total"] = data["maintainance_cost_total"] + data["maintainance_cost_yearly"]
             data["insurance_cost_total"] = data["insurance_cost_total"] + data["insurance_cost_yearly"]
-            data["cloud_subscription_total"] = data["cloud_subscription_total"] + cloud_new_rate
             cloud_new_rate = cloud_new_rate + data["maintainance_cost_yearly"] + data["insurance_cost_yearly"]
             data["cloud_total"] = data["cloud_total"] + cloud_new_rate
 
