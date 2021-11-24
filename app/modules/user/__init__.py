@@ -26,7 +26,7 @@ def auto_assign_lead_to_user(lead_id):
         .filter(or_(
             and_(
                 UserZipAssociation.current_cycle_index == current_cycle_index,
-                UserZipAssociation.current_cycle_count < UserZipAssociation.max_leads
+                UserZipAssociation.current_cycle_count <= UserZipAssociation.max_leads
             ),
             UserZipAssociation.current_cycle_index != current_cycle_index,
             UserZipAssociation.current_cycle_index.is_(None)
@@ -39,7 +39,7 @@ def auto_assign_lead_to_user(lead_id):
             .filter(or_(
                 and_(
                     UserZipAssociation.current_cycle_index == current_cycle_index,
-                    UserZipAssociation.current_cycle_count < UserZipAssociation.max_leads
+                    UserZipAssociation.current_cycle_count <= UserZipAssociation.max_leads
                 ),
                 UserZipAssociation.current_cycle_index != current_cycle_index,
                 UserZipAssociation.current_cycle_index.is_(None)
@@ -49,7 +49,7 @@ def auto_assign_lead_to_user(lead_id):
             .order_by(UserZipAssociation.last_assigned.asc())\
             .first()
     if user is None:
-        update_data = {"assigned_by_id": 1}
+        update_data = {"assigned_by_id": 344}
     else:
         update_data = {"assigned_by_id": user.user_id}
     update_lead(lead_id, update_data)
