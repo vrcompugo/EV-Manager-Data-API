@@ -63,6 +63,20 @@ def sign_date_test():
 
 
 @manager.command
+def rerun_auto_assign_lead_to_user():
+    import datetime
+    from app.modules.user import auto_assign_lead_to_user
+    from app.modules.external.bitrix24.lead import get_leads
+    leads = get_leads({
+        "filter[>ACTIVITY_DATE]": "2021-11-22",
+        "filter[ASSIGNED_BY_ID]": "344"
+    })
+    for lead in leads:
+        print(lead.get("id"))
+        auto_assign_lead_to_user(lead.get("id"))
+
+
+@manager.command
 def import_mfr_tasks():
     from app.modules.external.bitrix24.task import get_tasks
     print("import mfr tasks")
