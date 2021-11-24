@@ -223,6 +223,7 @@ def calculate_feasibility_study(offer: OfferV2):
         "cost_increase_rate_heat": price_increase_heat,
         "cost_increase_rate_ecloud": price_increase_ecloud,
         "cost_increase_rate_emove": price_increase_emove,
+        "cost_extra_decrease": 0.35,
         "inflation_rate": inflation_rate,
         "full_cost_increase_rate": price_increase + inflation_rate,
         "full_cost_increase_rate_heat": price_increase_heat + inflation_rate,
@@ -442,16 +443,20 @@ def calculate_feasibility_study(offer: OfferV2):
         if offer.data.get("new_heating_type") in "hybrid":
             data["maintainance_cost_monthly"] = data["maintainance_cost_monthly"] + 41.66667
     data["cloud_total"] = (data["cloud_monthly_cost"] + data["maintainance_cost_monthly"]) * 12 * int(cloud_runtime)
-    for i in range(data["runtime"] - int(cloud_runtime)):
-        cloud_total_light = (cloud_calulation["cloud_price_light"] * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
-        cloud_total_consumer = (cloud_calulation["cloud_price_consumer"] * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
-        cloud_total_heatcloud = (cloud_calulation["cloud_price_heatcloud"] * 12) * (1 + data["full_cost_increase_rate_heat"] / 100) ** (i + 1)
-        cloud_total_ecloud = (cloud_calulation["cloud_price_ecloud"] * 12) * (1 + data["full_cost_increase_rate_ecloud"] / 100) ** (i + 1)
-        cloud_total_emove = (cloud_calulation["cloud_price_emove"] * 12) * (1 + data["full_cost_increase_rate_emove"] / 100) ** (i + 1)
-        cloud_total_service = (data["maintainance_cost_monthly"] * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
-        cloud_total_extra = cloud_calulation["cloud_price_extra"] * 12
+    print(data["cost_increase_rate"])
+    print(data["cost_extra_decrease"])
+    for i in range(int(cloud_runtime), data["runtime"]):
+        cloud_total_light = (cloud_calulation["cloud_price_light"] * 12) * (1 + data["cost_increase_rate"] / 100) ** (i + 1)
+        cloud_total_consumer = (cloud_calulation["cloud_price_consumer"] * 12) * (1 + data["cost_increase_rate"] / 100) ** (i + 1)
+        cloud_total_heatcloud = (cloud_calulation["cloud_price_heatcloud"] * 12) * (1 + data["cost_increase_rate_heat"] / 100) ** (i + 1)
+        cloud_total_ecloud = (cloud_calulation["cloud_price_ecloud"] * 12) * (1 + data["cost_increase_rate_ecloud"] / 100) ** (i + 1)
+        cloud_total_emove = (cloud_calulation["cloud_price_emove"] * 12) * (1 + data["cost_increase_rate_emove"] / 100) ** (i + 1)
+        cloud_total_service = (data["maintainance_cost_monthly"] * 12) * (1 + data["cost_increase_rate"] / 100) ** (i + 1)
+        if cloud_calulation["cloud_price_extra"] < 0:
+            cloud_total_extra = (cloud_calulation["cloud_price_extra"] * 12) * (1 - data["cost_extra_decrease"] / 100) ** (i + 1)
+        else:
+            cloud_total_extra = (cloud_calulation["cloud_price_extra"] * 12) * (1 + data["cost_increase_rate"] / 100) ** (i + 1)
         cloud_new_rate = cloud_total_light + cloud_total_consumer + cloud_total_heatcloud + cloud_total_ecloud + cloud_total_emove + cloud_total_service + cloud_total_extra
-        print("cloud", cloud_new_rate)
         data["cloud_total"] = data["cloud_total"] + cloud_new_rate
 
     data["maintainance_cost_yearly"] = 110
@@ -479,10 +484,17 @@ def calculate_feasibility_study(offer: OfferV2):
         data["repair_cost_total"] = repair_cost_yearly
         data["cloud_total"] = data["cloud_subscription_total"] + data["maintainance_cost_total"] + data["insurance_cost_total"]
 
-        for i in range(data["runtime"] - int(cloud_runtime)):
-            cloud_new_rate = (data["cloud_monthly_cost"] * 12) * (1 + data["full_cost_increase_rate"] / 100) ** (i + 1)
-            if cloud_new_rate < 0:
-                cloud_new_rate = -cloud_new_rate + 2 * (data["cloud_monthly_cost"] * 12)
+        for i in range(int(cloud_runtime), data["runtime"]):
+            cloud_total_light = (cloud_calulation["cloud_price_light"] * 12) * (1 + data["cost_increase_rate"] / 100) ** (i + 1)
+            cloud_total_consumer = (cloud_calulation["cloud_price_consumer"] * 12) * (1 + data["cost_increase_rate"] / 100) ** (i + 1)
+            cloud_total_heatcloud = (cloud_calulation["cloud_price_heatcloud"] * 12) * (1 + data["cost_increase_rate_heat"] / 100) ** (i + 1)
+            cloud_total_ecloud = (cloud_calulation["cloud_price_ecloud"] * 12) * (1 + data["cost_increase_rate_ecloud"] / 100) ** (i + 1)
+            cloud_total_emove = (cloud_calulation["cloud_price_emove"] * 12) * (1 + data["cost_increase_rate_emove"] / 100) ** (i + 1)
+            if cloud_calulation["cloud_price_extra"] < 0:
+                cloud_total_extra = (cloud_calulation["cloud_price_extra"] * 12) * (1 - data["cost_extra_decrease"] / 100) ** (i + 1)
+            else:
+                cloud_total_extra = (cloud_calulation["cloud_price_extra"] * 12) * (1 + data["cost_increase_rate"] / 100) ** (i + 1)
+            cloud_new_rate = cloud_total_light + cloud_total_consumer + cloud_total_heatcloud + cloud_total_ecloud + cloud_total_emove + cloud_total_extra
             data["maintainance_cost_total"] = data["maintainance_cost_total"] + data["maintainance_cost_yearly"]
             data["insurance_cost_total"] = data["insurance_cost_total"] + data["insurance_cost_yearly"]
             data["cloud_subscription_total"] = data["cloud_subscription_total"] + cloud_new_rate
