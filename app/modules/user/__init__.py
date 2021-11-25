@@ -15,6 +15,8 @@ def auto_assign_lead_to_user(lead_id):
         return None
     if "contact_id" not in lead_data or lead_data["contact_id"] is None or int(lead_data["contact_id"]) == 0:
         return None
+    if "source_id" not in lead_data and lead_data["source_id"] in ["RECOMMENDATION", "6", "20", "27"]:
+        return None
 
     contact_data = get_contact(lead_data["contact_id"])
     if "zip" not in contact_data or contact_data["zip"] is None or contact_data["zip"] == "":

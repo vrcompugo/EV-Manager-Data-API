@@ -77,15 +77,9 @@ def rerun_auto_assign_lead_to_user():
 
 
 @manager.command
-def import_mfr_tasks():
-    from app.modules.external.bitrix24.task import get_tasks
-    print("import mfr tasks")
-    tasks = get_tasks({
-        "select": "full",
-        "filter[>ACTIVITY_DATE]": "2021-07-26",
-        "filter[TITLE]": "%[mfr]%"
-    })
-    print(len(tasks))
+def get_test_lead():
+    from app.modules.external.bitrix24.lead import get_lead
+    print(json.dumps(get_lead(30162), indent=2))
 
 
 @manager.command
