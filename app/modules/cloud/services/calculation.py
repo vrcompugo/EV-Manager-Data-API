@@ -14,7 +14,7 @@ from app.modules.offer.services.offer_generation._utils import base_offer_data, 
 
 
 def calculate_cloud(data):
-    bsh_changedate = datetime(2021,1,1,0,0,0)
+    bsh_changedate = datetime(2022,1,1,0,0,0)
     kez_changedate = datetime(2021,12,1,0,0,0)
     settings = get_settings("pv-settings")
     if settings is None:
