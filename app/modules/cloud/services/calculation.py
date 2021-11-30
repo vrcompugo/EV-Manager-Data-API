@@ -14,7 +14,7 @@ from app.modules.offer.services.offer_generation._utils import base_offer_data, 
 
 
 def calculate_cloud(data):
-    bsh_changedate = datetime(2022,1,1,0,0,0)
+    bsh_changedate = datetime(2021,1,1,0,0,0)
     kez_changedate = datetime(2021,12,1,0,0,0)
     settings = get_settings("pv-settings")
     if settings is None:
@@ -55,6 +55,7 @@ def calculate_cloud(data):
             "emove.drive III": {"price": 19.99, "kwp": 7},
             "emove.drive ALL": {"price": 39.00, "kwp": 7.6}
         }
+        settings["data"]["cloud_settings"]["kwp_to_refund_factor"] = 8
     result = {
         "lightcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
         "heatcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"],
