@@ -47,7 +47,7 @@ def calculate_cloud(data):
         settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
         settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"] = 0.289
         settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
-        settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"] = 0.999
+        settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"] = 0.0999
         settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] = 1.9987
         settings["data"]["cloud_settings"]["cloud_emove"] = {
             "emove.drive I": {"price": 9.99, "kwp": 3.3},
