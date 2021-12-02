@@ -86,6 +86,9 @@ def quote_calculator_defaults(lead_id):
             if "extra_options_zero" not in data["data"]:
                 data["data"]["extra_options_zero"] = []
             data["quote_datetime"] = data["datetime"]
+            if "status_id" not in data["data"]:
+                lead_data = get_lead(lead_id)
+                data["data"]["status_id"] = lead_data.get("status_id")
         else:
             post_data = None
             try:

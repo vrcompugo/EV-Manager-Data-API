@@ -56,6 +56,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "assigned_user": None,
         "datetime": str(datetime.datetime.now()),
         "data": {
+            "status_id": lead_data.get("status_id"),
             "emove_tarif": "none",
             "bluegen_cell_count": 1,
             "price_increase_rate": 5.75,
