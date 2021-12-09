@@ -265,6 +265,8 @@ class OrderUpload(Resource):
             raise ApiException("item_doesnt_exist", "Item doesn't exist.", 404)
         offer_v2_data = {"data": json.loads(json.dumps(offer.data))}
         offer_v2_data["data"]["offer_number"] = data["offer_number"]
+        offer_v2_data["data"]["construction_date"] = data["construction_date"]
+        offer_v2_data["data"]["smartme_number"] = data["smartme_number"]
         offer_v2_data["data"]["cloud_config_id"] = data["cloud_config_id"]
         offer_v2_data["data"]["signed_offer_pdf_id"] = data["signed_offer_pdf_id"]
         offer_v2_data["data"]["refund_transfer_pdf_id"] = data["refund_transfer_pdf_id"]

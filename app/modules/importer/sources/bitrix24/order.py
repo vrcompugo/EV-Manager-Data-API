@@ -321,7 +321,7 @@ def filter_export_input_cloud(data, order: Order, consumer_index=None):
             if field in order.data["address"]:
                 data[field.upper()] = order.data["address"][field]
         for field in ["power_meter_number", "power_usage", "heatcloud_power_meter_number", "heater_usage",
-                      "emove_tarif", "price_guarantee", "offer_number"]:
+                      "emove_tarif", "price_guarantee", "offer_number", "construction_date", "smartme_number"]:
             if field in order.data:
                 if field == "power_usage":
                     data["USAGE"] = int(order.data[field])

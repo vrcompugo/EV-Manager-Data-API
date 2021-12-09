@@ -384,7 +384,9 @@ def get_settings(section=None, domain_raw=None):
                     "cloud_street_nb": "UF_CRM_5DD4F51D4CA3E",
                     "cloud_city": "UF_CRM_5DD4F51D57898",
                     "cloud_zip": "UF_CRM_5DD4F51D603E2",
-                    "malo_id": "UF_CRM_1616427015"
+                    "malo_id": "UF_CRM_1616427015",
+                    "construction_date": "UF_CRM_1585237939",
+                    "smartme_number": "UF_CRM_1605610632"
                 }
             },
             "quote": {

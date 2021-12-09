@@ -14,7 +14,7 @@ from app.modules.offer.services.offer_generation._utils import base_offer_data, 
 
 
 def calculate_cloud(data):
-    bsh_changedate = datetime(2022,1,1,0,0,0)
+    bsh_changedate = datetime(2021,12,16,0,0,0)
     kez_changedate = datetime(2021,12,1,0,0,0)
     settings = get_settings("pv-settings")
     if settings is None:
@@ -33,29 +33,31 @@ def calculate_cloud(data):
         if 330 in data["assigned_user"]["UF_DEPARTMENT"] or "330" in data["assigned_user"]["UF_DEPARTMENT"]:
             user = {"id": 120, "name": "bsh"}
             user_id_for_prices = 120
-    if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate):
-        settings["data"]["cloud_settings"]["extra_kwh_cost"] = "33.79"
-        settings["data"]["cloud_settings"]["power_to_kwp_factor"] = 2.296
-        settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
-        settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"] = 0.33
-        settings["data"]["cloud_settings"]["heater_to_kwp_factor"] = [
-            {"from": 1, "to": 4000, "value": 2.33},
-            {"from": 4001, "to": 6500, "value": 2.444},
-            {"from": 6501, "to": 9999999, "value": 2.574}
-        ]
-        settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 750
-        settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
-        settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"] = 0.289
-        settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
-        settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"] = 0.0999
-        settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] = 1.9987
-        settings["data"]["cloud_settings"]["cloud_emove"] = {
-            "emove.drive I": {"price": 9.99, "kwp": 3.3},
-            "emove.drive II": {"price": 14.99, "kwp": 4.3},
-            "emove.drive III": {"price": 19.99, "kwp": 7},
-            "emove.drive ALL": {"price": 39.00, "kwp": 7.6}
-        }
-        settings["data"]["cloud_settings"]["kwp_to_refund_factor"] = 8
+    if data.get("old_price_calculation", "") != "l2k3fblk3baxv55":
+        if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate):
+            settings["data"]["cloud_settings"]["extra_kwh_cost"] = "33.79"
+            settings["data"]["cloud_settings"]["power_to_kwp_factor"] = 2.296
+            settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
+            settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"] = 0.33
+            settings["data"]["cloud_settings"]["heater_to_kwp_factor"] = [
+                {"from": 1, "to": 4000, "value": 2.33},
+                {"from": 4001, "to": 6500, "value": 2.444},
+                {"from": 6501, "to": 9999999, "value": 2.574}
+            ]
+            settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 750
+            settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
+            settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"] = 0.289
+            settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
+            settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"] = 0.0999
+            settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] = 1.9987
+            settings["data"]["cloud_settings"]["cloud_emove"] = {
+                "emove.drive I": {"price": 9.99, "kwp": 3.3},
+                "emove.drive II": {"price": 14.99, "kwp": 4.3},
+                "emove.drive III": {"price": 19.99, "kwp": 7},
+                "emove.drive ALL": {"price": 39.00, "kwp": 7.6}
+            }
+            settings["data"]["cloud_settings"]["kwp_to_refund_factor"] = 8
+
     result = {
         "lightcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
         "heatcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"],
@@ -114,7 +116,7 @@ def calculate_cloud(data):
             result["conventional_price_heating"] = 0.24
     pv_efficiancy_faktor = None
     if "name" in user and user["name"].lower() == "bsh":
-        if datetime.now() > bsh_changedate:
+        if data.get("old_price_calculation", "") != "l2k3fblk3baxv55" and datetime.now() > bsh_changedate:
             settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 750
         else:
             settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 2405
@@ -160,7 +162,7 @@ def calculate_cloud(data):
     if "power_usage" in data and data["power_usage"] != "" and data["power_usage"] != "0" and data["power_usage"] != 0:
         data["power_usage"] = int(data["power_usage"])
         power_to_kwp_factor = settings["data"]["cloud_settings"]["power_to_kwp_factor"]
-        if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate):
+        if data.get("old_price_calculation", "") != "l2k3fblk3baxv55" and (("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate)):
             if 0 < data["power_usage"] <= 7000:
                 power_to_kwp_factor = 2.06
             if 7000 < data["power_usage"] <= 25000:
