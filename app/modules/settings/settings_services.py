@@ -104,7 +104,9 @@ def get_settings(section=None):
                     "contract_number": "UF_CRM_1596704551167",
                     "has_consumer": "UF_CRM_1597755071841",
                     "is_consumer": "UF_CRM_1597755099494",
-                    "has_ecloud": "UF_CRM_1597755087885"
+                    "has_ecloud": "UF_CRM_1597755087885",
+                    "construction_date": "UF_CRM_1585237939",
+                    "smartme_number": "UF_CRM_1605610632"
                 }
             }
         }
