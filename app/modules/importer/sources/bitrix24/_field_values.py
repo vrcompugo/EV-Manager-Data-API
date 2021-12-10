@@ -1032,12 +1032,10 @@ def convert_field_euro_from_remote(field, data):
 def convert_data_to_post_data(data, data_type):
     config = get_settings("external/bitrix24")
     post_data = {}
-    print(json.dumps(config[data_type]["fields"], indent=2))
     for field in data.keys():
         online_field = field.upper()
         if field.lower() in config[data_type]["fields"]:
             online_field = config[data_type]["fields"][field.lower()]
-        print(field.lower(), online_field)
         if type(data[field]) is bool:
             post_data[f"fields[{online_field}]"] = int(data[field])
         elif type(data[field]) is list:
