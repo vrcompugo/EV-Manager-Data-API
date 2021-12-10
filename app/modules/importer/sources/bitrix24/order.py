@@ -332,6 +332,7 @@ def filter_export_input_cloud(data, order: Order, consumer_index=None):
                         data[field.upper()] = int(order.data[field].replace("_years", ""))
                 else:
                     data[field.upper()] = order.data[field]
+                    data[field] = order.data[field]
 
         for file_key in ["cloud_config_id", "signed_offer_pdf_id", "refund_transfer_pdf_id", "sepa_form_id",
                          "old_power_invoice_id", "old_gas_invoice_id"]:
@@ -405,8 +406,8 @@ def run_export(local_id=None, remote_id=None):
     post_data = filter_export_input_all(order)
     consumer_data_base = json.loads(json.dumps(post_data))
     post_data = filter_export_input_cloud(post_data, order)
-    print(json.dumps(post_data, indent=2))
-    print(json.dumps(convert_data_to_post_data(post_data, "deal"), indent=2))
+    print(post_data.get("construction_date"))
+    print(post_data.get("CONSTRUCTION_DATE"))
     if link is None:
         print("run export order new")
         response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
