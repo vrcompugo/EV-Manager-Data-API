@@ -1032,33 +1032,34 @@ def convert_field_euro_from_remote(field, data):
 def convert_data_to_post_data(data, data_type):
     config = get_settings("external/bitrix24")
     post_data = {}
+    print(json.dumps(config[data_type]["fields"], indent=2))
     for field in data.keys():
         online_field = field.upper()
         if field.lower() in config[data_type]["fields"]:
             online_field = config[data_type]["fields"][field.lower()]
+        print(field.lower(), online_field)
         if type(data[field]) is bool:
             post_data[f"fields[{online_field}]"] = int(data[field])
+        elif type(data[field]) is list:
+            for i in range(len(data[field])):
+                if type(data[field][i]) is dict:
+                    for field2 in data[field][i].keys():
+                        if type(data[field][i][field2]) is list:
+                            for i2 in range(len(data[field][i][field2])):
+                                post_data[f"fields[{online_field}][{i}][{field2}][{i2}]"] = data[field][i][field2][i2]
+                        else:
+                            post_data[f"fields[{online_field}][{i}][{field2}]"] = data[field][i][field2]
+                else:
+                    post_data[f"fields[{online_field}][{i}]"] = data[field][i]
+        elif type(data[field]) is dict:
+            for key in data[field].keys():
+                if type(data[field][key]) is list:
+                    for i in range(len(data[field][key])):
+                        post_data[f"fields[{online_field}][{key}][{i}]"] = convert_list_value(field, data[field][key][i], config)
+                else:
+                    post_data[f"fields[{online_field}][{key}]"] = convert_list_value(field, data[field][key], config)
         else:
-            if type(data[field]) is list:
-                for i in range(len(data[field])):
-                    if type(data[field][i]) is dict:
-                        for field2 in data[field][i].keys():
-                            if type(data[field][i][field2]) is list:
-                                for i2 in range(len(data[field][i][field2])):
-                                    post_data[f"fields[{online_field}][{i}][{field2}][{i2}]"] = data[field][i][field2][i2]
-                            else:
-                                post_data[f"fields[{online_field}][{i}][{field2}]"] = data[field][i][field2]
-                    else:
-                        post_data[f"fields[{online_field}][{i}]"] = data[field][i]
-            elif type(data[field]) is dict:
-                for key in data[field].keys():
-                    if type(data[field][key]) is list:
-                        for i in range(len(data[field][key])):
-                            post_data[f"fields[{online_field}][{key}][{i}]"] = convert_list_value(field, data[field][key][i], config)
-                    else:
-                        post_data[f"fields[{online_field}][{key}]"] = convert_list_value(field, data[field][key], config)
-            else:
-                post_data[f"fields[{online_field}]"] = convert_list_value(field, data[field], config)
+            post_data[f"fields[{online_field}]"] = convert_list_value(field, data[field], config)
     if data_type == "deal":
         if "fields[ID]" in post_data:
             post_data["id"] = post_data["fields[ID]"]
