@@ -405,6 +405,8 @@ def run_export(local_id=None, remote_id=None):
     post_data = filter_export_input_all(order)
     consumer_data_base = json.loads(json.dumps(post_data))
     post_data = filter_export_input_cloud(post_data, order)
+    print(json.dumps(post_data, indent=2))
+    print(json.dumps(convert_data_to_post_data(post_data, "deal"), indent=2))
     if link is None:
         print("run export order new")
         response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
