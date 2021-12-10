@@ -763,7 +763,10 @@ def run_cron_export():
     for deal in deals:
         if deal.get("iban") not in [None, "", "None"]:
             if deal.get("fakturia_contract_number") in [None, "", "None"]:
-                export_deal(deal["id"])
+                try:
+                    export_deal(deal["id"])
+                except Exception as e:
+                    continue
                 deal = get_deal(deal["id"])
         if deal.get("fakturia_contract_number") not in [None, "", "None"]:
             print(deal.get("fakturia_contract_number"))
