@@ -386,7 +386,8 @@ def get_settings(section=None, domain_raw=None):
                     "cloud_zip": "UF_CRM_5DD4F51D603E2",
                     "malo_id": "UF_CRM_1616427015",
                     "construction_date2": "UF_CRM_1585237939",
-                    "smartme_number": "UF_CRM_1605610632"
+                    "smartme_number": "UF_CRM_1605610632",
+                    "contracting_version": "UF_CRM_1639388034"
                 }
             },
             "quote": {
@@ -449,7 +450,8 @@ def get_settings(section=None, domain_raw=None):
                     "construction_week": "UF_CRM_1627383698",
                     "construction_year": "UF_CRM_1627384966",
                     "order_confirmation_date": "UF_CRM_1627383773",
-                    "order_sign_date": "UF_CRM_1633684390348"
+                    "order_sign_date": "UF_CRM_1633684390348",
+                    "contracting_version": "UF_CRM_1639388043"
                 }
             },
             "company": {

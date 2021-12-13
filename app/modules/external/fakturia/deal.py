@@ -134,6 +134,11 @@ def get_service_contract_data_by_deal(deal):
 
 
 def initilize_service_contract_data(deal):
+    total_price = 72 * 1.19
+    total_price_net = 72
+    if deal["contracting_version"] == "Version G1":
+        total_price = 84 * 1.19
+        total_price_net = 84
     data = {
         "item_lists": [
             {
@@ -144,8 +149,8 @@ def initilize_service_contract_data(deal):
                     "label": "Remote Care Jahres Beitrag",
                     "description": "Contracting Vertrag\n - Remote Care - Online Überwachung PV Anlage",
                     "tax_rate": 19,
-                    "total_price": 72 * 1.19,
-                    "total_price_net": 72,
+                    "total_price": total_price,
+                    "total_price_net": total_price_net,
                     "deal": {"id": deal["id"], "title": deal["title"]}
                 }]
             }
@@ -522,7 +527,10 @@ def get_export_data_service(deal, contact):
                 "activityType": "DEFAULT_PERFORMANCE"
             }
             if item["type"] == "service":
-                item_data["itemNumber"] = "CV-RC 00092021"
+                if deal["contracting_version"] == "Version G1":
+                    item_data["itemNumber"] = "CV-RC 00122021"
+                else:
+                    item_data["itemNumber"] = "CV-RC 00092021"
             if item["type"] == "insurance":
                 item_data["itemNumber"] = "CV-0092020"
                 cost = round(float(item["total_price"]) / 1.19, 4)

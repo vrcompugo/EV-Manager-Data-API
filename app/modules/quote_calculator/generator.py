@@ -465,6 +465,8 @@ def generate_contract_summary_pdf(lead_id, data):
         add_pdf_by_drive_id(merger, 1598546, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1598546/?&ncc=1&filename=Verkaufsunterlagen+Gewerbe.pdf
     else:
         add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
+    if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
+        add_pdf_by_drive_id(merger, 2528314, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2528314/?&ncc=1&filename=contractingvertrag_januar_2022.pdf
     add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
     add_pdf_by_drive_id(merger, 523230, cached=True)  # Abtretungsformular
 
@@ -486,6 +488,8 @@ def generate_contract_summary_part2_pdf(lead_id, data):
 
 
 def generate_contract_summary_part3_pdf(lead_id, data):
+    if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
+        return get_file_content_cached(2528314)  # https://keso.bitrix24.de/disk/downloadFile/2528314/?&ncc=1&filename=contractingvertrag_januar_2022.pdf
     return get_file_content_cached(443350)  # Contractigvertrag
 
 

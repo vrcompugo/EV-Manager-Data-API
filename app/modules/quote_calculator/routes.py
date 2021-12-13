@@ -637,7 +637,11 @@ def quote_calculator_contract_summary_pdf(lead_id):
 
     history.data = data
     db.session.commit()
-    update_lead(lead_id, {"pdf_contract_summary_link": data["pdf_contract_summary_link"]})
+    lead_update_data = {"pdf_contract_summary_link": data["pdf_contract_summary_link"]}
+    lead_update_data["contracting_version"] = "Version F1"
+    if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
+        lead_update_data["contracting_version"] = "Version G1"
+    update_lead(lead_id, lead_update_data)
 
     return Response(
         json.dumps({"status": "success", "data": data}),
