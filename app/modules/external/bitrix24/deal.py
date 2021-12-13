@@ -187,26 +187,8 @@ def run_cron_add_missing_values():
                 if history is None:
                     continue
                 print(json.dumps(history.data, indent=2))
-
-                cloud_type = ["Zero"]
-                if history.data["calculated"]["min_kwp_ecloud"] > 0:
-                    cloud_type.append("eCloud")
-                if history.data["calculated"]["min_kwp_heatcloud"] > 0:
-                    cloud_type.append("Wärmecloud")
-                if history.data["calculated"]["min_kwp_consumer"] > 0:
-                    cloud_type.append("Consumer")
-
-                stack_count = math.ceil((history.data["calculated"]["storage_size"] - 2.5) / 2.5)
-                stack_count = stack_count * 2.5 + 2.5
-                storage_size = [f"Senec {stack_count} Li"]
-                if stack_count in [2.5, 7.5]:
-                    stack_count = str(stack_count).replace('.', ',')
-                    storage_size = [f"Senec {stack_count} Li"]
-
                 update_data = {
-                    "cloud_type": cloud_type,
-                    "storage_size": storage_size,
-                    "inverter_type": ["Fremdwechselrichter (Fronius bevorzugt) oder 10 Jahre Garantie WR"],
+                    "inverter_type": [],
                     "extra_packages": [],
                     "extra_packages2": [],
                     "quote_type2": [],
@@ -217,9 +199,38 @@ def run_cron_add_missing_values():
                     "emove_packet": "none",
                     "hwp": ["keine Auswahl"]
                 }
-                update_data["storage_model"] = ["Senec Home 2.1"]
-                update_data["extra_packages2"].append("Senec Wechselrichtergarantie 20 Jahre")
                 if history.data["data"].get("has_pv_quote") is True:
+                    cloud_type = ["Zero"]
+                    if history.data["calculated"]["min_kwp_ecloud"] > 0:
+                        cloud_type.append("eCloud")
+                    if history.data["calculated"]["min_kwp_heatcloud"] > 0:
+                        cloud_type.append("Wärmecloud")
+                    if history.data["calculated"]["min_kwp_consumer"] > 0:
+                        cloud_type.append("Consumer")
+
+                    stack_count = math.ceil((history.data["calculated"]["storage_size"] - 2.5) / 2.5)
+                    stack_count = stack_count * 2.5 + 2.5
+                    storage_size = [f"Senec {stack_count} Li"]
+                    if stack_count in [2.5, 7.5]:
+                        stack_count = str(stack_count).replace('.', ',')
+                        storage_size = [f"Senec {stack_count} Li"]
+
+                    update_data = {
+                        "cloud_type": cloud_type,
+                        "storage_size": storage_size,
+                        "inverter_type": ["Fremdwechselrichter (Fronius bevorzugt) oder 10 Jahre Garantie WR"],
+                        "extra_packages": [],
+                        "extra_packages2": [],
+                        "quote_type2": [],
+                        "tax_consultant": "Nein",
+                        "bwwp": ["keine Auswahl"],
+                        "pv_module": ["keine Auswahl"],
+                        "count_modules": 0,
+                        "emove_packet": "none",
+                        "hwp": ["keine Auswahl"]
+                    }
+                    update_data["storage_model"] = ["Senec Home 2.1"]
+                    update_data["extra_packages2"].append("Senec Wechselrichtergarantie 20 Jahre")
                     if "solaredge" in history.data["data"]["extra_options"]:
                         update_data["inverter_type"] = ["Solar Edge (Optimierer laut Auslegung)"]
                     if "technik_service_packet" in history.data["data"]["extra_options"]:
