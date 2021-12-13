@@ -206,7 +206,7 @@ def calculate_products(data):
             products=data["products"]
         )
         add_direct_product(
-            label="BlueCard",
+            label="Portal Card mit Loadingfunktion",
             category="Optionen PV Anlage",
             quantity=1,
             products=data["products"]
