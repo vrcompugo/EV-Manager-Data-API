@@ -291,6 +291,8 @@ def calculate_feasibility_study(offer: OfferV2):
             if refund_rate is not None:
                 data["eeg_refund_per_kwh"] = refund_rate.value
 
+    if offer.data is not None and "storage_type" in offer.data:
+        data["storage_type"] = offer.data["storage_type"]
     if offer.data is not None and "loan_total" in offer.data and offer.data["loan_total"] is not None and offer.data["loan_total"] != "":
         data["pv_offer_total"] = float(offer.data["loan_total"])
     if offer.data is not None and "total_net" in offer.data and offer.data["total_net"] is not None and offer.data["total_net"] != "":

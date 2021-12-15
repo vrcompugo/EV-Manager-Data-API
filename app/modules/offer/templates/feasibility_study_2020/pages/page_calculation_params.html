@@ -75,10 +75,21 @@
             {% endif %}
           </td>
         </tr>
-        <tr>
-          <td>Ertrag der PV-Anlage</td>
-          <td><b>{{ data.pv_efficiancy }} kWh</b> je kWp pro Jahr</td>
-        </tr>
+        {% if offer.reseller.document_style == "bsh" %}
+          <tr>
+            <td>Ausrichtung der PV-Anlage</td>
+            <td>{{ data.orientation_label }}</td>
+          </tr>
+          <tr>
+            <td>Ertrag der PV-Anlage</td>
+            <td><b>{{ (data.pv_efficiancy * data.cloud_calulation.pv_kwp) | numberformat('de', 0) }} kWh</b> pro Jahr</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td>Ertrag der PV-Anlage</td>
+            <td><b>{{ data.pv_efficiancy }} kWh</b> je kWp pro Jahr</td>
+          </tr>
+        {% endif %}
         <tr>
           <td>Degradation der PV-Anlage</td>
           <td>
@@ -89,17 +100,26 @@
             {% endif %}
           </td>
         </tr>
-        <tr>
-          <td>Speichersysteme</td>
-          <td>
-            SENEC Li laut Angebot
-          </td>
-        </tr>
-        <tr>
-          <td>Ausrichtung der PV-Anlage</td>
-          <td>{{ data.orientation_label }}</td>
-        </tr>
+        {% if offer.reseller.document_style == "bsh" and data.storage_type %}
+          <tr>
+            <td>Speichersysteme</td>
+            <td>
+              {{ data.storage_type | nl2br | safe }}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td>Speichersysteme</td>
+            <td>
+              SENEC Li laut Angebot
+            </td>
+          </tr>
+        {% endif %}
         {% if offer.reseller.document_style != "bsh" %}
+          <tr>
+            <td>Ausrichtung der PV-Anlage</td>
+            <td>{{ data.orientation_label }}</td>
+          </tr>
           <tr>
             <td>Autarkiegrad gemäß Hersteller</td>
             <td>ca. <b>60 %</b></td>
