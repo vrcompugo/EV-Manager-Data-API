@@ -692,7 +692,7 @@ def get_cloud_products(data=None, offer=None):
         description=(
             "<b>Cashback</b><br>"
             + "Wird weniger Strom verbraucht als bei (a) vereinbart,<br>"
-            + "so erhalten Sie 10 Cent inkl. MwSt je kWh als Energiespar-Bonus von uns zurück.<br>"
+            + "so erhalten Sie 8 Cent inkl. MwSt je kWh als Energiespar-Bonus von uns zurück.<br>"
             + "Die ersten 250 kWh bleiben davon ausgenommen."),
         single_price=0))
     if data["calculated"]["cloud_price_ecloud"] > 0:
