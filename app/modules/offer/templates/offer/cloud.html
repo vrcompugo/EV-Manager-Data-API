@@ -160,6 +160,9 @@
     <h2>Verbindliche Bestellung</h2>
     <p>Diese Ausarbeitung ist geistiges Eigentum des Unternehmens. Die Unterlagen d&uuml;rfen gem&auml;&szlig; &sect;&sect; 1,2 und 11 des UrhG und &sect; 823 BGB ohne Genehmigung des Unternehmens weder zur Ausschreibung benutzt, noch Dritten zur Einsicht &uuml;berlassen oder in sonstiger Weise inhaltlich mitgeteilt werden. Es gelten unsere allgemeinen Gesch&auml;ftsbedingungen. Gerichtsstand ist Korbach.</p>
     <p>
+      {% if offer.reseller.document_style in ["bsh", "eeg"] %}
+        Das Angebot ist ab Erstellung 2 Wochen g&uuml;ltig.
+      {% endif %}
       Ein verbindlicher Vertrag kommt erst zu Stande, nachdem das unterschriebene
       {% if offer.reseller.document_style in ["bsh", "eeg"] -%}
         Leistungsverzeichnis/
