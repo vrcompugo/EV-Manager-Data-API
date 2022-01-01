@@ -26,6 +26,10 @@ def run_cron_import():
     if len(devices) > 0:
         for device in devices:
             print(device["Name"])
+            if "CounterReading" not in device:
+                print("error counter reading")
+                print(json.dumps(device, indent=2))
+                continue
             power_meter = PowerMeter.query.filter(PowerMeter.number == str(device["Serial"])).first()
             if power_meter is None:
                 power_meter = PowerMeter(
