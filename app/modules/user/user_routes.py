@@ -18,7 +18,16 @@ def sales_users():
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
         return "forbidden", 401
     users = []
-    for department_id in [5, 23, 57, 43, 248, 272, 270]:
+    departments = [
+        5,   # Vertrieb
+        23,  # VK Profis E360
+        57,  # HV Profis E360
+        43,  # ---
+        248,  # Team POWER-PLAY
+        272,  # ---
+        270  # ---
+    ]
+    for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
         if response is None:
             continue
