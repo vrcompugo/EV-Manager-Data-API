@@ -998,7 +998,7 @@ def quote_calculator_index():
     config = get_settings(section="external/bitrix24")
     auth_info = get_auth_info()
     if auth_info["user"] is None:
-        return "Forbidden"
+        return "Forbidden2"
     options = request.form.get("PLACEMENT_OPTIONS")
     if options is None:
         return "Keine Placement Optionen gesetzt"
