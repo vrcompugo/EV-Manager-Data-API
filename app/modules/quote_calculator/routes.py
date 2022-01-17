@@ -803,7 +803,7 @@ def send_insign_email(lead_id):
 
 def get_insign_session(data):
     from app.modules.external.insign.signature import get_session_id
-
+    config = get_settings("general")
     signatures = [
         {
             "id": "mainsig",
@@ -988,7 +988,7 @@ def get_insign_session(data):
         "callbackURL": "https://www.energie360.de/insign-callback/",
         "userFullName": f'{data["assigned_user"]["NAME"]} {data["assigned_user"]["LAST_NAME"]}',
         "userEmail": data["assigned_user"]["EMAIL"],
-        "serverSidecallbackURL": f"https://api.korbacher-energiezentrum.de/quote_calculator/insign/callback/{token['token']}",
+        "serverSidecallbackURL": f"{config['base_url']}quote_calculator/insign/callback/{token['token']}",
         "documents": documents
     })
 
