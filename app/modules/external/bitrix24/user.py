@@ -1,4 +1,5 @@
 import datetime
+from sqlalchemy import or_
 from app import db
 from app.modules.settings import get_settings
 
@@ -45,7 +46,10 @@ def get_user_by_email(email):
 def get_users_per_department(department_id):
     refresh = False
     result = []
-    users_cached = UserCache.query.filter(UserCache.department.like(f"%{department_id},%")).all()
+    users_cached = UserCache.query.filter(or_(
+        UserCache.department.like(f"{department_id},%"),
+        UserCache.department.like(f"%,{department_id},%")
+    )).all()
     for user_cached in users_cached:
         if user_cached.last_update is None or user_cached.last_update < (datetime.datetime.now() - datetime.timedelta(days=1)):
             refresh = True
