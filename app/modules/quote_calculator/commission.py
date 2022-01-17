@@ -1,5 +1,6 @@
 from app.exceptions import ApiException
 from app.modules.auth import get_auth_info
+from app.models import UserZipAssociation
 
 
 def calculate_commission_data(quote_data, data, quote_key=""):
@@ -99,8 +100,10 @@ def calculate_commission_data(quote_data, data, quote_key=""):
 
 
 def get_commission_rate(quote_data, data, quote_key):
-    if quote_key == "bluegen_quote":
-        return 5
+    association = UserZipAssociation.query.filter(UserZipAssociation.user_id == data["assigned_user"]["ID"]).first()
+    modifier = 0
+    if association is None or association.user_type not in ["Teamleiter HV", "Teamleiter Angestellt", "Handelsvertreter 2021", "Angestellter"]:
+        modifier = -1
     if quote_key == "pv_quote":
         if 23 in data["assigned_user"]["UF_DEPARTMENT"]:
             if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
@@ -117,18 +120,28 @@ def get_commission_rate(quote_data, data, quote_key):
             if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
                 return 10
             if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
-                return 8.5
+                return 8.5 + modifier
             if 5 < quote_data["calculated"]["effective_internal_discount_rate"] <= 8:
-                return 7.5
+                return 7.5 + modifier
             if 8 < quote_data["calculated"]["effective_internal_discount_rate"] <= 10:
-                return 6.5
+                return 6.5 + modifier
             if 10 < quote_data["calculated"]["effective_internal_discount_rate"] <= 15:
-                return 5
+                return 5 + modifier
     if 23 in data["assigned_user"]["UF_DEPARTMENT"]:
         if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
             return 2.5
         if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
             return 2
+    if association is None or association.user_type not in ["Teamleiter HV", "Teamleiter Angestellt", "Handelsvertreter 2021", "Angestellter"]:
+        if quote_key == "roof_reconstruction_quote":
+            if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
+                return 5
+            if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
+                return 3.5
+        if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
+            return 5
+        if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
+            return 4
     if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
         return 4.25
     if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:

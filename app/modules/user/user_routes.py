@@ -18,6 +18,10 @@ def sales_users():
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
         return "forbidden", 401
     users = []
+    defaults = {
+        "data": [],
+        "user_type": "Handelsvertreter 2022"
+    }
     departments = [
         5,   # Vertrieb
         23,  # VK Profis E360
@@ -25,7 +29,8 @@ def sales_users():
         43,  # ---
         248,  # Team POWER-PLAY
         272,  # ---
-        270  # ---
+        270,  # ---
+        41  # Extern IT Unterstützung
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
@@ -39,16 +44,18 @@ def sales_users():
                 user["NAME"] = user["EMAIL"]
             association = UserZipAssociation.query.filter(UserZipAssociation.user_id == user["ID"]).first()
             if association is None:
-                user["association"] = {
-                    "data": []
-                }
+                user["association"] = defaults
             else:
+                if association.user_type in [None, ""]:
+                    association.user_type = defaults["user_type"]
                 user["association"] = {
                     "data": association.data,
                     "last_assigned": str(association.last_assigned),
                     "max_leads": association.max_leads,
                     "current_cycle_index": association.current_cycle_index,
-                    "current_cycle_count": association.current_cycle_count
+                    "current_cycle_count": association.current_cycle_count,
+                    "supervisor_id": association.supervisor_id,
+                    "user_type": association.user_type
                 }
                 if user["association"]["last_assigned"] == "None":
                     user["association"]["last_assigned"] = None
@@ -80,9 +87,57 @@ def sales_users_store():
     if "max_leads" not in data["association"] or data["association"]["max_leads"] is None or data["association"]["max_leads"] == "":
         data["association"]["max_leads"] = 0
     association.max_leads = int(data["association"]["max_leads"])
+    if "supervisor_id" in data["association"]:
+        association.supervisor_id = int(data["association"]["supervisor_id"])
+    association.user_type = data["association"].get("user_type")
     db.session.commit()
     return Response(
         json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("supervisors", methods=['GET'])
+def supervisors():
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden", 401
+    users = []
+    departments = [
+        5,   # Vertrieb
+        23,  # VK Profis E360
+        57,  # HV Profis E360
+        43,  # ---
+        248,  # Team POWER-PLAY
+        272,  # ---
+        270,  # ---
+        41  # Extern IT Unterstützung
+    ]
+    for department_id in departments:
+        response = get_users_per_department(department_id)  # Verkauf/Außendienst
+        if response is None:
+            continue
+        for user in response:
+            existing_user = next((item for item in users if str(item["ID"]) == str(user["ID"])), None)
+            if existing_user is not None:
+                continue
+            association = UserZipAssociation.query.filter(UserZipAssociation.user_id == user["ID"]).first()
+            if association is None:
+                continue
+            if association.user_type not in ["Ausbilder", "Teamleiter HV", "Teamleiter Angestellt"]:
+                continue
+            user["fullname"] = user["NAME"] + " " + user["LAST_NAME"]
+            user["ID"] = int(user["ID"])
+            if user["ACTIVE"] is True or user["ACTIVE"] == "true":
+                users.append(user)
+    users.sort(key=lambda x: x["NAME"], reverse=True)
+    users.append({
+        "fullname": "Kein Teamleiter",
+        "ID": 0
+    })
+    users.reverse()
+    return Response(
+        json.dumps({"status": "success", "data": users}),
         status=200,
         mimetype='application/json')
 
