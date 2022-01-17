@@ -87,7 +87,7 @@ def sales_users_store():
     if "max_leads" not in data["association"] or data["association"]["max_leads"] is None or data["association"]["max_leads"] == "":
         data["association"]["max_leads"] = 0
     association.max_leads = int(data["association"]["max_leads"])
-    if "supervisor_id" in data["association"]:
+    if "supervisor_id" in data["association"] and data["association"]["supervisor_id"] is not None:
         association.supervisor_id = int(data["association"]["supervisor_id"])
     association.user_type = data["association"].get("user_type")
     db.session.commit()
