@@ -30,7 +30,8 @@ def sales_users():
         248,  # Team POWER-PLAY
         272,  # ---
         270,  # ---
-        41  # Extern IT Unterstützung
+        41,  # Extern IT Unterstützung
+        384  # Team Schuster
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
@@ -111,7 +112,8 @@ def supervisors():
         248,  # Team POWER-PLAY
         272,  # ---
         270,  # ---
-        41  # Extern IT Unterstützung
+        41,  # Extern IT Unterstützung
+        384  # Team Schuster
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
