@@ -30,8 +30,10 @@ def sales_users():
         248,  # Team POWER-PLAY
         272,  # ---
         270,  # ---
-        41,  # Extern IT Unterstützung
-        384  # Team Schuster
+        41,   # Extern IT Unterstützung
+        384,  # Team Schuster
+        390,  # Team Power Play 2022
+        386   # Team Maier
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
@@ -113,7 +115,9 @@ def supervisors():
         272,  # ---
         270,  # ---
         41,  # Extern IT Unterstützung
-        384  # Team Schuster
+        384,  # Team Schuster
+        390,  # Team Power Play 2022
+        386   # Team Maier
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
