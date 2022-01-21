@@ -237,7 +237,7 @@ def run_cron_add_missing_values():
                         update_data["extra_packages"] = ["Technik & Service (Anschlussgarantie, Technikpaket, Portal)"]
                     if "wallbox" in history.data["data"]["extra_options"]:
                         if history.data["data"].get("extra_options_wallbox_variant") == "senec-22kW":
-                            update_data["extra_packages2"].append("Wallbox Senec Pro (bis22KW)")
+                            update_data["extra_packages2"].append("Wallbox SENEC 22kW Pro")
                         elif history.data["data"].get("extra_options_wallbox_variant") == "control-11kW":
                             update_data["extra_packages2"].append("Wallbox Heidelberger Energie Control (11KW)")
                         elif history.data["data"].get("extra_options_wallbox_variant") == "senec-pro-11kW":

@@ -372,7 +372,7 @@ def calculate_products(data):
                 quantity = data["data"]["extra_options_wallbox_count"]
             wallbox_type = "Heidelberg ECO Home 11kW"
             if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-22kW":
-                wallbox_type = "Wallbox SENEC 11kW bis 22 kW"
+                wallbox_type = "Wallbox SENEC 22kW Pro"
             if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "control-11kW":
                 wallbox_type = "Heidelberg Energy Control. 11 kW"
             if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-pro-11kW":
