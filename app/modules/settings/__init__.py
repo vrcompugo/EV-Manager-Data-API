@@ -145,6 +145,10 @@ def get_settings(section=None, domain_raw=None):
                 },
                 "extra_packages2": {
                     "4168": "ENW (Brick)",
+                    "5604": "Wallbox Heidelberger Home Eco (11KW)",
+                    "5606": "Wallbox Heidelberger Energie Control (11KW)",
+                    "5606": "Wallbox SENEC pro S (11kW)",
+                    "5610": "Wallbox Senec Pro (bis22KW)",
                     "186": "Wallbox 11 kW (SENEC) mit Kabel",
                     "4374": "Wallbox 22 kW (SENEC) mit Kabel",
                     "4148": "Senec Wechselrichtergarantie 20 Jahre",

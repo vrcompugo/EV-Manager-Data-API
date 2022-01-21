@@ -375,6 +375,8 @@ def calculate_products(data):
                 wallbox_type = "Wallbox SENEC 11kW bis 22 kW"
             if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "control-11kW":
                 wallbox_type = "Heidelberg Energy Control. 11 kW"
+            if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-pro-11kW":
+                wallbox_type = "Wallbox SENEC pro S (11kW)"
             add_direct_product(
                 label=wallbox_type,
                 category="Extra Pakete",
