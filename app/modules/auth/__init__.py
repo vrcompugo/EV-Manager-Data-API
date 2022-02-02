@@ -85,6 +85,16 @@ def get_auth_info():
             data["user"] = {}
             for k, v in response_data["result"].items():
                 data["user"][k.lower()] = v
+    if data.get("user") is not None:
+        user = data.get("user")
+        data["user"] = {
+            "id": user.get("id"),
+            "name": user.get("name"),
+            "last_name": user.get("last_name"),
+            "email": user.get("email"),
+            "active": user.get("active"),
+            "uf_department": user.get("uf_department")
+        }
     return data
 
 
