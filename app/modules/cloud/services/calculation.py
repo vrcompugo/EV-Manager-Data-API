@@ -101,7 +101,10 @@ def calculate_cloud(data):
     if data is not None and "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
         data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
     else:
-        data["conventional_power_cost_per_kwh"] = 31
+        data["conventional_power_cost_per_kwh"] = 38
+        if "name" in user and user["name"].lower() == "bsh":
+            data["conventional_power_cost_per_kwh"] = 31
+
     result["conventional_power_cost_per_kwh"] = data["conventional_power_cost_per_kwh"]
 
     if data.get("has_heating_quote", False) is True and data.get("heating_quote_usage_old") not in [None, ""]:
