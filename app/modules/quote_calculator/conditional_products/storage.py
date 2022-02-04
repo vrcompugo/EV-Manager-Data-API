@@ -6,9 +6,9 @@ from app.modules.external.bitrix24.products import get_product
 def add_product(data):
     if "storage_size" not in data["calculated"] or data["calculated"]["storage_size"] is None:
         raise Exception("storage produkt could not be calculated")
-    # version = "SENEC V3 Hybrid"
-    # if ("pv_kwp" in data["data"] and data["data"]["pv_kwp"] > 11) or "solaredge" in data["data"]["extra_options"]:
-    version = "Senec Lithium Speicher"
+    version = "SENEC V3 Hybrid"
+    if ("pv_kwp" in data["data"] and data["data"]["pv_kwp"] > 11) or "solaredge" in data["data"]["extra_options"]:
+        version = "Senec Lithium Speicher"
     stack_count = math.ceil((data["calculated"]["storage_size"] - 2.5) / 2.5)
     product = get_product(label=version, category="Stromspeicher")
     product["quantity"] = 1
