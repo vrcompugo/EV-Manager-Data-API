@@ -412,10 +412,14 @@ def run_export(local_id=None, remote_id=None):
         response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
         if "result" in response:
             associate_item("Order", local_id=local_id, remote_id=response["result"])
+        else:
+            print("error export", response)
     else:
         print("run export order update", link.remote_id)
         post_data["id"] = link.remote_id
         response = post("crm.deal.update", convert_data_to_post_data(post_data, "deal"))
+        if "result" in response:
+            print("error export update", response)
     # if "consumers" in order.data:
     #     for i, consumer in enumerate(order.data["consumers"]):
     #         link = find_association(f"OrderC{i}", local_id=local_id)
