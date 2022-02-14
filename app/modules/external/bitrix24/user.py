@@ -55,7 +55,7 @@ def get_users_per_department(department_id):
             refresh = True
             break
         result.append(user_cached.data)
-    if refresh is True:
+    if refresh is True or len(users_cached) == 0:
         payload = {
             "FILTER[UF_DEPARTMENT]": department_id,
             "start": 0
