@@ -49,3 +49,9 @@ def run_cron_import():
         if config is not None:
             config["last_import_datetime"] = str(last_import_datetime)
         set_settings("external/smartme2", config)
+
+
+def get_device_by_datetime(smartme_number, datetime):
+    device = get("/DeviceBySerial", parameters={ "serial": smartme_number})
+
+    return get(f"/MeterValues/{device['Id']}", parameters={ "date": str(datetime) })

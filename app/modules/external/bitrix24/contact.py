@@ -22,6 +22,10 @@ def convert_config_values(data_raw):
         data["salutation"] = "ms"
     else:
         data["salutation"] = "mr"
+    if "first_name" in data:
+        data["firstname"] = data["first_name"]
+    if "last_name" in data:
+        data["lastname"] = data["last_name"]
     if "street" not in data or data["street"] is None or data["street"] is False:
         data["street"] = ""
     if "street_nb" not in data or data["street_nb"] is None or data["street_nb"] is False:

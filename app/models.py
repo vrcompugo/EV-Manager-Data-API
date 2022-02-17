@@ -23,3 +23,5 @@ from app.modules.external.mfr.models.task_persistent_users import TaskPersistent
 from app.modules.external.mfr.models.mfr_import_buffer import MfrImportBuffer
 from app.modules.external.mfr.models.mfr_export_buffer import MfrExportBuffer
 from app.modules.external.mfr.models.mfr_log_event import MfrLogEvent
+from app.modules.cloud.models.sherpa_invoice import SherpaInvoice
+from app.modules.cloud.models.sherpa_invoice_item import SherpaInvoiceItem

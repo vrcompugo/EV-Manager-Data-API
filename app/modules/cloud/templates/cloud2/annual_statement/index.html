@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PV-Angebot</title>
+  {% include('quote_calculator/generator/style.html') %}
+  {% include('quote_calculator/generator/elements/table.html') %}
+  <style>
+    .summary td {
+      border-top: 1px double #333;
+    }
+  </style>
+</head>
+<body>
+
+  {% include('cloud2/annual_statement/head.html') %}
+  <div class="letter-text" style="margin-top: 0em;">
+    <b>Anlage Verbrauchsaufstellung für das Jahr: {{ statement.year }}</b><br>
+    <br>
+    <h2>Ihre Übersicht Entnahme &amp; Lieferung der Cloud ZERO 4.0</h2>
+    <h3>Verbrauchsaufstellung: {{ data.pv_system.street }} {{ data.pv_system.street_nb }}, {{ data.pv_system.zip }} {{ data.pv_system.city }} (Zählernummer: {{ data.pv_system.power_meter_number }})</h3>
+    <table>
+      <tr class="heading">
+        <th>von</th>
+        <th>bis</th>
+        <th>Abnahmeart</th>
+        <th>Abnahme</th>
+      </tr>
+      <tr>
+        <td>{{ statement.pv_system.begin | dateformat }}</td>
+        <td>{{ statement.pv_system.end | dateformat }}</td>
+        <td>Cloud Abnahme</td>
+        <td style="text-align: right;">{{ statement.pv_system.cloud_usage }} kWh</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>direkte Abnahme</td>
+        <td style="text-align: right;">{{ statement.pv_system.direct_usage }} kWh</td>
+      </tr>
+      <tr class="summary">
+        <td colspan="3"><b>Abnahme gesamt</b> (Verbrauch a)</td>
+        <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
+      </tr>
+    </table>
+    {% if statement.consumers and len(statement.consumers) > 0 %}
+      <h3>Cloud Consumer</h3>
+
+      {% for consumer in data.consumers %}
+        <h3>Verbrauchsaufstellung: {{ consumer.street }} {{ consumer.street_nb }}, {{ consumer.zip }} {{ consumer.city }}</h3>
+        <table>
+          <tr class="heading">
+            <th>von</th>
+            <th>bis</th>
+            <th>Abnahmeart</th>
+            <th>Abnahme</th>
+          </tr>
+          <tr>
+            <td>{{ consumer.begin | dateformat }}</td>
+            <td>{{ consumer.end | dateformat }}</td>
+            <td>Cloud Abnahme</td>
+            <td>123 kWh</td>
+          </tr>
+          <tr class="summary">
+            <td colspan="4"><b>Abnahme gesamt</b> (Verbrauch a)</td>
+            <td>3242 kWh</td>
+          </tr>
+        </table>
+      {% endfor %}
+    {% endif %}
+    <br>
+    <h2>Aufstellung Mehrverbrauch und Minderverbrauch</h2>
+    <table>
+      <tr class="heading">
+        <th></th>
+        <th></th>
+        <th></th>
+        <th colspan="2" style="text-align: center;">Verbauch</th>
+      </tr>
+      <tr class="heading">
+        <th>Cloud Produkt/Abnahmestelle</th>
+        <th>von</th>
+        <th>bis</th>
+        <th>abgedeckt</th>
+        <th>ermittelt</th>
+      </tr>
+      <tr>
+        <td>Lichtcloud {% if statement.lightcloud.year_percent < 1 %}(Anteil){% endif %}</td>
+        <td>{{ statement.lightcloud.begin | dateformat }}</td>
+        <td>{{ statement.lightcloud.end | dateformat }}</td>
+        <td style="text-align: right;">{{ statement.lightcloud.included_usage }} kWh</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Abnahme: {{ data.pv_system.street }} {{ data.pv_system.street_nb }}, {{ data.pv_system.zip }} {{ data.pv_system.city }}</td>
+        <td>{{ statement.begin }}</td>
+        <td>{{ statement.end }}</td>
+        <td></td>
+        <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
+      </tr>
+      <tr class="summary">
+        <td colspan="4"><b>Mehrverbrauch</b></td>
+        <td style="text-align: right;">{{ statement.total_extra_usage }} kWh</td>
+      </tr>
+      {% if statement.consumers and len(statement.consumers) > 0 %}
+        <tr>
+          <td colspan="5">&nbsp;</td>
+        </tr>
+        {% for consumer in data.consumers %}
+          <tr>
+            <td>Consumer {{ consumer.street }} {{ consumer.street_nb }}, {{ consumer.zip }} {{ consumer.city }}</td>
+            <td>{{ consumer.begin | dateformat }}</td>
+            <td>{{ consumer.end | dateformat }}</td>
+            <td>3000 kWh</td>
+            <td>4000 kWh</td>
+          </tr>
+        {% endfor %}
+        <tr class="summary">
+          <td colspan="4"><b>Mehrverbrauch (33,12 Cent)</b></td>
+          <td>2000 kWh</td>
+        </tr>
+      {% endif %}
+    </table>
+    <br>
+    <h2>Aufstellung Vorauszahlungen/Kosten</h2>
+    <table>
+      <tr class="heading">
+        <th>Art</th>
+        <th>von</th>
+        <th>bis</th>
+        <th>Soll</th>
+        <th>Haben</th>
+      </tr>
+      {% for pre_payment in statement.pre_payments %}
+        <tr>
+          <td>{{ pre_payment.label }}</td>
+          <td>{{ pre_payment.begin | dateformat }}</td>
+          <td>{{ pre_payment.end | dateformat }}</td>
+          <td style="text-align: right;">{% if pre_payment.price < 0 %}{{ -pre_payment.price | currencyformat }}{% endif%}</td>
+          <td style="text-align: right;">{% if pre_payment.price > 0 %}{{ pre_payment.price | currencyformat }}{% endif%}</td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td>Lichtcloud</td>
+        <td>{{ statement.lightcloud.begin | dateformat }}</td>
+        <td>{{ statement.lightcloud.end | dateformat }}</td>
+        <td style="text-align: right;">{% if statement.lightcloud.price > 0 %}{{ statement.lightcloud.price | currencyformat }}{% endif%}</td>
+        <td style="text-align: right;">{% if statement.lightcloud.price < 0 %}{{ -statement.lightcloud.price | currencyformat }}{% endif%}</td>
+      </tr>
+      <tr>
+        <td>Mehrverbrauch {{ statement.total_extra_usage }} kWh je {{ (statement.lightcloud.extra_price_per_kwh * 100 ) | numberformat }} Cent</td>
+        <td>{{ statement.begin }}</td>
+        <td>{{ statement.end }}</td>
+        <td style="text-align: right;">{% if statement.total_extra_usage_price > 0 %}{{ statement.total_extra_usage_price | currencyformat }}{% endif%}</td>
+        <td style="text-align: right;">{% if statement.total_extra_usage_price < 0 %}{{ -statement.total_extra_usage_price | currencyformat }}{% endif%}</td>
+        <td></td>
+      </tr>
+      <tr class="summary">
+        <td colspan="3"><b>Kontostand</b></td>
+        <td style="text-align: right;">{% if statement.to_pay > 0 %}{{ statement.to_pay | currencyformat }}{% endif%}</td>
+        <td style="text-align: right;">{% if statement.to_pay < 0 %}{{ -statement.to_pay | currencyformat }}{% endif%}</td>
+      </tr>
+    </table>
+    <br>
+    <br>
+    {% if statement.to_pay > 0 %}
+      Wir werden Ihr Konto die nächsten 14 Tage mit dieser Summe belasten. Die bisherige Cloudgebühr wird wie vereinbart weiterhin abgebucht.
+    {% else %}
+      Ihr Guthaben werden wir in den nächsten 14 Tagen auf Ihr Konto überweisen und die bisherige Cloudgebühr wie vereinbart weiterhin abbuchen.
+    {% endif %}
+    <br>
+    <br>
+    Mit sonnigen Grüssen<br>
+    Ihr Team von energie360<br>
+    <br>
+    <small>* Diese Abrechnug wurde unter Vorbehalt der angegebenen Einspeisemengen berechnet. Sollten sich die Einspeisemengen rückwirkend ändern, so wird diese Abrechnung auch korrigiert. Die Cloudgebühren sowie die Kosten für die Zusatzpakete wurden unter der Tatsache, dass diese regelmäßig bezahlt wurden, erstellt. Sollte dies nicht der Fall sein und noch offenene Forderungen unsererseits vorliegen, so werden diese Rechnungen separat angemahnt und verrechnet. Bei Nichtvorliegen EEG-Vergütung, behalten wir uns vor den Verbrauch mit 27,69 € zu berechnen.</small>
+    <img src="{{ base_url }}static/cloud/contract/annual_statement/Stromkennzeichen%202020.jpeg" style="width: 100%; height: auto;" />
+  </div>
+
+</body>
+</html>
+
+

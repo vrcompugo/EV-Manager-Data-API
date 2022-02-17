@@ -271,7 +271,15 @@ class OrderUpload(Resource):
         offer_v2_data["data"]["signed_offer_pdf_id"] = data["signed_offer_pdf_id"]
         offer_v2_data["data"]["refund_transfer_pdf_id"] = data["refund_transfer_pdf_id"]
         offer_v2_data["data"]["sepa_form_id"] = data["sepa_form_id"]
-        offer_v2_data["data"]["old_power_invoice_id"] = data["old_power_invoice_id"]
+        offer_v2_data["data"]["bankowner"] = data["bankowner"]
+        offer_v2_data["data"]["iban"] = data["iban"]
+        offer_v2_data["data"]["bic"] = data["bic"]
+        offer_v2_data["data"]["malo_lightcloud"] = data["malo_lightcloud"]
+        offer_v2_data["data"]["malo_heatcloud"] = data["malo_heatcloud"]
+        offer_v2_data["data"]["malo_ecloud"] = data["malo_ecloud"]
+        offer_v2_data["data"]["malo_consumer1"] = data["malo_consumer1"]
+        offer_v2_data["data"]["malo_consumer2"] = data["malo_consumer2"]
+        offer_v2_data["data"]["malo_consumer3"] = data["malo_consumer3"]
         if "old_gas_invoice_id" in data:
             offer_v2_data["data"]["old_gas_invoice_id"] = data["old_gas_invoice_id"]
         offer_v2_data["is_sent"] = True

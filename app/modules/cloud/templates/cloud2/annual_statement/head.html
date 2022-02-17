@@ -1,0 +1,66 @@
+<style>
+  header .logo {
+    display: block;
+    margin-top: -2em;
+    padding-bottom: 7em;
+  }
+  header .logo img {
+    width: 13em;
+    padding-top: 3em;
+    background-color: #d91219;
+  }
+  header .return_line small {
+    font-size: 0.9em;
+  }
+  header h2 {
+    padding-top: 1em;
+    text-align: right;
+  }
+</style>
+<div class="small" style="float: right; font-size: 11px; line-height: 1.4em; margin-left: 2em;">
+  {% include "offer/logo-kez.html" %}
+  <br>
+  <br>
+  Geschäftsführer : André Schön<br>
+  Wildunger Landstraße 14b<br>
+  34497 Korbach<br>
+  Tel: 05631 501717 &nbsp; Fax: 5061742<br>
+  Email: info@energie360.de<br>
+  <br>
+  <div style="font-size: 12px; line-height: 1.5em;">
+    <div style="display: grid; grid-template-columns: 7em 1fr;">
+      <div>Datum:</div>
+      <div>{{ data.datetime | dateformat }}</div>
+      <div>Vertrag:</div>
+      <div>{{ data.contract_number }}</div>
+    </div>
+  </div>
+</div>
+
+<div style="padding-bottom: 4em;">
+  <div style="
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 20px;
+    text-align: right;
+    padding: 0 0 0.5em;
+    color: #888888;">
+    Energie ist unsere Profession
+  </div>
+  <div style="
+    font-size: 16px;
+    text-align: right;">
+    Energieberatung, Anlagenwartung, Konzeptentwicklung
+    </div>
+</div>
+
+
+<div>
+  <small style="text-decoration: underline;font-size: 10px;">energie360 GmbH & Co KG<br>Wildunger Landstr. 14b 34497 Korbach</small><br>
+  {% if data.contact %}
+    {{ data.contact | addressblock2 | nltobr }}
+  {% endif %}
+</div>
+
+<div style="clear: both;"></div>
+
+</header>

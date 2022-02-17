@@ -186,7 +186,6 @@ def run_cron_add_missing_values():
                 history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal["unique_identifier"]).order_by(QuoteHistory.datetime.desc()).first()
                 if history is None:
                     continue
-                print(json.dumps(history.data, indent=2))
                 update_data = {
                     "inverter_type": [],
                     "extra_packages": [],

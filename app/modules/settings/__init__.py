@@ -391,7 +391,16 @@ def get_settings(section=None, domain_raw=None):
                     "malo_id": "UF_CRM_1616427015",
                     "construction_date2": "UF_CRM_1585237939",
                     "smartme_number": "UF_CRM_1605610632",
-                    "contracting_version": "UF_CRM_1639388034"
+                    "contracting_version": "UF_CRM_1639388034",
+                    "netprovider": "UF_CRM_1607947330",
+                    "cloud_monthly_price": "UF_CRM_1612265225",
+                    "bankowner": "UF_CRM_1644838647",
+                    "malo_lightcloud": "UF_CRM_1616427015",
+                    "malo_heatcloud": "UF_CRM_1644838543",
+                    "malo_ecloud": "UF_CRM_1644838574",
+                    "malo_consumer1": "UF_CRM_1644838588",
+                    "malo_consumer2": "UF_CRM_1644838598",
+                    "malo_consumer3": "UF_CRM_1644838617"
                 }
             },
             "quote": {

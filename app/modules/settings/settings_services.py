@@ -106,7 +106,17 @@ def get_settings(section=None):
                     "is_consumer": "UF_CRM_1597755099494",
                     "has_ecloud": "UF_CRM_1597755087885",
                     "construction_date": "UF_CRM_1585237939",
-                    "smartme_number": "UF_CRM_1605610632"
+                    "smartme_number": "UF_CRM_1605610632",
+                    "iban": "UF_CRM_1582292567",
+                    "bic": "UF_CRM_1582292579",
+                    "bank": "UF_CRM_1607947258",
+                    "bankowner": "UF_CRM_1644838647",
+                    "malo_lightcloud": "UF_CRM_1616427015",
+                    "malo_heatcloud": "UF_CRM_1644838543",
+                    "malo_ecloud": "UF_CRM_1644838574",
+                    "malo_consumer1": "UF_CRM_1644838588",
+                    "malo_consumer2": "UF_CRM_1644838598",
+                    "malo_consumer3": "UF_CRM_1644838617"
                 }
             }
         }

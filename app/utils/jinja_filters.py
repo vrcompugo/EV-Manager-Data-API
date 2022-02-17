@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from dateutil.parser import parse
 from flask import Markup
 
 
@@ -38,6 +39,7 @@ def convert_to_datetime(value):
     if isinstance(value, date):
         return value
     if type(value) == str:
+        return parse(value)
         if value.find("T") >= 0:
             return datetime.fromisoformat(value)
         return datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")

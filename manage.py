@@ -100,6 +100,11 @@ def test_special():
                 run_order_export(local_id=order.id)
 
 
+@manager.command
+def adsfdsf():
+    from app.modules.external.bitrix24.user import get_users_per_department
+    print(json.dumps(get_users_per_department(390), indent=2))
+
 
 @manager.command
 def run_legacy_folder_creation():
