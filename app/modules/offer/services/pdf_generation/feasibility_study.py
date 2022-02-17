@@ -303,7 +303,7 @@ def calculate_feasibility_study(offer: OfferV2):
             data["heating_offer_substitute_total"] = float(heating_offer.get("total", 0)) * 0.60
         if offer.data.get("old_heating_type") == "oil":
             data["heating_offer_substitute_total"] = float(heating_offer.get("total", 0)) * 0.50
-        if offer.data.get("old_heating_type") == "new":
+        if offer.data.get("old_heating_type") in ["new", "heatpump"]:
             data["heating_offer_substitute_total"] = float(heating_offer.get("total", 0)) * 0.65
     data["loan_amount"] = data["pv_offer_total"] + data["heating_offer_substitute_total"]
     data["yearly_loan_payment"] = data["loan_amount"] / 20
