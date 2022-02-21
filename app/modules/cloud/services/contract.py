@@ -5,10 +5,62 @@ import json
 import calendar
 from dateutil.parser import parse
 
+from app import db
 from app.modules.settings import get_settings
 from app.modules.external.bitrix24.deal import get_deals, get_deal
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
+from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
+from app.models import SherpaInvoice, ContractStatus
+
+
+def check_contract_data(contract_number, year):
+    data = get_contract_data(contract_number)
+    statement = get_annual_statement_data(data, year)
+    status = ContractStatus.query\
+        .filter(ContractStatus.contract_number == contract_number)\
+        .filter(ContractStatus.year == year)\
+        .first()
+    if status is None:
+        status = ContractStatus(contract_number=contract_number, year=year)
+        db.session.add(status)
+    status.has_lightcloud = data["lightcloud"] is not None
+    if status.has_lightcloud:
+        status.has_cloud_number = data["cloud"].get("cloud_number") not in [None, "", 0, "0"]
+        status.has_smartme_number = data["pv_system"]["smartme_number"] not in [None, "", 0, "0"]
+        status.has_smartme_number_values = statement["pv_system"].get("total_usage", 0) > 0
+        print(statement["pv_system"].get("total_usage", 0))
+        status.has_correct_usage = True
+        if statement["pv_system"].get("begin") is None or statement["lightcloud"].get("begin") is None:
+             status.has_correct_usage = "begin date don't exist"
+        else:
+            begin1 = parse(statement["pv_system"].get("begin")).strftime("%Y%-m-%d")
+            begin2 = parse(statement["lightcloud"].get("begin")).strftime("%Y%-m-%d")
+            if begin1 != begin2:
+                status.has_correct_usage = f"begin date don't match {begin1} {begin2}"
+        if statement["pv_system"].get("end") is None or statement["lightcloud"].get("end") is None:
+             status.has_correct_usage = "end date don't exist"
+        else:
+            end1 = parse(statement["pv_system"].get("end")).strftime("%Y-%m-%d")
+            end2 = parse(statement["lightcloud"].get("end")).strftime("%Y-%m-%d")
+            if end1 != end2:
+                status.has_correct_usage = f"end date don't match {end1} {end2}"
+        status.has_sherpa_values = statement["pv_system"].get("cloud_usage", 0) > 0
+        status.has_heatcloud = data["heatcloud"] is not None
+        status.has_ecloud = data["ecloud"] is not None
+        status.has_consumers = len(data["consumers"]) > 0
+        status.has_emove = data["emove"] is not None
+    else:
+        status.has_cloud_number = False
+        status.has_smartme_number = False
+        status.has_smartme_number_values = False
+        status.has_correct_usage = False
+        status.has_sherpa_values = False
+        status.has_heatcloud = False
+        status.has_ecloud = False
+        status.has_consumers = False
+        status.has_emove = False
+    db.session.commit()
 
 
 def get_contract_data(contract_number):
@@ -43,11 +95,18 @@ def get_contract_data(contract_number):
             f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
             "FILTER[CATEGORY_ID]": 15
         })
+        if len(deals) >= 1:
+            print("perfect")
+        else:
+            deals = get_deals({
+                "SELECT": "full",
+                f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
+                "FILTER[CATEGORY_ID]": 176
+            })
     if deals is not None:
         data["deals"] = deals
         for deal in deals:
             if deal.get("is_cloud_master_deal") in [True, "1", 1]:
-                print(json.dumps(deal, indent=2))
                 data["contact_id"] = deal.get("contact_id")
                 data["pv_system"]["smartme_number"] = deal.get("smartme_number")
                 data["pv_system"]["pv_kwp"] = deal.get("pv_kwp")
@@ -61,6 +120,7 @@ def get_contract_data(contract_number):
                 data["cloud"]["cloud_monthly_price"] = deal.get("cloud_monthly_price")
                 data["cloud"]["extra_price_per_kwh"] = deal.get("extra_price_per_kwh")
                 data["cloud"]["cashback_per_kwh"] = deal.get("cashback_per_kwh")
+                data["cloud"]["cloud_number"] = deal.get("cloud_number")
                 data["lightcloud"] = {
                     "status": get_item_status(deal),
                     "usage": deal.get("lightcloud_usage"),
@@ -120,6 +180,8 @@ def get_contract_data(contract_number):
                 beginning_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number"), data["lightcloud"].get("delivery_begin"))
             else:
                 beginning_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number"), f"{year}-01-01 00:00:00")
+            if beginning_of_year is None:
+                continue
             end_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number"), f"{year}-12-31 23:59:59")
             values = {
                 "year": year,
@@ -144,19 +206,34 @@ def get_annual_statement_data(data, year):
         if enddate.year == year:
             lightcloud_end = enddate
     pv_usage = next((item for item in data["pv_system"]["usages"] if item["year"] == year), None)
-    statement = {
-        "year": year,
-        "pv_system": {
-            "begin": pv_usage["start_date"],
-            "end": pv_usage["end_date"],
-            "total_usage": int(pv_usage["usage"]),
-            "cloud_usage": 917
+    sherpaInvoice = SherpaInvoice.query.filter(SherpaInvoice.identnummer == data.get("contract_number")).first()
+    cloud_usage = 0
+    if sherpaInvoice is not None:
+        cloud_usage = sherpaInvoice.verbrauch
+    if pv_usage is None:
+        statement = {
+            "year": year,
+            "pv_system": {
+                "begin": None,
+                "end": None,
+                "total_usage": 0,
+                "cloud_usage": cloud_usage
+            }
         }
-    }
+    else:
+        statement = {
+            "year": year,
+            "pv_system": {
+                "begin": pv_usage["start_date"],
+                "end": pv_usage["end_date"],
+                "total_usage": int(pv_usage["usage"]),
+                "cloud_usage": cloud_usage
+            }
+        }
     statement["pv_system"]["direct_usage"] = statement["pv_system"]["total_usage"] - statement["pv_system"]["cloud_usage"]
     statement["lightcloud"] = {
-        "begin": lightcloud_begin,
-        "end": lightcloud_end,
+        "begin": str(lightcloud_begin),
+        "end": str(lightcloud_end),
         "year_percent": (diff_month(lightcloud_end, lightcloud_begin) / 12),
         "extra_price_per_kwh": 0.2769 ,
         "cashback_per_kwh": 0.10,
@@ -169,12 +246,11 @@ def get_annual_statement_data(data, year):
     statement["pre_payments"] = []
     statement["pre_payments"].append({
         "label": "Vorauszahlungen",
-        "begin": lightcloud_begin,
-        "end": lightcloud_end,
+        "begin": str(lightcloud_begin),
+        "end": str(lightcloud_end),
         "price": statement["lightcloud"]["price"]
     })
     statement["to_pay"] = statement["total_extra_usage_price"]
-
     return statement
 
 def normalize_contract_number(cloud_contract_number):

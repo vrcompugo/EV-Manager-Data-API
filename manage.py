@@ -101,9 +101,28 @@ def test_special():
 
 
 @manager.command
-def adsfdsf():
-    from app.modules.external.bitrix24.user import get_users_per_department
-    print(json.dumps(get_users_per_department(390), indent=2))
+def create_cloud_contract_deals():
+    from app.modules.external.bitrix24.deal import get_deals, add_deal, get_deal, update_deal
+    from app.modules.cloud.cloud2_routes import get_invoce_list
+    from app.modules.order.models.order import Order
+    from app.modules.cloud.services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data
+    from app.modules.settings import get_settings
+
+    config = get_settings(section="external/bitrix24")
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 126
+    })
+    for deal in deals:
+        if deal.get("contact_id") in [None, "", "0", 0]:
+            contract_data = get_contract_data(deal.get('contract_number'))
+            if contract_data.get("contact_id") not in [None, "", "0", 0]:
+                deal_data = {
+                    "contact_id": contract_data.get("contact_id"),
+                    "cloud_number": contract_data["cloud"].get("cloud_number")
+                }
+                print(json.dumps(deal_data, indent=2))
+                update_deal(deal.get("id"), deal_data)
 
 
 @manager.command

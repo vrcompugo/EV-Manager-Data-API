@@ -1,6 +1,9 @@
+import datetime
 import json
 
+from app import db
 from app.modules.external.bitrix24.drive import get_file_content, get_file
+from app.models import InsignLog, InsignDocumentLog
 
 from ._connector import get, post
 
@@ -38,17 +41,25 @@ def cli_command():
     get_public_url(sessionId)
 
 
-def get_session_id(session_data):
-    sessionId = create_session(session_data)
+def get_session_id(session_data, lead_id=None):
+    sessionId = create_session(session_data, lead_id)
     print("asd", sessionId)
     for document in session_data["documents"]:
         upload_file(sessionId=sessionId, file_id=document["id"])
     return sessionId
 
 
-def create_session(session_data):
+def create_session(session_data, lead_id=None):
     response = post("/configure/session", post_data=session_data)
     if response is not None and "sessionid" in response:
+        log = InsignLog(
+            datetime=datetime.datetime.now(),
+            lead_id=lead_id,
+            session_id=response.get("sessionid"),
+            data=session_data
+        )
+        db.session.add(log)
+        db.session.commit()
         return response.get("sessionid")
     else:
         print(response)
@@ -70,6 +81,13 @@ def upload_file(sessionId, file_id):
         "file": (file["NAME"], file["content"])
     }
     response = post("/configure/uploaddocument", params=query_data, files=files)
+    log = InsignDocumentLog(
+        session_id=sessionId,
+        docid=response.get("docid"),
+        data=query_data
+    )
+    db.session.add(log)
+    db.session.commit()
     print(response)
 
 

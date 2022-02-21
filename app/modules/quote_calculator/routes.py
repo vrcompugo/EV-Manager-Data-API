@@ -14,6 +14,7 @@ from app.modules.external.bitrix24.quote import get_quote, add_quote, update_quo
 from app.modules.external.bitrix24.drive import get_file, add_file, get_folder_id, get_public_link, create_folder_path
 from app.modules.external.bitrix24.products import reload_products
 from app.modules.external.bitrix24.contact import add_contact
+from app.modules.external.insign.models.insign_log import InsignLog
 from app.modules.settings import get_settings
 from app.modules.cloud.services.calculation import get_cloud_products
 from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item_v2
@@ -746,7 +747,12 @@ def get_insign_callback(token):
             lead_data["order_confirmation_date"] = str(datetime.datetime.now())
         lead_data["order_sign_date"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-01:00")
         update_lead(token_data["unique_identifier"], lead_data)
-
+    log = InsignLog.query.filter(InsignLog.session_id == session_id).first()
+    if log is not None:
+        data = json.loads(json.dumps(log.data))
+        data["final_response"] = str(datetime.datetime.now())
+        log.data = data
+        db.session.commit()
     return Response(
             '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
             status=200,
@@ -982,15 +988,19 @@ def get_insign_session(data):
     if "calculated" in data:
         token_data["pv_kwp"] = data["calculated"].get("pv_kwp")
     token = encode_jwt(token_data, 172800)
-    return get_session_id({
-        "displayname": data["number"],
-        "foruser": data["assigned_by_id"] + " " + data["assigned_user"]["EMAIL"],
-        "callbackURL": "https://www.energie360.de/insign-callback/",
-        "userFullName": f'{data["assigned_user"]["NAME"]} {data["assigned_user"]["LAST_NAME"]}',
-        "userEmail": data["assigned_user"]["EMAIL"],
-        "serverSidecallbackURL": f"{config['base_url']}quote_calculator/insign/callback/{token['token']}",
-        "documents": documents
-    })
+    return get_session_id(
+        {
+            "displayname": data["number"],
+            "displayname": data["number"],
+            "foruser": data["assigned_by_id"] + " " + data["assigned_user"]["EMAIL"],
+            "callbackURL": "https://www.energie360.de/insign-callback/",
+            "userFullName": f'{data["assigned_user"]["NAME"]} {data["assigned_user"]["LAST_NAME"]}',
+            "userEmail": data["assigned_user"]["EMAIL"],
+            "serverSidecallbackURL": f"{config['base_url']}quote_calculator/insign/callback/{token['token']}",
+            "documents": documents
+        },
+        data.get("id")
+    )
 
 
 @blueprint.route("", methods=['GET', 'POST'])

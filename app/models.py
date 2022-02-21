@@ -25,3 +25,6 @@ from app.modules.external.mfr.models.mfr_export_buffer import MfrExportBuffer
 from app.modules.external.mfr.models.mfr_log_event import MfrLogEvent
 from app.modules.cloud.models.sherpa_invoice import SherpaInvoice
 from app.modules.cloud.models.sherpa_invoice_item import SherpaInvoiceItem
+from app.modules.cloud.models.contract_status import ContractStatus
+from app.modules.external.insign.models.insign_log import InsignLog
+from app.modules.external.insign.models.insign_document_log import InsignDocumentLog

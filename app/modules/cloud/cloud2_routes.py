@@ -20,9 +20,9 @@ from app.modules.auth.jwt_parser import encode_jwt
 from app.modules.external.bitrix24.deal import get_deals, get_deal
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.modules.settings import get_settings
-from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem
+from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus
 from .services.annual_statement import generate_annual_statement_pdf
-from .services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data
+from .services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data, check_contract_data
 
 
 blueprint = Blueprint("cloud2", __name__, template_folder='templates')
@@ -52,20 +52,27 @@ def post_contract_annual_statement_year(contract_number, year):
     if "annualStatements" not in data:
         data["annualStatements"] = []
 
-    pdf = generate_annual_statement_pdf(data, year)
-    print(f"Cloud/Kunde {data['contact_id']}/Vertrag {data['contract_number']}")
+    statement = get_annual_statement_data(data, year)
+    pdf = generate_annual_statement_pdf(data, statement)
     subfolder_id = create_folder_path(415280, path=f"Cloud/Kunde {data['contact_id']}/Vertrag {data['contract_number']}")  # https://keso.bitrix24.de/docs/path/Kundenordner/
 
-    statement = next((item for item in data["annualStatements"] if item["year"] == year), None)
-    if statement is None:
-        statement = {
-            "year": year
-        }
     statement["drive_id"] = add_file(folder_id=subfolder_id, data={
         "file_content": pdf,
         "filename": f"Cloud Abrechnung {year}.pdf"
     })
     statement["pdf_link"] = get_public_link(statement["drive_id"])
+
+    status = ContractStatus.query\
+        .filter(ContractStatus.contract_number == contract_number)\
+        .filter(ContractStatus.year == year)\
+        .first()
+    if status is None:
+        status = ContractStatus(contract_number=contract_number, year=year)
+        db.session.add(status)
+    status.is_generated = True
+    status.pdf_file_id = statement["drive_id"]
+    status.pdf_file_link = statement["pdf_link"]
+    db.session.commit()
 
     data["annualStatements"].append(statement)
     return Response(
@@ -91,6 +98,81 @@ def post_contract_annual_statement_year2(contract_number, year):
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline; filenam=export.pdf'
     return response
+
+
+@blueprint.route("contract/<year>/list", methods=['GET'])
+def get_contract_list(year):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    data = get_invoce_list(year)
+
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("contract/<contract_number>/check/<year>", methods=['GET'])
+def get_contract_check(contract_number, year):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    data = check_contract_data(contract_number, year)
+
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+def get_invoce_list(year):
+    invoices = db.session.query(SherpaInvoice) \
+        .filter(SherpaInvoice.abrechnungszeitraum_von >= f"{year}-01-01") \
+        .filter(SherpaInvoice.abrechnungszeitraum_von <= f"{year}-12-31") \
+        .order_by(SherpaInvoice.identnummer.desc()) \
+        .all()
+    data = []
+    status_field_list = [
+        "has_lightcloud",
+        "has_cloud_number",
+        "has_smartme_number",
+        "has_smartme_number_values",
+        "has_correct_usage",
+        "has_sherpa_values",
+        "has_heatcloud",
+        "has_ecloud",
+        "has_consumers",
+        "has_emove",
+        "pdf_file_id",
+        "pdf_file_link",
+        "is_generated",
+        "is_invoiced",
+        "status"
+    ]
+    for invoice in invoices:
+        status = ContractStatus.query\
+            .filter(ContractStatus.contract_number == invoice.identnummer)\
+            .filter(ContractStatus.year == year)\
+            .first()
+        item = {
+            "contract_number": invoice.identnummer,
+            "invoice_number": invoice.rechnungsnummer,
+            "begin": str(invoice.abrechnungszeitraum_von),
+            "end": str(invoice.abrechnungszeitraum_bis),
+            "power_meter_number": invoice.zahlernummer,
+            "usage": invoice.verbrauch,
+            "days": invoice.tage
+        }
+        for field in status_field_list:
+            if status is not None:
+                item[field] = getattr(status, field)
+            else:
+                item[field] = None
+        data.append(item)
+    return data
 
 
 @blueprint.route("import", methods=[ 'POST'])
