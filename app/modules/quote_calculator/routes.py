@@ -1,10 +1,13 @@
+
 import requests
 import json
 import os
 import datetime
 from flask import Blueprint, request, render_template, redirect, make_response, Response
+from flask_emails import Message
 
 from app import db
+from app.config import email_config
 from app.decorators import api_response
 from app.modules.auth import get_auth_info
 from app.modules.auth.jwt_parser import decode_jwt, encode_jwt, encode_shared_jwt
@@ -693,7 +696,24 @@ def get_insign_callback(token):
     collection_files = []
     for file in token_data.get("documents", []):
         file_content = download_file(sessionId=session_id, file_id=file["id"])
-        if file_content[0:1] != "{":
+        if isinstance(file_content, dict):
+            error_response = json.dumps({
+                "status": "error",
+                "error_code": "document_download_failed",
+                "message": f"GET /get/document s:{session_id} d:{file['id']} did respond with error in data",
+                "data": file_content
+            }, indent=2)
+            message = Message(text=error_response,
+                            subject="Insign Error Response",
+                            mail_from=("EV-Manager", "bugs@api.korbacher-energiezentrum.de"),
+                            config=email_config)
+            message.mail_to = "a.hedderich@hbb-werbung.de"
+            message.send()
+            return Response(
+                error_response,
+                status=400,
+                mimetype='application/json')
+        else:
             '''add_file(0, {
                 "bitrix_file_id": file["id"],
                 "filename": file["displayname"],

@@ -97,6 +97,12 @@ def download_file(sessionId, file_id):
         "docid": file_id
     }, as_binary=True)
     if response is not None:
+        if response[:1] == b'{' or response[:1] == b'[':
+            try:
+                data = json.loads(response.decode("utf-8"))
+                return data
+            except Exception as e:
+                pass
         return response
     else:
         print(response)

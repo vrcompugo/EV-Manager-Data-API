@@ -85,7 +85,9 @@ def get_test_lead():
 @manager.command
 def get_test_insign():
     from app.modules.external.insign.signature import download_file
-    content = download_file("1d50e5f694214325f07b2b54", 3007242)
+    content = download_file("3fe264f4a2497fba4f6e59e", 3007910)
+    if isinstance(content, dict):
+        return content
     with open("lsdk.pdf", "wb") as fh:
         fh.write(content)
 
