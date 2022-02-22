@@ -171,34 +171,40 @@ def rename_folder(folder_id, new_name):
 
 def add_file(folder_id, data):
 
-    if data.get("bitrix_file_id", None) is not None:
-        response = post("disk.file.uploadversion", {
-            "id": data.get("bitrix_file_id"),
-            "fileContent[0]": data["filename"],
-            "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
-        })
-    else:
-        existing_file = None
+    '''children = get_folder(folder_id, data["filename"])
+    existing_file = None
+    for child in children:
+        if child["NAME"] == data["filename"]:
+            existing_file = child'''
+    if "file" in data:
+        data["file_content"] = data["file"].read()
+
+    response = post("disk.folder.uploadfile", {
+        "id": folder_id,
+        "data[NAME]": data["filename"],
+        "fileContent[0]": data["filename"],
+        "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
+    })
+    if response.get("error") == "DISK_OBJ_22000":
         children = get_folder(folder_id, data["filename"])
-        if children is not None:
-            for child in children:
-                if child["NAME"] == data["filename"]:
-                    existing_file = child
-        if existing_file is None:
+        existing_file = None
+        for child in children:
+            if child["NAME"] == data["filename"]:
+                existing_file = child
+        if existing_file is not None:
+            response = post("disk.file.uploadversion", {
+                "id": existing_file["ID"],
+                "fileContent[0]": data["filename"],
+                "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
+            })
+        else:
+            data["filename"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + data["filename"]
             response = post("disk.folder.uploadfile", {
                 "id": folder_id,
                 "data[NAME]": data["filename"],
                 "fileContent[0]": data["filename"],
                 "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
             })
-        else:
-            response = post("disk.file.uploadversion", {
-                "id": existing_file["ID"],
-                "fileContent[0]": data["filename"],
-                "fileContent[1]": base64.encodestring(data["file_content"]).decode("utf-8")
-            })
-        if "result" not in response:
-            print("add_file error", response)
     if "result" in response:
         return int(response["result"]["ID"])
     else:
