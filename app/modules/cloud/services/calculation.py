@@ -29,6 +29,7 @@ def calculate_cloud(data):
         user_id_for_prices = 1
     if user_id_for_prices == 1:
         settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"] = 0.099
+    settings["data"]["cloud_settings"]["cashback_price_per_kwh"] = 0.1
     if data.get("assigned_user") is not None:
         if 330 in data["assigned_user"]["UF_DEPARTMENT"] or "330" in data["assigned_user"]["UF_DEPARTMENT"]:
             user = {"id": 120, "name": "bsh"}
@@ -57,12 +58,14 @@ def calculate_cloud(data):
                 "emove.drive ALL": {"price": 39.00, "kwp": 7.6}
             }
             settings["data"]["cloud_settings"]["kwp_to_refund_factor"] = 8
+            settings["data"]["cloud_settings"]["cashback_price_per_kwh"] = 0.08
 
     result = {
         "lightcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
         "heatcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"],
         "ecloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"],
         "consumercloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
+        "cashback_price_per_kwh": settings["data"]["cloud_settings"]["cashback_price_per_kwh"],
         "errors": [],
         "invalid_form": False,
         "kwp_extra": 0,
@@ -695,7 +698,7 @@ def get_cloud_products(data=None, offer=None):
         description=(
             "<b>Cashback</b><br>"
             + "Wird weniger Strom verbraucht als bei (a) vereinbart,<br>"
-            + "so erhalten Sie 8 Cent inkl. MwSt je kWh als Energiespar-Bonus von uns zurück.<br>"
+            + f"so erhalten Sie {int(data['calculated']['cashback_price_per_kwh'] * 100)} Cent inkl. MwSt je kWh als Energiespar-Bonus von uns zurück.<br>"
             + "Die ersten 250 kWh bleiben davon ausgenommen."),
         single_price=0))
     if data["calculated"]["cloud_price_ecloud"] > 0:
