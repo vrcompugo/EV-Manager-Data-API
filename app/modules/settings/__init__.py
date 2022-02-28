@@ -391,6 +391,7 @@ def get_settings(section=None, domain_raw=None):
                     "malo_id": "UF_CRM_1632220041088",
                     "construction_date2": "UF_CRM_1585237939",
                     "smartme_number": "UF_CRM_1605610632",
+                    "smartme_number_heatcloud": "UF_CRM_1605610662",
                     "contracting_version": "UF_CRM_1639388034",
                     "netprovider": "UF_CRM_1607947330",
                     "cloud_monthly_price": "UF_CRM_1612265225",

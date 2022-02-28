@@ -16,6 +16,7 @@ from app.modules.offer.services.offer_generation._utils import base_offer_data, 
 def calculate_cloud(data):
     bsh_changedate = datetime(2021,12,16,0,0,0)
     kez_changedate = datetime(2021,12,1,0,0,0)
+    kez_changedate2 = datetime(2022,3,1,0,0,0)
     settings = get_settings("pv-settings")
     if settings is None:
         return None
@@ -59,6 +60,25 @@ def calculate_cloud(data):
             }
             settings["data"]["cloud_settings"]["kwp_to_refund_factor"] = 8
             settings["data"]["cloud_settings"]["cashback_price_per_kwh"] = 0.08
+
+        if datetime.now() > kez_changedate2:
+            settings["data"]["cloud_settings"]["extra_kwh_cost"] = "38.79"
+            settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3879
+
+        if "name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
+            settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"] = 0.37
+            settings["data"]["cloud_settings"]["cloud_user_prices"]["1"] = [
+                { "from": 0, "to": 7000, "value": 57.99 },
+                { "from": 7001, "to": 14500, "value": 67.99 },
+                { "from": 14501, "to": 25000, "value": 137.99 },
+                { "from": 25001, "to": 40000, "value": 239.99 },
+                { "from": 40001, "to": 52000, "value": 269.99 },
+                { "from": 52001, "to": 99000, "value": 379.99 },
+                { "from": 99001, "to": 300000, "value": 598.99 },
+                { "from": 300001, "to": 749999, "value": 2999.99 },
+                { "from": 750000, "to": 9999999, "value": 3490.99 }
+            ]
+
 
     result = {
         "lightcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
@@ -181,6 +201,19 @@ def calculate_cloud(data):
                 power_to_kwp_factor = 3.315
             if 750000 <= data["power_usage"]:
                 power_to_kwp_factor = 4.381
+            if "name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
+                if 0 < data["power_usage"] <= 7000:
+                    power_to_kwp_factor = 2.16
+                if 7000 < data["power_usage"] <= 25000:
+                    power_to_kwp_factor = 2.396
+                if 25000 < data["power_usage"] <= 52000:
+                    power_to_kwp_factor = 2.557
+                if 52000 < data["power_usage"] < 300000:
+                    power_to_kwp_factor = 2.791
+                if 300000 <= data["power_usage"] < 750000:
+                    power_to_kwp_factor = 3.415
+                if 750000 <= data["power_usage"]:
+                    power_to_kwp_factor = 4.681
             if "price_guarantee" in data and data["price_guarantee"] == "2_years":
                 if 0 < data["power_usage"] <= 7000:
                     power_to_kwp_factor = 1.678
@@ -227,9 +260,20 @@ def calculate_cloud(data):
         result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor_kwp / 1000
         if "name" not in user or user["name"].lower() not in ["aev", "eeg", "bsh"]:
             if "extra_options" in data:
+                if "price_guarantee" in data and data["price_guarantee"] != "2_years":
+                    if "solaredge" not in data["extra_options"]:
+                        data["extra_options"].append("solaredge")
                 if "solaredge" not in data["extra_options"]:
                     result["min_kwp_light"] = result["min_kwp_light"] + 0.44
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
+        if "name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
+            if "price_guarantee" in data and data["price_guarantee"] != "2_years":
+                result["storage_size"] = math.ceil((data["power_usage"] / 500)) * 500 / 1000
+        if result["storage_size"] < 2.5:
+            result["storage_size"] = 2.5
+        if "price_guarantee" in data and data["price_guarantee"] != "2_years":
+            if result["storage_size"] < 5:
+                result["storage_size"] = 5
         if data.get("has_old_pv") not in [None, ""] and data.get("has_old_pv") is True:
             result["storage_size"] = result["storage_size"] + 2.5
             if data.get("old_pv_kwp") not in [None, "", "0"]:
@@ -279,6 +323,8 @@ def calculate_cloud(data):
                 result["cloud_price_light"] = 99
             if "name" not in user or user["name"].lower() not in ["aev", "eeg"]:
                 result["cloud_price_light"] = data["power_usage"] * 0.4755 / 10 / 12
+                if "name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
+                    result["cloud_price_light"] = data["power_usage"] * 0.6485 / 10 / 12
         result["conventional_price_light"] = (data["power_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
 
         result["conventional_price_light"] = (data["power_usage"] * data["conventional_power_cost_per_kwh"] / 100) / 12

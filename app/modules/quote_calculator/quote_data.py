@@ -206,6 +206,18 @@ def calculate_products(data):
             products=data["products"]
         )
         add_direct_product(
+            label="Anmeldung beim Netzbetreiber",
+            category="Elektrik",
+            quantity=1,
+            products=data["products"]
+        )
+        add_direct_product(
+            label="Die Inbetriebnahme",
+            category="Elektrik",
+            quantity=1,
+            products=data["products"]
+        )
+        add_direct_product(
             label="Portal Card mit Loadingfunktion",
             category="Optionen PV Anlage",
             quantity=1,
@@ -254,8 +266,14 @@ def calculate_products(data):
                 quantity=quantity,
                 products=data["products"]
             )
-            if "technik_service_packet_autumn_extra" in data["data"]["extra_options"]:
+            if "technik_service_packet_autumn_extra2" in data["data"]["extra_options"]:
                 product = get_product(label="Service, Technik & Garantie Paket Winter Highlight", category="Extra Pakete")
+                if product is not None:
+                    product["quantity"] = 1
+                    product["PRICE"] = -float(product["PRICE"])
+                    data["products"].append(product)
+            if "technik_service_packet_spring_extra" in data["data"]["extra_options"]:
+                product = get_product(label="Service, Technik & Garantie Paket Frühlings Highlight", category="Extra Pakete")
                 if product is not None:
                     product["quantity"] = 1
                     product["PRICE"] = -float(product["PRICE"])
