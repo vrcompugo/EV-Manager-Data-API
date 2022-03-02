@@ -401,7 +401,8 @@ def get_settings(section=None, domain_raw=None):
                     "malo_ecloud": "UF_CRM_1644838574",
                     "malo_consumer1": "UF_CRM_1644838588",
                     "malo_consumer2": "UF_CRM_1644838598",
-                    "malo_consumer3": "UF_CRM_1644838617"
+                    "malo_consumer3": "UF_CRM_1644838617",
+                    "annual_statement_link": "UF_CRM_1646239276"
                 }
             },
             "quote": {

@@ -100,7 +100,7 @@
         <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
       </tr>
       <tr class="summary">
-        <td colspan="4"><b>Mehrverbrauch</b></td>
+        <td colspan="4"><b>{% if statement.total_extra_usage > 0 %}Mehrverbrauch{% else %}Minderverbrauch{% endif %}</b></td>
         <td style="text-align: right;">{{ statement.total_extra_usage }} kWh</td>
       </tr>
       {% if statement.consumers and len(statement.consumers) > 0 %}
@@ -132,6 +132,13 @@
         <th>Soll</th>
         <th>Haben</th>
       </tr>
+      <tr>
+        <td>Lichtcloud</td>
+        <td>{{ statement.lightcloud.begin | dateformat }}</td>
+        <td>{{ statement.lightcloud.end | dateformat }}</td>
+        <td style="text-align: right;">{% if statement.lightcloud.price > 0 %}{{ statement.lightcloud.price | currencyformat }}{% endif%}</td>
+        <td style="text-align: right;">{% if statement.lightcloud.price < 0 %}{{ -statement.lightcloud.price | currencyformat }}{% endif%}</td>
+      </tr>
       {% for pre_payment in statement.pre_payments %}
         <tr>
           <td>{{ pre_payment.label }}</td>
@@ -142,24 +149,23 @@
         </tr>
       {% endfor %}
       <tr>
-        <td>Lichtcloud</td>
-        <td>{{ statement.lightcloud.begin | dateformat }}</td>
-        <td>{{ statement.lightcloud.end | dateformat }}</td>
-        <td style="text-align: right;">{% if statement.lightcloud.price > 0 %}{{ statement.lightcloud.price | currencyformat }}{% endif%}</td>
-        <td style="text-align: right;">{% if statement.lightcloud.price < 0 %}{{ -statement.lightcloud.price | currencyformat }}{% endif%}</td>
-      </tr>
-      <tr>
-        <td>Mehrverbrauch {{ statement.total_extra_usage }} kWh je {{ (statement.lightcloud.extra_price_per_kwh * 100 ) | numberformat }} Cent</td>
+        <td>
+          {% if statement.total_extra_usage > 0 %}
+            Mehrverbrauch {{ statement.total_extra_usage }} kWh je {{ (statement.lightcloud.extra_price_per_kwh * 100 ) | numberformat }} Cent
+          {% else %}
+            Minderverbrauch {{ -statement.total_extra_usage }} kWh je {{ (statement.lightcloud.cashback_per_kwh * 100 ) | numberformat }} Cent ab 250kWh
+          {% endif %}
+        </td>
         <td>{{ statement.begin }}</td>
         <td>{{ statement.end }}</td>
         <td style="text-align: right;">{% if statement.total_extra_usage_price > 0 %}{{ statement.total_extra_usage_price | currencyformat }}{% endif%}</td>
-        <td style="text-align: right;">{% if statement.total_extra_usage_price < 0 %}{{ -statement.total_extra_usage_price | currencyformat }}{% endif%}</td>
+        <td style="text-align: right;">{% if statement.total_extra_usage_price <= 0 %}{{ -statement.total_extra_usage_price | currencyformat }}{% endif%}</td>
         <td></td>
       </tr>
       <tr class="summary">
         <td colspan="3"><b>Kontostand</b></td>
         <td style="text-align: right;">{% if statement.to_pay > 0 %}{{ statement.to_pay | currencyformat }}{% endif%}</td>
-        <td style="text-align: right;">{% if statement.to_pay < 0 %}{{ -statement.to_pay | currencyformat }}{% endif%}</td>
+        <td style="text-align: right;">{% if statement.to_pay <= 0 %}{{ -statement.to_pay | currencyformat }}{% endif%}</td>
       </tr>
     </table>
     <br>

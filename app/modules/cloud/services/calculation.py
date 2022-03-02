@@ -121,6 +121,8 @@ def calculate_cloud(data):
         "conventional_price_ecloud": 0,
         "conventional_price_consumer": 0
     }
+    if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0:
+        data["price_guarantee"] = "2_years"
     if data is not None and "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
         data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
     else:

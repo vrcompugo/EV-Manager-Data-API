@@ -1,4 +1,5 @@
 import datetime
+from turtle import update
 import pytz
 import re
 import json
@@ -7,11 +8,12 @@ from dateutil.parser import parse
 
 from app import db
 from app.modules.settings import get_settings
-from app.modules.external.bitrix24.deal import get_deals, get_deal
+from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.contact import get_contact
+from app.modules.external.fakturia.deal import get_payments
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
-from app.models import SherpaInvoice, ContractStatus
+from app.models import SherpaInvoice, ContractStatus, OfferV2
 
 
 def check_contract_data(contract_number, year):
@@ -26,40 +28,47 @@ def check_contract_data(contract_number, year):
         db.session.add(status)
     status.has_lightcloud = data["lightcloud"] is not None
     if status.has_lightcloud:
+        status.has_begin_date = statement["lightcloud"].get("begin") is not None
         status.has_cloud_number = data["cloud"].get("cloud_number") not in [None, "", 0, "0"]
-        status.has_smartme_number = data["pv_system"]["smartme_number"] not in [None, "", 0, "0"]
+        status.cloud_number = data["cloud"].get("cloud_number")
+        status.has_smartme_number = data["pv_system"]["smartme_number"] not in [None, "", 0, "0", "123"]
         status.has_smartme_number_values = statement["pv_system"].get("total_usage", 0) > 0
-        print(statement["pv_system"].get("total_usage", 0))
-        status.has_correct_usage = True
+    else:
+        status.has_begin_date = False
+        status.has_cloud_number = False
+        status.cloud_number = ""
+        status.has_smartme_number = False
+        status.has_smartme_number_values = False
+
+    status.has_correct_usage = True
+    if statement["pv_system"].get("begin") in [None, 0]:
+         status.has_correct_usage = "no usage data"
+    else:
         if statement["pv_system"].get("begin") is None or statement["lightcloud"].get("begin") is None:
-             status.has_correct_usage = "begin date don't exist"
+                status.has_correct_usage = "begin date don't exist"
         else:
             begin1 = parse(statement["pv_system"].get("begin")).strftime("%Y%-m-%d")
             begin2 = parse(statement["lightcloud"].get("begin")).strftime("%Y%-m-%d")
             if begin1 != begin2:
                 status.has_correct_usage = f"begin date don't match {begin1} {begin2}"
         if statement["pv_system"].get("end") is None or statement["lightcloud"].get("end") is None:
-             status.has_correct_usage = "end date don't exist"
+                status.has_correct_usage = f"end date don't exist {statement['pv_system'].get('end')}"
         else:
             end1 = parse(statement["pv_system"].get("end")).strftime("%Y-%m-%d")
             end2 = parse(statement["lightcloud"].get("end")).strftime("%Y-%m-%d")
             if end1 != end2:
                 status.has_correct_usage = f"end date don't match {end1} {end2}"
-        status.has_sherpa_values = statement["pv_system"].get("cloud_usage", 0) > 0
-        status.has_heatcloud = data["heatcloud"] is not None
-        status.has_ecloud = data["ecloud"] is not None
-        status.has_consumers = len(data["consumers"]) > 0
-        status.has_emove = data["emove"] is not None
+    status.has_sherpa_values = statement["pv_system"].get("cloud_usage", 0) > 0
+    status.has_heatcloud = data["heatcloud"] is not None
+    if status.has_heatcloud:
+        status.has_smartme_number_heatcloud = data["pv_system"].get("smartme_number_heatcloud") not in [None, "", 0, "0", "123"]
+        status.has_smartme_number_heatcloud_values = statement["pv_system"].get("usage_heatcloud", 0) > 0
     else:
-        status.has_cloud_number = False
-        status.has_smartme_number = False
-        status.has_smartme_number_values = False
-        status.has_correct_usage = False
-        status.has_sherpa_values = False
-        status.has_heatcloud = False
-        status.has_ecloud = False
-        status.has_consumers = False
-        status.has_emove = False
+        status.has_smartme_number_heatcloud = None
+        status.has_smartme_number_heatcloud_values = None
+    status.has_consumers = len(data["consumers"]) > 0
+    status.has_ecloud = data["ecloud"] is not None
+    status.has_emove = data["emove"] is not None
     db.session.commit()
 
 
@@ -95,20 +104,38 @@ def get_contract_data(contract_number):
             f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
             "FILTER[CATEGORY_ID]": 15
         })
-        if len(deals) >= 1:
-            print("perfect")
-        else:
-            deals = get_deals({
+        deals2 = get_deals({
                 "SELECT": "full",
                 f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
                 "FILTER[CATEGORY_ID]": 176
             })
+        deals = deals + deals2
     if deals is not None:
+        if len(deals) == 1:
+            if deals[0].get("is_cloud_master_deal") not in [True, "1", 1]:
+                update_deal(deals[0].get("id"), {"is_cloud_master_deal": "1"})
+                deals[0]["is_cloud_master_deal"] = "1"
+        else:
+            has_master = False
+            for deal in deals:
+                if deal.get("is_cloud_master_deal") in [True, "1", 1]:
+                    has_master = True
+            if has_master is False:
+                for deal in deals:
+                    if deal.get("is_cloud_consumer") not in [True, "1", 1] and deal.get("is_cloud_ecloud") not in [True, "1", 1] and deal.get("is_cloud_heatcloud") not in [True, "1", 1]:
+                        if deal.get("category_id") in [15, "15"]:
+                            print(deal.get("id"), deal.get("category_id"))
+                            update_deal(deal.get("id"), {"is_cloud_master_deal": "1"})
+                            deal["is_cloud_master_deal"] = "1"
+
         data["deals"] = deals
         for deal in deals:
             if deal.get("is_cloud_master_deal") in [True, "1", 1]:
                 data["contact_id"] = deal.get("contact_id")
-                data["pv_system"]["smartme_number"] = deal.get("smartme_number")
+                if data["pv_system"].get("smartme_number") in [None, "", 0, "0", "123"]:
+                    data["pv_system"]["smartme_number"] = deal.get("smartme_number")
+                if data["pv_system"].get("smartme_number_heatcloud") in [None, "", 0, "0", "123"]:
+                    data["pv_system"]["smartme_number_heatcloud"] = deal.get("smartme_number_heatcloud")
                 data["pv_system"]["pv_kwp"] = deal.get("pv_kwp")
                 data["pv_system"]["malo_id"] = deal.get("malo_id")
                 data["pv_system"]["power_meter_number"] = deal.get("power_meter_number")
@@ -117,10 +144,16 @@ def get_contract_data(contract_number):
                 data["pv_system"]["city"] = deal.get("cloud_city")
                 data["pv_system"]["zip"] = deal.get("cloud_zip")
                 data["pv_system"]["netprovider"] = deal.get("netprovider")
-                data["cloud"]["cloud_monthly_price"] = deal.get("cloud_monthly_price")
+                data["cloud"]["cloud_monthly_price"] = float(deal.get("cloud_monthly_price").replace(".", "").replace(",", "."))
                 data["cloud"]["extra_price_per_kwh"] = deal.get("extra_price_per_kwh")
                 data["cloud"]["cashback_per_kwh"] = deal.get("cashback_per_kwh")
                 data["cloud"]["cloud_number"] = deal.get("cloud_number")
+                if data["cloud"]["cloud_number"] not in [None, "", 0, "0"]:
+                    offer = OfferV2.query.filter(OfferV2.number == data["cloud"]["cloud_number"]).first()
+                    if offer is not None:
+                        data["cloud"]["cloud_monthly_price"] = offer.calculated["cloud_price_incl_refund"]
+                        data["cloud"]["calculated"] = offer.calculated
+                        data["cloud"]["data"] = offer.data
                 data["lightcloud"] = {
                     "status": get_item_status(deal),
                     "usage": deal.get("lightcloud_usage"),
@@ -139,6 +172,8 @@ def get_contract_data(contract_number):
                         "cancelation_due_date": deal.get("cancelation_due_date")
                     }
             if deal.get("is_cloud_heatcloud") in [True, "1", 1]:
+                if data["pv_system"].get("smartme_number_heatcloud") in [None, "", 0, "0", "123"]:
+                    data["pv_system"]["smartme_number_heatcloud"] = deal.get("smartme_number_heatcloud")
                 data["heatcloud"] = {
                     "status": get_item_status(deal),
                     "power_meter_number": deal.get("heatcloud_power_meter_number"),
@@ -171,7 +206,7 @@ def get_contract_data(contract_number):
                 })
     if "contact_id" in data:
         data["contact"] = get_contact(data["contact_id"])
-    if data["pv_system"].get("smartme_number") not in [None, "", "0", 0]:
+    if data["pv_system"].get("smartme_number") not in [None, "", "0", 0] and data["lightcloud"].get("delivery_begin") not in [None, "", "0", 0]:
         delivery_begin = parse(data["lightcloud"].get("delivery_begin"))
         start_year = delivery_begin.year
         end_year = datetime.datetime.now().year
@@ -192,64 +227,132 @@ def get_contract_data(contract_number):
             }
             values["usage"] = values["end_value"] - values["start_value"]
             data["pv_system"]["usages"].append(values)
+    if data["pv_system"].get("smartme_number_heatcloud") not in [None, "", "0", 0]:
+        data["pv_system"]["heatcloud_usages"] = []
+        delivery_begin = parse(data["heatcloud"].get("delivery_begin"))
+        start_year = delivery_begin.year
+        end_year = datetime.datetime.now().year
+        for year in range(start_year, end_year + 1):
+            if delivery_begin.year == year:
+                beginning_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), data["heatcloud"].get("delivery_begin"))
+            else:
+                beginning_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), f"{year}-01-01 00:00:00")
+            if beginning_of_year is None:
+                continue
+            end_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), f"{year}-12-31 23:59:59")
+            values = {
+                "year": year,
+                "start_date": beginning_of_year.get("Date"),
+                "start_value": beginning_of_year.get("CounterReading", 0),
+                "end_date": end_of_year.get("Date"),
+                "end_value": end_of_year.get("CounterReading", 0)
+            }
+            values["usage"] = values["end_value"] - values["start_value"]
+            data["pv_system"]["heatcloud_usages"].append(values)
+    data["payments"] = get_payments(contract_number)
     return data
 
 
 def get_annual_statement_data(data, year):
     year = int(year)
-    lightcloud_begin = parse(data["lightcloud"]["delivery_begin"])
-    if lightcloud_begin.year < year:
-        lightcloud_begin = parse(f"{year}-01-01")
-    lightcloud_end = parse(f"{year}-12-31")
-    if data["lightcloud"].get("cancelation_due_date") not in ["", None, 0, "0"]:
-        enddate = parse(data["lightcloud"]["cancelation_due_date"])
-        if enddate.year == year:
-            lightcloud_end = enddate
+    statement = {
+        "year": year,
+        "pv_system": {
+            "begin": None,
+            "end": None,
+            "total_usage": 0,
+            "cloud_usage": 0
+        }
+    }
+    status = ContractStatus.query\
+        .filter(ContractStatus.contract_number == data.get("contract_number"))\
+        .filter(ContractStatus.year == str(year))\
+        .first()
     pv_usage = next((item for item in data["pv_system"]["usages"] if item["year"] == year), None)
     sherpaInvoice = SherpaInvoice.query.filter(SherpaInvoice.identnummer == data.get("contract_number")).first()
     cloud_usage = 0
     if sherpaInvoice is not None:
         cloud_usage = sherpaInvoice.verbrauch
-    if pv_usage is None:
-        statement = {
-            "year": year,
-            "pv_system": {
-                "begin": None,
-                "end": None,
-                "total_usage": 0,
-                "cloud_usage": cloud_usage
-            }
-        }
-    else:
-        statement = {
-            "year": year,
-            "pv_system": {
-                "begin": pv_usage["start_date"],
-                "end": pv_usage["end_date"],
-                "total_usage": int(pv_usage["usage"]),
-                "cloud_usage": cloud_usage
-            }
-        }
+    statement["pv_system"]["cloud_usage"] = cloud_usage
+    if pv_usage is not None:
+        statement["pv_system"]["begin"] = pv_usage["start_date"]
+        statement["pv_system"]["end"] = pv_usage["end_date"]
+        statement["pv_system"]["total_usage"] = int(pv_usage["usage"])
+    if data["pv_system"].get("heatcloud_usages") not in [None, "", 0]:
+        pv_heatcloud_usage = next((item for item in data["pv_system"]["heatcloud_usages"] if item["year"] == year), None)
+        if pv_heatcloud_usage is not None:
+            statement["pv_system"]["begin_heatcloud"] = pv_heatcloud_usage["start_date"]
+            statement["pv_system"]["end_heatcloud"] = pv_heatcloud_usage["end_date"]
+            statement["pv_system"]["total_usage_heatcloud"] = int(pv_heatcloud_usage["usage"])
     statement["pv_system"]["direct_usage"] = statement["pv_system"]["total_usage"] - statement["pv_system"]["cloud_usage"]
+    if data.get("lightcloud") is None:
+        return statement
+    lightcloud_begin = None
+    if data["lightcloud"].get("delivery_begin") not in ["", None, 0, "0"]:
+        lightcloud_begin = parse(data["lightcloud"]["delivery_begin"])
+        if lightcloud_begin.year < year:
+            lightcloud_begin = parse(f"{year}-01-01")
+    lightcloud_end = parse(f"{year}-12-31")
+    if data["lightcloud"].get("cancelation_due_date") not in ["", None, 0, "0"]:
+        enddate = parse(data["lightcloud"]["cancelation_due_date"])
+        if enddate.year == year:
+            lightcloud_end = enddate
     statement["lightcloud"] = {
         "begin": str(lightcloud_begin),
         "end": str(lightcloud_end),
         "year_percent": (diff_month(lightcloud_end, lightcloud_begin) / 12),
-        "extra_price_per_kwh": 0.2769 ,
+        "extra_price_per_kwh": 0.3379,
         "cashback_per_kwh": 0.10,
-        "price_per_month": -2.25
+        "price_per_month": data["cloud"]["cloud_monthly_price"]
     }
+    if status is not None and status.manuell_data is not None:
+        if status.manuell_data.get("senec_direct_usage") not in [None, 0]:
+            statement["pv_system"]["direct_usage"] = int(status.manuell_data.get("senec_direct_usage")) + int(status.manuell_data.get("senec_storage_usage"))
+        statement["pv_system"]["begin"] = str(lightcloud_begin)
+        statement["pv_system"]["end"] = str(lightcloud_end)
+        statement["pv_system"]["total_usage"] = statement["pv_system"]["cloud_usage"] + statement["pv_system"]["direct_usage"]
+        if status.manuell_data.get("extra_price_per_kwh") not in [None, 0, "", "0"]:
+            statement["lightcloud"]["extra_price_per_kwh"] = float(status.manuell_data.get("extra_price_per_kwh"))
+
     statement["lightcloud"]["included_usage"] = int(int(data["lightcloud"]["usage"]) * statement["lightcloud"]["year_percent"])
     statement["lightcloud"]["price"] = statement["lightcloud"]["price_per_month"] * 12 * statement["lightcloud"]["year_percent"]
     statement["total_extra_usage"] = statement["pv_system"]["total_usage"] - statement["lightcloud"]["included_usage"]
-    statement["total_extra_usage_price"] = statement["total_extra_usage"] * statement["lightcloud"]["extra_price_per_kwh"]
+    if statement["total_extra_usage"] > 0:
+        statement["total_extra_usage_price"] = statement["total_extra_usage"] * statement["lightcloud"]["extra_price_per_kwh"]
+    else:
+        if statement["total_extra_usage"] < -250:
+            statement["total_extra_usage_price"] = (statement["total_extra_usage"] + 250) * statement["lightcloud"]["cashback_per_kwh"]
+        else:
+            statement["total_extra_usage_price"] = 0
     statement["pre_payments"] = []
-    statement["pre_payments"].append({
-        "label": "Vorauszahlungen",
-        "begin": str(lightcloud_begin),
-        "end": str(lightcloud_end),
-        "price": statement["lightcloud"]["price"]
-    })
+    if len(data["payments"].get("invoices")) > 0 or len(data["payments"].get("credit_notes")) > 0:
+        if len(data["payments"].get("invoices")) > 0:
+            for invoice in data["payments"].get("invoices"):
+                invoice_date = parse(invoice['date'])
+                if invoice['amountGross'] != 0 and str(invoice_date.year) == str(year):
+                    statement["pre_payments"].append({
+                        "label": f"Vorauszahlungen {invoice['number']}",
+                        "begin": str(invoice['date']),
+                        "end": "",
+                        "price": invoice['amountGross']
+                    })
+        if len(data["payments"].get("credit_notes")) > 0:
+            for invoice in data["payments"].get("credit_notes"):
+                invoice_date = parse(invoice['date'])
+                if invoice['amountGross'] != 0 and str(invoice_date.year) == str(year):
+                    statement["pre_payments"].append({
+                        "label": f"Vorauszahlungen {invoice['number']}",
+                        "begin": str(invoice['date']),
+                        "end": "",
+                        "price": -invoice['amountGross']
+                    })
+    else:
+        statement["pre_payments"].append({
+            "label": "Vorauszahlungen",
+            "begin": str(lightcloud_begin),
+            "end": str(lightcloud_end),
+            "price": statement["lightcloud"]["price"]
+        })
     statement["to_pay"] = statement["total_extra_usage_price"]
     return statement
 
@@ -277,6 +380,8 @@ def get_item_status(deal):
 
 
 def diff_month(d1, d2):
+    if d1 is None or d2 is None:
+        return 0
     months = (d1.year - d2.year) * 12 + d1.month - d2.month
     _null, last_day = calendar.monthrange(d1.year, d1.month)
     months = months + (1 - (d1.day - 1) / (last_day - 1))

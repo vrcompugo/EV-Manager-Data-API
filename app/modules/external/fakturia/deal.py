@@ -259,6 +259,21 @@ def get_cloud_contract_data_by_deal(deal):
     return deal
 
 
+def get_payments(contract_number):
+    contract_number = int(contract_number.replace("C", ""))
+    data = {
+        "invoices": get(f"/Invoices", parameters={
+            "contractNumber": contract_number,
+            "extendedData": True
+        }),
+        "credit_notes": get(f"/CreditNotes", parameters={
+            "contractNumber": contract_number,
+            "extendedData": True
+        })
+    }
+    return data
+
+
 def initilize_faktura_data(deal):
     print("init")
     cloud_contract_number = normalize_contract_number(deal.get("cloud_contract_number"))

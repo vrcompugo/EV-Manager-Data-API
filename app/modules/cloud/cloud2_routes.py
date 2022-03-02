@@ -17,7 +17,7 @@ from app.decorators import api_response
 from app.exceptions import ApiException
 from app.modules.auth import validate_jwt, get_auth_info
 from app.modules.auth.jwt_parser import encode_jwt
-from app.modules.external.bitrix24.deal import get_deals, get_deal
+from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.modules.settings import get_settings
 from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus
@@ -47,6 +47,7 @@ def post_contract_annual_statement_year(contract_number, year):
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
         return "forbidden,", 401
+    config = get_settings(section="external/bitrix24")
 
     data = get_contract_data(contract_number)
     if "annualStatements" not in data:
@@ -72,6 +73,20 @@ def post_contract_annual_statement_year(contract_number, year):
     status.is_generated = True
     status.pdf_file_id = statement["drive_id"]
     status.pdf_file_link = statement["pdf_link"]
+    status.to_pay = statement["to_pay"]
+    if contract_number != "":
+        deals = get_deals({
+            "SELECT": "full",
+            f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
+            "FILTER[CATEGORY_ID]": 126,
+        })
+        if deals is not None and len(deals) > 0:
+            deal_id = deals[0].get("id")
+            update_deal(deal_id, {
+                "stage_id": "C126:PREPAYMENT_INVOICE",
+                "annual_statement_link": statement["pdf_link"],
+                "opportunity": statement["to_pay"]
+            })
     db.session.commit()
 
     data["annualStatements"].append(statement)
@@ -114,6 +129,27 @@ def get_contract_list(year):
         mimetype='application/json')
 
 
+@blueprint.route("contract/<contract_number>/manuell_data/<year>", methods=['PUT'])
+def put_manuell_data(contract_number, year):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    data = request.json
+
+    status = ContractStatus.query\
+        .filter(ContractStatus.contract_number == contract_number) \
+        .filter(ContractStatus.year == year)\
+        .first()
+    status.manuell_data = data.get("contract").get("manuell_data")
+    db.session.commit()
+
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
 @blueprint.route("contract/<contract_number>/check/<year>", methods=['GET'])
 def get_contract_check(contract_number, year):
     auth_data = validate_jwt()
@@ -136,10 +172,14 @@ def get_invoce_list(year):
         .all()
     data = []
     status_field_list = [
+        "cloud_number",
         "has_lightcloud",
         "has_cloud_number",
+        "has_begin_date",
         "has_smartme_number",
         "has_smartme_number_values",
+        "has_smartme_number_heatcloud",
+        "has_smartme_number_heatcloud_values",
         "has_correct_usage",
         "has_sherpa_values",
         "has_heatcloud",
@@ -150,6 +190,7 @@ def get_invoce_list(year):
         "pdf_file_link",
         "is_generated",
         "is_invoiced",
+        "manuell_data",
         "status"
     ]
     for invoice in invoices:
@@ -169,6 +210,8 @@ def get_invoce_list(year):
         for field in status_field_list:
             if status is not None:
                 item[field] = getattr(status, field)
+                if field == "manuell_data" and item[field] is None:
+                    item[field] = {}
             else:
                 item[field] = None
         data.append(item)
@@ -259,6 +302,16 @@ def get_contract_annual_statement():
         return "Forbidden"
     token = encode_jwt(auth_info, expire_minutes=600)
     return render_template("cloud2/contract/annual_statement.html", token=token)
+
+
+@blueprint.route("contract/<year>/listview", methods=['GET', 'POST'])
+def cloud2_listview(year):
+    config = get_settings(section="external/bitrix24")
+    auth_info = get_auth_info()
+    if auth_info["user"] is None:
+        return "Forbidden2"
+    token = encode_jwt(auth_info, expire_minutes=600)
+    return render_template("cloud2/list.html", token=token, year=year)
 
 
 @blueprint.route("", methods=['GET', 'POST'])

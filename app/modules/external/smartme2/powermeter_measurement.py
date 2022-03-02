@@ -6,6 +6,7 @@ from app import db
 from app.modules.settings import get_settings, set_settings
 from app.utils.error_handler import error_handler
 from app.models import PowerMeter, PowerMeterMeasurement
+from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as smart2_get_device_by_datetime
 
 from ._connector import get
 
@@ -54,5 +55,5 @@ def run_cron_import():
 def get_device_by_datetime(smartme_number, datetime):
     device = get("/DeviceBySerial", parameters={ "serial": smartme_number})
     if device is None:
-        return None
+        return smart2_get_device_by_datetime(smartme_number, datetime)
     return get(f"/MeterValues/{device['Id']}", parameters={ "date": str(datetime) })

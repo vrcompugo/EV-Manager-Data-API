@@ -57,5 +57,7 @@ def run_cron_import():
 
 def get_device_by_datetime(smartme_number, datetime):
     device = get("/DeviceBySerial", parameters={ "serial": smartme_number})
-
+    if device is None:
+        print("smart-error2", smartme_number)
+        return None
     return get(f"/MeterValues/{device['Id']}", parameters={ "date": str(datetime) })
