@@ -92,6 +92,15 @@
         <td style="text-align: right;">{{ statement.lightcloud.included_usage }} kWh</td>
         <td></td>
       </tr>
+      {% if statement.emove %}
+        <tr>
+          <td>{{ statement.emove.packet }} {% if statement.emove.year_percent < 1 %}(Anteil){% endif %}</td>
+          <td>{{ statement.emove.begin | dateformat }}</td>
+          <td>{{ statement.emove.end | dateformat }}</td>
+          <td style="text-align: right;">{{ statement.emove.usage_inhouse }} kWh</td>
+          <td></td>
+        </tr>
+      {% endif %}
       <tr>
         <td>Abnahme: {{ data.pv_system.street }} {{ data.pv_system.street_nb }}, {{ data.pv_system.zip }} {{ data.pv_system.city }}</td>
         <td>{{ statement.begin }}</td>

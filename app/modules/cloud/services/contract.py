@@ -161,16 +161,19 @@ def get_contract_data(contract_number):
                     "cancelation_date": deal.get("cancelation_date"),
                     "cancelation_due_date": deal.get("cancelation_due_date")
                 }
-                if deal.get("emove_packet") not in [None, "0", 0, ""]:
+                if deal.get("has_emove_package") not in ["none", None, "0", 0, "", False, "false", "Nein"]:
+                    print("lkncy", deal.get("has_emove_package"))
                     data["emove"] = {
                         "status": get_item_status(deal),
-                        "packet": deal.get("emove_packet"),
+                        "packet": "eMove",
                         "usage_inhouse": deal.get("emove_usage_inhouse"),
                         "usage_outside": deal.get("emove_usage_inhouse"),
                         "delivery_begin": deal.get("cloud_delivery_begin"),
                         "cancelation_date": deal.get("cancelation_date"),
                         "cancelation_due_date": deal.get("cancelation_due_date")
                     }
+                    if data["cloud"].get("data") is not None:
+                        data["emove"]["packet"] = data["cloud"]["data"].get("emove_tarif")
             if deal.get("is_cloud_heatcloud") in [True, "1", 1]:
                 if data["pv_system"].get("smartme_number_heatcloud") in [None, "", 0, "0", "123"]:
                     data["pv_system"]["smartme_number_heatcloud"] = deal.get("smartme_number_heatcloud")
@@ -305,6 +308,19 @@ def get_annual_statement_data(data, year):
         "cashback_per_kwh": 0.10,
         "price_per_month": data["cloud"]["cloud_monthly_price"]
     }
+    statement["lightcloud"]["included_usage"] = int(int(data["lightcloud"]["usage"]) * statement["lightcloud"]["year_percent"])
+    statement["lightcloud"]["price"] = statement["lightcloud"]["price_per_month"] * 12 * statement["lightcloud"]["year_percent"]
+    if data["emove"] is not None:
+        statement["emove"] = {
+            "packet": data["emove"]["packet"],
+            "begin": str(lightcloud_begin),
+            "end": str(lightcloud_end),
+            "year_percent": (diff_month(lightcloud_end, lightcloud_begin) / 12),
+            "extra_price_per_kwh": 0.3379,
+            "price_per_month": 0
+        }
+        statement["emove"]["included_usage"] = int(int(data["emove"]["usage_inhouse"]) * statement["emove"]["year_percent"])
+        statement["emove"]["price"] = statement["emove"]["price_per_month"] * 12 * statement["emove"]["year_percent"]
     if status is not None and status.manuell_data is not None:
         if status.manuell_data.get("senec_direct_usage") not in [None, 0]:
             statement["pv_system"]["direct_usage"] = int(status.manuell_data.get("senec_direct_usage")) + int(status.manuell_data.get("senec_storage_usage"))
@@ -313,9 +329,6 @@ def get_annual_statement_data(data, year):
         statement["pv_system"]["total_usage"] = statement["pv_system"]["cloud_usage"] + statement["pv_system"]["direct_usage"]
         if status.manuell_data.get("extra_price_per_kwh") not in [None, 0, "", "0"]:
             statement["lightcloud"]["extra_price_per_kwh"] = float(status.manuell_data.get("extra_price_per_kwh"))
-
-    statement["lightcloud"]["included_usage"] = int(int(data["lightcloud"]["usage"]) * statement["lightcloud"]["year_percent"])
-    statement["lightcloud"]["price"] = statement["lightcloud"]["price_per_month"] * 12 * statement["lightcloud"]["year_percent"]
     statement["total_extra_usage"] = statement["pv_system"]["total_usage"] - statement["lightcloud"]["included_usage"]
     if statement["total_extra_usage"] > 0:
         statement["total_extra_usage_price"] = statement["total_extra_usage"] * statement["lightcloud"]["extra_price_per_kwh"]
@@ -326,6 +339,7 @@ def get_annual_statement_data(data, year):
             statement["total_extra_usage_price"] = 0
     statement["pre_payments"] = []
     if len(data["payments"].get("invoices")) > 0 or len(data["payments"].get("credit_notes")) > 0:
+        statement["to_pay"] = statement["lightcloud"]["price"] + statement["total_extra_usage_price"]
         if len(data["payments"].get("invoices")) > 0:
             for invoice in data["payments"].get("invoices"):
                 invoice_date = parse(invoice['date'])
@@ -336,24 +350,26 @@ def get_annual_statement_data(data, year):
                         "end": "",
                         "price": invoice['amountGross']
                     })
+                    statement["to_pay"] = statement["to_pay"] - invoice['amountGross']
         if len(data["payments"].get("credit_notes")) > 0:
             for invoice in data["payments"].get("credit_notes"):
                 invoice_date = parse(invoice['date'])
                 if invoice['amountGross'] != 0 and str(invoice_date.year) == str(year):
                     statement["pre_payments"].append({
-                        "label": f"Vorauszahlungen {invoice['number']}",
+                        "label": f"Auszahlung {invoice['number']}",
                         "begin": str(invoice['date']),
                         "end": "",
                         "price": -invoice['amountGross']
                     })
-    else:
+                    statement["to_pay"] = statement["to_pay"] + invoice['amountGross']
+    if len(statement["pre_payments"]) == 0:
         statement["pre_payments"].append({
             "label": "Vorauszahlungen",
             "begin": str(lightcloud_begin),
             "end": str(lightcloud_end),
             "price": statement["lightcloud"]["price"]
         })
-    statement["to_pay"] = statement["total_extra_usage_price"]
+        statement["to_pay"] = statement["total_extra_usage_price"]
     return statement
 
 def normalize_contract_number(cloud_contract_number):
