@@ -13,7 +13,7 @@ from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.fakturia.deal import get_payments
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
-from app.models import SherpaInvoice, ContractStatus, OfferV2
+from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract
 
 
 def check_contract_data(contract_number, year):
@@ -58,7 +58,8 @@ def check_contract_data(contract_number, year):
             end2 = parse(statement["lightcloud"].get("end")).strftime("%Y-%m-%d")
             if end1 != end2:
                 status.has_correct_usage = f"end date don't match {end1} {end2}"
-    status.has_sherpa_values = statement["pv_system"].get("cloud_usage", 0) > 0
+    print(statement["pv_system"])
+    status.has_sherpa_values = not statement["pv_system"].get("no_sherpa", False)
     status.has_heatcloud = data["heatcloud"] is not None
     if status.has_heatcloud:
         status.has_smartme_number_heatcloud = data["pv_system"].get("smartme_number_heatcloud") not in [None, "", 0, "0", "123"]
@@ -74,6 +75,7 @@ def check_contract_data(contract_number, year):
 
 def get_contract_data(contract_number):
     contract_number = normalize_contract_number(contract_number)
+    contract2 = Contract.query.filter(Contract.contract_number == contract_number).first()
     config = get_settings(section="external/bitrix24")
     data = {
         "contract_number": contract_number,
@@ -161,6 +163,10 @@ def get_contract_data(contract_number):
                     "cancelation_date": deal.get("cancelation_date"),
                     "cancelation_due_date": deal.get("cancelation_due_date")
                 }
+                if deal.get("cloud_delivery_begin") not in ["", None] and contract2 is not None and contract2.begin != parse(deal.get("cloud_delivery_begin")):
+                    contract2.begin = parse(deal.get("cloud_delivery_begin"))
+                    db.session.commit()
+
                 if deal.get("has_emove_package") not in ["none", None, "0", 0, "", False, "false", "Nein"]:
                     print("lkncy", deal.get("has_emove_package"))
                     data["emove"] = {
@@ -272,10 +278,16 @@ def get_annual_statement_data(data, year):
         .filter(ContractStatus.year == str(year))\
         .first()
     pv_usage = next((item for item in data["pv_system"]["usages"] if item["year"] == year), None)
-    sherpaInvoice = SherpaInvoice.query.filter(SherpaInvoice.identnummer == data.get("contract_number")).first()
+    sherpaInvoice = SherpaInvoice.query\
+        .filter(SherpaInvoice.identnummer == data.get("contract_number"))\
+        .filter(SherpaInvoice.abrechnungszeitraum_von >= f"{year}-01-01") \
+        .filter(SherpaInvoice.abrechnungszeitraum_von <= f"{year}-12-31") \
+        .first()
     cloud_usage = 0
     if sherpaInvoice is not None:
         cloud_usage = sherpaInvoice.verbrauch
+    else:
+        statement["pv_system"]["no_sherpa"] = True
     statement["pv_system"]["cloud_usage"] = cloud_usage
     if pv_usage is not None:
         statement["pv_system"]["begin"] = pv_usage["start_date"]

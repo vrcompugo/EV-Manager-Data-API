@@ -7,6 +7,7 @@ import re
 import pytz
 from dateutil.parser import parse
 from flask import Blueprint, Response, request, render_template, make_response
+from sqlalchemy import or_, and_
 from isodate import UTC
 import zipfile
 import tempfile
@@ -20,7 +21,7 @@ from app.modules.auth.jwt_parser import encode_jwt
 from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.modules.settings import get_settings
-from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus
+from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus, Contract
 from .services.annual_statement import generate_annual_statement_pdf
 from .services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data, check_contract_data
 
@@ -165,11 +166,15 @@ def get_contract_check(contract_number, year):
 
 
 def get_invoce_list(year):
-    invoices = db.session.query(SherpaInvoice) \
-        .filter(SherpaInvoice.abrechnungszeitraum_von >= f"{year}-01-01") \
-        .filter(SherpaInvoice.abrechnungszeitraum_von <= f"{year}-12-31") \
-        .order_by(SherpaInvoice.identnummer.desc()) \
-        .all()
+    contracts = db.session.query(Contract)\
+        .filter(or_(
+            and_(
+                Contract.begin >= f"{year}-01-01",
+                Contract.begin <= f"{year}-12-31"
+            ),
+            Contract.begin.is_(None)
+        )) \
+        .order_by(Contract.contract_number.desc())
     data = []
     status_field_list = [
         "cloud_number",
@@ -193,20 +198,36 @@ def get_invoce_list(year):
         "manuell_data",
         "status"
     ]
-    for invoice in invoices:
+    for contract in contracts:
+        invoice = db.session.query(SherpaInvoice) \
+            .filter(SherpaInvoice.abrechnungszeitraum_von >= f"{year}-01-01") \
+            .filter(SherpaInvoice.abrechnungszeitraum_von <= f"{year}-12-31") \
+            .filter(SherpaInvoice.identnummer == contract.contract_number) \
+            .first()
         status = ContractStatus.query\
-            .filter(ContractStatus.contract_number == invoice.identnummer)\
+            .filter(ContractStatus.contract_number == contract.contract_number)\
             .filter(ContractStatus.year == year)\
             .first()
-        item = {
-            "contract_number": invoice.identnummer,
-            "invoice_number": invoice.rechnungsnummer,
-            "begin": str(invoice.abrechnungszeitraum_von),
-            "end": str(invoice.abrechnungszeitraum_bis),
-            "power_meter_number": invoice.zahlernummer,
-            "usage": invoice.verbrauch,
-            "days": invoice.tage
-        }
+        if invoice is None:
+            item = {
+                "contract_number": contract.contract_number,
+                "invoice_number": "",
+                "begin": None,
+                "end": None,
+                "power_meter_number": "",
+                "usage": 0,
+                "days": 0
+            }
+        else:
+            item = {
+                "contract_number": contract.contract_number,
+                "invoice_number": invoice.rechnungsnummer,
+                "begin": str(invoice.abrechnungszeitraum_von),
+                "end": str(invoice.abrechnungszeitraum_bis),
+                "power_meter_number": invoice.zahlernummer,
+                "usage": invoice.verbrauch,
+                "days": invoice.tage
+            }
         for field in status_field_list:
             if status is not None:
                 item[field] = getattr(status, field)
@@ -287,6 +308,40 @@ def post_invoices_upload_file():
                     db.session.commit()
 
         shutil.rmtree(temp_dir)
+
+    return Response(
+        json.dumps({"status": "success", "data": 0}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("import_contracts", methods=['POST'])
+@api_response
+def post_contract_upload_file():
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+    contracts = request.files.get("contracts")
+    if contracts is None:
+        raise ApiException("no-file", "no file", 400)
+    data = json.load(contracts)
+    print(len(data))
+    for contract in data:
+        contract_number = normalize_contract_number(contract.get("identnummer"))
+        existing = Contract.query.filter(Contract.contract_number == contract_number).first()
+        if existing is None:
+            contract = Contract(
+                contract_number=contract_number,
+                first_name=contract.get("vorname"),
+                last_name=contract.get("nachname"),
+                street=contract.get("lsStrasse"),
+                street_nb=contract.get("lsHausnummer"),
+                zip=contract.get("lsPLZ"),
+                city=contract.get("lsOrt")
+            )
+            db.session.add(contract)
+            db.session.commit()
+            print(contract_number)
 
     return Response(
         json.dumps({"status": "success", "data": 0}),
