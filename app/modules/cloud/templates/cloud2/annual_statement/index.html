@@ -191,6 +191,52 @@
     <br>
     <small>* Diese Abrechnug wurde unter Vorbehalt der angegebenen Einspeisemengen berechnet. Sollten sich die Einspeisemengen rückwirkend ändern, so wird diese Abrechnung auch korrigiert. Die Cloudgebühren sowie die Kosten für die Zusatzpakete wurden unter der Tatsache, dass diese regelmäßig bezahlt wurden, erstellt. Sollte dies nicht der Fall sein und noch offenene Forderungen unsererseits vorliegen, so werden diese Rechnungen separat angemahnt und verrechnet. Bei Nichtvorliegen EEG-Vergütung, behalten wir uns vor den Verbrauch mit 27,69 € zu berechnen.</small>
     <img src="{{ base_url }}static/cloud/contract/annual_statement/Stromkennzeichen%202020.jpeg" style="width: 100%; height: auto;" />
+
+    <h2>Zur Abrechnung verwendete Zählerstande</h2>
+    <table>
+      <tr>
+        <th colspan="3">&nbsp;</th>
+        <th colspan="2">Stand Alt</th>
+        <th colspan="2">Stand Neu</th>
+        <th>&nbsp;</th>
+      </tr>
+      <tr>
+        <th>Zählernummer</th>
+        <th>Zählerart</th>
+        <th>Ablesegrund</th>
+        <th style="text-align: right;">Datum</th>
+        <th style="text-align: right;">Wert</th>
+        <th style="text-align: right;">Datum</th>
+        <th style="text-align: right;">Wert</th>
+        <th style="text-align: right;">Verbrauch</th>
+      </tr>
+      {% for counter in statement.counters %}
+        {% if counter.sherpa_invoice_id %}
+          <tr>
+            <td>{{ counter.zahlernummer }}</td>
+            <td>{{ counter.zahlerart }}</td>
+            <td>{{ counter.ablesegrund }}</td>
+            <td style="text-align: right;">{{ counter.datum_stand_alt | dateformat }}</td>
+            <td style="text-align: right;">{{ counter.stand_alt | numberformat('de', 0) }} kWh</td>
+            <td style="text-align: right;">{{ counter.datum_stand_neu | dateformat }}</td>
+            <td style="text-align: right;">{{ counter.stand_neu | numberformat('de', 0) }} kWh</td>
+            <td style="text-align: right;">{{ counter.verbrauch | numberformat('de', 0) }} kWh</td>
+          </tr>
+        {% endif %}
+        {% if counter.number %}
+          <tr>
+            <td>{{ counter.number }}</td>
+            <td>smartMe</td>
+            <td></td>
+            <td style="text-align: right;">{{ counter.start_date | dateformat }}</td>
+            <td style="text-align: right;">{{ counter.start_value | numberformat('de', 0) }} kWh</td>
+            <td style="text-align: right;">{{ counter.end_date | dateformat }}</td>
+            <td style="text-align: right;">{{ counter.end_value | numberformat('de', 0) }} kWh</td>
+            <td style="text-align: right;">{{ counter.usage | numberformat('de', 0) }} kWh</td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+  </table>
   </div>
 
 </body>

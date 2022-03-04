@@ -7,13 +7,14 @@ import calendar
 from dateutil.parser import parse
 
 from app import db
+from app.utils.model_func import to_dict
 from app.modules.settings import get_settings
 from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.fakturia.deal import get_payments
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
-from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract
+from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem
 
 
 def check_contract_data(contract_number, year):
@@ -229,6 +230,7 @@ def get_contract_data(contract_number):
             end_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number"), f"{year}-12-31 23:59:59")
             values = {
                 "year": year,
+                "number": data["pv_system"].get("smartme_number"),
                 "start_date": beginning_of_year.get("Date"),
                 "start_value": beginning_of_year.get("CounterReading", 0),
                 "end_date": end_of_year.get("Date"),
@@ -251,6 +253,7 @@ def get_contract_data(contract_number):
             end_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), f"{year}-12-31 23:59:59")
             values = {
                 "year": year,
+                "number": data["pv_system"].get("smartme_number_heatcloud"),
                 "start_date": beginning_of_year.get("Date"),
                 "start_value": beginning_of_year.get("CounterReading", 0),
                 "end_date": end_of_year.get("Date"),
@@ -266,6 +269,7 @@ def get_annual_statement_data(data, year):
     year = int(year)
     statement = {
         "year": year,
+        "counters": [],
         "pv_system": {
             "begin": None,
             "end": None,
@@ -285,6 +289,9 @@ def get_annual_statement_data(data, year):
         .first()
     cloud_usage = 0
     if sherpaInvoice is not None:
+        sherpa_items = SherpaInvoiceItem.query.filter(SherpaInvoiceItem.sherpa_invoice_id == sherpaInvoice.id).all()
+        for item in sherpa_items:
+            statement["counters"].append(to_dict(item))
         cloud_usage = sherpaInvoice.verbrauch
     else:
         statement["pv_system"]["no_sherpa"] = True
@@ -293,6 +300,8 @@ def get_annual_statement_data(data, year):
         statement["pv_system"]["begin"] = pv_usage["start_date"]
         statement["pv_system"]["end"] = pv_usage["end_date"]
         statement["pv_system"]["total_usage"] = int(pv_usage["usage"])
+        statement["counters"].append(pv_usage)
+
     if data["pv_system"].get("heatcloud_usages") not in [None, "", 0]:
         pv_heatcloud_usage = next((item for item in data["pv_system"]["heatcloud_usages"] if item["year"] == year), None)
         if pv_heatcloud_usage is not None:
