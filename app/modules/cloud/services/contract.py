@@ -97,22 +97,14 @@ def get_contract_data(contract_number):
     deals = get_deals({
         "SELECT": "full",
         f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
-        "FILTER[CATEGORY_ID]": 174,
+        "FILTER[CATEGORY_ID]": 15
     })
-    if len(deals) >= 1:
-        print("perfect")
-    else:
-        deals = get_deals({
+    deals2 = get_deals({
             "SELECT": "full",
             f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
-            "FILTER[CATEGORY_ID]": 15
+            "FILTER[CATEGORY_ID]": 176
         })
-        deals2 = get_deals({
-                "SELECT": "full",
-                f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
-                "FILTER[CATEGORY_ID]": 176
-            })
-        deals = deals + deals2
+    deals = deals + deals2
     if deals is not None:
         if len(deals) == 1:
             if deals[0].get("is_cloud_master_deal") not in [True, "1", 1]:
