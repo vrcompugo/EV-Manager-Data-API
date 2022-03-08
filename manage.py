@@ -117,22 +117,33 @@ def create_cloud_contract_deals():
     from app.modules.order.models.order import Order
     from app.modules.cloud.services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data
     from app.modules.settings import get_settings
+    from app.models import Contract
 
     config = get_settings(section="external/bitrix24")
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 126
     })
+    existing_deals = []
+    year = 2021
+    contracts = db.session.query(Contract)\
+        .filter(Contract.begin >= f"{year}-01-01") \
+        .filter(Contract.begin <= f"{year}-12-31") \
+        .order_by(Contract.contract_number.desc())
     for deal in deals:
-        if deal.get("contact_id") in [None, "", "0", 0]:
-            contract_data = get_contract_data(deal.get('contract_number'))
-            if contract_data.get("contact_id") not in [None, "", "0", 0]:
-                deal_data = {
-                    "contact_id": contract_data.get("contact_id"),
-                    "cloud_number": contract_data["cloud"].get("cloud_number")
-                }
-                print(json.dumps(deal_data, indent=2))
-                update_deal(deal.get("id"), deal_data)
+        existing_deals.append(deal.get('contract_number'))
+    for contract in contracts:
+        if contract.contract_number not in existing_deals:
+            contract_data = get_contract_data(contract.contract_number)
+            deal_data = {
+                "contact_id": contract_data.get("contact_id"),
+                "cloud_number": contract_data["cloud"].get("cloud_number"),
+                "title": contract.contract_number,
+                "category_id": 126,
+                "stage_id": "C126:NEW"
+            }
+            print(contract.contract_number )
+            add_deal(deal_data)
 
 
 @manager.command
