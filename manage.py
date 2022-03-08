@@ -143,17 +143,20 @@ def create_cloud_contract_deals():
             print("double", deal.get('contract_number'))
     for contract in contracts:
         if contract.contract_number not in existing_deals:
-            contract_data = get_contract_data(contract.contract_number)
-            deal_data = {
-                "contact_id": contract_data.get("contact_id"),
-                config["deal"]["fields"]["cloud_number"]: contract_data["cloud"].get("cloud_number"),
-                config["deal"]["fields"]["contract_number"]: contract.contract_number,
-                "title": contract.contract_number,
-                "category_id": 126,
-                "stage_id": "C126:NEW"
-            }
-            print(contract.contract_number )
-            add_deal(deal_data)
+            try:
+                contract_data = get_contract_data(contract.contract_number)
+                deal_data = {
+                    "contact_id": contract_data.get("contact_id"),
+                    config["deal"]["fields"]["cloud_number"]: contract_data["cloud"].get("cloud_number"),
+                    config["deal"]["fields"]["contract_number"]: contract.contract_number,
+                    "title": contract.contract_number,
+                    "category_id": 126,
+                    "stage_id": "C126:NEW"
+                }
+                print(contract.contract_number )
+                add_deal(deal_data)
+            except Exception as e:
+                print(e)
 
 
 @manager.command
