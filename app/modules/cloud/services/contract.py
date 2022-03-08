@@ -369,7 +369,6 @@ def get_annual_statement_data(data, year):
             for invoice in data["payments"].get("credit_notes"):
                 if invoice.get("canceled") in [True, "true"]:
                     continue
-                print(json.dumps(invoice, indent=2))
                 invoice_date = parse(invoice['date'])
                 if invoice['amountGross'] != 0 and str(invoice_date.year) == str(year):
                     statement["pre_payments"].append({

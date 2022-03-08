@@ -27,18 +27,27 @@
         <th>Abnahmeart</th>
         <th>Abnahme</th>
       </tr>
-      <tr>
-        <td>{{ statement.pv_system.begin | dateformat }}</td>
-        <td>{{ statement.pv_system.end | dateformat }}</td>
-        <td>Cloud Abnahme</td>
-        <td style="text-align: right;">{{ statement.pv_system.cloud_usage }} kWh</td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>direkte Abnahme</td>
-        <td style="text-align: right;">{{ statement.pv_system.direct_usage }} kWh</td>
-      </tr>
+      {% if statement.pv_system.cloud_usage == 0 %}
+        <tr>
+          <td>{{ statement.pv_system.begin | dateformat }}</td>
+          <td>{{ statement.pv_system.end | dateformat }}</td>
+          <td>Cloud Verbrauch</td>
+          <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td>{{ statement.pv_system.begin | dateformat }}</td>
+          <td>{{ statement.pv_system.end | dateformat }}</td>
+          <td>Cloud Abnahme</td>
+          <td style="text-align: right;">{{ statement.pv_system.cloud_usage }} kWh</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>direkte Abnahme</td>
+          <td style="text-align: right;">{{ statement.pv_system.direct_usage }} kWh</td>
+        </tr>
+      {% endif %}
       <tr class="summary">
         <td colspan="3"><b>Abnahme gesamt</b> (Verbrauch a)</td>
         <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
