@@ -231,27 +231,28 @@ def get_contract_data(contract_number):
             data["pv_system"]["usages"].append(values)
     if data["pv_system"].get("smartme_number_heatcloud") not in [None, "", "0", 0]:
         data["pv_system"]["heatcloud_usages"] = []
-        delivery_begin = parse(data["heatcloud"].get("delivery_begin"))
-        start_year = delivery_begin.year
-        end_year = datetime.datetime.now().year
-        for year in range(start_year, end_year + 1):
-            if delivery_begin.year == year:
-                beginning_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), data["heatcloud"].get("delivery_begin"))
-            else:
-                beginning_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), f"{year}-01-01 00:00:00")
-            if beginning_of_year is None:
-                continue
-            end_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), f"{year}-12-31 23:59:59")
-            values = {
-                "year": year,
-                "number": data["pv_system"].get("smartme_number_heatcloud"),
-                "start_date": beginning_of_year.get("Date"),
-                "start_value": beginning_of_year.get("CounterReading", 0),
-                "end_date": end_of_year.get("Date"),
-                "end_value": end_of_year.get("CounterReading", 0)
-            }
-            values["usage"] = values["end_value"] - values["start_value"]
-            data["pv_system"]["heatcloud_usages"].append(values)
+        if data["heatcloud"].get("delivery_begin") not in [None, ""]:
+            delivery_begin = parse(data["heatcloud"].get("delivery_begin"))
+            start_year = delivery_begin.year
+            end_year = datetime.datetime.now().year
+            for year in range(start_year, end_year + 1):
+                if delivery_begin.year == year:
+                    beginning_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), data["heatcloud"].get("delivery_begin"))
+                else:
+                    beginning_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), f"{year}-01-01 00:00:00")
+                if beginning_of_year is None:
+                    continue
+                end_of_year = get_device_by_datetime(data["pv_system"].get("smartme_number_heatcloud"), f"{year}-12-31 23:59:59")
+                values = {
+                    "year": year,
+                    "number": data["pv_system"].get("smartme_number_heatcloud"),
+                    "start_date": beginning_of_year.get("Date"),
+                    "start_value": beginning_of_year.get("CounterReading", 0),
+                    "end_date": end_of_year.get("Date"),
+                    "end_value": end_of_year.get("CounterReading", 0)
+                }
+                values["usage"] = values["end_value"] - values["start_value"]
+                data["pv_system"]["heatcloud_usages"].append(values)
     data["payments"] = get_payments(contract_number)
     return data
 
