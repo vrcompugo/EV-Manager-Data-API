@@ -59,7 +59,6 @@ def check_contract_data(contract_number, year):
             end2 = parse(statement["lightcloud"].get("end")).strftime("%Y-%m-%d")
             if end1 != end2:
                 status.has_correct_usage = f"end date don't match {end1} {end2}"
-    print(statement["pv_system"])
     status.has_sherpa_values = not statement["pv_system"].get("no_sherpa", False)
     status.has_heatcloud = data["heatcloud"] is not None
     if status.has_heatcloud:
@@ -355,6 +354,8 @@ def get_annual_statement_data(data, year):
         statement["to_pay"] = statement["lightcloud"]["price"] + statement["total_extra_usage_price"]
         if len(data["payments"].get("invoices")) > 0:
             for invoice in data["payments"].get("invoices"):
+                if invoice.get("canceled") in [True, "true"]:
+                    continue
                 invoice_date = parse(invoice['date'])
                 if invoice['amountGross'] != 0 and str(invoice_date.year) == str(year):
                     statement["pre_payments"].append({
@@ -366,6 +367,9 @@ def get_annual_statement_data(data, year):
                     statement["to_pay"] = statement["to_pay"] - invoice['amountGross']
         if len(data["payments"].get("credit_notes")) > 0:
             for invoice in data["payments"].get("credit_notes"):
+                if invoice.get("canceled") in [True, "true"]:
+                    continue
+                print(json.dumps(invoice, indent=2))
                 invoice_date = parse(invoice['date'])
                 if invoice['amountGross'] != 0 and str(invoice_date.year) == str(year):
                     statement["pre_payments"].append({
