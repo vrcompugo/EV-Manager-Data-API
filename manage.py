@@ -131,13 +131,23 @@ def create_cloud_contract_deals():
         .filter(Contract.begin <= f"{year}-12-31") \
         .order_by(Contract.contract_number.desc())
     for deal in deals:
-        existing_deals.append(deal.get('contract_number'))
+        if deal.get('contract_number') in [None, ""]:
+            print(deal.get("title"))
+            data = {
+                config["deal"]["fields"]["contract_number"]: deal.get("title")
+            }
+            update_deal(deal.get("id"), data)
+        if deal.get('contract_number') not in existing_deals:
+            existing_deals.append(deal.get('contract_number'))
+        else:
+            print("double", deal.get('contract_number'))
     for contract in contracts:
         if contract.contract_number not in existing_deals:
             contract_data = get_contract_data(contract.contract_number)
             deal_data = {
                 "contact_id": contract_data.get("contact_id"),
-                "cloud_number": contract_data["cloud"].get("cloud_number"),
+                config["deal"]["fields"]["cloud_number"]: contract_data["cloud"].get("cloud_number"),
+                config["deal"]["fields"]["contract_number"]: contract.contract_number,
                 "title": contract.contract_number,
                 "category_id": 126,
                 "stage_id": "C126:NEW"
