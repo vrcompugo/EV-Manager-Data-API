@@ -106,7 +106,7 @@
           <td>{{ statement.emove.packet }} {% if statement.emove.year_percent < 1 %}(Anteil){% endif %}</td>
           <td>{{ statement.emove.begin | dateformat }}</td>
           <td>{{ statement.emove.end | dateformat }}</td>
-          <td style="text-align: right;">{{ statement.emove.usage_inhouse }} kWh</td>
+          <td style="text-align: right;">{{ statement.emove.included_usage }} kWh</td>
           <td></td>
         </tr>
       {% endif %}

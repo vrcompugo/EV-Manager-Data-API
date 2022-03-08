@@ -165,7 +165,7 @@ def get_contract_data(contract_number):
                         "status": get_item_status(deal),
                         "packet": "eMove",
                         "usage_inhouse": deal.get("emove_usage_inhouse"),
-                        "usage_outside": deal.get("emove_usage_inhouse"),
+                        "usage_outside": deal.get("emove_usage_outside"),
                         "delivery_begin": deal.get("cloud_delivery_begin"),
                         "cancelation_date": deal.get("cancelation_date"),
                         "cancelation_due_date": deal.get("cancelation_due_date")
@@ -343,6 +343,8 @@ def get_annual_statement_data(data, year):
         if status.manuell_data.get("extra_price_per_kwh") not in [None, 0, "", "0"]:
             statement["lightcloud"]["extra_price_per_kwh"] = float(status.manuell_data.get("extra_price_per_kwh"))
     statement["total_extra_usage"] = statement["pv_system"]["total_usage"] - statement["lightcloud"]["included_usage"]
+    if statement.get("emove") is not None:
+        statement["total_extra_usage"] = statement["total_extra_usage"] - statement["emove"]["included_usage"]
     if statement["total_extra_usage"] > 0:
         statement["total_extra_usage_price"] = statement["total_extra_usage"] * statement["lightcloud"]["extra_price_per_kwh"]
     else:
