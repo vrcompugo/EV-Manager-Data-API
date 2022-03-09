@@ -139,6 +139,7 @@ def create_cloud_contract_deals():
                     "contact_id": contract_data.get("contact_id"),
                     config["deal"]["fields"]["cloud_number"]: contract_data["cloud"].get("cloud_number")
                 }
+                print(deal.get("id"), deal_data)
                 update_deal(deal.get("id"), deal_data)
             existing_deals.append(deal.get('contract_number'))
         else:
