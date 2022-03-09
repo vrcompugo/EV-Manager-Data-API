@@ -125,11 +125,6 @@ def create_cloud_contract_deals():
         "FILTER[CATEGORY_ID]": 126
     })
     existing_deals = []
-    year = 2021
-    contracts = db.session.query(Contract)\
-        .filter(Contract.begin >= f"{year}-01-01") \
-        .filter(Contract.begin <= f"{year}-12-31") \
-        .order_by(Contract.contract_number.desc())
     for deal in deals:
         if deal.get('contract_number') in [None, ""]:
             print(deal.get("title"))
@@ -138,9 +133,22 @@ def create_cloud_contract_deals():
             }
             update_deal(deal.get("id"), data)
         if deal.get('contract_number') not in existing_deals:
+            if deal.get('contact_id') in [None, 0, "0"] or deal.get('cloud_number') in [None, 0, "0"]:
+                contract_data = get_contract_data(deal.get('contract_number'))
+                deal_data = {
+                    "contact_id": contract_data.get("contact_id"),
+                    config["deal"]["fields"]["cloud_number"]: contract_data["cloud"].get("cloud_number")
+                }
+                update_deal(deal.get("id"), deal_data)
             existing_deals.append(deal.get('contract_number'))
         else:
             print("double", deal.get('contract_number'))
+    '''
+    year = 2021
+    contracts = db.session.query(Contract)\
+        .filter(Contract.begin >= f"{year}-01-01") \
+        .filter(Contract.begin <= f"{year}-12-31") \
+        .order_by(Contract.contract_number.desc())
     for contract in contracts:
         if contract.contract_number not in existing_deals:
             try:
@@ -157,6 +165,7 @@ def create_cloud_contract_deals():
                 add_deal(deal_data)
             except Exception as e:
                 print(e)
+    '''
 
 
 @manager.command
