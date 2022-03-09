@@ -84,7 +84,7 @@ def post_contract_annual_statement_year(contract_number, year):
         if deals is not None and len(deals) > 0:
             deal_id = deals[0].get("id")
             update_deal(deal_id, {
-                "stage_id": "C126:PREPAYMENT_INVOICE",
+                "stage_id": "C126:UC_WT48N4",
                 "annual_statement_link": statement["pdf_link"],
                 "opportunity": statement["to_pay"]
             })
