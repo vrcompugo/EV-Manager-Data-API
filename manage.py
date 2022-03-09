@@ -134,13 +134,16 @@ def create_cloud_contract_deals():
             update_deal(deal.get("id"), data)
         if deal.get('contract_number') not in existing_deals:
             if deal.get('contact_id') in [None, 0, "0"] or deal.get('cloud_number') in [None, 0, "0"]:
-                contract_data = get_contract_data(deal.get('contract_number'))
-                deal_data = {
-                    "contact_id": contract_data.get("contact_id"),
-                    config["deal"]["fields"]["cloud_number"]: contract_data["cloud"].get("cloud_number")
-                }
-                print(deal.get("id"), deal_data)
-                update_deal(deal.get("id"), deal_data)
+                try:
+                    contract_data = get_contract_data(deal.get('contract_number'))
+                    deal_data = {
+                        "contact_id": contract_data.get("contact_id"),
+                        config["deal"]["fields"]["cloud_number"]: contract_data["cloud"].get("cloud_number")
+                    }
+                    print(deal.get("id"), deal_data)
+                    update_deal(deal.get("id"), deal_data)
+                except Exception as e:
+                    pass
             existing_deals.append(deal.get('contract_number'))
         else:
             print("double", deal.get('contract_number'))
