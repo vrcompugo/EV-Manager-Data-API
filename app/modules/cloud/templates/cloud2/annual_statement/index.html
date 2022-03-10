@@ -222,7 +222,7 @@
       {% for counter in statement.counters %}
         {% if counter.sherpa_invoice_id %}
           <tr>
-            <td>{{ counter.zahlernummer }}</td>
+            <td>{{ counter.zahlernummer }} *</td>
             <td>{{ counter.zahlerart }}</td>
             <td>{{ counter.ablesegrund }}</td>
             <td style="text-align: right;">{{ counter.datum_stand_alt | dateformat }}</td>
@@ -234,7 +234,7 @@
         {% endif %}
         {% if counter.number %}
           <tr>
-            <td>{{ counter.number }}</td>
+            <td>{{ counter.number }} **</td>
             <td>smartMe</td>
             <td></td>
             <td style="text-align: right;">{{ counter.start_date | dateformat }}</td>
@@ -245,7 +245,11 @@
           </tr>
         {% endif %}
       {% endfor %}
-  </table>
+    </table>
+    <small>
+      * Netzbezug<br>
+      ** gesamter Hausverbrauch (beinhaltet die Direktabnahme von PV-Anlage, Bezug aus dem Speicher sowie den Netzbezug)<br>
+    </small>
   </div>
 
 </body>
