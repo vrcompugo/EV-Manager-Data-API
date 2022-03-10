@@ -270,6 +270,7 @@ class OrderUpload(Resource):
         offer_v2_data["data"]["cloud_config_id"] = data["cloud_config_id"]
         offer_v2_data["data"]["signed_offer_pdf_id"] = data["signed_offer_pdf_id"]
         offer_v2_data["data"]["refund_transfer_pdf_id"] = data["refund_transfer_pdf_id"]
+        offer_v2_data["data"]["old_power_invoice_id"] = data["old_power_invoice_id"]
         offer_v2_data["data"]["sepa_form_id"] = data["sepa_form_id"]
         offer_v2_data["data"]["bankowner"] = data["bankowner"]
         offer_v2_data["data"]["iban"] = data["iban"]
