@@ -183,7 +183,7 @@ def generate_cloud_contract_reports():
     })
     for deal in deals:
         print(deal.get("contract_number"))
-        generate_annual_report(deal.get("contract_number"), 2021)
+        generate_annual_report(deal.get("contract_number"), "2021")
         return
 
 
