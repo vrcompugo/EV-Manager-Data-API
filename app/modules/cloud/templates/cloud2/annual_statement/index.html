@@ -38,18 +38,18 @@
         <tr>
           <td>{{ statement.pv_system.begin | dateformat }}</td>
           <td>{{ statement.pv_system.end | dateformat }}</td>
-          <td>Cloud Abnahme</td>
+          <td>Netzbezug</td>
           <td style="text-align: right;">{{ statement.pv_system.cloud_usage }} kWh</td>
         </tr>
         <tr>
           <td>&nbsp;</td>
           <td>&nbsp;</td>
-          <td>direkte Abnahme</td>
+          <td>direkte Abnahme (PV-Anlage und Speicher)</td>
           <td style="text-align: right;">{{ statement.pv_system.direct_usage }} kWh</td>
         </tr>
       {% endif %}
       <tr class="summary">
-        <td colspan="3"><b>Abnahme gesamt</b> (Verbrauch a)</td>
+        <td colspan="3"><b>Cloudabnahme gesamt</b> (Verbrauch a)</td>
         <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
       </tr>
     </table>
