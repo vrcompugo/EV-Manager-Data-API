@@ -14,7 +14,9 @@ from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.fakturia.deal import get_payments
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
+from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem
+from .annual_statement import generate_annual_statement_pdf
 
 
 def check_contract_data(contract_number, year):
@@ -423,3 +425,50 @@ def diff_month(d1, d2):
     _null, last_day = calendar.monthrange(d2.year, d2.month)
     months = months + (1 - (d2.day - 1) / (last_day - 1))
     return months
+
+
+def generate_annual_report(contract_number, year):
+    config = get_settings(section="external/bitrix24")
+
+    data = get_contract_data(contract_number)
+    if "annualStatements" not in data:
+        data["annualStatements"] = []
+
+    statement = get_annual_statement_data(data, year)
+    pdf = generate_annual_statement_pdf(data, statement)
+    subfolder_id = create_folder_path(415280, path=f"Cloud/Kunde {data['contact_id']}/Vertrag {data['contract_number']}")  # https://keso.bitrix24.de/docs/path/Kundenordner/
+
+    statement["drive_id"] = add_file(folder_id=subfolder_id, data={
+        "file_content": pdf,
+        "filename": f"Cloud Abrechnung {year}.pdf"
+    })
+    statement["pdf_link"] = get_public_link(statement["drive_id"])
+
+    status = ContractStatus.query\
+        .filter(ContractStatus.contract_number == contract_number)\
+        .filter(ContractStatus.year == year)\
+        .first()
+    if status is None:
+        status = ContractStatus(contract_number=contract_number, year=year)
+        db.session.add(status)
+    status.is_generated = True
+    status.pdf_file_id = statement["drive_id"]
+    status.pdf_file_link = statement["pdf_link"]
+    status.to_pay = statement["to_pay"]
+    if contract_number != "":
+        deals = get_deals({
+            "SELECT": "full",
+            f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
+            "FILTER[CATEGORY_ID]": 126,
+        })
+        if deals is not None and len(deals) > 0:
+            deal_id = deals[0].get("id")
+            update_deal(deal_id, {
+                "stage_id": "C126:UC_WT48N4",
+                "annual_statement_link": statement["pdf_link"],
+                "opportunity": statement["to_pay"]
+            })
+    db.session.commit()
+
+    data["annualStatements"].append(statement)
+    return data

@@ -171,6 +171,21 @@ def create_cloud_contract_deals():
                 print(e)
     '''
 
+@manager.command
+def generate_cloud_contract_reports():
+    from app.modules.external.bitrix24.deal import get_deals, get_deal
+    from app.modules.cloud.services.contract import generate_annual_report
+
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 126,
+        "FILTER[STAGE_ID]": "C126:PREPAYMENT_INVOICE"
+    })
+    for deal in deals:
+        print(deal.get("contract_number"))
+        generate_annual_report(deal.get("contract_number"), 2021)
+        return
+
 
 @manager.command
 def run_legacy_folder_creation():
