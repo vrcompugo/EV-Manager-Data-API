@@ -58,7 +58,7 @@ def get_task(id, with_comments=False):
     return None
 
 
-def get_tasks(payload):
+def get_tasks(payload, force_reload=False):
     payload["start"] = 0
     if "select" in payload and payload["select"] == "full":
         del payload["select"]
@@ -68,7 +68,7 @@ def get_tasks(payload):
             payload[f"select[{index + 1}]"] = "UF_AUTO_" + config["task"]["fields"][field].replace("ufAuto", "")
     result = []
     while payload["start"] is not None:
-        data = post("tasks.task.list", payload)
+        data = post("tasks.task.list", payload, force_reload=force_reload)
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]["tasks"]:

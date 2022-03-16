@@ -69,7 +69,7 @@ def get_contacts_by_changedate(changedate):
     return result
 
 
-def get_contacts(payload):
+def get_contacts(payload, force_reload=False):
     payload["start"] = 0
     result = []
     if "SELECT" in payload and payload["SELECT"] == "full":
@@ -80,7 +80,7 @@ def get_contacts(payload):
         for index, field in enumerate(config["contact"]["fields"]):
             payload[f"SELECT[{index + 2}]"] = config["contact"]["fields"][field]
     while payload["start"] is not None:
-        data = post("crm.contact.list", payload)
+        data = post("crm.contact.list", payload, force_reload=force_reload)
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]:
