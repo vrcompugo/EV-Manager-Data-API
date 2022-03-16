@@ -29,3 +29,7 @@ from app.modules.cloud.models.contract_status import ContractStatus
 from app.modules.cloud.models.contract import Contract
 from app.modules.external.insign.models.insign_log import InsignLog
 from app.modules.external.insign.models.insign_document_log import InsignDocumentLog
+from app.modules.external.bitrix24.models.bitrix24_file_cache import Bitrix24FileCache
+from app.modules.external.bitrix24.models.bitrix24_product_cache import Bitrix24ProductCache
+from app.modules.external.bitrix24.models.bitrix24_request_cache import Bitrix24RequestCache
+from app.modules.stats.models.request_log import RequestLog

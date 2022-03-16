@@ -14,7 +14,7 @@ import tempfile
 import shutil
 
 from app import db
-from app.decorators import api_response
+from app.decorators import api_response, log_request
 from app.exceptions import ApiException
 from app.modules.auth import validate_jwt, get_auth_info
 from app.modules.auth.jwt_parser import encode_jwt
@@ -30,6 +30,7 @@ blueprint = Blueprint("cloud2", __name__, template_folder='templates')
 
 
 @blueprint.route("contract/<contract_number>", methods=['GET'])
+@log_request
 def get_contract(contract_number):
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
@@ -44,6 +45,7 @@ def get_contract(contract_number):
 
 
 @blueprint.route("contract/<contract_number>/annual_statement/<year>", methods=['POST'])
+@log_request
 def post_contract_annual_statement_year(contract_number, year):
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
@@ -58,6 +60,7 @@ def post_contract_annual_statement_year(contract_number, year):
 
 
 @blueprint.route("contract/<contract_number>/annual_statement/<year>", methods=['GET'])
+@log_request
 def post_contract_annual_statement_year2(contract_number, year):
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
@@ -77,6 +80,7 @@ def post_contract_annual_statement_year2(contract_number, year):
 
 
 @blueprint.route("contract/<year>/list", methods=['GET'])
+@log_request
 def get_contract_list(year):
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
@@ -91,6 +95,7 @@ def get_contract_list(year):
 
 
 @blueprint.route("contract/<contract_number>/manuell_data/<year>", methods=['PUT'])
+@log_request
 def put_manuell_data(contract_number, year):
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
@@ -112,6 +117,7 @@ def put_manuell_data(contract_number, year):
 
 
 @blueprint.route("contract/<contract_number>/check/<year>", methods=['GET'])
+@log_request
 def get_contract_check(contract_number, year):
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
@@ -201,6 +207,7 @@ def get_invoce_list(year):
 
 @blueprint.route("import", methods=[ 'POST'])
 @api_response
+@log_request
 def post_invoices_upload_file():
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
@@ -277,6 +284,7 @@ def post_invoices_upload_file():
 
 @blueprint.route("import_contracts", methods=['POST'])
 @api_response
+@log_request
 def post_contract_upload_file():
     auth_data = validate_jwt()
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
@@ -310,6 +318,7 @@ def post_contract_upload_file():
 
 
 @blueprint.route("contract/<deal_id>/annual_statement", methods=['GET', 'POST'])
+@log_request
 def get_contract_annual_statement():
     config = get_settings(section="external/bitrix24")
     auth_info = get_auth_info()
@@ -320,6 +329,7 @@ def get_contract_annual_statement():
 
 
 @blueprint.route("contract/<year>/listview", methods=['GET', 'POST'])
+@log_request
 def cloud2_listview(year):
     config = get_settings(section="external/bitrix24")
     auth_info = get_auth_info()

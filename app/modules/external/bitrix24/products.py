@@ -3,43 +3,24 @@ import os
 import json
 import datetime
 
+from app import db
+from app.exceptions import ApiException
+from app.models import Bitrix24ProductCache
 from app.modules.external.bitrix24._field_values import convert_field_euro_from_remote
 from app.modules.settings import get_settings
+from app.modules.external.bitrix24.drive import get_file_content, get_file_content_cached, get_file
 
 from ._connector import get, post
 
-product_cache_filename = 'products-cache.json'
-PRODUCT_CACHE = {}
-
-
-def load_cache():
-    if "last_import" in PRODUCT_CACHE and "products" in PRODUCT_CACHE:
-        return PRODUCT_CACHE
-    if os.path.exists(product_cache_filename):
-        with open(product_cache_filename) as json_file:
-            cache = json.load(json_file)
-            if "products" not in cache:
-                return None
-            PRODUCT_CACHE["products"] = cache["products"]
-            PRODUCT_CACHE["last_import"] = datetime.datetime.fromisoformat(str(cache["last_import"]))
-            return PRODUCT_CACHE
-
-
-def store_cache():
-    PRODUCT_CACHE["last_import"] = str(PRODUCT_CACHE["last_import"])
-    with open(product_cache_filename, 'w') as outfile:
-        json.dump(PRODUCT_CACHE, outfile)
-    PRODUCT_CACHE["last_import"] = datetime.datetime.fromisoformat(str(PRODUCT_CACHE["last_import"]))
-
 
 def reload_products(filters=None, force=False):
-    PRODUCT_CACHE["last_import"] = datetime.datetime.now()
-    if not force and PRODUCT_CACHE["last_import"] < datetime.datetime.now() - datetime.timedelta(minutes=15):
+    cache = Bitrix24ProductCache.query.order_by(Bitrix24ProductCache.datetime.asc()).first()
+    if not force and cache is not None and cache.datetime > datetime.datetime.now() - datetime.timedelta(minutes=3600):
         return None
+    import_datetime = datetime.datetime.now()
     config = get_settings(section="external/bitrix24")
     categories = config["product"]["categories"]
     units = config["product"]["units"]
-    store_cache()
     payload = {}
     if filters is not None:
         for filter_key in filters.keys():
@@ -82,9 +63,34 @@ def reload_products(filters=None, force=False):
             print("error1:", data)
             payload["start"] = None
             return None
-    PRODUCT_CACHE["products"] = result
-    store_cache()
+    for product in result:
+        item = Bitrix24ProductCache.query.filter(Bitrix24ProductCache.product_id == product.get("ID")).first()
+        if item is None:
+            item = Bitrix24ProductCache(product_id=product.get("ID"))
+            db.session.add(item)
+        item.name = product.get("NAME")
+        item.catalog_id = product.get("CATALOG_ID")
+        item.section_id = product.get("SECTION_ID")
+        item.datetime = import_datetime
+        item.data = product
+    deleteds = Bitrix24ProductCache.query.filter(Bitrix24ProductCache.datetime < import_datetime - datetime.timedelta(minutes=5)).all()
+    for deleted in deleteds:
+        db.session.delete(deleted)
+    db.session.commit()
     return result
+
+
+def load_cache():
+    items = Bitrix24ProductCache.query.order_by(Bitrix24ProductCache.datetime.asc()).all()
+    if len(items) == 0:
+        return None
+    product_cache = {
+        "last_import": items[0].datetime,
+        "products": []
+    }
+    for item in items:
+        product_cache["products"].append(item.data)
+    return product_cache
 
 
 def get_list(filters=None):

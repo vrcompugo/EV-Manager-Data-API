@@ -5,7 +5,7 @@ from flask_restplus import Resource
 from flask_restplus import Namespace, fields
 
 from app.exceptions import ApiException
-from app.decorators import token_required, api_response
+from app.decorators import token_required, api_response, log_request
 from app.modules.auth.auth_services import get_logged_in_user
 from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item_v2
 from app.modules.customer.services.customer_address_services import get_one_item as get_address_data

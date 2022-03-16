@@ -62,7 +62,7 @@ def run_cron_export():
     contacts = get_contacts({
         "SELECT": "full",
         "FILTER[>DATE_MODIFY]": str(config.get("last_contact_export_time", "2021-01-20 00:00:00"))
-    })
+    }, force_reload=True)
     for contact in contacts:
         export_contact(contact)
     config = get_settings("external/fakturia")

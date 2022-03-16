@@ -41,7 +41,7 @@ def convert_config_values(data_raw):
     return data
 
 
-def get_deals(payload):
+def get_deals(payload, force_reload=False):
     payload["start"] = 0
     result = []
     if "SELECT" in payload and payload["SELECT"] == "full":
@@ -51,7 +51,7 @@ def get_deals(payload):
         for index, field in enumerate(config["deal"]["fields"]):
             payload[f"SELECT[{index + 1}]"] = config["deal"]["fields"][field]
     while payload["start"] is not None:
-        data = post("crm.deal.list", payload)
+        data = post("crm.deal.list", payload, force_reload=force_reload)
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]:
@@ -179,7 +179,7 @@ def run_cron_add_missing_values():
     }
     if "last_import_datetime" in config:
         payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]
-    deals = get_deals(payload)
+    deals = get_deals(payload, force_reload=True)
     if len(deals) > 0:
         for deal in deals:
             if "unique_identifier" in deal:

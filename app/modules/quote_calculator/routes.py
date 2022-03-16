@@ -8,7 +8,7 @@ from flask_emails import Message
 
 from app import db
 from app.config import email_config
-from app.decorators import api_response
+from app.decorators import api_response, log_request
 from app.modules.auth import get_auth_info
 from app.modules.auth.jwt_parser import decode_jwt, encode_jwt, encode_shared_jwt
 from app.modules.external.bitrix24.lead import get_lead, update_lead
@@ -32,12 +32,14 @@ blueprint = Blueprint("quote_calculator", __name__, template_folder='templates')
 
 
 @blueprint.route("/reload_products", methods=['GET', 'POST'])
+@log_request
 def route_reload_products():
     reload_products(force=True)
     return {"status": "success"}
 
 
 @blueprint.route("/history/<history_id>", methods=['PUT'])
+@log_request
 def edit_history(history_id):
     auth_info = get_auth_info()
     if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
@@ -56,6 +58,7 @@ def edit_history(history_id):
 
 
 @blueprint.route("/history/<history_id>/push", methods=['POST'])
+@log_request
 def push_history(history_id):
     auth_info = get_auth_info()
     if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
@@ -73,6 +76,7 @@ def push_history(history_id):
 
 
 @blueprint.route("/<lead_id>", methods=['GET', 'POST'])
+@log_request
 def quote_calculator_defaults(lead_id):
     auth_info = get_auth_info()
     if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
@@ -155,6 +159,7 @@ def quote_calculator_defaults(lead_id):
 
 @blueprint.route("/<lead_id>/calculate", methods=['GET', 'POST'])
 @api_response
+@log_request
 def quote_calculator_calculate(lead_id):
     auth_info = get_auth_info()
     if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
@@ -181,6 +186,7 @@ def quote_calculator_calculate(lead_id):
 
 
 @blueprint.route("/<lead_id>", methods=['PUT'])
+@log_request
 def quote_calculator_update(lead_id):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -319,6 +325,7 @@ def quote_calculator_update(lead_id):
 
 
 @blueprint.route("/<lead_id>/extra_data", methods=['PUT'])
+@log_request
 def quote_calculator_extra_data_update(lead_id):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
@@ -369,6 +376,7 @@ def quote_calculator_extra_data_update(lead_id):
 
 
 @blueprint.route("/<lead_id>/cloud_pdfs", methods=['PUT'])
+@log_request
 def quote_calculator_cloud_pdfs(lead_id):
     from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
     from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf, generate_feasibility_study_short_pdf
@@ -462,6 +470,7 @@ def quote_calculator_cloud_pdfs(lead_id):
 
 
 @blueprint.route("/<lead_id>/pv_pdf", methods=['PUT'])
+@log_request
 def quote_calculator_pv_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -480,6 +489,7 @@ def quote_calculator_pv_pdf(lead_id):
 
 
 @blueprint.route("/<lead_id>/heating_pdf", methods=['PUT'])
+@log_request
 def quote_calculator_heating_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -498,6 +508,7 @@ def quote_calculator_heating_pdf(lead_id):
 
 
 @blueprint.route("/<lead_id>/bluegen_pdf", methods=['PUT'])
+@log_request
 def quote_calculator_bluegen_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -517,6 +528,7 @@ def quote_calculator_bluegen_pdf(lead_id):
 
 
 @blueprint.route("/<lead_id>/roof_reconstruction_pdf", methods=['PUT'])
+@log_request
 def quote_calculator_roof_reconstruction_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -535,6 +547,7 @@ def quote_calculator_roof_reconstruction_pdf(lead_id):
 
 
 @blueprint.route("/<lead_id>/commission_pdf", methods=['PUT'])
+@log_request
 def quote_calculator_commission_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -554,6 +567,7 @@ def quote_calculator_commission_pdf(lead_id):
 
 
 @blueprint.route("/<lead_id>/datasheets_pdf", methods=['PUT'])
+@log_request
 def quote_calculator_datasheets_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -573,6 +587,7 @@ def quote_calculator_datasheets_pdf(lead_id):
 
 
 @blueprint.route("/<lead_id>/summary_pdf", methods=['PUT', 'GET'])
+@log_request
 def quote_calculator_summary_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -597,6 +612,7 @@ def quote_calculator_summary_pdf(lead_id):
 
 
 @blueprint.route("/<lead_id>/quote_summary_pdf", methods=['PUT'])
+@log_request
 def quote_calculator_quote_summary_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -625,6 +641,7 @@ def quote_calculator_quote_summary_pdf(lead_id):
 
 
 @blueprint.route("/<lead_id>/contract_summary_pdf", methods=['PUT'])
+@log_request
 def quote_calculator_contract_summary_pdf(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
@@ -677,6 +694,7 @@ def genrate_pdf(data, generate_function, lead_id, pdf_id_key, label, subfolder_i
 
 
 @blueprint.route("/insign/callback/<token>", methods=['GET', 'POST'])
+@log_request
 def get_insign_callback(token):
     from app.modules.external.insign.signature import download_file
 
@@ -780,6 +798,7 @@ def get_insign_callback(token):
 
 
 @blueprint.route("/<lead_id>/insign/data", methods=['POST'])
+@log_request
 def get_insign_data(lead_id):
     from app.modules.external.insign.signature import get_public_url
 
@@ -805,6 +824,7 @@ def get_insign_data(lead_id):
 
 
 @blueprint.route("/<lead_id>/insign/email", methods=['POST'])
+@log_request
 def send_insign_email(lead_id):
     from app.modules.external.insign.signature import send_insign_email
 

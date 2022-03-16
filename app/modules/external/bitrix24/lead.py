@@ -175,7 +175,7 @@ def get_leads_by_createdate(created_after_datetime):
     }
     result = []
     while payload["start"] is not None:
-        data = post("crm.lead.list", payload)
+        data = post("crm.lead.list", payload, force_reload=True)
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]:
@@ -249,7 +249,7 @@ def run_bennemann_lead_convert():
         "SELECT": "full",
         "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
         "FILTER[CATEGORY_ID]": "180"
-    })
+    }, force_reload=True)
     if deals is not None:
         for deal in deals:
             if deal.get("unique_identifier") in [None, "", "None", "0"]:

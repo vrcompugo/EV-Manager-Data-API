@@ -34,7 +34,7 @@ def import_new_appointments():
         for appointment in response["data"]:
             if appointment.get('SelectedAnswers') in [None, ""]:
                 continue
-            existing_deals = get_deals({"FILTER[UF_CRM_1614177772351]": appointment['ID']})
+            existing_deals = get_deals({"FILTER[UF_CRM_1614177772351]": appointment['ID']}, force_reload=True)
             if len(existing_deals) == 0:
                 contact = get_contact_by_email(appointment["Email"])
                 deal_data = {
@@ -107,7 +107,7 @@ def export_appointments():
         "select[17]": "UF_AUTO_513701476131",
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
-    })
+    }, force_reload=True)
     last_task_export_time = datetime.now()
     if tasks is None:
         return

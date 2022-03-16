@@ -75,7 +75,7 @@ def run_import():
         users_data = post("user.search", {
             "fields[USER_TYPE]": "employee",
             "start": users_data["next"]
-        })
+        }, force_reload=True)
         if "result" in users_data:
             users = users_data["result"]
             for user in users:

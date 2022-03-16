@@ -751,7 +751,7 @@ def run_cron_export():
         "FILTER[CATEGORY_ID]": 70,
         "FILTER[STAGE_ID]": "C70:3",
         "SELECT": "full"
-    })
+    }, force_reload=True)
     for deal in deals:
         if deal.get("iban") not in [None, "", "None"]:
             contracting_deals = get_deals({
@@ -782,7 +782,7 @@ def run_cron_export():
         "FILTER[CATEGORY_ID]": "68",
         "FILTER[STAGE_ID]": "C68:NEW",
         "SELECT": "full"
-    })
+    }, force_reload=True)
     for deal in deals:
         if deal.get("iban") not in [None, "", "None"]:
             if deal.get("fakturia_contract_number") in [None, "", "None"]:

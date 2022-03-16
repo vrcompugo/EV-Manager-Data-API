@@ -215,12 +215,12 @@ def run_cron_export():
         "select": "full",
         "filter[>ACTIVITY_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
-    })
+    }, force_reload=True)
     tasks2 = get_tasks({
         "select": "full",
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
-    })
+    }, force_reload=True)
     for task in tasks2:
         found = next((item for item in tasks if item.get("id") == task.get("id")), None)
         if found is None:

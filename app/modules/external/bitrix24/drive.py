@@ -238,7 +238,7 @@ def run_cron_folder_creation():
         "ORDER[DATE_CREATE]": "DESC",
         "FILTER[>DATE_MODIFY]": last_import,
         "SELECT": "full"
-    })
+    }, force_reload=True)
 
     for contact in contacts:
         post_data = {}
@@ -261,7 +261,7 @@ def run_cron_folder_creation():
 
     drive_insurance_folder = next((item for item in config["folders"] if item["key"] == "drive_insurance_folder"), None)
     if drive_insurance_folder is not None:
-        deals_insurance = get_deals({"FILTER[CATEGORY_ID]": "70", "FILTER[>DATE_CREATE]": str(last_import)})
+        deals_insurance = get_deals({"FILTER[CATEGORY_ID]": "70", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
         for deal in deals_insurance:
             print("deal:", deal["id"])
             deal = get_deal(deal["id"])
@@ -270,7 +270,7 @@ def run_cron_folder_creation():
                 create_folder_path(drive_insurance_folder["folder_id"], deal_path)
                 update_deal(deal["id"], {"drive_insurance_folder": f"{drive_insurance_folder['base_url']}{deal_path}"})
                 time.sleep(1)
-        deals_insurance_external = get_deals({"FILTER[CATEGORY_ID]": "110", "FILTER[>DATE_CREATE]": str(last_import)})
+        deals_insurance_external = get_deals({"FILTER[CATEGORY_ID]": "110", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
         for deal in deals_insurance_external:
             print("deal:", deal["id"])
             deal = get_deal(deal["id"])
@@ -283,7 +283,7 @@ def run_cron_folder_creation():
     drive_rental_folder = next((item for item in config["folders"] if item["key"] == "drive_rental_contract_folder"), None)
     drive_rental_folder2 = next((item for item in config["folders"] if item["key"] == "drive_rental_documents_folder"), None)
     if drive_rental_folder is not None and drive_rental_folder2 is not None:
-        deals_rental = get_deals({"FILTER[CATEGORY_ID]": "168", "FILTER[>DATE_CREATE]": str(last_import)})
+        deals_rental = get_deals({"FILTER[CATEGORY_ID]": "168", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
         for deal in deals_rental:
             print("deal:", deal["id"])
             deal = get_deal(deal["id"])
@@ -297,7 +297,7 @@ def run_cron_folder_creation():
 
     drive_cloud_folder = next((item for item in config["folders"] if item["key"] == "drive_cloud_folder"), None)
     if drive_cloud_folder is not None:
-        deals_cloud = get_deals({"FILTER[CATEGORY_ID]": "15", "FILTER[>DATE_CREATE]": str(last_import)})
+        deals_cloud = get_deals({"FILTER[CATEGORY_ID]": "15", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
         for deal in deals_cloud:
             print("deal:", deal["id"])
             deal = get_deal(deal["id"])
@@ -340,7 +340,7 @@ def run_cron_heating_folder_creation():
         "SELECT[0]": "*",
         "SELECT[1]": "ID",
         "SELECT[2]": "UF_CRM_60A60FF556B0C"
-    })
+    }, force_reload=True)
     for deal in deals:
         print("deal", deal["id"])
         if deal.get("upload_link_heatingcontract") in [None, "", 0]:
@@ -371,7 +371,7 @@ def run_cron_external_company_folder_creation():
         "FILTER[>DATE_MODIFY]": last_import,
         "FILTER[CATEGORY_ID]": 142,
         "SELECT": "full"
-    })
+    }, force_reload=True)
     for deal in deals:
         print("deal", deal["id"])
         if deal.get("upload_link_roof") in [None, "", 0]:
@@ -411,7 +411,7 @@ def run_legacy_folder_creation():
         "start": 0
     }
     while payload["start"] is not None:
-        data = post("disk.folder.getchildren", payload)
+        data = post("disk.folder.getchildren", payload, force_reload=True)
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             for folder in data["result"]:
