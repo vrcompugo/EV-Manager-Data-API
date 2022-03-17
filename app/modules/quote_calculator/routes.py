@@ -366,6 +366,8 @@ def quote_calculator_extra_data_update(lead_id):
         history.data["data"]["bic"] = post_data["bic"]
     if "bankname" in post_data:
         history.data["data"]["bankname"] = post_data["bankname"]
+    if "extra_notes" in post_data:
+        history.data["data"]["extra_notes"] = post_data["extra_notes"]
     for index, consumer in enumerate(post_data["consumers"]):
         if "power_meter_number" in consumer:
             history.data["data"]["consumers"][index]["power_meter_number"] = consumer["power_meter_number"]
