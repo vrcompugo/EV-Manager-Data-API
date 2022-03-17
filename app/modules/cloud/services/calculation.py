@@ -569,7 +569,6 @@ def calculate_cloud(data):
         if result["cloud_price_incl_refund"] > float(data["cloud_price_wish"]) > 0 and "price_guarantee" in data and data["price_guarantee"] == "2_years":
             price_diff = result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])
             result["user_one_time_cost"] = result["user_one_time_cost"] + (result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])) * 24
-    print(json.dumps(result, indent=2))
     return result
 
 

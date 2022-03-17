@@ -304,14 +304,14 @@ def calculate_products(data):
                 quantity = 1
             if data["data"]["extra_options_wwwp_variant"] == "NIBE L":
                 add_direct_product(
-                    label="Brauchwasser-Wärmepumpe NIBE L",
+                    label="Brauchwasser-Wärmepumpe L",
                     category="Extra Pakete",
                     quantity=quantity,
                     products=data["products"]
                 )
             if data["data"]["extra_options_wwwp_variant"] == "NIBE XL":
                 add_direct_product(
-                    label="Brauchwasser-Wärmepumpe NIBE XL",
+                    label="Brauchwasser-Wärmepumpe XL",
                     category="Extra Pakete",
                     quantity=quantity,
                     products=data["products"]
