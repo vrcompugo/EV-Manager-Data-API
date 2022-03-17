@@ -41,7 +41,7 @@ def log_request(f):
         start_time = datetime.datetime.now()
         response = f(*args, **kwargs)
         request_log = RequestLog()
-        request_log.route = str(request.url_rule)
+        request_log.route = str(request.url_rule)[:254]
         request_log.datetime = start_time
         request_log.url = request.url
         request_log.post_data = request.form
