@@ -145,7 +145,7 @@
           <tr class="highlight">
             <td colspan="2">Finanzierung</td>
           </tr>
-          {% if data.loan_interest_rate > 0 %}
+          {% if data.loan_calculation %}
             {% if data.loan_calculation.upfront_payment > 0 %}
               <tr>
                 <td>Anzahlung</td>
@@ -167,31 +167,49 @@
               </tr>
             {% else %}
               <tr>
-                <td>Kreditsumme {% if offer.reseller.document_style == "bsh" %}(Nettoinvestition){% endif %}</td>
+                <td>{% if data.loan_calculation.type == "leasing" %}Leasingsumme{% else %}Kreditsumme{% endif %} {% if offer.reseller.document_style == "bsh" %}(Nettoinvestition){% endif %}</td>
                 <td>{{ data.loan_calculation.load_amount | currencyformat }}</td>
               </tr>
             {% endif %}
             <tr>
-              <td>Laufzeit der Finanzierung</td>
+              <td>Laufzeit {% if data.loan_calculation.type == "leasing" %}des Leasing{% else %}der Finanzierung{% endif %}</td>
               <td>{{ data.loan_calculation.runtime_in_months }} Monate</td>
             </tr>
-            <tr>
-              <td>Sollzinssatz (Beispiel)</td>
-              <td>{{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr</td>
-            </tr>
+            {% if data.loan_calculation.type != "leasing" %}
+              <tr>
+                <td>Sollzinssatz (Beispiel)</td>
+                <td>{{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr</td>
+              </tr>
+            {% endif %}
             <tr>
               <td>Gesamtinvestition</td>
               <td>{{ data.loan_calculation.total_cost | currencyformat }}</td>
             </tr>
             <tr>
-              <td>{% if offer.reseller.document_style == "bsh" %}mtl. Finanzierungsrate <small>(Nettoinvestition)</small>{% else %}monatliche Finanzierungsrate{% endif %}</td>
+              <td>
+                {% if offer.reseller.document_style == "bsh" %}
+                  {% if data.loan_calculation.type == "leasing" %}
+                    mtl. Leasingrate <small>(Nettoinvestition)</small>
+                  {% else %}
+                    mtl. Finanzierungsrate <small>(Nettoinvestition)</small>
+                  {% endif %}
+                {% else %}
+                  monatliche Finanzierungsrate
+                {% endif %}</td>
               <td><b>{{ data.loan_calculation.monthly_payment | currencyformat }}</b></td>
             </tr>
             {% if offer.reseller.document_style == "bsh" %}
-              <tr>
-                <td>mtl. Finanzierungsrate <small>(Bruttoinvestition)</small></td>
-                <td>{{ data.loan_calculation.monthly_payment_with_tax | currencyformat }}</td>
-              </tr>
+              {% if data.loan_calculation.type != "leasing" %}
+                <tr>
+                  <td>mtl. Finanzierungsrate <small>(Bruttoinvestition)</small></td>
+                  <td>{{ data.loan_calculation.monthly_payment_with_tax | currencyformat }}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td>Leasing-Restwert</td>
+                  <td>{{ data.loan_calculation.rest_value | currencyformat }}</td>
+                </tr>
+              {% endif %}
             {% endif %}
           {% else %}
             <tr>

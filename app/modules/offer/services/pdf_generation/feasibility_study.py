@@ -13,7 +13,7 @@ from app.modules.file.file_services import add_item as add_file, update_item as 
 from app.models import OfferV2, S3File, EEGRefundRate
 from app.utils.gotenberg import generate_pdf as gotenberg_pdf
 from app.modules.cloud.services.calculation import cloud_offer_calculation_by_pv_offer
-from app.modules.loan_calculation import loan_calculation, loan_calculation_gross
+from app.modules.loan_calculation import loan_calculation, loan_calculation_gross, leasing_calculation
 
 from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
 
@@ -314,7 +314,11 @@ def calculate_feasibility_study(offer: OfferV2):
         data["loan_upfront"] = 0
     if data["loan_interest_rate"] > 0:
         if offer.reseller is not None and offer.reseller.document_style == "bsh":
-            data["loan_calculation"] = loan_calculation_gross(data["loan_amount"] * 1.19, data["loan_upfront"], data["loan_interest_rate"], data["loan_runtime"])
+            print(data["investment_type"])
+            if data["investment_type"] == "leasing":
+                data["loan_calculation"] = leasing_calculation(data["loan_amount"], data["loan_runtime"])
+            else:
+                data["loan_calculation"] = loan_calculation_gross(data["loan_amount"] * 1.19, data["loan_upfront"], data["loan_interest_rate"], data["loan_runtime"])
         else:
             data["loan_calculation"] = loan_calculation(data["loan_amount"], data["loan_upfront"], data["loan_interest_rate"], data["loan_runtime"])
         data["yearly_loan_payment"] = data["loan_calculation"]["yearly_payment"]
@@ -512,7 +516,6 @@ def calculate_feasibility_study(offer: OfferV2):
         data["cloud_total"] = data["cloud_total"] + data["eeg_direct_usage_cost"]
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
     if "loan_calculation" in data:
-        print(data["loan_calculation"].get("upfront_payment", 0))
         data["cost_total"] = data["cost_total"] + data["loan_calculation"].get("upfront_payment", 0)
     data["cost_benefit"] = data["conventional_total_cost"] - data["cost_total"]
     max_cost = data["conventional_total_cost"]

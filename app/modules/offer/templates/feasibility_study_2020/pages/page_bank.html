@@ -152,7 +152,11 @@
       <table class="right">
         <tr class="highlight">
           {% if data.loan_calculation %}
-            <td colspan="3"><b>Monatliche Belastung inkl. Finanzierungsrate (Zinssatz {{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr)</b></td>
+            {% if data.loan_calculation.type == "leasing" %}
+              <td colspan="3"><b>Monatliche Belastung inkl. Leasingrate (Zinssatz {{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr)</b></td>
+            {% else %}
+              <td colspan="3"><b>Monatliche Belastung inkl. Finanzierungsrate (Zinssatz {{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr)</b></td>
+            {% endif %}
           {% else %}
             <td colspan="3"><b>Monatliche Belastung</b></td>
           {% endif %}
