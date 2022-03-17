@@ -43,7 +43,7 @@ def log_request(f):
         request_log = RequestLog()
         request_log.route = str(request.url_rule)[:254]
         request_log.datetime = start_time
-        request_log.url = request.url
+        request_log.url = str(request.url)[:254]
         request_log.post_data = request.form
         request_log.json = request.json
         request_log.method = request.method
