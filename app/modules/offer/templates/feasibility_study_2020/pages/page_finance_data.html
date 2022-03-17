@@ -219,6 +219,9 @@
           {% endif %}
         </table>
         <br>
+        {% if data.loan_calculation.type == "leasing" %}
+          <small>Bei Vertragsbeginn wird eine einmalige Bearbeitungsgebühr von {{ data.loan_calculation.service_fee | currencyformat }} fällig</small>
+        {% endif %}
         <br>
         <br>
         {% if data.cloud_runtime > 2 %}
