@@ -76,10 +76,10 @@ def get_deals_normalized(filters):
     return get_deals(payload)
 
 
-def get_deal(id):
+def get_deal(id, force_reload=False):
     data = post("crm.deal.get", {
         "ID": id
-    })
+    }, force_reload=force_reload)
     if "result" in data:
         return convert_config_values(data["result"])
     else:

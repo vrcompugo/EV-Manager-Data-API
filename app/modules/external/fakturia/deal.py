@@ -18,12 +18,12 @@ from .customer import export_contact
 
 
 def get_contract_data_by_deal(deal_id):
-    deal = get_deal(deal_id)
+    deal = get_deal(deal_id, force_reload=True)
     if deal is None:
         raise ApiException('deal not found', 'Auftrag nicht gefunden')
     if deal.get("category_id") not in ["15", "68", "70", "176"]:
         return {"status": "failed", "data": {"error": "Nur in Cloud Pipeline verfügbar"}, "message": ""}
-    if deal.get("category_id") == "15":
+    if deal.get("category_id") in ["15", "176"]:
         return get_cloud_contract_data_by_deal(deal)
     if deal.get("category_id") == "68":
         return get_service_contract_data_by_deal(deal)
