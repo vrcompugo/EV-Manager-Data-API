@@ -21,7 +21,7 @@ def get_contract_data_by_deal(deal_id):
     deal = get_deal(deal_id)
     if deal is None:
         raise ApiException('deal not found', 'Auftrag nicht gefunden')
-    if deal.get("category_id") not in ["15", "68", "70"]:
+    if deal.get("category_id") not in ["15", "68", "70", "176"]:
         return {"status": "failed", "data": {"error": "Nur in Cloud Pipeline verfügbar"}, "message": ""}
     if deal.get("category_id") == "15":
         return get_cloud_contract_data_by_deal(deal)
