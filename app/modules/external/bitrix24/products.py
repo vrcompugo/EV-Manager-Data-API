@@ -12,6 +12,8 @@ from app.modules.external.bitrix24.drive import get_file_content, get_file_conte
 
 from ._connector import get, post
 
+PRODUCT_CACHE = {}
+
 
 def reload_products(filters=None, force=False):
     cache = Bitrix24ProductCache.query.order_by(Bitrix24ProductCache.datetime.asc()).first()
@@ -81,6 +83,10 @@ def reload_products(filters=None, force=False):
 
 
 def load_cache():
+    global PRODUCT_CACHE
+    if "last_import" in PRODUCT_CACHE and "products" in PRODUCT_CACHE:
+        if PRODUCT_CACHE["last_import"] < datetime.datetime.now() - datetime.timedelta(seconds=10):
+            return PRODUCT_CACHE
     items = Bitrix24ProductCache.query.order_by(Bitrix24ProductCache.datetime.asc()).all()
     if len(items) == 0:
         return None
@@ -90,6 +96,7 @@ def load_cache():
     }
     for item in items:
         product_cache["products"].append(item.data)
+    PRODUCT_CACHE = product_cache
     return product_cache
 
 
