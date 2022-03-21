@@ -163,6 +163,8 @@ def import_by_id(service_request_id):
                 if contact.get("Email") not in contacts:
                     if contact.get("Email") == "mike.becker.kez@gmail.com":
                         contact["Email"] = "becker@korbacher-energiezentrum.de"
+                    if contact.get("Email") == "niklas.koch.360@gmail.com":
+                        contact["Email"] = "niklas.koch.e360@gmail.com"
                     contacts[contact.get("Email")] = contact
                     contacts[contact.get("Email")]["user"] = get_user_by_email(contact.get("Email"))
                     if contacts[contact.get("Email")]["user"] is None:
