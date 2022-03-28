@@ -474,6 +474,12 @@ def quote_calculator_cloud_pdfs(lead_id):
 @blueprint.route("/<lead_id>/pv_pdf", methods=['PUT'])
 @log_request
 def quote_calculator_pv_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -493,6 +499,12 @@ def quote_calculator_pv_pdf(lead_id):
 @blueprint.route("/<lead_id>/heating_pdf", methods=['PUT'])
 @log_request
 def quote_calculator_heating_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -512,6 +524,12 @@ def quote_calculator_heating_pdf(lead_id):
 @blueprint.route("/<lead_id>/bluegen_pdf", methods=['PUT'])
 @log_request
 def quote_calculator_bluegen_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -532,6 +550,12 @@ def quote_calculator_bluegen_pdf(lead_id):
 @blueprint.route("/<lead_id>/roof_reconstruction_pdf", methods=['PUT'])
 @log_request
 def quote_calculator_roof_reconstruction_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -551,6 +575,12 @@ def quote_calculator_roof_reconstruction_pdf(lead_id):
 @blueprint.route("/<lead_id>/commission_pdf", methods=['PUT'])
 @log_request
 def quote_calculator_commission_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -571,6 +601,12 @@ def quote_calculator_commission_pdf(lead_id):
 @blueprint.route("/<lead_id>/datasheets_pdf", methods=['PUT'])
 @log_request
 def quote_calculator_datasheets_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -591,6 +627,12 @@ def quote_calculator_datasheets_pdf(lead_id):
 @blueprint.route("/<lead_id>/summary_pdf", methods=['PUT', 'GET'])
 @log_request
 def quote_calculator_summary_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -616,6 +658,12 @@ def quote_calculator_summary_pdf(lead_id):
 @blueprint.route("/<lead_id>/quote_summary_pdf", methods=['PUT'])
 @log_request
 def quote_calculator_quote_summary_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -645,6 +693,12 @@ def quote_calculator_quote_summary_pdf(lead_id):
 @blueprint.route("/<lead_id>/contract_summary_pdf", methods=['PUT'])
 @log_request
 def quote_calculator_contract_summary_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -654,7 +708,8 @@ def quote_calculator_contract_summary_pdf(lead_id):
     genrate_pdf(data, generate_contract_summary_part2_pdf, lead_id, "pdf_contract_summary_part2_file_id", "Abtrettung.pdf", subfolder_id)
     genrate_pdf(data, generate_contract_summary_part3_pdf, lead_id, "pdf_contract_summary_part3_file_id", "Contracting.pdf", subfolder_id)
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
-        genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Heizungsfragebogen.pdf", subfolder_id)
+        genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Heizungskonzept.pdf", subfolder_id)
+        data["pdf_contract_summary_part4_file_link"] = get_public_link(data["pdf_contract_summary_part4_file_id"])
     genrate_pdf(data, generate_contract_summary_pdf, lead_id, "pdf_contract_summary_file_id", "Vertragsunterlagen.pdf", subfolder_id)
     data["pdf_contract_summary_link"] = get_public_link(data["pdf_contract_summary_file_id"])
 
@@ -670,6 +725,19 @@ def quote_calculator_contract_summary_pdf(lead_id):
         json.dumps({"status": "success", "data": data}),
         status=200,
         mimetype='application/json')
+
+
+@blueprint.route("/<lead_id>/contract_summary_pdf2", methods=['GET'])
+@log_request
+def quote_calculator_contract_summary_pdf2(lead_id):
+    history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    data = json.loads(json.dumps(history.data))
+
+    pdf = generate_contract_summary_part4_pdf(lead_id, data)
+
+    return Response(pdf,
+        status=200,
+        mimetype='application/pdf')
 
 
 def genrate_pdf(data, generate_function, lead_id, pdf_id_key, label, subfolder_id, order_confirmation=False):
@@ -861,6 +929,7 @@ def get_insign_session(data):
         }
     ]
     documents = []
+    prefillable_documents = []
     if "pdf_pv_file_id" in data and data["pdf_pv_file_id"] > 0:
         documents.append({
             "id": data["pdf_pv_file_id"],
@@ -891,130 +960,64 @@ def get_insign_session(data):
             "displayname": "Bluegen-Angebot",
             "signatures": signatures
         })
-
-    sales_document = {
+    if "pdf_contract_summary_part4_file_id" in data:
+        prefillable_documents.append({
+            "id": data["pdf_contract_summary_part4_file_id"],
+            "displayname": "Heizungskonzept",
+            "preFilledFields": [],
+            "signatures": signatures
+        })
+    prefillable_documents.append({
         "id": data["pdf_contract_summary_part1_file_id"],
         "displayname": "Verkaufsunterlagen",
         "preFilledFields": []
-    }
-    contracting_document = {
+    })
+    prefillable_documents.append({
         "id": data["pdf_contract_summary_part3_file_id"],
         "displayname": "Contractigvertrag",
         "preFilledFields": []
-    }
-    abtrettung_document = {
-        "id": data["pdf_contract_summary_part2_file_id"],
-        "displayname": "Abtretungsformular",
-        "preFilledFields": []
-    }
-    for n in range(0,7):
-        suffix = f"#{n}"
-        if "contact" in data and "zip" in data["contact"]:
-            contracting_document["preFilledFields"].append({
-                "id": f"Name und Vorname{suffix}",
-                "text": data["contact"].get("firstname") + " " + data["contact"].get("lastname")
-            })
-            contracting_document["preFilledFields"].append({
-                "id": f"PLZ, Ort{suffix}",
-                "text": data["contact"].get("zip") + " " + data["contact"].get("city")
-            })
-            sales_document["preFilledFields"].append({
-                "id": f"Name und Vorname{suffix}",
-                "text": data["contact"].get("firstname") + " " + data["contact"].get("lastname")
-            })
-            sales_document["preFilledFields"].append({
-                "id": f"PLZ, Ort{suffix}",
-                "text": data["contact"].get("zip") + " " + data["contact"].get("city")
-            })
-            sales_document["preFilledFields"].append({
-                "id": f"Wohnort{suffix}",
-                "text": data["contact"].get("city")
-            })
-        if "data" in data and "iban" in data["data"]:
-            contracting_document["preFilledFields"].append({
-                "id": f"IBAN{suffix}",
-                "text": data["data"].get("iban")
-            })
-            contracting_document["preFilledFields"].append({
-                "id": f"BIC{suffix}",
-                "text": data["data"].get("bic")
-            })
-        if "data" in data and "power_meter_number" in data["data"]:
-            sales_document["preFilledFields"].append({
-                "id": f"Zähler Nummer{suffix}",
-                "text": data["data"].get("power_meter_number")
-            })
-        if "data" in data and "heatcloud_power_meter_number" in data["data"]:
-            sales_document["preFilledFields"].append({
-                "id": f"Wärme Zählernummer{suffix}",
-                "text": data["data"].get("heatcloud_power_meter_number")
-            })
-    if "data" in data and "iban" in data["data"]:
-        contracting_document["preFilledFields"].append({
-            "id": f"IBAN",
-            "text": data["data"].get("iban")
-        })
-    if "data" in data and "bic" in data["data"]:
-        contracting_document["preFilledFields"].append({
-            "id": f"BIC",
-            "text": data["data"].get("bic")
-        })
-    if "data" in data and "main_malo_id" in data["data"]:
-        abtrettung_document["preFilledFields"].append({
-            "id": f"malo id",
-            "text": data["data"].get("main_malo_id")
-        })
-    if "data" in data and "heatcloud_power_meter_number" in data["data"]:
-        sales_document["preFilledFields"].append({
-            "id": f"Wärme Zählernummer",
-            "text": data["data"].get("heatcloud_power_meter_number")
-        })
-    if "data" in data and "birthdate" in data["data"]:
-        sales_document["preFilledFields"].append({
-            "id": f"Geburtsdatum",
-            "text": data["data"].get("birthdate")
-        })
-    if "contact" in data and "zip" in data["contact"]:
-        abtrettung_document["preFilledFields"].append({
-            "id": f"Ort",
-            "text": data["contact"].get("city")
-        })
-        abtrettung_document["preFilledFields"].append({
-            "id": f"PLZ",
-            "text": data["contact"].get("zip")
-        })
-        abtrettung_document["preFilledFields"].append({
-            "id": f"PLZ, Ort",
-            "text": data["contact"].get("zip") + " " + data["contact"].get("city")
-        })
-        abtrettung_document["preFilledFields"].append({
-            "id": f"Strasse",
-            "text": data["contact"].get("street")
-        })
-        abtrettung_document["preFilledFields"].append({
-            "id": f"Hausnummer",
-            "text": data["contact"].get("street_nb")
-        })
-        abtrettung_document["preFilledFields"].append({
-            "id": f"Vorname",
-            "text": data["contact"].get("firstname")
-        })
-        abtrettung_document["preFilledFields"].append({
-            "id": f"Nachname",
-            "text": data["contact"].get("lastname")
-        })
-        sales_document["preFilledFields"].append({
-            "id": f"Wohnort",
-            "text": data["contact"].get("city")
-        })
-    documents.append(sales_document)
-    documents.append(abtrettung_document)
-    documents.append(contracting_document)
-    if "pdf_contract_summary_part4_file_id" in data:
-        documents.append({
-            "id": data["pdf_contract_summary_part4_file_id"],
-            "displayname": "Heizungsfragebogen"
-        })
+    })
+    auto_fill_fields = [
+        { "id": "Name und Vorname", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
+        { "id": "Name, Vorname ", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
+        { "id": "Name", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
+        { "id": "Vorname", "text": data.get("contact", {}).get("firstname") },
+        { "id": "Nachname", "text": data.get("contact", {}).get("lastname") },
+        { "id": "Strasse", "text": data.get("contact", {}).get("street") },
+        { "id": "Hausnummer", "text": data.get("contact", {}).get("street_nb") },
+        { "id": "PLZ", "text": data.get("contact", {}).get("zip") },
+        { "id": "Ort", "text": data.get("contact", {}).get("city") },
+        { "id": "Wohnort", "text": data.get("contact", {}).get("city") },
+        { "id": "Standort", "text": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
+        { "id": "PLZ, Ort", "text": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
+        { "id": "IBAN", "text": data.get("data", {}).get("iban") },
+        { "id": "BIC", "text": data.get("data", {}).get("bic") },
+        { "id": "Zähler Nummer", "text": data.get("data", {}).get("power_meter_number") },
+        { "id": "Wärme Zählernummer", "text": data.get("data", {}).get("heatcloud_power_meter_number") },
+        { "id": "malo id", "text": data.get("data", {}).get("main_malo_id") },
+        { "id": "Geburtsdatum", "text": data.get("data", {}).get("birthdate") }
+    ]
+    for field in auto_fill_fields:
+        for n in range(-1,7):
+            suffix = n
+            if n == -1:
+                suffix = ""
+            for document in prefillable_documents:
+                document["preFilledFields"].append({
+                    "id": f"{field['id']}#{suffix}",
+                    "text": field['text']
+                })
+                document["preFilledFields"].append({
+                    "id": f"{field['id']}{suffix}",
+                    "text": field['text']
+                })
+
+    for document in prefillable_documents:
+        documents.append(document)
+    token_documents = json.loads(json.dumps(documents))
+    for document in token_documents:
+        if "preFilledFields" in document:
+            del document["preFilledFields"]
     token_data = {
             "unique_identifier": data["id"],
             "number": data["number"],
@@ -1023,7 +1026,7 @@ def get_insign_session(data):
             "bluegen_quote_sum_net": data["bluegen_quote"].get("total_net"),
             "roof_reconstruction_quote_sum_net": data["roof_reconstruction_quote"].get("total_net"),
             "pv_kwp": None,
-            "documents": documents,
+            "documents": token_documents,
             "upload_folder_id_electric": data["data"]["upload_folder_id_electric"],
             "upload_folder_id_contract": data["data"]["upload_folder_id_contract"]
         }

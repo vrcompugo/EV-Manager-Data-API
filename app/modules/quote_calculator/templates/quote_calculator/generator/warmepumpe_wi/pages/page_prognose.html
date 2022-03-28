@@ -1,0 +1,62 @@
+<style>
+  .page_prognose {
+    padding: 60px;
+    font-size: 0.9em;
+  }
+  .page_prognose .greenbox {
+    text-align: center;
+    background-color: #abd0c9;
+    padding: 10px;
+  }
+  .page_prognose .value {
+    color: #4f6b66;
+    font-size: 2em;
+  }
+</style>
+
+<div class="page_prognose">
+  <h2>Verbrauchsprognose</h2>
+  <p>
+    Auf dieser Seite erhalten Sie den individuellen, für Sie prognostizierten Stromverbrauch Ihrer neuen Wärmepumpe.
+    Dieser ergibt sich aus den Eigenschaften Ihres Hauses, dem gewählten Wärmepumpensystem sowie aus den Angaben zu
+    Ihrem Nutzungsverhalten.
+  </p>
+  <div class="greenbox">
+    <div style="margin-right: 45px;">
+      <div>Kostenlose Umweltenergie</div>
+      <div class="value">{{ fields.Kostenlose_Umweltenergie }}</div>
+      <div>
+        <img src="{{ base_url }}static/warmepumpe_wi/energie.jpg" style="width: 60px; height: auto;">
+      </div>
+    </div>
+    <div class="layout horizontal" style="justify-content: center; align-items: center;">
+      <div>
+        <img src="{{ base_url }}static/warmepumpe_wi/strom.jpg" style="width: 60px; height: auto;margin-right: 20px;">
+      </div>
+      <div>
+        Stromverbrauch<br>
+        Wärmepumpe<br>
+        <div class="value">{{ fields.Stromverbrauch_Waermepumpe }}</div>
+        <img src="{{ base_url }}static/warmepumpe_wi/pfeil.jpg" style="width: 110px; height: auto;">
+      </div>
+      <div>
+        <img src="{{ base_url }}static/warmepumpe_wi/warmepumpe.jpg" style="width: 120px; height: auto;margin: 10px 20px;">
+      </div>
+      <div>
+        Wärmeertrag<br>
+        Wärmepumpe*<br>
+        <div class="value">{{ fields.Waermertrag }}</div>
+        <img src="{{ base_url }}static/warmepumpe_wi/pfeil.jpg" style="width: 110px; height: auto;">
+      </div>
+      <div>
+        <img src="{{ base_url }}static/warmepumpe_wi/haus.jpg" style="width: 140px; height: auto;">
+      </div>
+    </div>
+    <small style="margin-right: 45px;">*für Heizung und Warmwasser</small>
+  </div>
+  <p>
+    Daraus ergeben sich unter Annahme des durchschnittlichen Wärmepumpentarifs in Deutschland von <b>{{ fields.Waermeumpentarif }}</b> folgende Energiekosten pro Jahr: <b>{{ fields.EnergiekostenProJahr }}</b>
+  </p>
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}

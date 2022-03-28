@@ -1,0 +1,71 @@
+<style>
+  .page_house_data {
+    padding: 60px;
+    font-size: 0.9em;
+  }
+</style>
+
+<div class="page_house_data">
+  <h2>Angaben zum Wohnobjekt</h2>
+  <h3>Angaben zum Wohnobjekt</h3>
+  <table>
+    <tr>
+      <td width="50%">Haustyp</td>
+      <td width="50%" class="center">{{ fields.Haustyp }}</td>
+    </tr>
+    <tr>
+      <td>Art des Hauses</td>
+      <td class="center">{{ fields.Art_Hauses }}</td>
+    </tr>
+    <tr>
+      <td>Derzeitiger Verbrauch</td>
+      <td class="center">{{ fields.Derzeitiger_Verbrauch }}</td>
+    </tr>
+    <tr>
+      <td>Ursprung des Heizlastwertes</td>
+      <td class="center">{{ fields.Ursprung_Heizlastwertes }}</td>
+    </tr>
+    <tr>
+      <td>Warmwasserbereitung</td>
+      <td class="center">{{ fields.Warmwasserbereitung }}</td>
+    </tr>
+  </table>
+  <br>
+  <h3>Angaben zur Heizlastberechnung (Verbrauchsverfahren nach DIN EN 12831 /2)</h3>
+  <table>
+    <tr>
+      <td width="50%">Wohnfläche</td>
+      <td width="50%" class="center">{{ fields.Wohnflache }}</td>
+    </tr>
+    <tr>
+      <td>Beheizte Wohnfläche</td>
+      <td class="center">{{ fields.Beheizte_Wohnflache }}</td>
+    </tr>
+    <tr>
+      <td>Personen</td>
+      <td class="center">{{ fields.Personen }}</td>
+    </tr>
+    <tr>
+      <td>Heizsystem</td>
+      <td class="center">{{ fields.Heizsystem }}</td>
+    </tr>
+    <tr>
+      <td>Baujahr der Heizung</td>
+      <td class="center">{{ fields.Baujahr_Heizung }}</td>
+    </tr>
+    <tr>
+      <td>Angenommener WW-Verbrauch pro Person</td>
+      <td class="center">{{ fields.Angenommener_pro_person }}</td>
+    </tr>
+    <tr>
+      <td>Mittlerer Verbrauch der letzten 3 Jahre</td>
+      <td class="center">{{ fields.Mittlerer_3_Jahre }}</td>
+    </tr>
+    <tr>
+      <td>Zirkulationspumpe</td>
+      <td class="center">{{ fields.Zirkulationspumpe }}</td>
+    </tr>
+  </table>
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter.html') %}

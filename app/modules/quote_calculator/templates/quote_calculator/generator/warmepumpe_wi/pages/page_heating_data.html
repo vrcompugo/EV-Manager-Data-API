@@ -1,0 +1,58 @@
+<style>
+  .page_heating_data {
+    padding: 60px;
+    font-size: 0.9em;
+  }
+</style>
+
+<div class="page_heating_data">
+  <h2>Angaben zum Heizsystem</h2>
+  <h3>Angaben zum Heizsystem</h3>
+  <table>
+    <tr>
+      <td width="45%">Wärmequelle</td>
+      <td width="55%" class="center">{{ fields.Warmequelle }}</td>
+    </tr>
+    <tr>
+      <td>Betriebsweise</td>
+      <td class="center">{{ fields.Betriebsweise }}</td>
+    </tr>
+    <tr>
+      <td>Heizkreis 1</td>
+      <td class="center">{{ fields.Heizkreis_1 }}</td>
+    </tr>
+    <tr>
+      <td>Heizkreis 2</td>
+      <td class="center">{{ fields.Heizkreis_2 }}</td>
+    </tr>
+    <tr>
+      <td>Radiatorheizkörper im System</td>
+      <td class="center">{{ fields.Radiatorheizkorper }}</td>
+    </tr>
+    <tr>
+      <td>Anzahl Bewohner</td>
+      <td class="center">{{ fields.Bewohner }}</td>
+    </tr>
+    <tr>
+      <td>Warmwassertemperatur</td>
+      <td class="center">{{ fields.Warmwassertemperatur }}</td>
+    </tr>
+    <tr>
+      <td>Zirkulationspumpe</td>
+      <td class="center">{{ fields.Zirkulationspumpe }}</td>
+    </tr>
+    <tr>
+      <td>Wasserkomfort</td>
+      <td class="center">{{ fields.Wasserkomfort }}</td>
+    </tr>
+    <tr>
+      <td>Anzahl Duschen</td>
+      <td class="center">{{ fields.Duschen }}</td>
+    </tr>
+    <tr>
+      <td>Anzahl Badewannen</td>
+      <td class="center">{{ fields.Badewannen }}</td>
+    </tr>
+  </table>
+</div>
+{% include('feasibility_study_2020/elements/page_counter.html') %}

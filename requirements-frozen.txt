@@ -63,3 +63,4 @@ uamqp==1.2.14
 urllib3==1.25.3
 verify-email==2.4.1
 Werkzeug==0.15.5
+pdfrw

@@ -27,6 +27,9 @@ def calculate_commission_data(quote_data, data, quote_key=""):
     if data["data"].get(f"{quote_key}_price_increase_percent", None) is not None and data["data"].get(f"{quote_key}_price_increase_percent", None) != "":
         data["data"][f"{quote_key}_price_increase_percent"] = float(data["data"][f"{quote_key}_price_increase_percent"])
         data["data"][f"{quote_key}_price_increase_euro"] = round(quote_data["calculated"]["unchanged_total_net"] * data["data"][f"{quote_key}_price_increase_percent"] / 100, 2)
+        if data["data"][f"{quote_key}_price_increase_percent"] < 0:
+            data["data"][f"{quote_key}_price_increase_percent"] = 0
+            data["data"][f"{quote_key}_price_increase_euro"] = round(quote_data["calculated"]["unchanged_total_net"] * data["data"][f"{quote_key}_price_increase_percent"] / 100, 2)
         if data["data"][f"{quote_key}_price_increase_percent"] > 10:
             data["data"][f"{quote_key}_price_increase_percent"] = 10
             data["data"][f"{quote_key}_price_increase_euro"] = round(quote_data["calculated"]["unchanged_total_net"] * data["data"][f"{quote_key}_price_increase_percent"] / 100, 2)

@@ -4,12 +4,13 @@ from flask import request
 from flask_restplus import Resource
 from flask_restplus import Namespace, fields
 
+from app import db
 from app.exceptions import ApiException
 from app.decorators import token_required, api_response, log_request
 from app.modules.auth.auth_services import get_logged_in_user
 from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item_v2
 from app.modules.customer.services.customer_address_services import get_one_item as get_address_data
-from app.models import OfferV2, Reseller
+from app.models import OfferV2, Reseller, RequestLog
 
 from .services.offer import get_offer_by_offer_number
 from .services.calculation import calculate_cloud, get_cloud_products
@@ -25,10 +26,21 @@ class Items(Resource):
     @token_required("cloud_calculation")
     def post(self):
         """ Stores new offer """
+        start_time = datetime.datetime.now()
         data = request.json
         calculated = calculate_cloud(data)
         if calculated is None:
             raise ApiException("error-calculating", "Error Calculating", 500)
+        request_log = RequestLog()
+        request_log.route = str(request.url_rule)[:254]
+        request_log.datetime = start_time
+        request_log.url = str(request.url)[:254]
+        request_log.post_data = request.form
+        request_log.json = request.json
+        request_log.method = request.method
+        request_log.duration_milliseconds = int((datetime.datetime.now() - request_log.datetime).total_seconds() * 1000)
+        db.session.add(request_log)
+        db.session.commit()
         return {"status": "success",
                 "data": calculated}
 

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>asd</title>
+  {% include('feasibility_study_2020/style.html') %}
+  {% include('feasibility_study_2020/elements/graph-line.html') %}
+  {% include('feasibility_study_2020/elements/bar.html') %}
+  {% include('feasibility_study_2020/elements/step.html') %}
+  {% include('feasibility_study_2020/elements/arrow.html') %}
+  <style>
+    h2 {
+      font-family: 'Open Sans', sans-serif;
+      color: #6A6A69;
+      font-weight: 800;
+      margin-bottom: 3em;
+    }
+    h3 {
+      background-color: #b1ca07;
+      color: #fff;
+      font-weight: normal;
+      padding: 6px;
+      margin-bottom: 0;
+    }
+    table {
+      width: 100%;
+    }
+    table td {
+      padding: 6px;
+      border-bottom: 1px solid #000;
+      border-right: 1px solid #000;
+    }
+    table tr td:last-child {
+      border-right: none;
+    }
+    td.center {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  {% set total_pages = 9 %}
+
+
+  {% set current_page = 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/cover.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_blank.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_blank.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_house_data.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_heating_data.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_blank.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_blank.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_prognose.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_blank.html') %}
+  </div>
+
+  {% set current_page = current_page + 1 %}
+  <div class="page">
+    {% include('quote_calculator/generator/warmepumpe_wi/pages/page_blank.html') %}
+  </div>
+
+</body>
+</html>
+
+

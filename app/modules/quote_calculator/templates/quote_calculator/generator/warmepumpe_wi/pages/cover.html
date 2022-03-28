@@ -1,0 +1,28 @@
+<style>
+  .page_cover {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    background: url("{{ base_url }}static/warmepumpe_wi/seite1.jpeg") no-repeat;
+    background-size: cover;
+    font-size: 0.8em;
+  }
+  .page_cover h1 {
+    font-size: 4.2em;
+    padding: 50px 0 0 60px;
+  }
+</style>
+
+<div class="page_cover">
+  <h1>Ihr neues<br>Wärmepumpen-<br>System</h1>
+  <div class="layout horizontal" style="align-items:center;position: absolute; bottom: 10px; left: 0; width: 100vw;">
+    <div class="flex" style="padding-left: 50px;">
+      <b>Bauvorhaben:</b> {{ fields.Bauvorhaben }}<br>
+      <b>Standort:</b> {{ fields.Standort }}<br>
+      <b>Estellunsgdatum:</b> {{ fields.Erstellungsdatum }}<br>
+    </div>
+    <img src="{{ base_url }}static/warmepumpe_wi/logo.png" style="width: 250px; height: auto; margin-right: 50px;" />
+  </div>
+</div>

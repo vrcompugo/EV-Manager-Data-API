@@ -6,7 +6,7 @@ import os
 import requests
 import copy
 from flask import render_template
-from PyPDF2 import PdfFileMerger
+from PyPDF2 import PdfFileMerger, PdfFileWriter, PdfFileReader
 
 from app.modules.settings import get_settings
 from app.modules.external.bitrix24.user import get_user
@@ -305,7 +305,7 @@ def generate_bluegen_wi_pdf(lead_id, data, return_string=False, order_confirmati
     config = get_settings(section="offer/pdf")
     config_general = get_settings(section="general")
     if data is not None:
-        data["base_url"] = "https://api.korbacher-energiezentrum.de"
+        data["base_url"] = config_general["base_url"]
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
         content = render_template(
@@ -459,8 +459,6 @@ def generate_contract_summary_pdf(lead_id, data):
     output_file = io.BytesIO()
     merger = PdfFileMerger()
 
-    if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
-            add_pdf_by_drive_id(merger, 1413474, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1413474/?&ncc=1&filename=Aufnahmebogen-Heizung_15052020_DE.pdf
     if "data" in data and data["data"].get("is_commercial") is True:
         add_pdf_by_drive_id(merger, 1598546, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1598546/?&ncc=1&filename=Verkaufsunterlagen+Gewerbe.pdf
     else:
@@ -493,8 +491,102 @@ def generate_contract_summary_part3_pdf(lead_id, data):
     return get_file_content_cached(443350)  # Contractigvertrag
 
 
-def generate_contract_summary_part4_pdf(lead_id, data):
-    return get_file_content_cached(1413474)  # https://keso.bitrix24.de/disk/downloadFile/1413474/?&ncc=1&filename=Aufnahmebogen-Heizung_15052020_DE.pdf
+def generate_contract_summary_part4_pdf(lead_id, data, return_string=False):
+    from app.utils.jinja_filters import dateformat, numberformat, currencyformat
+    config_general = get_settings(section="general")
+    if data is not None:
+
+        old_heating_type = {
+            'gas': 'Gas',
+            'oil': 'Öl',
+            'heatpump': 'Wärmepumpe',
+            'pellez': 'Pellet',
+            'electro': 'Elektro',
+            'nightofen': 'Nachtspeicheröfen',
+            'other': 'Sonstige'
+        }
+        heating_quote_old_heating_build = {
+            '2-6_years': '2-6 Jahre',
+            '7-12_years': '7-12 Jahre',
+            'older': 'Über 12 Jahre'
+        }
+        new_usage = int(data.get("data", {}).get("heating_quote_usage"))
+        if data.get("data", {}).get("new_heating_type") == "hybrid_gas":
+            new_usage = int(data.get("data", {}).get("heating_quote_usage_wp"))
+        auto_fill_fields = {
+            "Bauvorhaben": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname"),
+            "Standort": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city"),
+            "Erstellungsdatum": dateformat(data.get("datetime")),
+            "Erstellungshinweise": f"Wärmepumpen Schnellauslegung | {data.get('contact', {}).get('lastname')} | {data.get('contact', {}).get('zip')} {data.get('contact', {}).get('city')} | Erstellungsdatum: {dateformat(data.get('datetime'))}",
+            "Haustyp": "Neubau" if data.get("data", {}).get("heating_quote_house_build") == "new_building" else "Bestand",
+            "Art_Hauses": data.get("data", {}).get("heating_quote_house_type"),
+            "Derzeitiger_Verbrauch": "-" if data.get("data", {}).get("heating_quote_house_build") == "new_building" else numberformat(data.get("data", {}).get("heating_quote_usage_old"), digits=0) + " kWh",
+            "Ursprung_Heizlastwertes": "Verbrauchsverfahren",
+            "Warmwasserbereitung": "Über das Heizsystem" if data.get("data", {}).get("heating_quote_warm_water_type") == "heater" else "Nicht über das Heizsystem",
+            "Wohnflache": str(data.get("data", {}).get("heating_quote_sqm")) + "m²",
+            "Beheizte_Wohnflache": str(data.get("data", {}).get("heating_quote_sqm")) + "m²",
+            "Personen": data.get("data", {}).get("heating_quote_people"),
+            "Warmwasser_Heizsystem": "Ja" if data.get("data", {}).get("heating_quote_warm_water_type") == "heater" else "Nein" ,
+            "Heizsystem": old_heating_type.get(data.get("data", {}).get("old_heating_type")),
+            "Baujahr_Heizung": heating_quote_old_heating_build.get(data.get("data", {}).get("heating_quote_old_heating_build")),
+            "Mittlerer_3_Jahre": "-" if data.get("data", {}).get("heating_quote_house_build") == "new_building" else numberformat(data.get("data", {}).get("heating_quote_usage_old"), digits=0) + " kWh",
+            "Zirkulationspumpe": "Ja" if data.get("data", {}).get("heating_quote_circulation_pump") is True else "Nein",
+            "Warmequelle": "Luft",
+            "Betriebsweise": "Hybrid-System" if data.get("data", {}).get("new_heating_type") == "hybrid_gas" else "Monoenergetisch",
+            "Radiatorheizkorper": data.get("data", {}).get("heating_quote_radiator_count"),
+            "Bewohner": data.get("data", {}).get("heating_quote_people"),
+            "Warmwassertemperatur": "50 - 55 °C",
+            "Zirkulationspumpe_2": "Ja" if data.get("data", {}).get("heating_quote_circulation_pump") is True else "Nein",
+            "Wasserkomfort": "Komfort",
+            "Duschen": data.get("data", {}).get("heating_quote_shower_count"),
+            "Badewannen": data.get("data", {}).get("heating_quote_bathtub_count"),
+            "Stromverbrauch_Waermepumpe": numberformat(new_usage, digits=0),
+            "Kostenlose_Umweltenergie": numberformat((new_usage * 3.6) - new_usage, digits=0),
+            "Waermertrag": numberformat(new_usage * 3.6, digits=0),
+            "Waermeumpentarif": numberformat(data.get("calculated", {}).get("heatcloud_extra_price_per_kwh", 0.2979) * 100, digits=2) + " Cent/kWh",
+            "EnergiekostenProJahr": currencyformat(data.get("calculated", {}).get("heatcloud_extra_price_per_kwh", 0.2979) * new_usage),
+            "Angenommener_pro_person": "50 l" if "extra_warm_water" in data.get("data", {}).get("heating_quote_extra_options", []) else "33.5 l",
+        }
+        if data.get("data", {}).get("heating_quote_radiator_type") == "floor_heating":
+            auto_fill_fields["Heizkreis_1"] = "Fußbodenheizung - Vorlauftemperatur: ca. 35 °C"
+            auto_fill_fields["Heizkreis_2"] = "-"
+        if data.get("data", {}).get("heating_quote_radiator_type") == "mixed":
+            auto_fill_fields["Heizkreis_1"] = "Fußbodenheizung - Vorlauftemperatur: ca. 35 °C"
+            auto_fill_fields["Heizkreis_2"] = "Heizkörper - Vorlauftemperatur: ca. 50 °C"
+        if data.get("data", {}).get("heating_quote_radiator_type") == "radiator_heating":
+            auto_fill_fields["Heizkreis_1"] = "Heizkörper - Vorlauftemperatur: ca. 50 °C"
+            auto_fill_fields["Heizkreis_2"] = "-"
+        data["base_url"] = config_general["base_url"]
+        if "datetime" not in data:
+            data["datetime"] = datetime.datetime.now()
+        content = render_template(
+            "quote_calculator/generator/warmepumpe_wi/index.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data,
+            fields=auto_fill_fields
+        )
+        data["datetime"] = str(data["datetime"])
+        if return_string:
+            return content
+        overlay_pdf = PdfFileReader(io.BytesIO(gotenberg_pdf(
+            content,
+            margins=["0", "0", "0", "0"],
+            landscape=False)))
+        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(3381834)))  # https://keso.bitrix24.de/disk/downloadFile/3381834/?&ncc=1&filename=waermepumpe_formular1.pdf
+        pdf = PdfFileWriter()
+        for i in range(0,9):
+            if i in [0, 3, 4, 7]:
+                page = overlay_pdf.getPage(i)
+            else:
+                page = overlay_pdf.getPage(i)
+                page.mergePage(base_pdf.getPage(i))
+            pdf.addPage(page)
+        output = io.BytesIO()
+        pdf.write(output)
+        output.seek(0)
+        return output.read()
+    return None
 
 
 def generate_order_confirmation_pdf(lead_id, data):

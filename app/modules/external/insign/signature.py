@@ -80,6 +80,7 @@ def upload_file(sessionId, file_id):
     files = {
         "file": (file["NAME"], file["content"])
     }
+    print(file["NAME"])
     response = post("/configure/uploaddocument", params=query_data, files=files)
     log = InsignDocumentLog(
         session_id=sessionId,
