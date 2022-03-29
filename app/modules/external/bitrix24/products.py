@@ -41,6 +41,7 @@ def reload_products(filters=None, force=False):
                     kwp = re.search(r"(.*) ([0-9]+) Watt(.*)\(([0-9,]+)qm\)$", item["NAME"])
                     if kwp is not None and kwp.group(2) != "":
                         item["kwp"] = int(kwp.group(2)) / 1000
+                        print(kwp)
                     if kwp is not None and kwp.group(4) != "":
                         try:
                             item["qm"] = float(kwp.group(4).replace(",", "."))
