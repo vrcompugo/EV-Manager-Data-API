@@ -220,7 +220,10 @@
         </table>
         <br>
         {% if data.loan_calculation and data.loan_calculation.type == "leasing" %}
-          <small>Bei Vertragsbeginn wird eine einmalige Bearbeitungsgebühr von {{ data.loan_calculation.service_fee | currencyformat }} fällig</small>
+          <small>
+            Bei Vertragsbeginn wird eine einmalige Bearbeitungsgebühr von {{ data.loan_calculation.service_fee | currencyformat }} fällig.<br>
+            Mtl. Leasingrate und Leasing-Restwert zzgl. jeweiliger gesetzlicher MwSt.
+          </small>
         {% endif %}
         <br>
         <br>

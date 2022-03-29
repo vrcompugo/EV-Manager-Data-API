@@ -74,7 +74,7 @@ def leasing_calculation(total_amount_net, upfront_payment, runtime_in_months):
         raise ApiException('not_enough', 'Leasingwert unter 10.000€ nicht möglich', 400)
     interest_rate = get_leasing_interest_rate(loan_amount, runtime_in_months)
     monthly_loan_payment = loan_amount * interest_rate  / 100
-    rest_value = loan_amount * rest_value_factor / 100
+    rest_value = total_amount * rest_value_factor / 100
     data = {
         "type": "leasing",
         "load_amount": loan_amount,
