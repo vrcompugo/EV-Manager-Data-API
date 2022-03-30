@@ -247,7 +247,7 @@ def run_cron_export():
 def export_by_bitrix_id(bitrix_id=None, task_data=None):
     if task_data is None:
         print("export mfr task ", bitrix_id)
-        task_data = get_task(bitrix_id)
+        task_data = get_task(bitrix_id, force_reload=True)
     else:
         bitrix_id = task_data.get("id")
         print("export mfr task ", task_data.get("id"))
@@ -268,8 +268,6 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         return
     else:
         print("change detected")
-        # print(json.dumps(task_data, indent=2))
-        # print(json.dumps(task_buffer.data, indent=2))
     task_buffer.last_change = datetime.now()
     task_buffer.data = task_data
     db.session.commit()
@@ -356,7 +354,7 @@ def get_linked_data_by_task(task_data):
         if crm_element[:2] == "D_":
             deal_id = crm_element[2:]
     if deal_id is not None:
-        deal_data = get_deal(deal_id)
+        deal_data = get_deal(deal_id, force_reload=True)
         if contact_id is None and company_id is None:
             if deal_data["contact_id"] not in [None, "", "0", 0]:
                 contact_id = deal_data["contact_id"]

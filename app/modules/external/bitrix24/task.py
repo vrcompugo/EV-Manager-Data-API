@@ -23,7 +23,7 @@ def convert_config_values(data_raw):
     return data
 
 
-def get_task(id, with_comments=False):
+def get_task(id, with_comments=False, force_reload=False):
     data = post("tasks.task.get", {
         "taskId": id,
         "select[0]": "TITLE",
@@ -49,7 +49,7 @@ def get_task(id, with_comments=False):
         task_data = convert_config_values(data["result"]["task"])
         comments = post("task.commentitem.getlist", {
             "taskId": id
-        })
+        }, force_reload=force_reload)
         if "result" in comments:
             task_data["comments"] = comments["result"]
         return task_data
