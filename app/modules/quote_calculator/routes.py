@@ -811,6 +811,11 @@ def get_insign_callback(token):
                 "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                 "file_content": file_content
             })
+            if file["displayname"] == "Heizungskonzept":
+                add_file(token_data["upload_folder_id_heating"], {
+                    "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
+                    "file_content": file_content
+                })
             file_id = add_file(token_data["upload_folder_id_contract"], {
                 "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                 "file_content": file_content
@@ -1028,6 +1033,7 @@ def get_insign_session(data):
             "pv_kwp": None,
             "documents": token_documents,
             "upload_folder_id_electric": data["data"]["upload_folder_id_electric"],
+            "upload_folder_id_heating": data["data"]["upload_folder_id_heating"],
             "upload_folder_id_contract": data["data"]["upload_folder_id_contract"]
         }
     if "calculated" in data:
