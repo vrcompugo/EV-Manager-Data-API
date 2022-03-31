@@ -42,18 +42,19 @@ def export_deal_route(deal_id):
 @api_response
 def export_deal_sherpa_route(deal_id):
     from app.modules.importer.sources.bitrix24.order import run_import as order_import
-    from app.modules.order.sherpa import generate_sherpa_file
+    from app.modules.external.bitrix24.deal import get_deal
+    from app.modules.external.bitrix24.contact import get_contact
+    from app.modules.order.sherpa import generate_sherpa2_file
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
         return {"status": "failed", "data": {}, "message": "auth failed"}
-    order = order_import(remote_id=deal_id)
-    if order is None:
-        return {"status": "failed", "data": {}, "message": "import failed"}
-    sherpa_file = generate_sherpa_file(order)
+    deal = get_deal(deal_id)
+    contact = get_contact(deal.get("contact_id"))
+    sherpa_file = generate_sherpa2_file(deal, contact)
     if sherpa_file is not None:
         response = make_response(sherpa_file)
         response.headers['Content-Type'] = 'application/excel'
-        response.headers['Content-Disposition'] = f'filename={order.contract_number}.xlsx'
+        response.headers['Content-Disposition'] = f'filename={deal.get("contract_number")}.xlsx'
         return response
     return {"status": "failed", "data": {}, "message": "history not found"}
 

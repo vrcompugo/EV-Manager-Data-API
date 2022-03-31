@@ -394,6 +394,7 @@ def get_settings(section=None, domain_raw=None):
                     "smartme_number_heatcloud": "UF_CRM_1605610662",
                     "contracting_version": "UF_CRM_1639388034",
                     "netprovider": "UF_CRM_1607947330",
+                    "netprovider_code": "UF_CRM_1581074754",
                     "cloud_monthly_price": "UF_CRM_1612265225",
                     "bankowner": "UF_CRM_1644838647",
                     "malo_lightcloud": "UF_CRM_1632220041088",
@@ -402,7 +403,15 @@ def get_settings(section=None, domain_raw=None):
                     "malo_consumer1": "UF_CRM_1644838588",
                     "malo_consumer2": "UF_CRM_1644838598",
                     "malo_consumer3": "UF_CRM_1644838617",
-                    "annual_statement_link": "UF_CRM_1646239276"
+                    "annual_statement_link": "UF_CRM_1646239276",
+                    "delivery_first_name": "UF_CRM_1607945707",
+                    "delivery_last_name": "UF_CRM_1607945716",
+                    "delivery_street": "UF_CRM_1607945727",
+                    "delivery_street_nb": "UF_CRM_1607945744",
+                    "delivery_zip": "UF_CRM_1607945768",
+                    "delivery_city": "UF_CRM_1607945776",
+                    "delivery_counter_number": "UF_CRM_1607945817",
+                    "delivery_usage": "UF_CRM_1610459059",
                 }
             },
             "quote": {
