@@ -63,6 +63,8 @@ def get_heating_products(data):
                     product_name = "Luft/Wasser-Wärmepumpe (Bestand 200)"
                 if 200 < data["data"]["heating_quote_sqm"] <= 250:
                     product_name = "Luft/Wasser-Wärmepumpe (Bestand 250)"
+                if 250 < data["data"]["heating_quote_sqm"] <= 290:
+                    product_name = "Luft/Wasser-Wärmepumpe (Bestand 290)"
                 if 250 < data["data"]["heating_quote_sqm"]:
                     product_name = "Luft/Wasser-Wärmepumpe (Bestand 400)"
                 if "heating_quote_house_build" in data["data"] and data["data"]["heating_quote_house_build"] == "new_building":
