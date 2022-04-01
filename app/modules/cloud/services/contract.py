@@ -4,6 +4,7 @@ import pytz
 import re
 import json
 import calendar
+import math
 from dateutil.parser import parse
 
 from app import db
@@ -225,9 +226,9 @@ def get_contract_data(contract_number):
                 "year": year,
                 "number": data["pv_system"].get("smartme_number"),
                 "start_date": beginning_of_year.get("Date"),
-                "start_value": beginning_of_year.get("CounterReading", 0),
+                "start_value": math.abs(beginning_of_year.get("CounterReading", 0)),
                 "end_date": end_of_year.get("Date"),
-                "end_value": end_of_year.get("CounterReading", 0)
+                "end_value": math.abs(end_of_year.get("CounterReading", 0))
             }
             values["usage"] = values["end_value"] - values["start_value"]
             data["pv_system"]["usages"].append(values)
