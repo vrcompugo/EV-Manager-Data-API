@@ -5,7 +5,7 @@ from .utils import get_data_value
 
 
 def part02_rechnungsanschrift(wb, excel_layout, deal, contact):
-    wb["Neukunden"]["S" + str(wb.current_row)] = contact.get("fakturia_number")
+    wb["Neukunden"]["S" + str(wb.current_row)] = deal.get("contract_number")
     wb["Neukunden"]["U" + str(wb.current_row)] = contact.get("company")
     wb["Neukunden"]["X" + str(wb.current_row)] = "Frau" if contact.get("salutation") == "ms" else "Herr"
     wb["Neukunden"]["Y" + str(wb.current_row)] = ""  # title
