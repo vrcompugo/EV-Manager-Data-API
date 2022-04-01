@@ -37,11 +37,11 @@ def convert_config_values(data_raw):
     return data
 
 
-def get_contact(id):
+def get_contact(id, force_reload=False):
     config = get_settings(section="external/bitrix24")
     data = post("crm.contact.get", {
         "ID": id
-    })
+    }, force_reload=force_reload)
 
     if "result" in data and len(data["result"]) > 0:
         return convert_config_values(data["result"])

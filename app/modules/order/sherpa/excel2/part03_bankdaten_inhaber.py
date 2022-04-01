@@ -5,7 +5,7 @@ from .utils import get_data_value
 
 def part03_bankdaten_inhaber(wb, excel_layout, deal, contact):
     if excel_layout in ["gas", "power"]:
-        wb["Neukunden"]["BI" + str(wb.current_row)] = contact.get("salutation")
+        wb["Neukunden"]["BI" + str(wb.current_row)] = "Frau" if contact.get("salutation") == "ms" else "Herr"
         wb["Neukunden"]["BJ" + str(wb.current_row)] = ""  # title
         wb["Neukunden"]["BK" + str(wb.current_row)] = contact.get("first_name")
         wb["Neukunden"]["BL" + str(wb.current_row)] = contact.get("last_name")

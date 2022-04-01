@@ -48,8 +48,8 @@ def export_deal_sherpa_route(deal_id):
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
         return {"status": "failed", "data": {}, "message": "auth failed"}
-    deal = get_deal(deal_id)
-    contact = get_contact(deal.get("contact_id"))
+    deal = get_deal(deal_id, force_reload=True)
+    contact = get_contact(deal.get("contact_id"), force_reload=True)
     sherpa_file = generate_sherpa2_file(deal, contact)
     if sherpa_file is not None:
         response = make_response(sherpa_file)
