@@ -226,9 +226,9 @@ def get_contract_data(contract_number):
                 "year": year,
                 "number": data["pv_system"].get("smartme_number"),
                 "start_date": beginning_of_year.get("Date"),
-                "start_value": math.abs(beginning_of_year.get("CounterReading", 0)),
+                "start_value": abs(beginning_of_year.get("CounterReading", 0)),
                 "end_date": end_of_year.get("Date"),
-                "end_value": math.abs(end_of_year.get("CounterReading", 0))
+                "end_value": abs(end_of_year.get("CounterReading", 0))
             }
             values["usage"] = values["end_value"] - values["start_value"]
             data["pv_system"]["usages"].append(values)
@@ -250,9 +250,9 @@ def get_contract_data(contract_number):
                     "year": year,
                     "number": data["pv_system"].get("smartme_number_heatcloud"),
                     "start_date": beginning_of_year.get("Date"),
-                    "start_value": beginning_of_year.get("CounterReading", 0),
+                    "start_value": abs(beginning_of_year.get("CounterReading", 0)),
                     "end_date": end_of_year.get("Date"),
-                    "end_value": end_of_year.get("CounterReading", 0)
+                    "end_value": abs(end_of_year.get("CounterReading", 0))
                 }
                 values["usage"] = values["end_value"] - values["start_value"]
                 data["pv_system"]["heatcloud_usages"].append(values)
