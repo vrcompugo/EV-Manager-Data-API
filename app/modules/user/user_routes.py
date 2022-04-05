@@ -31,9 +31,16 @@ def sales_users():
         272,  # ---
         270,  # ---
         41,   # Extern IT Unterstützung
-        384,  # Team Schuster
         390,  # Team Power Play 2022
-        386   # Team Maier
+        434,   # Team Dura
+        432,   # Team Gode
+        436,   # Team Herzberg
+        392,   # Team Hoffmann
+        428,   # Team Kraft
+        386,   # Team Maier
+        430,   # Team Miele
+        426,   # Team Niggemann
+        384    # Team Schuster
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
@@ -115,9 +122,16 @@ def supervisors():
         272,  # ---
         270,  # ---
         41,  # Extern IT Unterstützung
-        384,  # Team Schuster
         390,  # Team Power Play 2022
-        386   # Team Maier
+        434,   # Team Dura
+        432,   # Team Gode
+        436,   # Team Herzberg
+        392,   # Team Hoffmann
+        428,   # Team Kraft
+        386,   # Team Maier
+        430,   # Team Miele
+        426,   # Team Niggemann
+        384    # Team Schuster
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
