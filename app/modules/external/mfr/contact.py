@@ -52,7 +52,7 @@ def export_by_bitrix_id(bitrix_id):
         print("no config")
         return None
 
-    contact_data = get_contact(bitrix_id)
+    contact_data = get_contact(bitrix_id, force_reload=True)
     if contact_data.get("company_id") not in [None, "", 0]:
         company_data = get_company(contact_data.get("company_id"))
         if company_data is not None and company_data.get("street") not in ["", 0, False, None]:

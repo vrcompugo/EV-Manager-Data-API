@@ -275,7 +275,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
     deal_data, contact_data, company_data = get_linked_data_by_task(task_data)
     if contact_data is not None and contact_data.get("mfr_id") in [None, "", "0"]:
         export_contact_by_bitrix_id(contact_data["id"])
-        contact_data = get_contact(contact_data["id"])
+        contact_data = get_contact(contact_data["id"], force_reload=True)
     else:
         if company_data is not None and company_data.get("mfr_id") in [None, "", "0"]:
             export_company_by_bitrix_id(company_data["id"])
@@ -363,7 +363,7 @@ def get_linked_data_by_task(task_data):
                 if deal_data["company_id"] not in [None, "", "0", 0]:
                     company_id = deal_data["company_id"]
     if contact_id is not None:
-        contact_data = get_contact(contact_id)
+        contact_data = get_contact(contact_id, force_reload=True)
         if contact_data["company_id"] not in [None, "", "0", 0]:
             company_data = get_company(contact_data["company_id"])
     else:
