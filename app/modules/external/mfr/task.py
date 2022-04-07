@@ -289,6 +289,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         documents = post_data["documents"]
         del post_data["documents"]
     if task_data.get("mfr_id", None) in ["", None, 0]:
+        print(json.dumps(post_data, indent=2))
         response = post("/ServiceRequests", post_data=post_data)
         if response.get("Id") not in ["", None, 0]:
             task_data['mfr_id'] = response.get("Id")
