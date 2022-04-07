@@ -90,6 +90,12 @@ def get_heating_products(data):
                     products=data["heating_quote"]["products"]
                 )
             add_direct_product(
+                label="Technik & Service Paket - 5 Jahres Garantie, Remote Care & Smart -Steuerung",
+                category=f"Online - Heizung - WP",
+                quantity=1,
+                products=data["heating_quote"]["products"]
+            )
+            add_direct_product(
                 label="Beantragung der BAFA Förderung (Bafa)",
                 category=f"Online - Heizung - WP",
                 quantity=1,
