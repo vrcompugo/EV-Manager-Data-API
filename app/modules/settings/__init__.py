@@ -54,6 +54,14 @@ def get_settings(section=None, domain_raw=None):
             "url": "https://keso.bitrix24.de/rest/106/v38b9iovomrydti2/",
             "taxrate": 19,
             "select_lists": {
+                "transaction_code": {
+                    "3040": "E01",
+					"3042": "E02",
+					"3044": "E03",
+					"3046": "ZD2",
+					"3048": "E14",
+					"3050": "E24"
+                },
                 "heating_type": {
                 },
                 "salutation": {
@@ -395,6 +403,8 @@ def get_settings(section=None, domain_raw=None):
                     "contracting_version": "UF_CRM_1639388034",
                     "netprovider": "UF_CRM_1607947330",
                     "netprovider_code": "UF_CRM_1581074754",
+                    "energie_delivery_code": "UF_CRM_1597138326",
+                    "transaction_code": "UF_CRM_1607947140",
                     "cloud_monthly_price": "UF_CRM_1612265225",
                     "bankowner": "UF_CRM_1644838647",
                     "malo_lightcloud": "UF_CRM_1632220041088",

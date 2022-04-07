@@ -43,6 +43,7 @@ def generate_sherpa_file(deal, order: Order):
 
 
 def generate_sherpa2_file(deal, contact):
+    from app.modules.order.sherpa.excel2.part01_general import part01_general
     from app.modules.order.sherpa.excel2.part02_rechnungsanschrift import part02_rechnungsanschrift
     from app.modules.order.sherpa.excel2.part03_bankdaten import part03_bankdaten
     from app.modules.order.sherpa.excel2.part03_bankdaten_inhaber import part03_bankdaten_inhaber
@@ -62,6 +63,7 @@ def generate_sherpa2_file(deal, contact):
             excel_layout = "power"
     wb = load_workbook(os.path.join(os.path.dirname(__file__), f'excel/basefiles/{excel_layout}.xlsx'))
     wb.current_row = 4
+    part01_general(wb, excel_layout, deal, contact)
     part02_rechnungsanschrift(wb, excel_layout, deal, contact)
     part03_bankdaten(wb, excel_layout, deal, contact)
     part03_bankdaten_inhaber(wb, excel_layout, deal, contact)
