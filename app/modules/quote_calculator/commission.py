@@ -108,7 +108,7 @@ def get_commission_rate(quote_data, data, quote_key):
     if association is None or association.user_type not in ["Teamleiter HV", "Teamleiter Angestellt", "Handelsvertreter 2021", "Angestellter"]:
         modifier = -1
     if quote_key == "pv_quote":
-        if 23 in data["assigned_user"]["UF_DEPARTMENT"]:
+        if 23 in data["assigned_user"]["UF_DEPARTMENT"] or str(data["assigned_user"]["ID"]) in ["264", "384", "428"]:
             if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
                 return 6
             if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
@@ -130,7 +130,7 @@ def get_commission_rate(quote_data, data, quote_key):
                 return 6.5 + modifier
             if 10 < quote_data["calculated"]["effective_internal_discount_rate"] <= 15:
                 return 5 + modifier
-    if 23 in data["assigned_user"]["UF_DEPARTMENT"]:
+    if 23 in data["assigned_user"]["UF_DEPARTMENT"] or str(data["assigned_user"]["ID"]) in ["264", "384", "428"]:
         if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
             return 2.5
         if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
