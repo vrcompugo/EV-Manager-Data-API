@@ -35,6 +35,9 @@ def calculate_cloud(data):
         if 330 in data["assigned_user"]["UF_DEPARTMENT"] or "330" in data["assigned_user"]["UF_DEPARTMENT"]:
             user = {"id": 120, "name": "bsh"}
             user_id_for_prices = 120
+    settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
+    settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
+    settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
     if data.get("old_price_calculation", "") != "l2k3fblk3baxv55":
         if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate):
             settings["data"]["cloud_settings"]["extra_kwh_cost"] = "33.79"
