@@ -51,7 +51,7 @@ class Items(Resource):
     @api_response
     @token_required("cloud_calculation")
     def post(self):
-        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf, generate_feasibility_study_short_pdf
+        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
 
         data = request.json
         user = get_logged_in_user()
@@ -101,9 +101,6 @@ class Items(Resource):
             generate_feasibility_study_pdf(item)
             if item.feasibility_study_pdf is not None:
                 item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
-            generate_feasibility_study_short_pdf(item)
-            if item.feasibility_study_short_pdf is not None:
-                item_dict["pdf_wi_short_link"] = item.feasibility_study_short_pdf.public_link
         return {"status": "success",
                 "data": item_dict}
 
@@ -132,8 +129,6 @@ class User(Resource):
             item_dict["pdf_link"] = offer.pdf.public_link
         if offer.feasibility_study_pdf is not None:
             item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
-        if offer.feasibility_study_short_pdf is not None:
-            item_dict["pdf_wi_short_link"] = offer.feasibility_study_short_pdf.public_link
         return {
             "status": "success",
             "data": item_dict
@@ -143,7 +138,7 @@ class User(Resource):
     @token_required("cloud_calculation")
     def put(self, offer_number):
         from app.modules.offer.services.pdf_generation.offer import generate_offer_pdf
-        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf, generate_feasibility_study_short_pdf
+        from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf
 
         offer = get_offer_by_offer_number(offer_number)
         if offer is None:
@@ -189,14 +184,11 @@ class User(Resource):
         item = update_item_v2(id=offer.id, data=offer_v2_data)
         generate_offer_pdf(item)
         generate_feasibility_study_pdf(item)
-        generate_feasibility_study_short_pdf(item)
         item_dict = get_one_item_v2(item.id)
         if item.pdf is not None:
             item_dict["pdf_link"] = item.pdf.public_link
         if item.feasibility_study_pdf is not None:
             item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
-        if item.feasibility_study_short_pdf is not None:
-            item_dict["pdf_wi_short_link"] = item.feasibility_study_short_pdf.public_link
         return {"status": "success",
                 "data": item_dict}
 
