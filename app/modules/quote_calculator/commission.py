@@ -104,49 +104,50 @@ def calculate_commission_data(quote_data, data, quote_key=""):
 
 def get_commission_rate(quote_data, data, quote_key):
     association = UserZipAssociation.query.filter(UserZipAssociation.user_id == data["assigned_user"]["ID"]).first()
+    effective_discount_rate_rounded = round(quote_data["calculated"]["effective_internal_discount_rate"], 2)
     modifier = 0
     if association is None or association.user_type not in ["Teamleiter HV", "Teamleiter Angestellt", "Handelsvertreter 2021", "Angestellter"]:
         modifier = -1
     if quote_key == "pv_quote":
         if 23 in data["assigned_user"]["UF_DEPARTMENT"] or str(data["assigned_user"]["ID"]) in ["264", "384", "428"]:
-            if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
+            if effective_discount_rate_rounded <= 0:
                 return 6
-            if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
+            if 0 < effective_discount_rate_rounded <= 5:
                 return 5
-            if 5 < quote_data["calculated"]["effective_internal_discount_rate"] <= 8:
+            if 5 < effective_discount_rate_rounded <= 8:
                 return 4
-            if 8 < quote_data["calculated"]["effective_internal_discount_rate"] <= 10:
+            if 8 < effective_discount_rate_rounded <= 10:
                 return 3.5
-            if 10 < quote_data["calculated"]["effective_internal_discount_rate"] <= 15:
+            if 10 < effective_discount_rate_rounded <= 15:
                 return 3
         else:
-            if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
+            if effective_discount_rate_rounded <= 0:
                 return 10
-            if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
+            if 0 < effective_discount_rate_rounded <= 5:
                 return 8.5 + modifier
-            if 5 < quote_data["calculated"]["effective_internal_discount_rate"] <= 8:
+            if 5 < effective_discount_rate_rounded <= 8:
                 return 7.5 + modifier
-            if 8 < quote_data["calculated"]["effective_internal_discount_rate"] <= 10:
+            if 8 < effective_discount_rate_rounded <= 10:
                 return 6.5 + modifier
-            if 10 < quote_data["calculated"]["effective_internal_discount_rate"] <= 15:
+            if 10 < effective_discount_rate_rounded <= 15:
                 return 5 + modifier
     if 23 in data["assigned_user"]["UF_DEPARTMENT"] or str(data["assigned_user"]["ID"]) in ["264", "384", "428"]:
-        if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
+        if effective_discount_rate_rounded <= 0:
             return 2.5
-        if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
+        if 0 < effective_discount_rate_rounded <= 5:
             return 2
     if association is None or association.user_type not in ["Teamleiter HV", "Teamleiter Angestellt", "Handelsvertreter 2021", "Angestellter"]:
         if quote_key == "roof_reconstruction_quote":
-            if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
+            if effective_discount_rate_rounded <= 0:
                 return 5
-            if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
+            if 0 < effective_discount_rate_rounded <= 5:
                 return 3.5
-        if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
+        if effective_discount_rate_rounded <= 0:
             return 5
-        if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
+        if 0 < effective_discount_rate_rounded <= 5:
             return 4
-    if quote_data["calculated"]["effective_internal_discount_rate"] <= 0:
+    if effective_discount_rate_rounded <= 0:
         return 4.25
-    if 0 < quote_data["calculated"]["effective_internal_discount_rate"] <= 5:
+    if 0 < effective_discount_rate_rounded <= 5:
         return 3.75
     return 2
