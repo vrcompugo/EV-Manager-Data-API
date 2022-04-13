@@ -28,6 +28,11 @@
     position: relative;
     display: flex;
     justify-content: flex-end;
+    {% if offer.reseller.document_style == "bsh2" %}
+      background-image: url("{{ data.base_url }}/static/feasibility_study_2020/house_with_pv_sun2.jpg");
+      background-position: 0 -120px;
+      background-size: 115%;
+    {% endif %}
     {% if offer.reseller.document_style == "bsh" %}
       background-image: url("{{ data.base_url }}/static/feasibility_study_2020/house_with_pv_sun.jpg");
     {% else %}
