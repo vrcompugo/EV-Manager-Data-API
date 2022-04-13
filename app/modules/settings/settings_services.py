@@ -111,7 +111,7 @@ def get_settings(section=None):
                     "bic": "UF_CRM_1582292579",
                     "bank": "UF_CRM_1607947258",
                     "bankowner": "UF_CRM_1644838647",
-                    "malo_lightcloud": "UF_CRM_1616427015",
+                    "malo_lightcloud": "UF_CRM_1632220041088",
                     "malo_heatcloud": "UF_CRM_1644838543",
                     "malo_ecloud": "UF_CRM_1644838574",
                     "malo_consumer1": "UF_CRM_1644838588",

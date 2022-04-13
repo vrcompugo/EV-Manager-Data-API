@@ -279,6 +279,7 @@ class OrderUpload(Resource):
         offer_v2_data["data"]["bankowner"] = data["bankowner"]
         offer_v2_data["data"]["iban"] = data["iban"]
         offer_v2_data["data"]["bic"] = data["bic"]
+        offer_v2_data["data"]["power_meter_number"] = data["power_meter_number"]
         offer_v2_data["data"]["malo_lightcloud"] = data["malo_lightcloud"]
         offer_v2_data["data"]["malo_heatcloud"] = data["malo_heatcloud"]
         offer_v2_data["data"]["malo_ecloud"] = data["malo_ecloud"]
