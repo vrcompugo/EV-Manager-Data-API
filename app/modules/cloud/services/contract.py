@@ -145,6 +145,9 @@ def get_contract_data(contract_number):
                 data["cloud"]["extra_price_per_kwh"] = deal.get("extra_price_per_kwh")
                 data["cloud"]["cashback_per_kwh"] = deal.get("cashback_per_kwh")
                 data["cloud"]["cloud_number"] = deal.get("cloud_number")
+                offer = OfferV2.query.filter(OfferV2.number == data["cloud"]["cloud_number"]).first()
+                if offer is not None:
+                    data["cloud"]["pdf_link"] = offer.pdf.public_link
                 if data["cloud"]["cloud_number"] not in [None, "", 0, "0"]:
                     offer = OfferV2.query.filter(OfferV2.number == data["cloud"]["cloud_number"]).first()
                     if offer is not None:
@@ -337,6 +340,17 @@ def get_annual_statement_data(data, year):
         }
         statement["emove"]["included_usage"] = int(int(data["emove"]["usage_inhouse"]) * statement["emove"]["year_percent"])
         statement["emove"]["price"] = statement["emove"]["price_per_month"] * 12 * statement["emove"]["year_percent"]
+
+    pv_end = normalize_date(statement["pv_system"].get("end"))
+    if normalize_date(lightcloud_end) > pv_end:
+        days_to_add = (lightcloud_end - pv_end).days
+        pv_begin = normalize_date(statement["pv_system"].get("begin"))
+        days_recorded = (pv_end - pv_begin).days
+        usage_per_day = statement["pv_system"].get("total_usage") / days_recorded
+        statement["pv_system"]["end"] = str(lightcloud_end)
+        statement["pv_system"]["total_usage"] = statement["pv_system"]["total_usage"] + usage_per_day * days_to_add
+        statement["pv_system"]["direct_usage"] = statement["pv_system"]["total_usage"] - statement["pv_system"]["cloud_usage"]
+
     if status is not None and status.manuell_data is not None:
         if status.manuell_data.get("senec_direct_usage") not in [None, 0]:
             statement["pv_system"]["direct_usage"] = int(status.manuell_data.get("senec_direct_usage")) + int(status.manuell_data.get("senec_storage_usage"))
@@ -473,3 +487,7 @@ def generate_annual_report(contract_number, year):
 
     data["annualStatements"].append(statement)
     return data
+
+
+def normalize_date(datetime):
+    return parse(parse(str(datetime)).strftime("%Y-%m-%d"))

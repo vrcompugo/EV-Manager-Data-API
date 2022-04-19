@@ -82,9 +82,6 @@ def get_device_by_datetime(smartme_number, datetime):
                             data["CounterReading"] = new_reading
                             data["Date"] = str(requested_date)
                             return data
-
-                print(responded_date)
-                print("---------")
     return data
 
 
