@@ -43,6 +43,20 @@ def get_contract(contract_number):
         status=200,
         mimetype='application/json')
 
+@blueprint.route("contract/<contract_number>", methods=['POST'])
+@log_request
+def post_contract(contract_number):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    data = get_contract_data(contract_number, force_reload=True)
+
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
 
 @blueprint.route("contract/<contract_number>/annual_statement/<year>", methods=['POST'])
 @log_request

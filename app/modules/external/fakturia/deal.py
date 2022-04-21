@@ -258,6 +258,12 @@ def get_cloud_contract_data_by_deal(deal):
     deal["fakturia"]["items_to_update"] = []
     return deal
 
+def get_contract(contract_number):
+    contract_number = int(contract_number.replace("C", ""))
+    data = get(f"/Contracts/{contract_number}", parameters={
+        "extendedData": True
+    })
+    return data
 
 def get_payments(contract_number):
     contract_number = int(contract_number.replace("C", ""))
@@ -271,6 +277,13 @@ def get_payments(contract_number):
             "extendedData": True
         })
     }
+    return data
+
+
+def get_payments2(account_number):
+    data = get(f"/Accounts/{account_number}/Transactions", parameters={
+        "extendedData": True
+    })
     return data
 
 

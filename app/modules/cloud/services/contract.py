@@ -12,12 +12,15 @@ from app.utils.model_func import to_dict
 from app.modules.settings import get_settings
 from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.contact import get_contact
-from app.modules.external.fakturia.deal import get_payments
+from app.modules.external.fakturia.deal import get_payments, get_payments2, get_contract
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem
 from .annual_statement import generate_annual_statement_pdf
+
+
+empty_values = [None, "", "0", 0]
 
 
 def check_contract_data(contract_number, year):
@@ -76,37 +79,90 @@ def check_contract_data(contract_number, year):
     db.session.commit()
 
 
-def get_contract_data(contract_number):
+def get_contract_data(contract_number, force_reload=False):
+    contract_number = normalize_contract_number(contract_number)
+    contract2 = Contract.query.filter(Contract.contract_number == contract_number).first()
+    if force_reload is False and contract2.data is not None:
+        return contract2.data
+    contract2.data = load_contract_data(contract_number)
+    db.session.commit()
+    return contract2.data
+
+
+def load_contract_data(contract_number):
     contract_number = normalize_contract_number(contract_number)
     contract2 = Contract.query.filter(Contract.contract_number == contract_number).first()
     config = get_settings(section="external/bitrix24")
     data = {
         "contract_number": contract_number,
+        "main_deal": None,
         "pv_system": {
-            "smartme_number": None,
-            "pv_kwp": None,
             "malo_id": None,
-            "usages": []
+            "pv_kwp": None,
+            "storage_size": None,
+            "address": [],
+            "counters": []
         },
-        "cloud": {},
-        "deals": [],
-        "lightcloud": None,
-        "heatcloud": None,
-        "ecloud": None,
-        "consumers": [],
-        "emove": None
+        "data_checks": [],
+        "configs": [],
+        "fakturia": [],
+        "payments": [],
     }
     deals = get_deals({
         "SELECT": "full",
         f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
+        f"FILTER[{config['deal']['fields']['is_cloud_master_deal']}]": "1",
         "FILTER[CATEGORY_ID]": 15
     })
-    deals2 = get_deals({
+    if len(deals) == 0:
+        deals = get_deals({
             "SELECT": "full",
             f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
             "FILTER[CATEGORY_ID]": 176
         })
-    deals = deals + deals2
+    if len(deals) > 1:
+        return {
+            "status": "invalid",
+            "errors": [{
+                "code": "multiple_masters",
+                "message": "Zu viele Aufträge mit 'Ist Cloud Hauptvertrag: Ja'",
+                "data": deals
+            }]
+        }
+    if len(deals) < 1:
+        return {
+            "status": "invalid",
+            "errors": [{
+                "code": "no master",
+                "message": "Kein Auftrag mit 'Ist Cloud Hauptvertrag: Ja' gefunden"
+            }]
+        }
+    data["main_deal"] = deals[0]
+
+    data["pv_system"]["malo_id"] = data["main_deal"].get("malo_id")
+    data["pv_system"]["netprovider"] = data["main_deal"].get("netprovider")
+    data["pv_system"]["street"] = data["main_deal"].get("cloud_street")
+    data["pv_system"]["street_nb"] = data["main_deal"].get("cloud_street_nb")
+    data["pv_system"]["city"] = data["main_deal"].get("cloud_city")
+    data["pv_system"]["zip"] = data["main_deal"].get("cloud_zip")
+    if data["main_deal"].get("cloud_delivery_begin") not in empty_values and data["main_deal"].get("cloud_number") not in empty_values:
+        data = get_cloud_config(data, data["main_deal"].get("cloud_number"), data["main_deal"].get("cloud_delivery_begin"))
+    if data["main_deal"].get("cloud_delivery_begin_1") not in empty_values and data["main_deal"].get("cloud_number_1") not in empty_values:
+        data = get_cloud_config(data, data["main_deal"].get("cloud_number_1"), data["main_deal"].get("cloud_delivery_begin_1"))
+    if data["main_deal"].get("cloud_delivery_begin_2") not in empty_values and data["main_deal"].get("cloud_number_2") not in empty_values:
+        data = get_cloud_config(data, data["main_deal"].get("cloud_number_2"), data["main_deal"].get("cloud_delivery_begin_2"))
+    if data["main_deal"].get("cloud_delivery_begin_3") not in empty_values and data["main_deal"].get("cloud_number_3") not in empty_values:
+        data = get_cloud_config(data, data["main_deal"].get("cloud_number_3"), data["main_deal"].get("cloud_delivery_begin_3"))
+
+    data["fakturia"] = get_contract(contract_number)
+    invoices_credit_infos = get_payments(contract_number)
+    data["invoices"] = invoices_credit_infos["invoices"]
+    data["credit_notes"] = invoices_credit_infos["credit_notes"]
+    if "accountNumber" in data["fakturia"]:
+        data["payments"] = get_payments2(data["fakturia"]["accountNumber"])
+
+    return data
+
     if deals is not None:
         if len(deals) == 1:
             if deals[0].get("is_cloud_master_deal") not in [True, "1", 1]:
@@ -260,6 +316,76 @@ def get_contract_data(contract_number):
                 values["usage"] = values["end_value"] - values["start_value"]
                 data["pv_system"]["heatcloud_usages"].append(values)
     data["payments"] = get_payments(contract_number)
+    contract2.data = data
+    db.session.commit()
+    return data
+
+
+def get_cloud_config(data, cloud_number, delivery_begin):
+    settings = get_settings(section="external/bitrix24")
+    config = {
+        "cloud_number": cloud_number,
+        "delivery_begin": delivery_begin,
+        "lightcloud": None,
+        "consumers": [],
+        "errors": []
+    }
+    offer_v2 = OfferV2.query.filter(OfferV2.number == cloud_number).first()
+    if offer_v2 is None:
+        config["errors"].append({
+            "code": "config not found",
+            "message": "Angebotsnummer konnte nicht gefunden werden."
+        })
+    else:
+        data["pv_system"]["pv_kwp"] = offer_v2.calculated.get("pv_kwp")
+        data["pv_system"]["storage_size"] = offer_v2.calculated.get("storage_size")
+        config["pdf_link"] = offer_v2.pdf.public_link
+        config["price_per_month"] = offer_v2.calculated.get("cloud_price_light_incl_refund")
+        config["price_per_month_net"] = offer_v2.calculated.get("cloud_price_light_incl_refund") / 1.19
+        if offer_v2.datetime >= datetime.datetime(2021,12,16,0,0,0):
+            config["cashback_price_per_kwh"] = 0.08
+        else:
+            config["cashback_price_per_kwh"] = 0.10
+        if offer_v2.calculated.get("cashback_price_per_kwh") is not None:
+            config["cashback_price_per_kwh"] = offer_v2.calculated.get("cashback_price_per_kwh")
+        if offer_v2.calculated.get("min_kwp_light") > 0:
+            config["lightcloud"] = {
+                "usage": offer_v2.calculated.get("power_usage"),
+                "extra_price_per_kwh": offer_v2.calculated.get("lightcloud_extra_price_per_kwh"),
+                "smartme_number": data["main_deal"].get("smartme_number"),
+                "power_meter_number": data["main_deal"].get("power_meter_number"),
+                "delivery_begin": data["main_deal"].get("cloud_delivery_begin"),
+                "deal": {
+                    "id": data["main_deal"].get("id"),
+                    "title": data["main_deal"].get("title")
+                }
+            }
+        if offer_v2.calculated.get("min_kwp_heatcloud") > 0:
+            config["heatcloud"] = {
+                "usage": offer_v2.calculated.get("heater_usage"),
+                "extra_price_per_kwh": offer_v2.calculated.get("heatcloud_extra_price_per_kwh"),
+                "deal": None
+            }
+            deals = get_deals({
+                "SELECT": "full",
+                f"FILTER[{settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
+                f"FILTER[{settings['deal']['fields']['is_cloud_heatcloud']}]": "1",
+                "FILTER[CATEGORY_ID]": 15
+            })
+            if len(deals) != 1:
+                config["errors"].append({
+                    "code": "deal_not_found",
+                    "message": "Wärmecloud Auftrag nicht gefunden"
+                })
+            else:
+                config["heatcloud"]["smartme_number"] = deals[0].get("smartme_number_heatcloud")
+                config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number")
+                config["heatcloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
+                config["heatcloud"]["deal"] = {
+                    "id": deals[0].get("id"),
+                    "title": deals[0].get("title")
+                }
+    data["configs"].append(config)
     return data
 
 

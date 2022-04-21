@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import JSONB
+
 from app import db
 
 
@@ -13,3 +15,4 @@ class Contract(db.Model):
     street_nb = db.Column(db.String(50))
     zip = db.Column(db.String(50))
     city = db.Column(db.String(50))
+    data = db.Column(JSONB)

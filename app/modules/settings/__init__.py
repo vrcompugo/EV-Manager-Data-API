@@ -422,6 +422,12 @@ def get_settings(section=None, domain_raw=None):
                     "delivery_city": "UF_CRM_1607945776",
                     "delivery_counter_number": "UF_CRM_1607945817",
                     "delivery_usage": "UF_CRM_1610459059",
+                    "cloud_delivery_begin_1": "UF_CRM_1648804042",
+                    "cloud_number_1": "UF_CRM_1648804148",
+                    "cloud_delivery_begin_2": "UF_CRM_1648804065",
+                    "cloud_number_2": "UF_CRM_1648804168",
+                    "cloud_delivery_begin_3": "UF_CRM_1648804078",
+                    "cloud_number_3": "UF_CRM_1648804184",
                 }
             },
             "quote": {
