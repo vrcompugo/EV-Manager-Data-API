@@ -85,10 +85,17 @@
               </tr>
             {% endif %}
           {% endif %}
-          <tr>
-            <td>Strompreissteigerung</td>
-            <td><b>{{ data.cost_increase_rate | percentformat(2) }}</b> pro Jahr</td>
-          </tr>
+          {% if offer.reseller.document_style == "bsh" %}
+            <tr>
+              <td>Strompreissteigerung & Inflation</td>
+              <td><b>{{ data.full_cost_increase_rate | percentformat(2) }}</b> pro Jahr</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td>Strompreissteigerung</td>
+              <td><b>{{ data.cost_increase_rate | percentformat(2) }}</b> pro Jahr</td>
+            </tr>
+          {% endif %}
           <tr class="highlight">
             <td colspan="2">Zukünftig</td>
           </tr>
@@ -116,10 +123,12 @@
             <td>Einspeisevergütung nach Ablauf EEG</td>
             <td>{{ (100 * data.refund_per_kwh) | numberformat('de', 2) }} cent pro kWh</td>
           </tr>
-          <tr>
-            <td>Inflationsrate</td>
-            <td>{{ data.inflation_rate | percentformat(2) }}</td>
-          </tr>
+          {% if offer.reseller.document_style != "bsh" %}
+            <tr>
+              <td>Inflationsrate</td>
+              <td>{{ data.inflation_rate | percentformat(2) }}</td>
+            </tr>
+          {% endif %}
         </table>
       </div>
     </div>
