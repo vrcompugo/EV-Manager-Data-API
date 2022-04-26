@@ -49,7 +49,10 @@
 {% endif %}
 
 
-{% set total_conventional_cost = data.lightcloud.price_runtime %}
+{% set total_conventional_cost = 0 %}
+{% if data.lightcloud %}
+  {% set total_conventional_cost = total_conventional_cost + data.lightcloud.price_runtime %}
+{% endif %}
 {% set total_conventional_cost = total_conventional_cost + heating_cost %}
 {% if data.consumer %}
   {% set total_conventional_cost = total_conventional_cost + data.consumer.price_runtime %}
@@ -95,10 +98,12 @@
           <tr class="highlight highlight--dark">
             <td colspan="2">Zusammensetzung</td>
           </tr>
-          <tr>
-            <td>Kosten für Haushaltsstrom <small>(brutto)</small></td>
-            <td class="align-right"><b>{{ data.lightcloud.price_runtime | currencyformat("de", 0) }}</b></td>
-          </tr>
+          {% if data.lightcloud %}
+            <tr>
+              <td>Kosten für Haushaltsstrom <small>(brutto)</small></td>
+              <td class="align-right"><b>{{ data.lightcloud.price_runtime | currencyformat("de", 0) }}</b></td>
+            </tr>
+          {% endif %}
           {% if data.consumer %}
             <tr>
               <td>Kosten für Extra Consumer <small>(brutto)</small></td>

@@ -30,13 +30,15 @@
           <td colspan="3"><b>Energiekosten ohne Energetische Sanierung</b></td>
         </tr>
 
-        {% set total_montly_convetional = total_montly_convetional + data.lightcloud.price_today %}
-        {% set total_montly_convetional_half_time = total_montly_convetional_half_time + data.lightcloud.price_half_time %}
-        {% set total_montly_convetional_full_time = total_montly_convetional_full_time + data.lightcloud.price_full_time %}
-        <tr>
-          <td>Lichtstrom</td>
-          <td>{{ data.lightcloud.price_today | currencyformat }} mtl.</td>
-        </tr>
+        {% if data.lightcloud %}
+          {% set total_montly_convetional = total_montly_convetional + data.lightcloud.price_today %}
+          {% set total_montly_convetional_half_time = total_montly_convetional_half_time + data.lightcloud.price_half_time %}
+          {% set total_montly_convetional_full_time = total_montly_convetional_full_time + data.lightcloud.price_full_time %}
+          <tr>
+            <td>Lichtstrom</td>
+            <td>{{ data.lightcloud.price_today | currencyformat }} mtl.</td>
+          </tr>
+        {% endif %}
         {% if data.heatcloud %}
           {% set total_montly_convetional = total_montly_convetional + data.heatcloud.price_today %}
           {% set total_montly_convetional_half_time = total_montly_convetional_half_time + data.heatcloud.price_half_time %}
@@ -80,11 +82,13 @@
         <tr class="highlight">
           <td colspan="2"><b>Energiekosten nach Sanierungsvorschlag</b></td>
         </tr>
-        {% set total_montly_new = total_montly_new + data.lightcloud.price_tomorrow %}
-        <tr>
-          <td>Cloud - Lichtstrom</td>
-          <td>{{ data.lightcloud.price_tomorrow | currencyformat }} mtl.</td>
-        </tr>
+        {% if data.lightcloud %}
+          {% set total_montly_new = total_montly_new + data.lightcloud.price_tomorrow %}
+          <tr>
+            <td>Cloud - Lichtstrom</td>
+            <td>{{ data.lightcloud.price_tomorrow | currencyformat }} mtl.</td>
+          </tr>
+        {% endif %}
         {% if data.heatcloud %}
           {% set total_montly_new = total_montly_new + data.heatcloud.price_tomorrow %}
           <tr>

@@ -92,10 +92,12 @@
     {% endif %}
   {% endif %}
 
-  {% set current_page = current_page + 1 %}
-  <div class="page">
-    {% include('feasibility_study_2020/pages/page_monthly_lightcloud.html') %}
-  </div>
+  {% if data.lightcloud %}
+    {% set current_page = current_page + 1 %}
+    <div class="page">
+      {% include('feasibility_study_2020/pages/page_monthly_lightcloud.html') %}
+    </div>
+  {% endif %}
 
   {% if data.ecloud %}
     {% set current_page = current_page + 1 %}

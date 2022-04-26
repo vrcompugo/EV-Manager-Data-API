@@ -459,13 +459,8 @@ def quote_calculator_cloud_pdfs(lead_id):
     if item.feasibility_study_pdf is None:
         generate_feasibility_study_pdf(item)
     history_data["calculated"]["pdf_wi_link"] = item.feasibility_study_pdf.longterm_public_link
-    if item.feasibility_study_short_pdf is None:
-        generate_feasibility_study_short_pdf(item)
-    history_data["calculated"]["pdf_wi_short_link"] = item.feasibility_study_short_pdf.longterm_public_link
     history_data["pdf_wi_link"] = history_data["calculated"]["pdf_wi_link"]
     history_data["pdf_wi_file_id"] = item.feasibility_study_pdf.bitrix_file_id
-    history_data["pdf_wi_short_link"] = history_data["calculated"]["pdf_wi_short_link"]
-    history_data["pdf_wi_short_file_id"] = item.feasibility_study_pdf.bitrix_file_id
     history.data = history_data
     db.session.commit()
     return {"status": "success", "data": history.data}

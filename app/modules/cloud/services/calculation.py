@@ -99,6 +99,7 @@ def calculate_cloud(data):
         "min_kwp_ecloud": 0,
         "min_kwp_emove": 0,
         "min_kwp_consumer": 0,
+        "min_kwp_refresh": 0,
         "storage_size": 0,
         "cloud_price_extra": 0,
         "cloud_price": 0,
@@ -423,7 +424,7 @@ def calculate_cloud(data):
             if data["price_guarantee"] in settings["data"]["cloud_settings"]["cloud_guarantee"][str(user_id_for_prices)]:
                 result["user_one_time_cost"] = result["user_one_time_cost"] + settings["data"]["cloud_settings"]["cloud_guarantee"][str(user_id_for_prices)][data["price_guarantee"]]["price"]
 
-    if result["power_usage"] <= 0:
+    if result["power_usage"] <= 0 and data.get("additional_cloud_contract") in [None, "", "0", 0]:
         result["invalid_form"] = True
         result["errors"].append("Lichtstrom muss immer bestellt werden")
 
@@ -624,6 +625,7 @@ def get_cloud_products(data=None, offer=None):
     if "cloud_price_wish" in data["data"] and data["data"]["cloud_price_wish"] != "" and 0 < float(data["data"]["cloud_price_wish"]) < data["calculated"]["cloud_price_incl_refund"]:
         cloud_price = float(data["data"]["cloud_price_wish"])
         wish_price = True
+    offer_data["items"] = []
     guarantee_runtime = ""
     if data["data"]["price_guarantee"] == "2_years":
         guarantee_runtime = "2 Jahre"
@@ -631,26 +633,33 @@ def get_cloud_products(data=None, offer=None):
         guarantee_runtime = "10 Jahre"
     if data["data"]["price_guarantee"] == "12_years":
         guarantee_runtime = "12 Jahre"
-    light_cloud_usage = int(data["calculated"]["power_usage"])
-    lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
-    if offer is not None and offer.reseller.document_style == "bsh":
-        cloud_label = "cCloud-Zero"
+    if cloud_price == 0:
+        guarantee_runtime = "2 Jahre"
+        offer_data["items"].append(monthly_price_product_base(
+            description=("<b>Cloud Kombinationsvertrag</b><br>"
+                         + "Die von Ihnen beauftragte Wärme-Cloud stellt eine zusätzlich Ergänzung zur Cloud.Zero dar. Diese setzt eine ungekündigte, aktive Strom-Cloud.Zero mit Energie360 GmbH & Co. KG voraus. Sollte die Cloud.Zero gekündigt werden, so wird die Wärme-Cloud automatisch mit gekündigt. Ein einzelnes bestehen bleiben der Wärme-Cloud ohne Strom-Cloud.Zero wird ausgeschlossen. Die Wärme-Cloud als Ergänzung kann jedoch wieder aufgekündigt werden, ohne das es die Hauptcloud Strom-Cloud ZERO verändert."),
+            single_price=0)
+        )
     else:
-        cloud_label = "Cloud ZERO 4.0"
-    cloud_description = f"<div style='float:right'><img style='width: 120px' src='{config_general['base_url']}static/zero-logo.jpg' /></div>Mit der {cloud_label} – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
-    cloud_tarif = cloud_label
-    if "document_style" in data["data"]:
-        if data["data"]["document_style"] == "bsh":
-            cloud_label = "BSH-Cloud"
-            cloud_description = "Genial einfach – einfach genial<br>Strom verbrauchen, wann immer Sie ihn brauchen."
-            cloud_tarif = "BSH-Cloud"
-        if data["data"]["document_style"] == "eeg":
-            cloud_label = "EEG-Cloud"
-            logo = render_template("offer/logo-eeg.html")
-            cloud_description = f"<div style='float: right'>{logo}</div>Genial einfach – einfach genial<br>Strom verbrauchen, wann immer Sie ihn brauchen."
-            cloud_tarif = "EEG-Cloud"
-    offer_data["items"] = [
-        {
+        light_cloud_usage = int(data["calculated"]["power_usage"])
+        lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
+        if offer is not None and offer.reseller.document_style == "bsh":
+            cloud_label = "cCloud-Zero"
+        else:
+            cloud_label = "Cloud ZERO 4.0"
+        cloud_description = f"<div style='float:right'><img style='width: 120px' src='{config_general['base_url']}static/zero-logo.jpg' /></div>Mit der {cloud_label} – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
+        cloud_tarif = cloud_label
+        if "document_style" in data["data"]:
+            if data["data"]["document_style"] == "bsh":
+                cloud_label = "BSH-Cloud"
+                cloud_description = "Genial einfach – einfach genial<br>Strom verbrauchen, wann immer Sie ihn brauchen."
+                cloud_tarif = "BSH-Cloud"
+            if data["data"]["document_style"] == "eeg":
+                cloud_label = "EEG-Cloud"
+                logo = render_template("offer/logo-eeg.html")
+                cloud_description = f"<div style='float: right'>{logo}</div>Genial einfach – einfach genial<br>Strom verbrauchen, wann immer Sie ihn brauchen."
+                cloud_tarif = "EEG-Cloud"
+        offer_data["items"].append({
             "label": cloud_label,
             "description": cloud_description,
             "quantity": 1,
@@ -669,16 +678,15 @@ def get_cloud_products(data=None, offer=None):
             "total_price": cloud_price,
             "total_price_net": cloud_price / (1 + tax_rate / 100),
             "total_tax_amount": cloud_price * (tax_rate / 100),
-        }
-    ]
-    offer_data["items"][0]["description"] = offer_data["items"][0]["description"] + "<br>\n<br>\n"\
-        + f"Tarif: {cloud_tarif}<br>\n" \
-        + f"Kündigungsfrist: {settings['data']['cloud_settings']['notice_period']}<br>\n" \
-        + f"Vertragslaufzeit: {guarantee_runtime}<br>\n" \
-        + f"garantierte Zero-Laufzeit für (a): {guarantee_runtime}<br>\n" \
-        + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {light_cloud_usage} kWh<br>\n" \
-        + "<small>PV, Speicher & Netzbezug</small><br>\n" \
-        + f"<small>Bei Mehrverbrauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(lightcloud_extra_price_per_kwh * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"
+        })
+        offer_data["items"][0]["description"] = offer_data["items"][0]["description"] + "<br>\n<br>\n"\
+            + f"Tarif: {cloud_tarif}<br>\n" \
+            + f"Kündigungsfrist: {settings['data']['cloud_settings']['notice_period']}<br>\n" \
+            + f"Vertragslaufzeit: {guarantee_runtime}<br>\n" \
+            + f"garantierte Zero-Laufzeit für (a): {guarantee_runtime}<br>\n" \
+            + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {light_cloud_usage} kWh<br>\n" \
+            + "<small>PV, Speicher & Netzbezug</small><br>\n" \
+            + f"<small>Bei Mehrverbrauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(lightcloud_extra_price_per_kwh * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"
     offer_data["items"].append(monthly_price_product_base(
         description=pv_production,
         single_price=0))

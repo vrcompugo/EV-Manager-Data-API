@@ -6,6 +6,8 @@ from app.modules.external.bitrix24.products import get_product
 def add_product(data):
     if "storage_size" not in data["calculated"] or data["calculated"]["storage_size"] is None:
         raise Exception("storage produkt could not be calculated")
+    if data["calculated"]["storage_size"] == 0:
+        return None
     version = "SENEC V3 Hybrid"
     if ("pv_kwp" in data["data"] and data["data"]["pv_kwp"] > 11) or "solaredge" in data["data"]["extra_options"]:
         version = "Senec Lithium Speicher"

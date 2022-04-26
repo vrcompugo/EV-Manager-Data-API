@@ -333,19 +333,21 @@ def calculate_feasibility_study(offer: OfferV2):
     base_base = data["conventional_base_cost_per_year"]
     base_usage = data["conventional_usage_cost"]
 
-    data["total_pages"] = 17
-    data["lightcloud"] = {
-        "price_today": cloud_calulation["conventional_price_light"] + cloud_calulation["conventional_price_consumer"],
-        "price_tomorrow": float(cloud_calulation["cloud_price_light_incl_refund"]) + float(cloud_calulation["cloud_price_consumer_incl_refund"])
-    }
-    data["lightcloud"]["price_half_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** (data["cloud_runtime"] / 2)
-    data["lightcloud"]["price_full_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** data["cloud_runtime"]
-    data["lightcloud"]["max_value"] = data["lightcloud"]["price_full_time"]
-    if data["lightcloud"]["price_tomorrow"] < 0:
-        data["lightcloud"]["max_value"] = data["lightcloud"]["max_value"] - data["lightcloud"]["price_tomorrow"]
-    data["lightcloud"]["price_runtime"] = 0
-    for i in range(data["runtime"]):
-        data["lightcloud"]["price_runtime"] = data["lightcloud"]["price_runtime"] + ((cloud_calulation["conventional_price_light"]) * (1 + data["full_cost_increase_rate"] / 100) ** i) * 12
+    data["total_pages"] = 16
+    if cloud_calulation["cloud_price_light"] > 0:
+        data["total_pages"] = data["total_pages"] + 1
+        data["lightcloud"] = {
+            "price_today": cloud_calulation["conventional_price_light"] + cloud_calulation["conventional_price_consumer"],
+            "price_tomorrow": float(cloud_calulation["cloud_price_light_incl_refund"]) + float(cloud_calulation["cloud_price_consumer_incl_refund"])
+        }
+        data["lightcloud"]["price_half_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** (data["cloud_runtime"] / 2)
+        data["lightcloud"]["price_full_time"] = data["lightcloud"]["price_today"] * (1 + data["full_cost_increase_rate"] / 100) ** data["cloud_runtime"]
+        data["lightcloud"]["max_value"] = data["lightcloud"]["price_full_time"]
+        if data["lightcloud"]["price_tomorrow"] < 0:
+            data["lightcloud"]["max_value"] = data["lightcloud"]["max_value"] - data["lightcloud"]["price_tomorrow"]
+        data["lightcloud"]["price_runtime"] = 0
+        for i in range(data["runtime"]):
+            data["lightcloud"]["price_runtime"] = data["lightcloud"]["price_runtime"] + ((cloud_calulation["conventional_price_light"]) * (1 + data["full_cost_increase_rate"] / 100) ** i) * 12
 
     if cloud_calulation["conventional_price_consumer"] > 0:
         data["consumer"] = {"price_runtime": 0}
@@ -428,7 +430,9 @@ def calculate_feasibility_study(offer: OfferV2):
         base_base = base_base * (1 + data["full_cost_increase_rate"] / 100)
         base_usage = base_usage * (1 + data["full_cost_increase_rate"] / 100)
 
-    data["conventional_total_cost"] = data["lightcloud"]["price_runtime"]
+    data["conventional_total_cost"] = 0
+    if "lightcloud" in data:
+        data["conventional_total_cost"] = data["lightcloud"]["price_runtime"]
     if "consumer" in data:
         data["conventional_total_cost"] = data["conventional_total_cost"] + data["consumer"]["price_runtime"]
     if "heatcloud" in data:
