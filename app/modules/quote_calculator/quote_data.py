@@ -187,7 +187,7 @@ def calculate_products(data):
     try:
         add_product_pv_module(data)
         storage_product = add_product_storage(data)
-        if data.get("additional_cloud_contract") not in [None, "", "0", 0]:
+        if data.get("additional_cloud_contract") in [None, "", "0", 0]:
             add_direct_product(
                 label="Cloud Fähigkeit",
                 category="Stromspeicher",
