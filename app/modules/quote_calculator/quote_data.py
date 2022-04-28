@@ -122,7 +122,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         if data.get("has_roof_reconstruction_quote") is True:
             delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=34)
         elif data.get("has_heating_quote") is True:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=15)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=16)
         else:
             delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=12)
         return_data["construction_week"] = int(delivery_date.strftime("%U"))
@@ -187,22 +187,23 @@ def calculate_products(data):
     try:
         add_product_pv_module(data)
         storage_product = add_product_storage(data)
-        if data.get("additional_cloud_contract") in [None, "", "0", 0]:
+        if data["data"].get("additional_cloud_contract") in [None, "", "0", 0]:
             add_direct_product(
                 label="Cloud Fähigkeit",
                 category="Stromspeicher",
                 quantity=1,
                 products=data["products"]
             )
+        if storage_product is None:
             add_direct_product(
-                label="AC-Installation mit Speicher.",
+                label="AC-Installation",
                 category="Elektrik",
                 quantity=kwp,
                 products=data["products"]
             )
         else:
             add_direct_product(
-                label="AC-Installation",
+                label="AC-Installation mit Speicher.",
                 category="Elektrik",
                 quantity=kwp,
                 products=data["products"]
@@ -225,12 +226,13 @@ def calculate_products(data):
             quantity=1,
             products=data["products"]
         )
-        add_direct_product(
-            label="Portal Card mit Loadingfunktion",
-            category="Optionen PV Anlage",
-            quantity=1,
-            products=data["products"]
-        )
+        if data["data"].get("additional_cloud_contract") in [None, "", "0", 0]:
+            add_direct_product(
+                label="Portal Card mit Loadingfunktion",
+                category="Optionen PV Anlage",
+                quantity=1,
+                products=data["products"]
+            )
         add_direct_product(
             label="Montage DC",
             category="PV Module",
@@ -264,7 +266,7 @@ def calculate_products(data):
                 products=data["products"]
             )
         technik_and_service_produkt = None
-        if "technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]:
+        if data["data"].get("additional_cloud_contract") in [None, "", "0", 0] and ("technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]):
             quantity = 0
             if "technik_service_packet" in data["data"]["extra_options"]:
                 quantity = 1
@@ -409,12 +411,20 @@ def calculate_products(data):
                 quantity=quantity,
                 products=data["products"]
             )
-        add_direct_product(
-            label="Unser Komplettschutz",
-            category="Optionen PV Anlage",
-            quantity=1,
-            products=data["products"]
-        )
+        if data["data"].get("additional_cloud_contract") in [None, "", "0", 0]:
+            add_direct_product(
+                label="Unser Komplettschutz",
+                category="Optionen PV Anlage",
+                quantity=1,
+                products=data["products"]
+            )
+        else:
+            add_direct_product(
+                label="Unser Komplettschutz EXTRA",
+                category="Optionen PV Anlage",
+                quantity=1,
+                products=data["products"]
+            )
         '''add_direct_product(
             label="E.MW (energie-monitoring-wireless)",
             category="Extra Pakete",
