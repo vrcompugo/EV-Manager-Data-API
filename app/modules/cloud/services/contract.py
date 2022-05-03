@@ -82,16 +82,6 @@ def check_contract_data(contract_number, year):
 def get_contract_data(contract_number, force_reload=False):
     contract_number = normalize_contract_number(contract_number)
     contract2 = Contract.query.filter(Contract.contract_number == contract_number).first()
-    if force_reload is False and contract2.data is not None:
-        return contract2.data
-    contract2.data = load_contract_data(contract_number)
-    db.session.commit()
-    return contract2.data
-
-
-def load_contract_data(contract_number):
-    contract_number = normalize_contract_number(contract_number)
-    contract2 = Contract.query.filter(Contract.contract_number == contract_number).first()
     config = get_settings(section="external/bitrix24")
     data = {
         "contract_number": contract_number,
