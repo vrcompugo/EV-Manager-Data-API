@@ -263,6 +263,8 @@ def get_contract(contract_number):
     data = get(f"/Contracts/{contract_number}", parameters={
         "extendedData": True
     })
+    if len(data.keys()) == 0:
+        return None
     return data
 
 def get_payments(contract_number):

@@ -31,4 +31,5 @@ class ContractStatus(db.Model):
     is_fakturia_transfered = db.Column(db.Boolean)
     is_invoiced = db.Column(db.Boolean)
     manuell_data = db.Column(JSONB)
+    data = db.Column(JSONB)
     status = db.Column(db.String(150))

@@ -1,4 +1,5 @@
 import datetime
+from tkinter import N
 from turtle import update
 import pytz
 import re
@@ -16,7 +17,7 @@ from app.modules.external.fakturia.deal import get_payments, get_payments2, get_
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
-from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem
+from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem, Survey
 from .annual_statement import generate_annual_statement_pdf
 
 
@@ -92,10 +93,11 @@ def get_contract_data(contract_number, force_reload=False):
 def load_contract_data(contract_number):
     contract_number = normalize_contract_number(contract_number)
     contract2 = Contract.query.filter(Contract.contract_number == contract_number).first()
-    config = get_settings(section="external/bitrix24")
+    system_config = get_settings(section="external/bitrix24")
     data = {
         "contract_number": contract_number,
         "main_deal": None,
+        "cancel_date": None,
         "pv_system": {
             "malo_id": None,
             "pv_kwp": None,
@@ -104,20 +106,21 @@ def load_contract_data(contract_number):
             "counters": []
         },
         "data_checks": [],
+        "annual_statements": [],
         "configs": [],
         "fakturia": [],
         "payments": [],
     }
     deals = get_deals({
         "SELECT": "full",
-        f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
-        f"FILTER[{config['deal']['fields']['is_cloud_master_deal']}]": "1",
+        f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
+        f"FILTER[{system_config['deal']['fields']['is_cloud_master_deal']}]": "1",
         "FILTER[CATEGORY_ID]": 15
     })
     if len(deals) == 0:
         deals = get_deals({
             "SELECT": "full",
-            f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
+            f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
             "FILTER[CATEGORY_ID]": 176
         })
     if len(deals) > 1:
@@ -139,6 +142,7 @@ def load_contract_data(contract_number):
         }
     data["main_deal"] = deals[0]
 
+    data["contact_id"] = data["main_deal"].get("contact_id")
     data["pv_system"]["malo_id"] = data["main_deal"].get("malo_id")
     data["pv_system"]["netprovider"] = data["main_deal"].get("netprovider")
     data["pv_system"]["street"] = data["main_deal"].get("cloud_street")
@@ -146,19 +150,70 @@ def load_contract_data(contract_number):
     data["pv_system"]["city"] = data["main_deal"].get("cloud_city")
     data["pv_system"]["zip"] = data["main_deal"].get("cloud_zip")
     if data["main_deal"].get("cloud_delivery_begin") not in empty_values and data["main_deal"].get("cloud_number") not in empty_values:
-        data = get_cloud_config(data, data["main_deal"].get("cloud_number"), data["main_deal"].get("cloud_delivery_begin"))
+        data = get_cloud_config(data, data["main_deal"].get("cloud_number"), data["main_deal"].get("cloud_delivery_begin"), data["main_deal"].get("cloud_delivery_begin_1"))
     if data["main_deal"].get("cloud_delivery_begin_1") not in empty_values and data["main_deal"].get("cloud_number_1") not in empty_values:
-        data = get_cloud_config(data, data["main_deal"].get("cloud_number_1"), data["main_deal"].get("cloud_delivery_begin_1"))
+        data = get_cloud_config(data, data["main_deal"].get("cloud_number_1"), data["main_deal"].get("cloud_delivery_begin_1"), data["main_deal"].get("cloud_delivery_begin_2"))
     if data["main_deal"].get("cloud_delivery_begin_2") not in empty_values and data["main_deal"].get("cloud_number_2") not in empty_values:
-        data = get_cloud_config(data, data["main_deal"].get("cloud_number_2"), data["main_deal"].get("cloud_delivery_begin_2"))
+        data = get_cloud_config(data, data["main_deal"].get("cloud_number_2"), data["main_deal"].get("cloud_delivery_begin_2"), data["main_deal"].get("cloud_delivery_begin_3"))
     if data["main_deal"].get("cloud_delivery_begin_3") not in empty_values and data["main_deal"].get("cloud_number_3") not in empty_values:
         data = get_cloud_config(data, data["main_deal"].get("cloud_number_3"), data["main_deal"].get("cloud_delivery_begin_3"))
+
+    min_delivery_begin = None
+    for config in data["configs"]:
+        if config["delivery_begin"] not in [None, ""] and (min_delivery_begin is None or min_delivery_begin < parse(config["delivery_begin"])):
+            min_delivery_begin = parse(config["delivery_begin"])
+    if min_delivery_begin is not None:
+        for year in range(min_delivery_begin.year, datetime.datetime.now().year):
+            annual_statement = {
+                "year": year,
+                "status": [],
+                "deal": None,
+                "data": None,
+                "manuell_data": None
+            }
+            contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
+            if contract_status is not None:
+                if contract_status.to_pay is not None:
+                    annual_statement["price_net"] = float(contract_status.to_pay) / 1.19
+                    annual_statement["price"] = float(contract_status.to_pay)
+                if contract_status.pdf_file_id is not None and contract_status.pdf_file_id > 0:
+                    annual_statement["pdf_link"] = get_public_link(contract_status.pdf_file_id)
+                if contract_status.manuell_data is not None:
+                    annual_statement["manuell_data"] = contract_status.manuell_data
+                annual_statement["data"] = contract_status.data
+
+            deals = get_deals({
+                "SELECT": "full",
+                f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
+                "FILTER[CATEGORY_ID]": 126
+            })
+            if len(deals) > 0:
+                annual_statement["deal"] = {
+                    "id": deals[0]["id"],
+                    "stage_id": deals[0]["stage_id"],
+                    "title": deals[0]["title"]
+                }
+                annual_statement["status"].append("has_status")
+                if deals[0]["stage_id"] == "C126:NEW":
+                    annual_statement["status"].append("is_generated")
+                if deals[0]["stage_id"] == "C126:UC_883FVL":
+                    annual_statement["status"].append("old_contract")
+                if deals[0]["stage_id"] == "C126:PREPARATION":
+                    annual_statement["status"].append("waiting for data")
+                if deals[0]["stage_id"] in ["C126:UC_T3E3U2", "C126:PREPAYMENT_INVOICE"]:
+                    annual_statement["status"].append("manuell_check")
+                if deals[0]["stage_id"] == "C126:UC_L0M7DR":
+                    annual_statement["status"].append("wartet auf Zahlung")
+                if deals[0]["stage_id"] == "C126:WON":
+                    annual_statement["status"].append("done")
+
+            data["annual_statements"].append(annual_statement)
 
     data["fakturia"] = get_contract(contract_number)
     invoices_credit_infos = get_payments(contract_number)
     data["invoices"] = invoices_credit_infos["invoices"]
     data["credit_notes"] = invoices_credit_infos["credit_notes"]
-    if "accountNumber" in data["fakturia"]:
+    if data["fakturia"] is not None and "accountNumber" in data["fakturia"]:
         data["payments"] = get_payments2(data["fakturia"]["accountNumber"])
 
     return data
@@ -321,22 +376,29 @@ def load_contract_data(contract_number):
     return data
 
 
-def get_cloud_config(data, cloud_number, delivery_begin):
+def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
     settings = get_settings(section="external/bitrix24")
     config = {
         "cloud_number": cloud_number,
         "delivery_begin": delivery_begin,
-        "lightcloud": None,
+        "delivery_end": None,
         "consumers": [],
         "errors": []
     }
+    if delivery_end not in empty_values:
+        config["delivery_end"] = delivery_end
+    else:
+        if data.get("cancel_date") not in empty_values:
+            config["delivery_end"] = data.get("cancel_date")
     offer_v2 = OfferV2.query.filter(OfferV2.number == cloud_number).first()
+    print("lasdkn")
     if offer_v2 is None:
         config["errors"].append({
             "code": "config not found",
             "message": "Angebotsnummer konnte nicht gefunden werden."
         })
     else:
+        print(offer_v2)
         data["pv_system"]["pv_kwp"] = offer_v2.calculated.get("pv_kwp")
         data["pv_system"]["storage_size"] = offer_v2.calculated.get("storage_size")
         config["pdf_link"] = offer_v2.pdf.public_link
@@ -350,6 +412,7 @@ def get_cloud_config(data, cloud_number, delivery_begin):
             config["cashback_price_per_kwh"] = offer_v2.calculated.get("cashback_price_per_kwh")
         if offer_v2.calculated.get("min_kwp_light") > 0:
             config["lightcloud"] = {
+                "label": "Lichtcloud",
                 "usage": offer_v2.calculated.get("power_usage"),
                 "extra_price_per_kwh": offer_v2.calculated.get("lightcloud_extra_price_per_kwh"),
                 "smartme_number": data["main_deal"].get("smartme_number"),
@@ -362,6 +425,7 @@ def get_cloud_config(data, cloud_number, delivery_begin):
             }
         if offer_v2.calculated.get("min_kwp_heatcloud") > 0:
             config["heatcloud"] = {
+                "label": "Wärmecloud",
                 "usage": offer_v2.calculated.get("heater_usage"),
                 "extra_price_per_kwh": offer_v2.calculated.get("heatcloud_extra_price_per_kwh"),
                 "deal": None
@@ -385,41 +449,138 @@ def get_cloud_config(data, cloud_number, delivery_begin):
                     "id": deals[0].get("id"),
                     "title": deals[0].get("title")
                 }
+        if offer_v2.calculated.get("min_kwp_ecloud") > 0:
+            config["ecloud"] = {
+                "label": "eCloud",
+                "usage": offer_v2.calculated.get("heater_usage"),
+                "extra_price_per_kwh": offer_v2.calculated.get("heatcloud_extra_price_per_kwh"),
+                "deal": None
+            }
+            deals = get_deals({
+                "SELECT": "full",
+                f"FILTER[{settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
+                f"FILTER[{settings['deal']['fields']['is_cloud_ecloud']}]": "1",
+                "FILTER[CATEGORY_ID]": 15
+            })
+            if len(deals) != 1:
+                config["errors"].append({
+                    "code": "deal_not_found",
+                    "message": "eCloud Auftrag nicht gefunden"
+                })
+            else:
+                config["ecloud"]["smartme_number"] = None
+                config["ecloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number")
+                config["ecloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
+                config["ecloud"]["deal"] = {
+                    "id": deals[0].get("id"),
+                    "title": deals[0].get("title")
+                }
     data["configs"].append(config)
     return data
 
 
-def get_annual_statement_data(data, year):
+def get_annual_statement_data(data, year, manuell_data):
     year = int(year)
+    if manuell_data is None:
+        manuell_data = {}
     statement = {
         "year": year,
+        "products": [],
         "counters": [],
-        "pv_system": {
-            "begin": None,
-            "end": None,
-            "total_usage": 0,
-            "cloud_usage": 0
-        }
+        "configs": [],
+        "net_usage": None,
+        "to_pay": 0
     }
-    status = ContractStatus.query\
-        .filter(ContractStatus.contract_number == data.get("contract_number"))\
-        .filter(ContractStatus.year == str(year))\
-        .first()
-    pv_usage = next((item for item in data["pv_system"]["usages"] if item["year"] == year), None)
     sherpaInvoice = SherpaInvoice.query\
         .filter(SherpaInvoice.identnummer == data.get("contract_number"))\
         .filter(SherpaInvoice.abrechnungszeitraum_von >= f"{year}-01-01") \
         .filter(SherpaInvoice.abrechnungszeitraum_von <= f"{year}-12-31") \
         .first()
-    cloud_usage = 0
     if sherpaInvoice is not None:
         sherpa_items = SherpaInvoiceItem.query.filter(SherpaInvoiceItem.sherpa_invoice_id == sherpaInvoice.id).all()
         for item in sherpa_items:
             statement["counters"].append(to_dict(item))
-        cloud_usage = sherpaInvoice.verbrauch
-    else:
-        statement["pv_system"]["no_sherpa"] = True
-    statement["pv_system"]["cloud_usage"] = cloud_usage
+        statement["net_usage"] = {
+            "begin": str(sherpaInvoice.abrechnungszeitraum_von),
+            "end": str(sherpaInvoice.abrechnungszeitraum_bis),
+            "usage": sherpaInvoice.verbrauch
+        }
+
+    for config in data["configs"]:
+        statement_config = json.loads(json.dumps(config))
+        statement["total_usage"] = 0
+        delivery_end = str(parse(config.get("delivery_begin")).year) + "-12-31"
+        if config.get("delivery_end") is not None:
+            delivery_end = str(config.get("delivery_end"))
+        delivery_begin = str(parse(config.get("delivery_begin")).year) + "-01-01"
+        if parse(config.get("delivery_begin")).year == year:
+            delivery_begin = str(config.get("delivery_begin"))
+        if parse(delivery_begin).year <= year and parse(delivery_end).year >= year:
+            for product in ["lightcloud", "heatcloud", "ecloud"] + config["consumers"]:
+                if config.get(product) is None or config[product].get("delivery_begin") in [None, "", 0, "0"]:
+                    continue
+                product_delivery_begin = f"{year}-01-01"
+                if parse(config[product].get("delivery_begin")).year == year:
+                    product_delivery_begin = parse(config[product].get("delivery_begin"))
+                statement_config[product]["delivery_begin"] = str(product_delivery_begin)
+                statement_config[product]["delivery_end"] = str(delivery_end)
+                print("aycxc", product)
+                values = {
+                    "product": product,
+                    "number": statement_config[product].get("smartme_number"),
+                    "type": "smartMe",
+                    "label": statement_config[product].get("label"),
+                    "start_date": None,
+                    "start_value": 0,
+                    "end_date": None,
+                    "end_value": 0,
+                    "usage": 0,
+                    "allowed_usage": statement_config[product]["usage"]
+                }
+                if config[product].get("smartme_number") not in [None, "", "123", 0, "0"]:
+                    beginning_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_begin"])
+                    end_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_end"])
+                    if beginning_of_year is not None and end_of_year is not None:
+                        values["start_date"] = beginning_of_year.get("Date")
+                        values["start_value"] = abs(beginning_of_year.get("CounterReading", 0))
+                        values["end_date"] = end_of_year.get("Date")
+                        values["end_value"] = abs(end_of_year.get("CounterReading", 0))
+                        if normalize_date(end_of_year.get("Date")) != f"{year}-12-31":
+                            values["label"] = values["label"] + " (Anteil)"
+                            diff_days = (parse(end_of_year.get("Date")) - parse(beginning_of_year.get("Date"))).days
+                            values["allowed_usage"] = statement_config[product]["usage"] * (diff_days / 365)
+                    statement["counters"].append(values)
+                elif statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
+                    for power_meter in statement["counters"]:
+                        if item["number"] == statement_config[product].get("power_meter_number"):
+                            values["number"] = power_meter.get("number")
+                            if values["start_date"] is None or parse(values["start_date"]) > parse(power_meter.get("start_date")):
+                                values["start_date"] = power_meter.get("start_date")
+                                values["start_value"] = power_meter.get("start_value")
+                            if values["end_date"] is None or parse(values["end_date"]) < parse(power_meter.get("end_date")):
+                                values["end_date"] = power_meter.get("end_date")
+                                values["end_value"] = power_meter.get("end_value")
+                else:
+                    values["start_date"] = statement_config[product]["delivery_begin"]
+                    values["end_date"] = statement_config[product]["delivery_end"]
+
+                if manuell_data is not None and product in manuell_data and manuell_data[product]:
+                    if manuell_data[product].get("start_date") not in empty_values and manuell_data[product].get("start_value") not in empty_values:
+                        values["start_date"] = manuell_data[product].get("start_date")
+                        values["start_value"] = manuell_data[product].get("start_value")
+                    if manuell_data[product].get("end_date") not in empty_values and manuell_data[product].get("end_value") not in empty_values:
+                        values["end_date"] = manuell_data[product].get("end_date")
+                        values["end_value"] = manuell_data[product].get("end_value")
+
+                values["usage"] = values["end_value"] - values["start_value"]
+
+                statement["total_usage"] = statement["total_usage"] + values["usage"]
+                statement["products"].append(values)
+                statement_config["values"] = values
+            statement["configs"].append(statement_config)
+    print(json.dumps(statement, indent=2))
+    return statement
+
     if pv_usage is not None:
         statement["pv_system"]["begin"] = pv_usage["start_date"]
         statement["pv_system"]["end"] = pv_usage["end_date"]
@@ -572,10 +733,12 @@ def generate_annual_report(contract_number, year):
     config = get_settings(section="external/bitrix24")
 
     data = get_contract_data(contract_number)
-    if "annualStatements" not in data:
-        data["annualStatements"] = []
 
-    statement = get_annual_statement_data(data, year)
+    contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
+
+    statement = get_annual_statement_data(data, year, contract_status.manuell_data)
+    contract_status.data = statement
+    db.session.commit()
     pdf = generate_annual_statement_pdf(data, statement)
     subfolder_id = create_folder_path(415280, path=f"Cloud/Kunde {data['contact_id']}/Vertrag {data['contract_number']}")  # https://keso.bitrix24.de/docs/path/Kundenordner/
 
@@ -610,8 +773,6 @@ def generate_annual_report(contract_number, year):
                 "opportunity": statement["to_pay"]
             })
     db.session.commit()
-
-    data["annualStatements"].append(statement)
     return data
 
 

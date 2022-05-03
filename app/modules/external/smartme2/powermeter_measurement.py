@@ -85,5 +85,7 @@ def get_device_by_datetime(smartme_number, datetime):
     return data
 
 
-def normalize_date(datetime):
-    return parse(parse(datetime).strftime("%Y-%m-%d"))
+def normalize_date(value):
+    if isinstance(value, datetime):
+        return parse(value.strftime("%Y-%m-%d"))
+    return parse(parse(value).strftime("%Y-%m-%d"))
