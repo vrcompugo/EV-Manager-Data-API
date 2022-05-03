@@ -95,73 +95,31 @@ def load_contract_data(contract_number):
     config = get_settings(section="external/bitrix24")
     data = {
         "contract_number": contract_number,
-        "main_deal": None,
         "pv_system": {
-            "malo_id": None,
+            "smartme_number": None,
             "pv_kwp": None,
-            "storage_size": None,
-            "address": [],
-            "counters": []
+            "malo_id": None,
+            "usages": []
         },
-        "data_checks": [],
-        "configs": [],
-        "fakturia": [],
-        "payments": [],
+        "cloud": {},
+        "deals": [],
+        "lightcloud": None,
+        "heatcloud": None,
+        "ecloud": None,
+        "consumers": [],
+        "emove": None
     }
     deals = get_deals({
         "SELECT": "full",
         f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
-        f"FILTER[{config['deal']['fields']['is_cloud_master_deal']}]": "1",
         "FILTER[CATEGORY_ID]": 15
     })
-    if len(deals) == 0:
-        deals = get_deals({
+    deals2 = get_deals({
             "SELECT": "full",
             f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
             "FILTER[CATEGORY_ID]": 176
         })
-    if len(deals) > 1:
-        return {
-            "status": "invalid",
-            "errors": [{
-                "code": "multiple_masters",
-                "message": "Zu viele Aufträge mit 'Ist Cloud Hauptvertrag: Ja'",
-                "data": deals
-            }]
-        }
-    if len(deals) < 1:
-        return {
-            "status": "invalid",
-            "errors": [{
-                "code": "no master",
-                "message": "Kein Auftrag mit 'Ist Cloud Hauptvertrag: Ja' gefunden"
-            }]
-        }
-    data["main_deal"] = deals[0]
-
-    data["pv_system"]["malo_id"] = data["main_deal"].get("malo_id")
-    data["pv_system"]["netprovider"] = data["main_deal"].get("netprovider")
-    data["pv_system"]["street"] = data["main_deal"].get("cloud_street")
-    data["pv_system"]["street_nb"] = data["main_deal"].get("cloud_street_nb")
-    data["pv_system"]["city"] = data["main_deal"].get("cloud_city")
-    data["pv_system"]["zip"] = data["main_deal"].get("cloud_zip")
-    if data["main_deal"].get("cloud_delivery_begin") not in empty_values and data["main_deal"].get("cloud_number") not in empty_values:
-        data = get_cloud_config(data, data["main_deal"].get("cloud_number"), data["main_deal"].get("cloud_delivery_begin"))
-    if data["main_deal"].get("cloud_delivery_begin_1") not in empty_values and data["main_deal"].get("cloud_number_1") not in empty_values:
-        data = get_cloud_config(data, data["main_deal"].get("cloud_number_1"), data["main_deal"].get("cloud_delivery_begin_1"))
-    if data["main_deal"].get("cloud_delivery_begin_2") not in empty_values and data["main_deal"].get("cloud_number_2") not in empty_values:
-        data = get_cloud_config(data, data["main_deal"].get("cloud_number_2"), data["main_deal"].get("cloud_delivery_begin_2"))
-    if data["main_deal"].get("cloud_delivery_begin_3") not in empty_values and data["main_deal"].get("cloud_number_3") not in empty_values:
-        data = get_cloud_config(data, data["main_deal"].get("cloud_number_3"), data["main_deal"].get("cloud_delivery_begin_3"))
-
-    data["fakturia"] = get_contract(contract_number)
-    invoices_credit_infos = get_payments(contract_number)
-    data["invoices"] = invoices_credit_infos["invoices"]
-    data["credit_notes"] = invoices_credit_infos["credit_notes"]
-    if "accountNumber" in data["fakturia"]:
-        data["payments"] = get_payments2(data["fakturia"]["accountNumber"])
-
-    return data
+    deals = deals + deals2
 
     if deals is not None:
         if len(deals) == 1:
