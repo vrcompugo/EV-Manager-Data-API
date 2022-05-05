@@ -76,6 +76,6 @@ def cron_heatpump_auto_quote_generator():
         data = quote_calculator_heatpump_autogenerate_pdf_action(deal.get("unique_identifier"))  # put /quote_calculator/${this.id}/heatpump_autogenerate_pdf
         if data.get("pdf_heatpump_auto_generate_link") not in [None, "", "0", 0, False]:
             update_deal(deal["id"], {
-                "pdf_heatpump_auto_generate_link": data.get("pdf_heatpump_auto_generate_link")
+                "pdf_heatpump_auto_generate_link": data.get("pdf_heatpump_auto_generate_link"),
                 "stage_id": "C210:EXECUTING"
             })
