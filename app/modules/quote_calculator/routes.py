@@ -777,6 +777,7 @@ def get_insign_callback(token):
     lead = get_lead(token_data["unique_identifier"])
     customer_folder_id = get_folder_id(myprotal_folder["folder_id"], path=f"Kunde {lead['contact_id']}/Vertragsunterlagen")
     collection_files = []
+    heatpump_survey_link = None
     for file in token_data.get("documents", []):
         file_content = download_file(sessionId=session_id, file_id=file["id"])
         if isinstance(file_content, dict):
@@ -807,10 +808,11 @@ def get_insign_callback(token):
                 "file_content": file_content
             })
             if file["displayname"] == "Heizungskonzept":
-                add_file(token_data["upload_folder_id_heating"], {
+                file_id = add_file(token_data["upload_folder_id_heating"], {
                     "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                     "file_content": file_content
                 })
+                heatpump_survey_link = get_public_link(file_id, 518400)
             file_id = add_file(token_data["upload_folder_id_contract"], {
                 "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                 "file_content": file_content
@@ -829,6 +831,8 @@ def get_insign_callback(token):
             "zoom_appointment": str(datetime.datetime.now()),
             "zoom_link": "1"
         }
+        if heatpump_survey_link is not None:
+            lead_data["heatpump_survey_link"] = heatpump_survey_link
         if "pv_quote_sum_net" in token_data:
             if token_data["pv_quote_sum_net"] is None:
                 lead_data["pv_quote_sum_net"] = 0
