@@ -65,6 +65,16 @@ def post_contract_annual_statement_year(contract_number, year):
     if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
         return "forbidden,", 401
 
+    contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
+    if contract_status is None:
+        contract_status = ContractStatus(
+            year=str(year),
+            contract_number=contract_number
+        )
+        db.session.add(contract_status)
+    contract_status.manuell_data = request.json
+    db.session.commit()
+
     data = generate_annual_report(contract_number, year)
 
     return Response(
@@ -82,7 +92,8 @@ def post_contract_annual_statement_year2(contract_number, year):
 
     return_string = False
     data = get_contract_data(contract_number)
-    statement = get_annual_statement_data(data, year)
+    contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
+    statement = contract_status.data
     pdf = generate_annual_statement_pdf(data, statement, return_string)
     if return_string is True:
         return pdf

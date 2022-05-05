@@ -19,7 +19,7 @@
     <b>Anlage Verbrauchsaufstellung für das Jahr: {{ statement.year }}</b><br>
     <br>
     <h2>Ihre Übersicht Entnahme &amp; Lieferung der Cloud ZERO 4.0</h2>
-    <h3>Verbrauchsaufstellung: {{ data.pv_system.street }} {{ data.pv_system.street_nb }}, {{ data.pv_system.zip }} {{ data.pv_system.city }}</h3>
+    <h3>Verbrauchsaufstellung: {{ data.pv_system.street }} {{ data.pv_system.street_nb }}, {{ data.pv_system.zip }} {{ data.pv_system.city }} (Zählernummer: {{ data.pv_system.power_meter_number }})</h3>
     <table>
       <tr class="heading">
         <th>von</th>
@@ -27,49 +27,30 @@
         <th>Abnahmeart</th>
         <th>Abnahme</th>
       </tr>
-      {% for product in statement.products %}
-        {% if product.product == "lightcloud" %}
-          {% if product.power_meter_usage == 0 %}
-            <tr>
-              <td>{{ product.start_date | dateformat }}</td>
-              <td>{{ product.end_date | dateformat }}</td>
-              <td>Cloud Verbrauch</td>
-              <td style="text-align: right;">{{ product.usage | numberformat("de", 0) }} kWh</td>
-            </tr>
-          {% else %}
-            <tr>
-              <td>{{ product.power_meter_start_date | dateformat }}</td>
-              <td>{{ product.power_meter_end_date | dateformat }}</td>
-              <td>Netzbezug</td>
-              <td style="text-align: right;">{{ product.power_meter_usage | numberformat("de", 0) }} kWh</td>
-            </tr>
-            <tr>
-              <td>{{ product.start_date | dateformat }}</td>
-              <td>{{ product.end_date | dateformat }}</td>
-              <td>direkte Abnahme (PV-Anlage und Speicher)</td>
-              <td style="text-align: right;">{{ product.usage | numberformat("de", 0) }} kWh</td>
-            </tr>
-          {% endif %}
-        {% endif %}
-        {% if product.product == "heatcloud" %}
-          {% set total_usage = total_usage + product.power_meter_usage + product.usage %}
-          <tr>
-            <td>{{ product.power_meter_start_date | dateformat }}</td>
-            <td>{{ product.power_meter_end_date | dateformat }}</td>
-            <td>Wärmestrom Netzbezug</td>
-            <td style="text-align: right;">{{ product.power_meter_usage | numberformat("de", 0) }} kWh</td>
-          </tr>
-          <tr>
-            <td>{{ product.start_date | dateformat }}</td>
-            <td>{{ product.end_date | dateformat }}</td>
-            <td>direkte Abnahme Wärmestrom (PV-Anlage und Speicher)</td>
-            <td style="text-align: right;">{{ product.usage | numberformat("de", 0) }} kWh</td>
-          </tr>
-        {% endif %}
-      {% endfor %}
+      {% if statement.pv_system.cloud_usage == 0 %}
+        <tr>
+          <td>{{ statement.pv_system.begin | dateformat }}</td>
+          <td>{{ statement.pv_system.end | dateformat }}</td>
+          <td>Cloud Verbrauch</td>
+          <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td>{{ statement.pv_system.begin | dateformat }}</td>
+          <td>{{ statement.pv_system.end | dateformat }}</td>
+          <td>Netzbezug</td>
+          <td style="text-align: right;">{{ statement.pv_system.cloud_usage }} kWh</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>direkte Abnahme (PV-Anlage und Speicher)</td>
+          <td style="text-align: right;">{{ statement.pv_system.direct_usage }} kWh</td>
+        </tr>
+      {% endif %}
       <tr class="summary">
-        <td colspan="3"><b>Cloudabnahme gesamt</b></td>
-        <td style="text-align: right;">{{ statement.total_usage | numberformat("de", 0) }} kWh</td>
+        <td colspan="3"><b>Cloudabnahme gesamt</b> (Verbrauch a)</td>
+        <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
       </tr>
     </table>
     {% if statement.consumers and len(statement.consumers) > 0 %}
@@ -104,7 +85,7 @@
         <th></th>
         <th></th>
         <th></th>
-        <th colspan="3" style="text-align: center;">Verbauch</th>
+        <th colspan="2" style="text-align: center;">Verbauch</th>
       </tr>
       <tr class="heading">
         <th>Cloud Produkt/Abnahmestelle</th>
@@ -112,21 +93,33 @@
         <th>bis</th>
         <th>abgedeckt</th>
         <th>ermittelt</th>
-        <th>Differenz</th>
       </tr>
-      {% for product in statement.products %}
+      <tr>
+        <td>Lichtcloud {% if statement.lightcloud.year_percent < 1 %}(Anteil){% endif %}</td>
+        <td>{{ statement.lightcloud.begin | dateformat }}</td>
+        <td>{{ statement.lightcloud.end | dateformat }}</td>
+        <td style="text-align: right;">{{ statement.lightcloud.included_usage }} kWh</td>
+        <td></td>
+      </tr>
+      {% if statement.emove %}
         <tr>
-          <td>{{ product.label }}</td>
-          <td>{{ product.start_date | dateformat }}</td>
-          <td>{{ product.end_date | dateformat }}</td>
-          <td style="text-align: right;">{{ product.allowed_usage | numberformat("de", 0) }} kWh</td>
-          <td style="text-align: right;">{{ product.total_usage | numberformat("de", 0) }} kWh</td>
-          <td style="text-align: right;">{{ (product.total_usage - product.allowed_usage) | numberformat("de", 0) }} kWh</td>
+          <td>{{ statement.emove.packet }} {% if statement.emove.year_percent < 1 %}(Anteil){% endif %}</td>
+          <td>{{ statement.emove.begin | dateformat }}</td>
+          <td>{{ statement.emove.end | dateformat }}</td>
+          <td style="text-align: right;">{{ statement.emove.included_usage }} kWh</td>
+          <td></td>
         </tr>
-      {% endfor %}
+      {% endif %}
+      <tr>
+        <td>Abnahme: {{ data.pv_system.street }} {{ data.pv_system.street_nb }}, {{ data.pv_system.zip }} {{ data.pv_system.city }}</td>
+        <td>{{ statement.begin }}</td>
+        <td>{{ statement.end }}</td>
+        <td></td>
+        <td style="text-align: right;">{{ statement.pv_system.total_usage }} kWh</td>
+      </tr>
       <tr class="summary">
-        <td colspan="5"><b>{% if statement.total_extra_usage > 0 %}Mehrverbrauch{% else %}Minderverbrauch{% endif %}</b></td>
-        <td style="text-align: right;">{{ statement.total_extra_usage | numberformat("de", 0) }} kWh</td>
+        <td colspan="4"><b>{% if statement.total_extra_usage > 0 %}Mehrverbrauch{% else %}Minderverbrauch{% endif %}</b></td>
+        <td style="text-align: right;">{{ statement.total_extra_usage }} kWh</td>
       </tr>
       {% if statement.consumers and len(statement.consumers) > 0 %}
         <tr>
@@ -208,7 +201,6 @@
     <small>* Diese Abrechnung wurde unter Vorbehalt der angegebenen Einspeisemengen berechnet. Sollten sich die Einspeisemengen rückwirkend ändern, so wird diese Abrechnung auch korrigiert. Die Cloudgebühren sowie die Kosten für die Zusatzpakete wurden unter der Tatsache, dass diese regelmäßig bezahlt wurden, erstellt. Sollte dies nicht der Fall sein und noch offene Forderungen unsererseits vorliegen, so werden diese Rechnungen separat angemahnt und verrechnet. Bei Nichtvorliegen EEG-Vergütung, behalten wir uns vor den Verbrauch mit {{ (statement.lightcloud.extra_price_per_kwh * 100 ) | numberformat }} Cent/kWh zu berechnen.</small>
     <img src="{{ base_url }}static/cloud/contract/annual_statement/Stromkennzeichen%202020.jpeg" style="width: 100%; height: auto;" />
 
-    {% endif %}
     <h2>Zur Abrechnung verwendete Zählerstande</h2>
     <table>
       <tr>
@@ -228,16 +220,30 @@
         <th style="text-align: right;">Verbrauch</th>
       </tr>
       {% for counter in statement.counters %}
-        <tr>
-          <td>{{ counter.number }} **</td>
-          <td>{{ counter.type }}</td>
-          <td></td>
-          <td style="text-align: right;">{{ counter.start_date | dateformat }}</td>
-          <td style="text-align: right;">{{ counter.start_value | numberformat('de', 0) }} kWh</td>
-          <td style="text-align: right;">{{ counter.end_date | dateformat }}</td>
-          <td style="text-align: right;">{{ counter.end_value | numberformat('de', 0) }} kWh</td>
-          <td style="text-align: right;">{{ counter.usage | numberformat('de', 0) }} kWh</td>
-        </tr>
+        {% if counter.sherpa_invoice_id %}
+          <tr>
+            <td>{{ counter.zahlernummer }} *</td>
+            <td>{{ counter.zahlerart }}</td>
+            <td>{{ counter.ablesegrund }}</td>
+            <td style="text-align: right;">{{ counter.datum_stand_alt | dateformat }}</td>
+            <td style="text-align: right;">{{ counter.stand_alt | numberformat('de', 0) }} kWh</td>
+            <td style="text-align: right;">{{ counter.datum_stand_neu | dateformat }}</td>
+            <td style="text-align: right;">{{ counter.stand_neu | numberformat('de', 0) }} kWh</td>
+            <td style="text-align: right;">{{ counter.verbrauch | numberformat('de', 0) }} kWh</td>
+          </tr>
+        {% endif %}
+        {% if counter.number %}
+          <tr>
+            <td>{{ counter.number }} **</td>
+            <td>smartMe</td>
+            <td></td>
+            <td style="text-align: right;">{{ counter.start_date | dateformat }}</td>
+            <td style="text-align: right;">{{ counter.start_value | numberformat('de', 0) }} kWh</td>
+            <td style="text-align: right;">{{ counter.end_date | dateformat }}</td>
+            <td style="text-align: right;">{{ counter.end_value | numberformat('de', 0) }} kWh</td>
+            <td style="text-align: right;">{{ counter.usage | numberformat('de', 0) }} kWh</td>
+          </tr>
+        {% endif %}
       {% endfor %}
     </table>
     <small>

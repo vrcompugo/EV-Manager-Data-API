@@ -483,3 +483,64 @@ def calculate_extra_products(data):
         print(trace_output)
         data["extra_quotes"] = []
     return data
+
+
+def calculate_heating_usage(lead_id, post_data):
+    if post_data.get("heating_quote_house_build") == 'new_building':
+        post_data["old_heating_type"] = 'new'
+
+        if float(post_data.get("heating_quote_sqm")) <= 0 or float(post_data.get("heating_quote_people")) < 0:
+            return post_data
+        heating_usage = float(post_data.get("heating_quote_sqm")) * 18
+        water_heating_usage = float(post_data.get("heating_quote_people")) * 320
+        post_data["heating_quote_usage"] = heating_usage + water_heating_usage
+
+        if post_data.get("new_heating_type") == 'hybrid_gas':
+            wp_percent = 0.60
+            if "bufferstorage" in post_data.get("heating_quote_extra_options"):
+                wp_percent = 0.75
+            post_data["heating_quote_usage_gas"] = round(post_data.get("heating_quote_usage") * (1 - wp_percent))
+            post_data["heating_quote_usage_wp"] = round(post_data.get("heating_quote_usage") * wp_percent)
+        return post_data
+    new_heating_benefit = 0.75
+    if post_data.get("heating_quote_old_heating_build") == '2-6_years':
+        new_heating_benefit = 0.86
+    if post_data.get("heating_quote_old_heating_build") == 'older':
+        new_heating_benefit = 0.69
+    if post_data.get("new_heating_type") == 'heatpump':
+        post_data["heating_quote_usage_gas"] = 0
+        post_data["heating_quote_usage_wp"] = (float(post_data.get("heating_quote_usage_old")) * new_heating_benefit) / 3.75
+        post_data["heating_quote_usage"] = post_data.get("heating_quote_usage_wp")
+
+    if post_data.get("old_heating_type") == 'heatpump' and post_data.get("new_heating_type") == 'heatpump':
+        post_data["heating_quote_usage_gas"] = 0
+        post_data["heating_quote_usage_wp"] = (post_data.get("heating_quote_usage_old") * new_heating_benefit)
+        post_data["heating_quote_usage"] = post_data.get("heating_quote_usage_wp")
+    if post_data.get("new_heating_type") == 'hybrid_gas':
+        wp_percent = 0.60
+        if "bufferstorage" in post_data.get("heating_quote_extra_options"):
+            wp_percent = 0.75
+        post_data["heating_quote_usage_gas"] = post_data.get("heating_quote_usage_old") * new_heating_benefit * (1 - wp_percent)
+        post_data["heating_quote_usage_wp"] = ((post_data.get("heating_quote_usage_old") * 0.75 * wp_percent)) / 3.75
+        post_data["heating_quote_usage"] = post_data.get("heating_quote_usage_gas") + post_data.get("heating_quote_usage_wp")
+    if post_data.get("new_heating_type") == 'gas':
+        post_data["heating_quote_usage_gas"] = post_data.get("heating_quote_usage_old") * new_heating_benefit
+        post_data["heating_quote_usage_wp"] = 0
+        post_data["heating_quote_usage"] = post_data.get("heating_quote_usage_gas")
+    factors = {
+        '1940-1969': 1.125,
+        '1970-1979': 1.09,
+        '1980-1999': 1.06,
+        '2000-2015': 1.035,
+        '2016 und neuer': 1.015,
+        'new_building': 0.95
+    }
+    extra_factor = 1
+    if factors[post_data.get("heating_quote_house_build")]:
+        extra_factor = factors[post_data.get("heating_quote_house_build")]
+    post_data["heating_quote_usage_wp"] = post_data.get("heating_quote_usage_wp") * extra_factor
+    post_data["heating_quote_usage"] = post_data.get("heating_quote_usage") * extra_factor
+    post_data["heating_quote_usage_gas"] = round(post_data.get("heating_quote_usage_gas"))
+    post_data["heating_quote_usage_wp"] = round(post_data.get("heating_quote_usage_wp"))
+    post_data["heating_quote_usage"] = round(post_data.get("heating_quote_usage"))
+    return post_data

@@ -197,3 +197,10 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "productive" or section == "heatpump_auto_quote_generator":
+        from app.modules.quote_calculator.cron import cron_heatpump_auto_quote_generator
+        try:
+            cron_heatpump_auto_quote_generator()
+        except Exception as e:
+            error_handler()
+
