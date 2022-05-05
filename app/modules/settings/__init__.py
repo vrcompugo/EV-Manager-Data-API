@@ -235,6 +235,58 @@ def get_settings(section=None, domain_raw=None):
                     "": "nicht ausgewählt",
                     "3036": "Ja",
                     "3038": "Nein"
+                },
+                "heating_quote_house_type": {
+                    "": "nicht ausgewählt",
+                    "6194": "Einfamilienhaus",
+                    "6196": "Mehrfamilienhaus",
+                },
+                "heating_quote_house_build": {
+                    "": "nicht ausgewählt",
+                    '6198': '1940-1969',
+                    '6200': '1970-1979',
+                    '6202': '1980-1999',
+                    '6204': '2000-2015',
+                    '6206': '2016 und neuer',
+                    '6208': 'new_building',
+                },
+                "old_heating_type": {
+                    "": "nicht ausgewählt",
+                    "6210": "gas",
+                    "6212": "oil",
+                    "6214": "heatpump",
+                    "6216": "pellez",
+                    "6218": "electro",
+                    "6220": "nightofen",
+                    "6222": "other"
+                },
+                "heating_quote_old_heating_build": {
+                    "": "nicht ausgewählt",
+                    "6224": "2-6_years",
+                    "6226": "7-12_years",
+                    "6228": "older"
+                },
+                "new_heating_type": {
+                    "": "nicht ausgewählt",
+                    "6230": "gas",
+                    "6232": "heatpump",
+                    "6234": "hybrid_gas"
+                },
+                "heating_quote_radiator_type": {
+                    "": "nicht ausgewählt",
+                    "6236": "floor_heating",
+                    "6238": "mixed",
+                    "6240": "radiator_heating"
+                },
+                "heating_quote_warm_water_type": {
+                    "": "nicht ausgewählt",
+                    "6242": "heater",
+                    "6244": "separate"
+                },
+                "heating_quote_circulation_pump": {
+                    "": False,
+                    "6246": True,
+                    "6248": False
                 }
             },
             "product": {
@@ -428,6 +480,21 @@ def get_settings(section=None, domain_raw=None):
                     "cloud_number_2": "UF_CRM_1648804168",
                     "cloud_delivery_begin_3": "UF_CRM_1648804078",
                     "cloud_number_3": "UF_CRM_1648804184",
+                    "heating_quote_house_type": "UF_CRM_1650893500",
+                    "heating_quote_house_build": "UF_CRM_1650893590",
+                    "old_heating_type": "UF_CRM_1650893668",
+                    "heating_quote_old_heating_build": "UF_CRM_1650893723",
+                    "new_heating_type": "UF_CRM_1650893816",
+                    "heating_quote_usage_mixed": "UF_CRM_1650893974",
+                    "heating_quote_sqm": "UF_CRM_1650894021",
+                    "heating_quote_radiator_type": "UF_CRM_1650894088",
+                    "heating_quote_warm_water_type": "UF_CRM_1650894323",
+                    "heating_quote_circulation_pump": "UF_CRM_1650894404",
+                    "heating_quote_radiator_count": "UF_CRM_1650894425",
+                    "heating_quote_shower_count": "UF_CRM_1650894452",
+                    "heating_quote_bathtub_count": "UF_CRM_1650894476",
+                    "heating_quote_people": "UF_CRM_1650894495",
+                    "pdf_heatpump_auto_generate_link": "UF_CRM_1651497860"
                 }
             },
             "quote": {
@@ -461,6 +528,7 @@ def get_settings(section=None, domain_raw=None):
                     "pdf_summary_link": "UF_CRM_1603982021",
                     "pdf_quote_summary_link": "UF_CRM_1603982035",
                     "pdf_contract_summary_link": "UF_CRM_1603982051",
+                    "pdf_heatpump_auto_generate_link": "UF_CRM_1651676940",
                     "upload_link_roof": "UF_CRM_1603982144",
                     "upload_link_electric": "UF_CRM_1603982169",
                     "upload_link_heating": "UF_CRM_1603982160",

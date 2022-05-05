@@ -649,6 +649,22 @@ def generate_commission_pdf(lead_id, data, return_string=False, order_confirmati
     return None
 
 
+def generate_heatpump_auto_generate_pdf(lead_id, data):
+    output_file = io.BytesIO()
+    merger = PdfFileMerger()
+
+    if data.get("pdf_quote_summary_file_id") not in [None, "", "0", 0, False]:
+        add_pdf_by_drive_id(merger, data["pdf_quote_summary_file_id"])
+    if data.get("pdf_contract_summary_part4_file_id") not in [None, "", "0", 0, False]:
+        add_pdf_by_drive_id(merger, data["pdf_contract_summary_part4_file_id"])
+
+    merger.write(output_file)
+    merger.close()
+    output_file.seek(0)
+    pdf_content = output_file.read()
+    return pdf_content
+
+
 def set_confirmation_text(data):
     config_general = get_settings(section="general")
     data["heading"] = "Auftragsbestätigung"

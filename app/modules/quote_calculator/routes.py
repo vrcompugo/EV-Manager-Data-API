@@ -23,8 +23,8 @@ from app.modules.cloud.services.calculation import get_cloud_products
 from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_one_item_v2
 from app.models import OfferV2
 
-from .quote_data import calculate_quote
-from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_bluegen_wi_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf
+from .quote_data import calculate_quote, calculate_heating_usage
+from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_bluegen_wi_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf, generate_heatpump_auto_generate_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -80,73 +80,7 @@ def push_history(history_id):
 def quote_calculator_defaults(lead_id):
     auth_info = get_auth_info()
     if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
-        lead_id = int(lead_id)
-        if lead_id <= 0:
-            return Response(
-                '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
-                status=404,
-                mimetype='application/json')
-        history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
-        if history is not None:
-            data = history.data
-            if "financing_rate" not in data["data"]:
-                data["data"]["financing_rate"] = 3.79
-            if "extra_options_zero" not in data["data"]:
-                data["data"]["extra_options_zero"] = []
-            data["quote_datetime"] = data["datetime"]
-            if "status_id" not in data["data"]:
-                lead_data = get_lead(lead_id)
-                data["data"]["status_id"] = lead_data.get("status_id")
-        else:
-            post_data = None
-            try:
-                post_data = request.json
-            except Exception as e:
-                pass
-            data = calculate_quote(lead_id, post_data)
-            data["quote_datetime"] = str(datetime.datetime.now())
-
-        lead = get_lead(lead_id)
-        if "unique_identifier" not in lead or lead["unique_identifier"] is None or lead["unique_identifier"] == "":
-            lead["unique_identifier"] = lead_id
-        if "upload_link_roof" not in data["data"] or data["data"]["upload_link_roof"].find(f"Vorgang {lead['unique_identifier']}") < 0:
-            data["data"]["upload_folder_id_roof"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Dachbilder")
-            data["data"]["upload_link_roof"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Dachbilder"
-            data["data"]["upload_folder_id_roof_extra"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Weitere Dachbilder")
-            data["data"]["upload_link_roof_extra"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Weitere Dachbilder"
-            data["data"]["upload_folder_id_electric"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Elektrik-Bilder")
-            data["data"]["upload_link_electric"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Elektrik-Bilder"
-            data["data"]["upload_folder_id_heating"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Heizungsbilder")
-            data["data"]["upload_link_heating"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Heizungsbilder"
-            data["data"]["upload_folder_id_invoices"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter")
-            data["data"]["upload_link_invoices"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter"
-            data["data"]["upload_folder_id_contract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen")
-            data["data"]["upload_link_contract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen"
-
-            update_data = {
-                "unique_identifier": str(lead_id),
-                "upload_link_roof": data["data"]["upload_link_roof"],
-                "upload_link_electric": data["data"]["upload_link_electric"],
-                "upload_link_heating": data["data"]["upload_link_heating"],
-                "upload_link_invoices": data["data"]["upload_link_invoices"],
-                "upload_link_contract": data["data"]["upload_link_contract"]
-            }
-            update_lead(lead_id, update_data)
-        if "upload_link_firstcall" not in data["data"] or data["data"]["upload_link_firstcall"].find(f"Vorgang {lead['unique_identifier']}") < 0:
-            data["data"]["upload_folder_id_firstcall"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/First Call")
-            data["data"]["upload_link_firstcall"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/First Call"
-            update_data = {
-                "upload_link_firstcall": data["data"]["upload_link_firstcall"]
-            }
-            update_lead(lead_id, update_data)
-        histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).all()
-        data["histories"] = []
-        for history in histories:
-            data["histories"].append({
-                "id": history.id,
-                "datetime": str(history.datetime),
-                "label": history.label
-            })
+        data = quote_calculator_set_defaults(lead_id)
         return Response(
             json.dumps({"status": "success", "data": data}),
             status=200,
@@ -155,6 +89,77 @@ def quote_calculator_defaults(lead_id):
         '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
         status=501,
         mimetype='application/json')
+
+
+def quote_calculator_set_defaults(lead_id):
+    lead_id = int(lead_id)
+    if lead_id <= 0:
+        return Response(
+            '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
+            status=404,
+            mimetype='application/json')
+    history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    if history is not None:
+        data = history.data
+        if "financing_rate" not in data["data"]:
+            data["data"]["financing_rate"] = 3.79
+        if "extra_options_zero" not in data["data"]:
+            data["data"]["extra_options_zero"] = []
+        data["quote_datetime"] = data["datetime"]
+        if "status_id" not in data["data"]:
+            lead_data = get_lead(lead_id)
+            data["data"]["status_id"] = lead_data.get("status_id")
+    else:
+        post_data = None
+        try:
+            post_data = request.json
+        except Exception as e:
+            pass
+        data = calculate_quote(lead_id, post_data)
+        data["quote_datetime"] = str(datetime.datetime.now())
+
+    lead = get_lead(lead_id)
+    if "unique_identifier" not in lead or lead["unique_identifier"] is None or lead["unique_identifier"] == "":
+        lead["unique_identifier"] = lead_id
+    if "upload_link_roof" not in data["data"] or data["data"]["upload_link_roof"].find(f"Vorgang {lead['unique_identifier']}") < 0:
+        data["data"]["upload_folder_id_roof"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Dachbilder")
+        data["data"]["upload_link_roof"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Dachbilder"
+        data["data"]["upload_folder_id_roof_extra"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Weitere Dachbilder")
+        data["data"]["upload_link_roof_extra"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Weitere Dachbilder"
+        data["data"]["upload_folder_id_electric"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Elektrik-Bilder")
+        data["data"]["upload_link_electric"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Elektrik-Bilder"
+        data["data"]["upload_folder_id_heating"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Heizungsbilder")
+        data["data"]["upload_link_heating"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Heizungsbilder"
+        data["data"]["upload_folder_id_invoices"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter")
+        data["data"]["upload_link_invoices"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter"
+        data["data"]["upload_folder_id_contract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen")
+        data["data"]["upload_link_contract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen"
+
+        update_data = {
+            "unique_identifier": str(lead_id),
+            "upload_link_roof": data["data"]["upload_link_roof"],
+            "upload_link_electric": data["data"]["upload_link_electric"],
+            "upload_link_heating": data["data"]["upload_link_heating"],
+            "upload_link_invoices": data["data"]["upload_link_invoices"],
+            "upload_link_contract": data["data"]["upload_link_contract"]
+        }
+        update_lead(lead_id, update_data)
+    if "upload_link_firstcall" not in data["data"] or data["data"]["upload_link_firstcall"].find(f"Vorgang {lead['unique_identifier']}") < 0:
+        data["data"]["upload_folder_id_firstcall"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/First Call")
+        data["data"]["upload_link_firstcall"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/First Call"
+        update_data = {
+            "upload_link_firstcall": data["data"]["upload_link_firstcall"]
+        }
+        update_lead(lead_id, update_data)
+    histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).all()
+    data["histories"] = []
+    for history in histories:
+        data["histories"].append({
+            "id": history.id,
+            "datetime": str(history.datetime),
+            "label": history.label
+        })
+    return data
 
 
 @blueprint.route("/<lead_id>/calculate", methods=['GET', 'POST'])
@@ -185,6 +190,34 @@ def quote_calculator_calculate(lead_id):
         mimetype='application/json')
 
 
+@blueprint.route("/<lead_id>/calculate_heating_usage", methods=['POST'])
+@api_response
+@log_request
+def quote_calculator_calculate_heating_usage(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+        post_data = None
+        try:
+            post_data = request.json
+        except Exception as e:
+            pass
+        lead_id = int(lead_id)
+        if lead_id <= 0:
+            return Response(
+                '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
+                status=404,
+                mimetype='application/json')
+        data = calculate_heating_usage(lead_id, post_data)
+        return Response(
+            json.dumps({"status": "success", "data": data}),
+            status=200,
+            mimetype='application/json')
+    return Response(
+        '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
+        status=501,
+        mimetype='application/json')
+
+
 @blueprint.route("/<lead_id>", methods=['PUT'])
 @log_request
 def quote_calculator_update(lead_id):
@@ -205,7 +238,10 @@ def quote_calculator_update(lead_id):
             '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
             status=404,
             mimetype='application/json')
+    return quote_calculator_add_history(lead_id, post_data)
 
+
+def quote_calculator_add_history(lead_id, post_data):
     contact_id = None
     lead = get_lead(lead_id)
     if lead["contact_id"] is None or lead["contact_id"] is False or lead["contact_id"] == "" or int(lead["contact_id"]) == 0:
@@ -500,6 +536,14 @@ def quote_calculator_heating_pdf(lead_id):
             json.dumps({"status": "failed"}),
             status=200,
             mimetype='application/json')
+    data = quote_calculator_heating_pdf_action(lead_id)
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+def quote_calculator_heating_pdf_action(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -510,10 +554,7 @@ def quote_calculator_heating_pdf(lead_id):
 
     history.data = data
     db.session.commit()
-    return Response(
-        json.dumps({"status": "success", "data": data}),
-        status=200,
-        mimetype='application/json')
+    return data
 
 
 @blueprint.route("/<lead_id>/bluegen_pdf", methods=['PUT'])
@@ -602,6 +643,14 @@ def quote_calculator_datasheets_pdf(lead_id):
             json.dumps({"status": "failed"}),
             status=200,
             mimetype='application/json')
+    data = quote_calculator_datasheets_pdf_action(lead_id)
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+def quote_calculator_datasheets_pdf_action(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -613,10 +662,7 @@ def quote_calculator_datasheets_pdf(lead_id):
     history.data = data
     db.session.commit()
     update_lead(lead_id, {"pdf_datasheets_link": data["pdf_datasheets_link"]})
-    return Response(
-        json.dumps({"status": "success", "data": data}),
-        status=200,
-        mimetype='application/json')
+    return data
 
 
 @blueprint.route("/<lead_id>/summary_pdf", methods=['PUT', 'GET'])
@@ -628,6 +674,14 @@ def quote_calculator_summary_pdf(lead_id):
             json.dumps({"status": "failed"}),
             status=200,
             mimetype='application/json')
+    data = quote_calculator_summary_pdf_action(lead_id)
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+def quote_calculator_summary_pdf_action(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -644,10 +698,7 @@ def quote_calculator_summary_pdf(lead_id):
         "pdf_summary_link": data["pdf_summary_link"]
     })
 
-    return Response(
-        json.dumps({"status": "success", "data": data}),
-        status=200,
-        mimetype='application/json')
+    return data
 
 
 @blueprint.route("/<lead_id>/quote_summary_pdf", methods=['PUT'])
@@ -659,6 +710,14 @@ def quote_calculator_quote_summary_pdf(lead_id):
             json.dumps({"status": "failed"}),
             status=200,
             mimetype='application/json')
+    data = quote_calculator_quote_summary_pdf_action(lead_id)
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+def quote_calculator_quote_summary_pdf_action(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -678,11 +737,7 @@ def quote_calculator_quote_summary_pdf(lead_id):
         "construction_year": data["construction_year"],
         "pdf_quote_summary_link": data["pdf_quote_summary_link"]
     })
-
-    return Response(
-        json.dumps({"status": "success", "data": data}),
-        status=200,
-        mimetype='application/json')
+    return data
 
 
 @blueprint.route("/<lead_id>/contract_summary_pdf", methods=['PUT'])
@@ -694,6 +749,15 @@ def quote_calculator_contract_summary_pdf(lead_id):
             json.dumps({"status": "failed"}),
             status=200,
             mimetype='application/json')
+    data = quote_calculator_contract_summary_pdf_action(lead_id)
+
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+def quote_calculator_contract_summary_pdf_action(lead_id):
     lead = get_lead(lead_id)
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
@@ -715,11 +779,41 @@ def quote_calculator_contract_summary_pdf(lead_id):
     if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
         lead_update_data["contracting_version"] = "Version G1"
     update_lead(lead_id, lead_update_data)
+    return data
+
+
+@blueprint.route("/<lead_id>/heatpump_autogenerate_pdf", methods=['PUT'])
+@log_request
+def quote_calculator_heatpump_autogenerate_pdf(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+        return Response(
+            json.dumps({"status": "failed"}),
+            status=200,
+            mimetype='application/json')
+    data = quote_calculator_heatpump_autogenerate_pdf_action(lead_id)
 
     return Response(
         json.dumps({"status": "success", "data": data}),
         status=200,
         mimetype='application/json')
+
+
+def quote_calculator_heatpump_autogenerate_pdf_action(lead_id):
+    lead = get_lead(lead_id)
+    history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    data = json.loads(json.dumps(history.data))
+    subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
+
+    genrate_pdf(data, generate_heatpump_auto_generate_pdf, lead_id, "pdf_heatpump_auto_generate_file_id", "Angebotspaket Heizung.pdf", subfolder_id)
+    data["pdf_heatpump_auto_generate_link"] = get_public_link(data["pdf_heatpump_auto_generate_file_id"])
+
+    history.data = data
+    db.session.commit()
+    lead_update_data = {"pdf_heatpump_auto_generate_link": data["pdf_heatpump_auto_generate_link"]}
+    update_lead(lead_id, lead_update_data)
+    return data
+
 
 
 @blueprint.route("/<lead_id>/contract_summary_pdf2", methods=['GET'])

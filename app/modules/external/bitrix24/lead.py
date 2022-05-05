@@ -63,10 +63,10 @@ def convert_config_values(data_raw):
     return data
 
 
-def get_lead(id):
+def get_lead(id, force_reload=False):
     data = post("crm.lead.get", {
         "ID": id
-    })
+    }, force_reload=force_reload)
     if "result" in data:
         return convert_config_values(data["result"])
     else:
@@ -135,7 +135,7 @@ def add_lead(data, domain=None):
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
     response = post("crm.lead.add", update_data, domain=domain)
     if "result" in response and response["result"]:
-        return get_lead(int(response["result"]))
+        return get_lead(int(response["result"]), force_reload=True)
     else:
         return False
 
