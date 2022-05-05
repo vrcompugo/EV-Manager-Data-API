@@ -489,7 +489,10 @@ def get_annual_statement_data(data, year, manuell_data):
         "counters": [],
         "configs": [],
         "net_usage": None,
-        "to_pay": 0
+        "to_pay": 0,
+        "pv_system": data["pv_system"],
+        "total_usage": 0,
+        "total_extra_usage": 0
     }
     sherpaInvoice = SherpaInvoice.query\
         .filter(SherpaInvoice.identnummer == data.get("contract_number"))\
@@ -499,7 +502,17 @@ def get_annual_statement_data(data, year, manuell_data):
     if sherpaInvoice is not None:
         sherpa_items = SherpaInvoiceItem.query.filter(SherpaInvoiceItem.sherpa_invoice_id == sherpaInvoice.id).all()
         for item in sherpa_items:
-            statement["counters"].append(to_dict(item))
+            statement["counters"].append({
+                "number": item.zahlernummer,
+                "type": "Zähler",
+                "label": "Stromzähler",
+                "start_date": str(item.datum_stand_alt),
+                "start_value": item.stand_alt,
+                "end_date": str(item.datum_stand_neu),
+                "end_value": item.stand_neu,
+                "usage": item.verbrauch,
+                "allowed_usage": 0
+            })
         statement["net_usage"] = {
             "begin": str(sherpaInvoice.abrechnungszeitraum_von),
             "end": str(sherpaInvoice.abrechnungszeitraum_bis),
@@ -508,7 +521,6 @@ def get_annual_statement_data(data, year, manuell_data):
 
     for config in data["configs"]:
         statement_config = json.loads(json.dumps(config))
-        statement["total_usage"] = 0
         delivery_end = str(parse(config.get("delivery_begin")).year) + "-12-31"
         if config.get("delivery_end") is not None:
             delivery_end = str(config.get("delivery_end"))
@@ -535,7 +547,13 @@ def get_annual_statement_data(data, year, manuell_data):
                     "end_date": None,
                     "end_value": 0,
                     "usage": 0,
-                    "allowed_usage": statement_config[product]["usage"]
+                    "allowed_usage": statement_config[product]["usage"],
+                    "extra_price_per_kwh": statement_config[product]["extra_price_per_kwh"],
+                    "power_meter_start_date": None,
+                    "power_meter_start_value": 0,
+                    "power_meter_end_date": None,
+                    "power_meter_end_value": 0,
+                    "power_meter_usage": 0
                 }
                 if config[product].get("smartme_number") not in [None, "", "123", 0, "0"]:
                     beginning_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_begin"])
@@ -547,22 +565,20 @@ def get_annual_statement_data(data, year, manuell_data):
                         values["end_value"] = abs(end_of_year.get("CounterReading", 0))
                         if normalize_date(end_of_year.get("Date")) != f"{year}-12-31":
                             values["label"] = values["label"] + " (Anteil)"
-                            diff_days = (parse(end_of_year.get("Date")) - parse(beginning_of_year.get("Date"))).days
+                            diff_days = (normalize_date(end_of_year.get("Date")) - normalize_date(beginning_of_year.get("Date"))).days
                             values["allowed_usage"] = statement_config[product]["usage"] * (diff_days / 365)
                     statement["counters"].append(values)
-                elif statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
+                if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
                     for power_meter in statement["counters"]:
-                        if item["number"] == statement_config[product].get("power_meter_number"):
-                            values["number"] = power_meter.get("number")
-                            if values["start_date"] is None or parse(values["start_date"]) > parse(power_meter.get("start_date")):
-                                values["start_date"] = power_meter.get("start_date")
-                                values["start_value"] = power_meter.get("start_value")
-                            if values["end_date"] is None or parse(values["end_date"]) < parse(power_meter.get("end_date")):
-                                values["end_date"] = power_meter.get("end_date")
-                                values["end_value"] = power_meter.get("end_value")
-                else:
-                    values["start_date"] = statement_config[product]["delivery_begin"]
-                    values["end_date"] = statement_config[product]["delivery_end"]
+                        if power_meter["number"] == statement_config[product].get("power_meter_number"):
+                            values["power_meter_number"] = power_meter.get("number")
+                            if values["power_meter_start_date"] is None or normalize_date(values["power_meter_start_date"]) > normalize_date(power_meter.get("start_date")):
+                                values["power_meter_start_date"] = str(power_meter.get("start_date"))
+                                values["power_meter_start_value"] = power_meter.get("start_value")
+                            if values["power_meter_end_date"] is None or normalize_date(values["power_meter_end_date"]) < normalize_date(power_meter.get("end_date")):
+                                values["power_meter_end_date"] = str(power_meter.get("end_date"))
+                                values["power_meter_end_value"] = power_meter.get("end_value")
+                            values["power_meter_usage"] = values["power_meter_usage"] + power_meter["usage"]
 
                 if manuell_data is not None and product in manuell_data and manuell_data[product]:
                     if manuell_data[product].get("start_date") not in empty_values and manuell_data[product].get("start_value") not in empty_values:
@@ -572,9 +588,12 @@ def get_annual_statement_data(data, year, manuell_data):
                         values["end_date"] = manuell_data[product].get("end_date")
                         values["end_value"] = manuell_data[product].get("end_value")
 
-                values["usage"] = values["end_value"] - values["start_value"]
+                values["total_usage"] = values["end_value"] - values["start_value"]
+                values["usage"] = values["total_usage"] - values["power_meter_usage"]
 
-                statement["total_usage"] = statement["total_usage"] + values["usage"]
+                if product in ["lightcloud", "heatcloud"]:
+                    statement["total_usage"] = statement["total_usage"] + values["total_usage"]
+                statement["total_extra_usage"] = statement["total_extra_usage"] + (values["total_usage"] - values["allowed_usage"])
                 statement["products"].append(values)
                 statement_config["values"] = values
             statement["configs"].append(statement_config)
