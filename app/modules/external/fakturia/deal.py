@@ -286,25 +286,28 @@ def get_payments(contract_number):
     })
     data = []
     for item in invoices:
-        item["type"] = "invoice"
-        item["date"] = parse(item["date"])
-        data.append(item)
+        data.append(enhance_payment(item, "invoice"))
     for item in invoice_correntions:
-        item["type"] = "invoice_corrention"
-        item["date"] = parse(item["date"])
-        data.append(item)
+        data.append(enhance_payment(item, "invoice_corrention"))
     for item in credit_notes:
-        item["type"] = "credit_note"
-        item["date"] = parse(item["date"])
-        data.append(item)
+        data.append(enhance_payment(item, "credit_note"))
     for item in credit_note_correntions:
-        item["type"] = "credit_note_corrention"
-        item["date"] = parse(item["date"])
-        data.append(item)
+        data.append(enhance_payment(item, "credit_note_corrention"))
     data = sorted(data, key=lambda d: d['date'])
     for item in data:
         item["date"] = str(item["date"])
     return data
+
+
+def enhance_payment(item, item_type):
+    item["date"] = parse(item["date"])
+    item["type"] = item_type
+    item["service_year"] = {}
+    item["service_year_net"] = {}
+    for pay_item in item["payItems"]:
+        item["service_year_net"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"]
+        item["service_year"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"] * (1 + (pay_item["taxRatePercent"] / 100))
+    return item
 
 
 def get_payments2(account_number):
