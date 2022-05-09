@@ -27,6 +27,7 @@ from app.modules.cloud.models.sherpa_invoice import SherpaInvoice
 from app.modules.cloud.models.sherpa_invoice_item import SherpaInvoiceItem
 from app.modules.cloud.models.contract_status import ContractStatus
 from app.modules.cloud.models.contract import Contract
+from app.modules.cloud.models.counter_value import CounterValue
 from app.modules.external.insign.models.insign_log import InsignLog
 from app.modules.external.insign.models.insign_document_log import InsignDocumentLog
 from app.modules.external.bitrix24.models.bitrix24_file_cache import Bitrix24FileCache

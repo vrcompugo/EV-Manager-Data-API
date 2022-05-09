@@ -198,6 +198,12 @@ def run_mfr_subscriptor():
     run_mfr_amqp_messaging_subscriptor()
 
 
+@manager.command
+def run_test_normalize_counter_values():
+    from app.modules.cloud.services.contract import test_normalize_counter_values
+    test_normalize_counter_values()
+
+
 @manager.option("-s", "--section", dest='section', default=None)
 def cron(section):
     from app.modules.cron import cron

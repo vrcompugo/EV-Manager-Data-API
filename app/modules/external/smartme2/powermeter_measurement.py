@@ -74,11 +74,10 @@ def get_device_by_datetime(smartme_number, datetime):
                     if data2 is not None:
                         responded_date2 = normalize_date(data2.get("Date"))
                         if responded_date2 > requested_date:
-                            print(requested_date2, responded_date2)
-                            kwh_diff = data2.get("CounterReading") - data.get("CounterReading")
+                            kwh_diff = data2.get("CounterReading") - data.get("CounterReading", 0)
                             days_diff = (responded_date2 - responded_date).days
                             days_to_add = (requested_date - responded_date).days
-                            new_reading = data.get("CounterReading") + days_to_add * (kwh_diff / days_diff)
+                            new_reading = data.get("CounterReading", 0) + days_to_add * (kwh_diff / days_diff)
                             data["CounterReading"] = new_reading
                             data["Date"] = str(requested_date)
                             return data

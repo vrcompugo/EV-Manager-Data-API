@@ -21,7 +21,7 @@ from app.modules.auth.jwt_parser import encode_jwt
 from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.modules.settings import get_settings
-from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus, Contract
+from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus, Contract, CounterValue
 from .services.annual_statement import generate_annual_statement_pdf
 from .services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data, check_contract_data, generate_annual_report
 
@@ -72,8 +72,7 @@ def post_contract_annual_statement_year(contract_number, year):
             contract_number=contract_number
         )
         db.session.add(contract_status)
-    contract_status.manuell_data = request.json
-    db.session.commit()
+        db.session.commit()
 
     data = generate_annual_report(contract_number, year)
 
@@ -119,7 +118,7 @@ def get_contract_list(year):
         mimetype='application/json')
 
 
-@blueprint.route("contract/<contract_number>/manuell_data/<year>", methods=['PUT'])
+@blueprint.route("contract/<contract_number>/annual_statement/<year>/manuell_data", methods=['PUT'])
 @log_request
 def put_manuell_data(contract_number, year):
     auth_data = validate_jwt()
@@ -132,13 +131,80 @@ def put_manuell_data(contract_number, year):
         .filter(ContractStatus.contract_number == contract_number) \
         .filter(ContractStatus.year == year)\
         .first()
-    status.manuell_data = data.get("contract").get("manuell_data")
+    print(data.get("data"))
+    status.manuell_data = data.get("data")
     db.session.commit()
+    print(data.get("data"), status.manuell_data)
 
     return Response(
         json.dumps({"status": "success", "data": data}),
         status=200,
         mimetype='application/json')
+
+
+@blueprint.route("contract/counter_values", methods=['POST'])
+@log_request
+def add_counter_value():
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    data = request.json
+    data = store_counter_value(data.get("counter"))
+
+    return Response(
+        json.dumps({"status": "success", "data": data.id}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("contract/counter_values/<id>", methods=['PUT'])
+@log_request
+def edit_counter_value(id):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    data = request.json
+    data = store_counter_value(data.get("counter"))
+
+    return Response(
+        json.dumps({"status": "success", "data": data.id}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("contract/counter_values/<counter_id>", methods=['DELETE'])
+@log_request
+def delete_counter_value(counter_id):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    counter = CounterValue.query.filter(CounterValue.id == counter_id).first()
+    if counter is not None:
+        db.session.delete(counter)
+        db.session.commit()
+
+    return Response(
+        json.dumps({"status": "success", "data": counter_id}),
+        status=200,
+        mimetype='application/json')
+
+
+def store_counter_value(counter):
+    if counter.get("id") is not None:
+        storedCounter = CounterValue.query.filter(CounterValue.id == counter["id"]).first()
+    else:
+        storedCounter = CounterValue(
+            number=counter.get("number"),
+            origin="energie360"
+        )
+        db.session.add(storedCounter)
+    storedCounter.date = counter.get("date")
+    storedCounter.value = counter.get("value")
+    db.session.commit()
+    return storedCounter
 
 
 @blueprint.route("contract/<contract_number>/check/<year>", methods=['GET'])

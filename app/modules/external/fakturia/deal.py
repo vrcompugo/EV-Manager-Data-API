@@ -1,12 +1,11 @@
-from app.modules.external.bitrix24.products import get_product
-from app.exceptions import ApiException
-from calendar import month
 import re
 import json
 import base64
 import datetime
+from dateutil.parser import parse
 
 from app import db
+from app.exceptions import ApiException
 from app.models import OfferV2
 from app.modules.external.bitrix24.deal import get_deal, get_deals, get_deals_normalized, update_deal, set_default_data
 from app.modules.external.bitrix24.contact import get_contact, update_contact
@@ -269,16 +268,42 @@ def get_contract(contract_number):
 
 def get_payments(contract_number):
     contract_number = int(contract_number.replace("C", ""))
-    data = {
-        "invoices": get(f"/Invoices", parameters={
-            "contractNumber": contract_number,
-            "extendedData": True
-        }),
-        "credit_notes": get(f"/CreditNotes", parameters={
-            "contractNumber": contract_number,
-            "extendedData": True
-        })
-    }
+    invoices = get(f"/Invoices", parameters={
+        "contractNumber": contract_number,
+        "extendedData": True
+    })
+    invoice_correntions = get(f"/InvoiceCorrections", parameters={
+        "contractNumber": contract_number,
+        "extendedData": True
+    })
+    credit_notes = get(f"/CreditNotes", parameters={
+        "contractNumber": contract_number,
+        "extendedData": True
+    })
+    credit_note_correntions = get(f"/CreditNoteCorrections", parameters={
+        "contractNumber": contract_number,
+        "extendedData": True
+    })
+    data = []
+    for item in invoices:
+        item["type"] = "invoice"
+        item["date"] = parse(item["date"])
+        data.append(item)
+    for item in invoice_correntions:
+        item["type"] = "invoice_corrention"
+        item["date"] = parse(item["date"])
+        data.append(item)
+    for item in credit_notes:
+        item["type"] = "credit_note"
+        item["date"] = parse(item["date"])
+        data.append(item)
+    for item in credit_note_correntions:
+        item["type"] = "credit_note_corrention"
+        item["date"] = parse(item["date"])
+        data.append(item)
+    data = sorted(data, key=lambda d: d['date'])
+    for item in data:
+        item["date"] = str(item["date"])
     return data
 
 
