@@ -116,7 +116,8 @@
               <td class="align-right"><b>
                 {% if data.ecloud %}
                   {{ data.ecloud.price_runtime | currencyformat("de", 0) }}
-                {% else %}
+                {% endif %}
+                {% if data.heatcloud %}
                   {{ data.heatcloud.price_runtime | currencyformat("de", 0) }}
                 {% endif %}
               </b></td>
