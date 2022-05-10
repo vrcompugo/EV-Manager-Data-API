@@ -110,7 +110,7 @@
               <td class="align-right"><b>{{ data.consumer.price_runtime | currencyformat("de", 0) }}</b></td>
             </tr>
           {% endif %}
-          {% if data.cloud_calulation.conventional_price_heating_usage and data.cloud_calulation.conventional_price_heating_usage > 0 %}
+          {% if data.ecloud or data.heatcloud and (data.eclouddata.cloud_calulation.conventional_price_heating_usage and data.cloud_calulation.conventional_price_heating_usage > 0) %}
             <tr>
               <td>Kosten für Wärme <small>inkl. Wartung (brutto)</small></td>
               <td class="align-right"><b>
