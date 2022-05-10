@@ -63,6 +63,12 @@ def push_history(history_id):
     auth_info = get_auth_info()
     if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
         history = QuoteHistory.query.filter(QuoteHistory.id == int(history_id)).first()
+        lead = get_lead(history.lead_id, True)
+        if lead.get("collection_url") not in [None, "", 0, "0"]:
+            return Response(
+                '{"status": "error", "error_code": "already_signed", "message": "Der Lead wurde bereits unterschrieben. Angebotserstellung nicht mehr möglich"}',
+                status=200,
+                mimetype='application/json')
         if history is not None:
             history.datetime = datetime.datetime.now()
             db.session.commit()
@@ -243,7 +249,14 @@ def quote_calculator_update(lead_id):
 
 def quote_calculator_add_history(lead_id, post_data):
     contact_id = None
-    lead = get_lead(lead_id)
+    lead = get_lead(lead_id, True)
+    print("coll", lead.get("collection_url"))
+    if lead.get("collection_url") not in [None, "", 0, "0"]:
+        return Response(
+            '{"status": "error", "error_code": "already_signed", "message": "Der Lead wurde bereits unterschrieben. Angebotserstellung nicht mehr möglich"}',
+            status=200,
+            mimetype='application/json')
+
     if lead["contact_id"] is None or lead["contact_id"] is False or lead["contact_id"] == "" or int(lead["contact_id"]) == 0:
         contact = add_contact(lead["contact"])
         contact_id = contact.get("id", None)
