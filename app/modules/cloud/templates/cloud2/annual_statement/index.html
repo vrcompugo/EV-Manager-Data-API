@@ -10,6 +10,9 @@
     .summary td {
       border-top: 1px double #333;
     }
+    small {
+      font-size: 0.8em;
+    }
   </style>
 </head>
 <body>
@@ -27,76 +30,38 @@
         <th>Abnahmeart</th>
         <th>Abnahme</th>
       </tr>
-      {% for product in statement.products %}
-        {% if product.product == "lightcloud" %}
-          {% if product.power_meter_usage == 0 %}
-            <tr>
-              <td>{{ product.start_date | dateformat }}</td>
-              <td>{{ product.end_date | dateformat }}</td>
-              <td>Cloud Verbrauch</td>
-              <td style="text-align: right;">{{ product.usage | numberformat("de", 0) }} kWh</td>
-            </tr>
-          {% else %}
-            <tr>
-              <td>{{ product.power_meter_start_date | dateformat }}</td>
-              <td>{{ product.power_meter_end_date | dateformat }}</td>
-              <td>Netzbezug</td>
-              <td style="text-align: right;">{{ product.power_meter_usage | numberformat("de", 0) }} kWh</td>
-            </tr>
-            <tr>
-              <td>{{ product.start_date | dateformat }}</td>
-              <td>{{ product.end_date | dateformat }}</td>
-              <td>direkte Abnahme (PV-Anlage und Speicher)</td>
-              <td style="text-align: right;">{{ product.usage | numberformat("de", 0) }} kWh</td>
-            </tr>
+      {% for config in statement.configs %}
+        {% for product in ["lightcloud", "heatcloud", "ecloud"] %}
+          {% if config[product] %}
+            {% if config[product].actual_usage_net == 0 %}
+              <tr>
+                <td>{{ config[product].delivery_begin | dateformat }}</td>
+                <td>{{ config[product].delivery_end | dateformat }}</td>
+                <td>{{ config[product].label }} Verbrauch</td>
+                <td style="text-align: right;">{{ config[product].actual_usage | numberformat("de", 0) }} kWh</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td>{{ config[product].delivery_begin | dateformat }}</td>
+                <td>{{ config[product].delivery_end | dateformat }}</td>
+                <td>{{ config[product].label }} Netzbezug </td>
+                <td style="text-align: right;">{{ config[product].actual_usage_net | numberformat("de", 0) }} kWh</td>
+              </tr>
+              <tr>
+                <td>{{ config[product].delivery_begin | dateformat }}</td>
+                <td>{{ config[product].delivery_end | dateformat }}</td>
+                <td>{{ config[product].label }} direkte Abnahme (PV-Anlage und Speicher)</td>
+                <td style="text-align: right;">{{ (config[product].actual_usage - config[product].actual_usage_net) | numberformat("de", 0) }} kWh</td>
+              </tr>
+            {% endif %}
           {% endif %}
-        {% endif %}
-        {% if product.product == "heatcloud" %}
-          {% set total_usage = total_usage + product.power_meter_usage + product.usage %}
-          <tr>
-            <td>{{ product.power_meter_start_date | dateformat }}</td>
-            <td>{{ product.power_meter_end_date | dateformat }}</td>
-            <td>Wärmestrom Netzbezug</td>
-            <td style="text-align: right;">{{ product.power_meter_usage | numberformat("de", 0) }} kWh</td>
-          </tr>
-          <tr>
-            <td>{{ product.start_date | dateformat }}</td>
-            <td>{{ product.end_date | dateformat }}</td>
-            <td>direkte Abnahme Wärmestrom (PV-Anlage und Speicher)</td>
-            <td style="text-align: right;">{{ product.usage | numberformat("de", 0) }} kWh</td>
-          </tr>
-        {% endif %}
+        {% endfor %}
       {% endfor %}
       <tr class="summary">
         <td colspan="3"><b>Cloudabnahme gesamt</b></td>
         <td style="text-align: right;">{{ statement.total_usage | numberformat("de", 0) }} kWh</td>
       </tr>
     </table>
-    {% if statement.consumers and len(statement.consumers) > 0 %}
-      <h3>Cloud Consumer</h3>
-
-      {% for consumer in data.consumers %}
-        <h3>Verbrauchsaufstellung: {{ consumer.street }} {{ consumer.street_nb }}, {{ consumer.zip }} {{ consumer.city }}</h3>
-        <table>
-          <tr class="heading">
-            <th>von</th>
-            <th>bis</th>
-            <th>Abnahmeart</th>
-            <th>Abnahme</th>
-          </tr>
-          <tr>
-            <td>{{ consumer.begin | dateformat }}</td>
-            <td>{{ consumer.end | dateformat }}</td>
-            <td>Cloud Abnahme</td>
-            <td>123 kWh</td>
-          </tr>
-          <tr class="summary">
-            <td colspan="4"><b>Abnahme gesamt</b> (Verbrauch a)</td>
-            <td>3242 kWh</td>
-          </tr>
-        </table>
-      {% endfor %}
-    {% endif %}
     <br>
     <h2>Aufstellung Mehrverbrauch und Minderverbrauch</h2>
     <table>
@@ -114,38 +79,24 @@
         <th>ermittelt</th>
         <th>Differenz</th>
       </tr>
-      {% for product in statement.products %}
-        <tr>
-          <td>{{ product.label }}</td>
-          <td>{{ product.start_date | dateformat }}</td>
-          <td>{{ product.end_date | dateformat }}</td>
-          <td style="text-align: right;">{{ product.allowed_usage | numberformat("de", 0) }} kWh</td>
-          <td style="text-align: right;">{{ product.total_usage | numberformat("de", 0) }} kWh</td>
-          <td style="text-align: right;">{{ (product.total_usage - product.allowed_usage) | numberformat("de", 0) }} kWh</td>
-        </tr>
+      {% for config in statement.configs %}
+        {% for product in ["lightcloud", "heatcloud", "ecloud"] %}
+          {% if config[product] %}
+            <tr>
+              <td>{{ config[product].label }}</td>
+              <td>{{ config[product].delivery_begin | dateformat }}</td>
+              <td>{{ config[product].delivery_end | dateformat }}</td>
+              <td style="text-align: right;">{{ config[product].allowed_usage | numberformat("de", 0) }} kWh</td>
+              <td style="text-align: right;">{{ config[product].actual_usage | numberformat("de", 0) }} kWh</td>
+              <td style="text-align: right;">{{ config[product].total_extra_usage | numberformat("de", 0) }} kWh</td>
+            </tr>
+          {% endif %}
+        {% endfor %}
       {% endfor %}
       <tr class="summary">
         <td colspan="5"><b>{% if statement.total_extra_usage > 0 %}Mehrverbrauch{% else %}Minderverbrauch{% endif %}</b></td>
         <td style="text-align: right;">{{ statement.total_extra_usage | numberformat("de", 0) }} kWh</td>
       </tr>
-      {% if statement.consumers and len(statement.consumers) > 0 %}
-        <tr>
-          <td colspan="5">&nbsp;</td>
-        </tr>
-        {% for consumer in data.consumers %}
-          <tr>
-            <td>Consumer {{ consumer.street }} {{ consumer.street_nb }}, {{ consumer.zip }} {{ consumer.city }}</td>
-            <td>{{ consumer.begin | dateformat }}</td>
-            <td>{{ consumer.end | dateformat }}</td>
-            <td>3000 kWh</td>
-            <td>4000 kWh</td>
-          </tr>
-        {% endfor %}
-        <tr class="summary">
-          <td colspan="4"><b>Mehrverbrauch (33,12 Cent)</b></td>
-          <td>2000 kWh</td>
-        </tr>
-      {% endif %}
     </table>
     <br>
     <h2>Aufstellung Vorauszahlungen/Kosten</h2>
@@ -157,38 +108,54 @@
         <th>Soll</th>
         <th>Haben</th>
       </tr>
-      <tr>
-        <td>Lichtcloud</td>
-        <td>{{ statement.lightcloud.begin | dateformat }}</td>
-        <td>{{ statement.lightcloud.end | dateformat }}</td>
-        <td style="text-align: right;">{% if statement.lightcloud.price > 0 %}{{ statement.lightcloud.price | currencyformat }}{% endif%}</td>
-        <td style="text-align: right;">{% if statement.lightcloud.price < 0 %}{{ -statement.lightcloud.price | currencyformat }}{% endif%}</td>
-      </tr>
-      {% for pre_payment in statement.pre_payments %}
-        <tr>
-          <td>{{ pre_payment.label }}</td>
-          <td>{{ pre_payment.begin | dateformat }}</td>
-          <td>{{ pre_payment.end | dateformat }}</td>
-          <td style="text-align: right;">{% if pre_payment.price < 0 %}{{ -pre_payment.price | currencyformat }}{% endif%}</td>
-          <td style="text-align: right;">{% if pre_payment.price > 0 %}{{ pre_payment.price | currencyformat }}{% endif%}</td>
-        </tr>
-      {% endfor %}
-      <tr>
-        <td>
-          {% if statement.total_extra_usage > 0 %}
-            Mehrverbrauch {{ statement.total_extra_usage }} kWh je {{ (statement.lightcloud.extra_price_per_kwh * 100 ) | numberformat }} Cent
-          {% else %}
-            Minderverbrauch {{ -statement.total_extra_usage }} kWh je {{ (statement.lightcloud.cashback_per_kwh * 100 ) | numberformat }} abzgl. der ersten 250 kWh
+      {% set total_extra_usage = 0 %}
+      {% for config in statement.configs %}
+        {% for product in ["lightcloud", "heatcloud", "ecloud"] %}
+          {% if config[product] and config[product].total_extra_price != 0 %}
+            <tr>
+              <td>
+                {{ config[product].label }}
+                {% if config[product].total_extra_usage > 0 %}
+                  Mehrverbrauch <small>({{ config[product].total_extra_usage | numberformat("de", 0)}} kWh je
+                  {{ (config[product].extra_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
+                {% else %}
+                  Minderverbrauch <small>({{ config[product].total_extra_usage | numberformat("de", 0)}} kWh
+                  ab -250 kWh je {{ (config[product].cashback_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
+                {% endif %}
+              </td>
+              <td>{{ config[product].delivery_begin | dateformat }}</td>
+              <td>{{ config[product].delivery_end | dateformat }}</td>
+              <td style="text-align: right;">{% if config[product].total_extra_price > 0 %}{{ config[product].total_extra_price | currencyformat }}{% endif%}</td>
+              <td style="text-align: right;">{% if config[product].total_extra_price < 0 %}{{ -config[product].total_extra_price | currencyformat }}{% endif%}</td>
+            </tr>
           {% endif %}
-        </td>
-        <td>{{ statement.begin }}</td>
-        <td>{{ statement.end }}</td>
-        <td style="text-align: right;">{% if statement.total_extra_usage_price > 0 %}{{ statement.total_extra_usage_price | currencyformat }}{% endif%}</td>
-        <td style="text-align: right;">{% if statement.total_extra_usage_price <= 0 %}{{ -statement.total_extra_usage_price | currencyformat }}{% endif%}</td>
-        <td></td>
-      </tr>
+        {% endfor %}
+
+        {% if statement.payments %}
+          <tr>
+            <td>
+              Cloud Jahresgebühr
+            </td>
+            <td>{{ config.delivery_begin | dateformat }}</td>
+            <td>{{ config.delivery_end | dateformat }}</td>
+            <td style="text-align: right;">{% if config.total_cloud_price_incl_refund > 0 %}{{ config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
+            <td style="text-align: right;">{% if config.total_cloud_price_incl_refund < 0 %}{{ -config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+      {% if statement.payments %}
+        {% for payment in statement.payments %}
+          <tr>
+            <td>{{ payment.number }}</td>
+            <td>{{ payment.date | dateformat }}</td>
+            <td></td>
+            <td style="text-align: right;">{% if payment.amountGross < 0 %}{{ -payment.amountGross | currencyformat }}{% endif%}</td>
+            <td style="text-align: right;">{% if payment.amountGross > 0 %}{{ payment.amountGross | currencyformat }}{% endif%}</td>
+          </tr>
+        {% endfor %}
+      {% endif %}
       <tr class="summary">
-        <td colspan="3"><b>Kontostand</b></td>
+        <td colspan="3"><b>{% if statement.to_pay > 0 %}Noch zu Zahlen{% else %}Auszahlung{% endif%}</b></td>
         <td style="text-align: right;">{% if statement.to_pay > 0 %}{{ statement.to_pay | currencyformat }}{% endif%}</td>
         <td style="text-align: right;">{% if statement.to_pay <= 0 %}{{ -statement.to_pay | currencyformat }}{% endif%}</td>
       </tr>
@@ -205,10 +172,9 @@
     Mit sonnigen Grüssen<br>
     Ihr Team von energie360<br>
     <br>
-    <small>* Diese Abrechnung wurde unter Vorbehalt der angegebenen Einspeisemengen berechnet. Sollten sich die Einspeisemengen rückwirkend ändern, so wird diese Abrechnung auch korrigiert. Die Cloudgebühren sowie die Kosten für die Zusatzpakete wurden unter der Tatsache, dass diese regelmäßig bezahlt wurden, erstellt. Sollte dies nicht der Fall sein und noch offene Forderungen unsererseits vorliegen, so werden diese Rechnungen separat angemahnt und verrechnet. Bei Nichtvorliegen EEG-Vergütung, behalten wir uns vor den Verbrauch mit {{ (statement.lightcloud.extra_price_per_kwh * 100 ) | numberformat }} Cent/kWh zu berechnen.</small>
+    <small>* Diese Abrechnung wurde unter Vorbehalt der angegebenen Einspeisemengen berechnet. Sollten sich die Einspeisemengen rückwirkend ändern, so wird diese Abrechnung auch korrigiert. Die Cloudgebühren sowie die Kosten für die Zusatzpakete wurden unter der Tatsache, dass diese regelmäßig bezahlt wurden, erstellt. Sollte dies nicht der Fall sein und noch offene Forderungen unsererseits vorliegen, so werden diese Rechnungen separat angemahnt und verrechnet. Bei Nichtvorliegen EEG-Vergütung, behalten wir uns vor den Verbrauch mit {{ (statement.configs[0].lightcloud.extra_price_per_kwh * 100 ) | numberformat }} Cent/kWh zu berechnen.</small>
     <img src="{{ base_url }}static/cloud/contract/annual_statement/Stromkennzeichen%202020.jpeg" style="width: 100%; height: auto;" />
 
-    {% endif %}
     <h2>Zur Abrechnung verwendete Zählerstande</h2>
     <table>
       <tr>

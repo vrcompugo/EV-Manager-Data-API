@@ -23,7 +23,7 @@ from app.modules.external.bitrix24.drive import add_file, get_public_link, get_f
 from app.modules.settings import get_settings
 from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus, Contract, CounterValue
 from .services.annual_statement import generate_annual_statement_pdf
-from .services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data, check_contract_data, generate_annual_report
+from .services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data, check_contract_data, generate_annual_report, generate_annual_report_pdf
 
 
 blueprint = Blueprint("cloud2", __name__, template_folder='templates')
@@ -75,6 +75,30 @@ def post_contract_annual_statement_year(contract_number, year):
         db.session.commit()
 
     data = generate_annual_report(contract_number, year)
+
+    return Response(
+        json.dumps({"status": "success", "data": data}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("contract/<contract_number>/annual_statement/<year>/pdf", methods=['POST'])
+@log_request
+def post_contract_annual_statement_year_pdf(contract_number, year):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
+    if contract_status is None:
+        contract_status = ContractStatus(
+            year=str(year),
+            contract_number=contract_number
+        )
+        db.session.add(contract_status)
+        db.session.commit()
+
+    data = generate_annual_report_pdf(contract_number, year)
 
     return Response(
         json.dumps({"status": "success", "data": data}),

@@ -422,8 +422,11 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
             config["cashback_price_per_kwh"] = 0.08
         else:
             config["cashback_price_per_kwh"] = 0.10
+        config["ecloud_cashback_price_per_kwh"] = 0.04
         if offer_v2.calculated.get("cashback_price_per_kwh") is not None:
             config["cashback_price_per_kwh"] = offer_v2.calculated.get("cashback_price_per_kwh")
+        if offer_v2.calculated.get("ecloud_cashback_price_per_kwh") is not None:
+            config["ecloud_cashback_price_per_kwh"] = offer_v2.calculated.get("ecloud_cashback_price_per_kwh")
         if offer_v2.calculated.get("min_kwp_light") > 0:
             config["lightcloud"] = {
                 "label": "Lichtcloud",
@@ -432,7 +435,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_light"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_light_incl_refund"),
                 "smartme_number": data["main_deal"].get("smartme_number"),
-                "power_meter_number": data["main_deal"].get("power_meter_number"),
+                "power_meter_number": data["main_deal"].get("power_meter_number").strip(),
                 "delivery_begin": data["main_deal"].get("cloud_delivery_begin"),
                 "deal": {
                     "id": data["main_deal"].get("id"),
@@ -461,7 +464,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 })
             else:
                 config["heatcloud"]["smartme_number"] = deals[0].get("smartme_number_heatcloud")
-                config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number")
+                config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number").strip()
                 config["heatcloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
                 config["heatcloud"]["deal"] = {
                     "id": deals[0].get("id"),
@@ -490,7 +493,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 })
             else:
                 config["ecloud"]["smartme_number"] = None
-                config["ecloud"]["power_meter_number"] = deals[0].get("ecloud_power_meter_number")
+                config["ecloud"]["power_meter_number"] = deals[0].get("counter_ecloud").strip()
                 config["ecloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
                 config["ecloud"]["deal"] = {
                     "id": deals[0].get("id"),
@@ -525,7 +528,11 @@ def get_annual_statement_data(data, year, manuell_data):
         "year": year,
         "counters": [],
         "configs": [],
+        "errors": [],
+        "warnings": [],
         "pv_system": data["pv_system"],
+        "total_usage": 0,
+        "total_extra_usage": 0,
         "total_extra_price": 0,
         "total_extra_price_net": 0,
         "total_cloud_price": 0,
@@ -542,25 +549,32 @@ def get_annual_statement_data(data, year, manuell_data):
     if sherpaInvoice is not None:
         sherpa_items = SherpaInvoiceItem.query.filter(SherpaInvoiceItem.sherpa_invoice_id == sherpaInvoice.id).all()
         for item in sherpa_items:
-            sherpa_counters.append({
-                "number": item.zahlernummer,
-                "type": "Zähler",
-                "start_date": str(item.datum_stand_alt),
-                "start_value": item.stand_alt,
-                "end_date": str(item.datum_stand_neu),
-                "end_value": item.stand_neu,
-                "usage": item.verbrauch
-            })
+            existing_counter = next((i for i in sherpa_counters if i["number"] == item.zahlernummer and i["start_date"] == str(item.datum_stand_alt) and i["end_date"] == str(item.datum_stand_neu)), None)
+            if existing_counter is not None:
+                existing_counter["start_value"] = existing_counter["start_value"] + item.stand_alt
+                existing_counter["end_value"] = existing_counter["end_value"] + item.stand_neu
+                existing_counter["usage"] = existing_counter["usage"] + item.verbrauch
+            else:
+                sherpa_counters.append({
+                    "number": item.zahlernummer,
+                    "type": "Zähler",
+                    "start_date": str(item.datum_stand_alt),
+                    "start_value": item.stand_alt,
+                    "end_date": str(item.datum_stand_neu),
+                    "end_value": item.stand_neu,
+                    "usage": item.verbrauch
+                })
+        for item in sherpa_counters:
             statement["available_values"].append({
-                "number": item.zahlernummer,
-                "date": normalize_date(str(item.datum_stand_alt)),
-                "value": item.stand_alt,
+                "number": item.get("number"),
+                "date": normalize_date(item.get("start_date")),
+                "value": item.get("start_value"),
                 "origin": "Netzbetreiber",
             })
             statement["available_values"].append({
-                "number": item.zahlernummer,
-                "date": normalize_date(str(item.datum_stand_neu)),
-                "value": item.stand_neu,
+                "number": item.get("number"),
+                "date": normalize_date(item.get("end_date")),
+                "value": item.get("end_value"),
                 "origin": "Netzbetreiber",
             })
 
@@ -568,6 +582,10 @@ def get_annual_statement_data(data, year, manuell_data):
         statement_config = json.loads(json.dumps(config))
         if manuell_data.get("cashback_price_per_kwh") not in [None, ""]:
             statement_config["cashback_price_per_kwh"] = float(manuell_data.get("cashback_price_per_kwh")) / 100
+        if manuell_data.get("ecloud_cashback_price_per_kwh") not in [None, ""]:
+            statement_config["ecloud_cashback_price_per_kwh"] = float(manuell_data.get("ecloud_cashback_price_per_kwh")) / 100
+        statement_config["total_usage"] = 0
+        statement_config["total_extra_usage"] = 0
         statement_config["total_extra_price"] = 0
         statement_config["total_cloud_price"] = 0
         statement_config["total_cloud_price_incl_refund"] = 0
@@ -587,6 +605,8 @@ def get_annual_statement_data(data, year, manuell_data):
                 if parse(config[product].get("delivery_begin")).year > year:
                     del statement_config[product]
                     continue
+                if statement_config[product]["extra_price_per_kwh"] < 0.3379:
+                    statement_config[product]["extra_price_per_kwh"] = 0.3379
                 if manuell_data.get(f"{product}_extra_price_per_kwh") not in [None, ""]:
                     statement_config[product]["extra_price_per_kwh"] = float(manuell_data.get(f"{product}_extra_price_per_kwh")) / 100
                 product_delivery_begin = f"{year}-01-01"
@@ -598,6 +618,7 @@ def get_annual_statement_data(data, year, manuell_data):
                 statement_config[product]["allowed_usage"] = statement_config[product]["usage"] * (diff_days / 365)
 
                 if product == "lightcloud" and config.get("emove") is not None:
+                    statement_config[product]["label"] = statement_config[product]["label"] + " inkl. eMove"
                     statement_config[product]["allowed_usage_emove"] = float(statement_config["emove"]["usage"]) * (diff_days / 365)
                     statement_config[product]["allowed_usage"] = statement_config[product]["allowed_usage"] + statement_config[product]["allowed_usage_emove"]
 
@@ -653,6 +674,12 @@ def get_annual_statement_data(data, year, manuell_data):
                             statement_config[product]["actual_usage"] = counter["usage"]
                         statement["counters"].append(counter)
                 percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
+                if statement_config[product]["actual_usage"] <= 0:
+                    statement["errors"].append(f"{statement_config[product]['label']} hat keinen Verbrauch")
+                if statement_config[product]["actual_usage"] < statement_config[product]["actual_usage_net"]:
+                    statement["errors"].append(f"{statement_config[product]['label']} Netzbezug ist größer als der Gesamtverbrauch")
+                if product == "lightcloud" and statement_config[product]["actual_usage_net"] <= 0:
+                    statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist nicht vorhanden")
                 statement_config[product]["total_cloud_price"] = statement_config[product]["cloud_price"] * 12 * percent_year
                 statement_config[product]["total_cloud_price_incl_refund"] = statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
                 statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
@@ -660,10 +687,19 @@ def get_annual_statement_data(data, year, manuell_data):
                 statement_config[product]["total_extra_usage"] = statement_config[product]["actual_usage"] - statement_config[product]["allowed_usage"]
                 statement_config[product]["total_extra_price"] = 0
                 if statement_config[product]["total_extra_usage"] < -250:
-                    statement_config[product]["total_extra_price"] = statement_config[product]["total_extra_usage"] * statement_config["cashback_price_per_kwh"]
+                    if product == "ecloud":
+                        statement_config[product]["cashback_price_per_kwh"] = statement_config["ecloud_cashback_price_per_kwh"]
+                    else:
+                        statement_config[product]["cashback_price_per_kwh"] = statement_config["cashback_price_per_kwh"]
+                    statement_config[product]["total_extra_price"] = (statement_config[product]["total_extra_usage"] + 250) * statement_config[product]["cashback_price_per_kwh"]
+
                 elif statement_config[product]["total_extra_usage"] > 0:
                     statement_config[product]["total_extra_price"] = statement_config[product]["total_extra_usage"] * statement_config[product]["extra_price_per_kwh"]
                 statement_config["total_extra_price"] = statement_config["total_extra_price"] + statement_config[product]["total_extra_price"]
+                statement_config["total_extra_usage"] = statement_config["total_extra_usage"] + statement_config[product]["total_extra_usage"]
+                statement_config["total_usage"] = statement_config["total_usage"] + statement_config[product]["actual_usage"]
+            statement["total_usage"] = statement["total_usage"] + statement_config["total_usage"]
+            statement["total_extra_usage"] = statement["total_extra_usage"] + statement_config["total_extra_usage"]
             statement["total_cloud_price"] = statement["total_cloud_price"] + statement_config["total_cloud_price"]
             statement["total_cloud_price_incl_refund"] = statement["total_cloud_price_incl_refund"] + statement_config["total_cloud_price_incl_refund"]
             statement["total_extra_price"] = statement["total_extra_price"] + statement_config["total_extra_price"]
@@ -848,7 +884,6 @@ def diff_month(d1, d2):
 
 
 def generate_annual_report(contract_number, year):
-    config = get_settings(section="external/bitrix24")
 
     data = get_contract_data(contract_number)
 
@@ -858,7 +893,16 @@ def generate_annual_report(contract_number, year):
     contract_status.data = statement
     db.session.commit()
     return data
-    pdf = generate_annual_statement_pdf(data, statement)
+
+
+def generate_annual_report_pdf(contract_number, year):
+    config = get_settings(section="external/bitrix24")
+
+    data = get_contract_data(contract_number)
+
+    contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
+    statement = contract_status.data
+    pdf = generate_annual_statement_pdf(data, contract_status.data)
     subfolder_id = create_folder_path(415280, path=f"Cloud/Kunde {data['contact_id']}/Vertrag {data['contract_number']}")  # https://keso.bitrix24.de/docs/path/Kundenordner/
 
     statement["drive_id"] = add_file(folder_id=subfolder_id, data={
@@ -906,6 +950,7 @@ def normalize_counter_values(start_date, end_date, number, values):
         .filter(CounterValue.date <= start_date)\
         .limit(1)\
         .all()
+    print("asd", number, start_value_earlier)
     if len(start_value_earlier) > 0:
         values.append({
             "date": normalize_date(start_value_earlier[0].date),
@@ -981,6 +1026,8 @@ def normalize_counter_values(start_date, end_date, number, values):
         "end_value": round(end_value["value"] + (end_date - end_value["date"]).days * value_per_day),
         "end_estimated": True if end_date != end_value["date"] else False,
     }
+    if counter["start_value"] < 0:
+        counter["start_value"] = 0
     if start_value["origin"] != end_value["origin"]:
         counter["type"] = f'{start_value["origin"]}/{end_value["origin"]}'
     counter["usage"] = counter["end_value"] - counter["start_value"]
