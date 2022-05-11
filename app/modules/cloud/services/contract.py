@@ -529,7 +529,8 @@ def get_annual_statement_data(data, year, manuell_data):
         "total_extra_price": 0,
         "total_extra_price_net": 0,
         "total_cloud_price": 0,
-        "total_cloud_price_incl_refund": 0
+        "total_cloud_price_incl_refund": 0,
+        "available_values": []
     }
     counter_numbers = []
     sherpa_counters = []
@@ -549,6 +550,18 @@ def get_annual_statement_data(data, year, manuell_data):
                 "end_date": str(item.datum_stand_neu),
                 "end_value": item.stand_neu,
                 "usage": item.verbrauch
+            })
+            statement["available_values"].append({
+                "number": item.zahlernummer,
+                "date": normalize_date(str(item.datum_stand_alt)),
+                "value": item.stand_alt,
+                "origin": "Netzbetreiber",
+            })
+            statement["available_values"].append({
+                "number": item.zahlernummer,
+                "date": normalize_date(str(item.datum_stand_neu)),
+                "value": item.stand_neu,
+                "origin": "Netzbetreiber",
             })
 
     for config in data["configs"]:
@@ -596,22 +609,26 @@ def get_annual_statement_data(data, year, manuell_data):
                     end_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_end"])
                     counter = None
                     if beginning_of_year is not None and end_of_year is not None:
+                        values = [
+                            {
+                                "number": statement_config[product].get("smartme_number"),
+                                "date": normalize_date(beginning_of_year.get("Date")),
+                                "value": abs(beginning_of_year.get("CounterReading", 0)),
+                                "origin": "smartme"
+                            },
+                            {
+                                "number": statement_config[product].get("smartme_number"),
+                                "date": normalize_date(end_of_year.get("Date")),
+                                "value": abs(end_of_year.get("CounterReading", 0)),
+                                "origin": "smartme"
+                            }
+                        ]
+                        statement["available_values"] = statement["available_values"] + values
                         counter = normalize_counter_values(
                             statement_config[product]["delivery_begin"],
                             statement_config[product]["delivery_end"],
                             statement_config[product].get("smartme_number"),
-                            [
-                                {
-                                    "date": normalize_date(beginning_of_year.get("Date")),
-                                    "value": abs(beginning_of_year.get("CounterReading", 0)),
-                                    "origin": "smartme"
-                                },
-                                {
-                                    "date": normalize_date(end_of_year.get("Date")),
-                                    "value": abs(end_of_year.get("CounterReading", 0)),
-                                    "origin": "smartme"
-                                }
-                            ]
+                            values
                         )
                         if counter is not None:
                             statement_config[product]["actual_usage"] = counter["usage"]
@@ -619,24 +636,16 @@ def get_annual_statement_data(data, year, manuell_data):
                 if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
                     counter_numbers.append(config[product].get("power_meter_number"))
                     values = []
-                    for counter in sherpa_counters:
-                        if counter["number"] == statement_config[product].get("power_meter_number"):
-                            values.append({
-                                "date": normalize_date(counter["start_date"]),
-                                "value": counter["start_value"],
-                                "origin": "Netzbetreiber",
-                            })
-                            values.append({
-                                "date": normalize_date(counter["end_date"]),
-                                "value": counter["end_value"],
-                                "origin": "Netzbetreiber",
-                            })
+                    for value in statement["available_values"]:
+                        if value["number"] == statement_config[product].get("power_meter_number"):
+                            values.append(value)
                     counter = normalize_counter_values(
                         statement_config[product]["delivery_begin"],
                         statement_config[product]["delivery_end"],
                         statement_config[product].get("power_meter_number"),
                         values
                     )
+
                     if counter is not None:
                         if product == "lightcloud":
                             statement_config[product]["actual_usage_net"] = counter["usage"]
@@ -674,6 +683,8 @@ def get_annual_statement_data(data, year, manuell_data):
 
     statement["to_pay"] = statement["total_cloud_price_incl_refund"] - statement["pre_payments_total"] + statement["total_extra_price"]
     statement["to_pay_net"] = statement["to_pay"] / 1.19
+    for value in statement["available_values"]:
+        value["date"] = str(value["date"])
     statement["manuell_counter_values"] = []
     for counter_number in counter_numbers:
         values = CounterValue.query.filter(CounterValue.number == counter_number).order_by(CounterValue.date.asc()).all()
