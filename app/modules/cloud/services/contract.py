@@ -911,7 +911,7 @@ def generate_annual_report_pdf(contract_number, year):
         "file_content": pdf,
         "filename": f"Cloud Abrechnung {year}.pdf"
     })
-    statement["pdf_link"] = get_public_link(statement["drive_id"])
+    statement["pdf_link"] = get_public_link(statement["drive_id"], expire_minutes=525600)
 
     status = ContractStatus.query\
         .filter(ContractStatus.contract_number == contract_number)\
