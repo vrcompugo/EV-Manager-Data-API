@@ -304,9 +304,10 @@ def enhance_payment(item, item_type):
     item["type"] = item_type
     item["service_year"] = {}
     item["service_year_net"] = {}
-    for pay_item in item["payItems"]:
-        item["service_year_net"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"]
-        item["service_year"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"] * (1 + (pay_item["taxRatePercent"] / 100))
+    if item.get("payItems") is not None:
+        for pay_item in item["payItems"]:
+            item["service_year_net"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"]
+            item["service_year"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"] * (1 + (pay_item["taxRatePercent"] / 100))
     return item
 
 
