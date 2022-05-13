@@ -195,7 +195,7 @@
       </tr>
       {% for counter in statement.counters %}
         <tr>
-          <td>{{ counter.number }} **</td>
+          <td>{{ counter.number }}{% if counter.type == "smartme" %} **{% endif %}</td>
           <td>{{ counter.type }}</td>
           <td></td>
           <td style="text-align: right;">{{ counter.start_date | dateformat }}</td>
