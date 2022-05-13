@@ -630,6 +630,24 @@ def get_annual_statement_data(data, year, manuell_data):
 
                 statement_config[product]["actual_usage"] = 0
                 statement_config[product]["actual_usage_net"] = 0
+                if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
+                    counter_numbers.append(config[product].get("power_meter_number"))
+                    values = []
+                    for value in statement["available_values"]:
+                        if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
+                            values.append(value)
+                    counters = normalize_counter_values(
+                        statement_config[product]["delivery_begin"],
+                        statement_config[product]["delivery_end"],
+                        [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
+                        values
+                    )
+                    if counters is not None and len(counters) > 0:
+                        if product == "lightcloud":
+                            statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
+                        else:
+                            statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
+                        statement["counters"] = statement["counters"] + counters
                 if config[product].get("smartme_number") not in [None, "", "123", 0, "0"]:
                     counter_numbers.append(config[product].get("smartme_number"))
                     beginning_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_begin"])
@@ -660,24 +678,6 @@ def get_annual_statement_data(data, year, manuell_data):
                         if counters is not None and len(counters) > 0:
                             statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
                             statement["counters"] = statement["counters"] + counters
-                if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
-                    counter_numbers.append(config[product].get("power_meter_number"))
-                    values = []
-                    for value in statement["available_values"]:
-                        if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
-                            values.append(value)
-                    counters = normalize_counter_values(
-                        statement_config[product]["delivery_begin"],
-                        statement_config[product]["delivery_end"],
-                        [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                        values
-                    )
-                    if counters is not None and len(counters) > 0:
-                        if product == "lightcloud":
-                            statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
-                        else:
-                            statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
-                        statement["counters"] = statement["counters"] + counters
 
                 percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
                 if statement_config[product]["actual_usage"] <= 0:
