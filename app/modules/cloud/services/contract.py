@@ -564,19 +564,19 @@ def get_annual_statement_data(data, year, manuell_data):
                     "end_value": item.stand_neu,
                     "usage": item.verbrauch
                 })
-        for item in sherpa_counters:
-            statement["available_values"].append({
-                "number": item.get("number"),
-                "date": normalize_date(item.get("start_date")),
-                "value": item.get("start_value"),
-                "origin": "Netzbetreiber",
-            })
-            statement["available_values"].append({
-                "number": item.get("number"),
-                "date": normalize_date(item.get("end_date")),
-                "value": item.get("end_value"),
-                "origin": "Netzbetreiber",
-            })
+    for item in sherpa_counters:
+        statement["available_values"].append({
+            "number": item.get("number"),
+            "date": normalize_date(item.get("start_date")),
+            "value": item.get("start_value"),
+            "origin": "Netzbetreiber",
+        })
+        statement["available_values"].append({
+            "number": item.get("number"),
+            "date": normalize_date(item.get("end_date")),
+            "value": item.get("end_value"),
+            "origin": "Netzbetreiber",
+        })
 
     for config in data["configs"]:
         statement_config = json.loads(json.dumps(config))
