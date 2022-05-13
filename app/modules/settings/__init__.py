@@ -473,6 +473,8 @@ def get_settings(section=None, domain_raw=None):
                     "delivery_zip": "UF_CRM_1607945768",
                     "delivery_city": "UF_CRM_1607945776",
                     "delivery_counter_number": "UF_CRM_1607945817",
+                    "delivery_counter_number2": "UF_CRM_1652437906170",
+                    "delivery_counter_number3": "UF_CRM_1652437944091",
                     "delivery_usage": "UF_CRM_1610459059",
                     "cloud_delivery_begin_1": "UF_CRM_1648804042",
                     "cloud_number_1": "UF_CRM_1648804148",

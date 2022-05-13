@@ -435,13 +435,18 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_light"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_light_incl_refund"),
                 "smartme_number": data["main_deal"].get("smartme_number"),
-                "power_meter_number": data["main_deal"].get("power_meter_number").strip(),
+                "power_meter_number": data["main_deal"].get("delivery_counter_number").strip(),
+                "additional_power_meter_numbers": [],
                 "delivery_begin": data["main_deal"].get("cloud_delivery_begin"),
                 "deal": {
                     "id": data["main_deal"].get("id"),
                     "title": data["main_deal"].get("title")
                 }
             }
+            if data["main_deal"].get("delivery_counter_number2") not in empty_values:
+                config["lightcloud"]["additional_power_meter_numbers"].append(data["main_deal"].get("delivery_counter_number2"))
+            if data["main_deal"].get("delivery_counter_number3") not in empty_values:
+                config["lightcloud"]["additional_power_meter_numbers"].append(data["main_deal"].get("delivery_counter_number3"))
         if offer_v2.calculated.get("min_kwp_heatcloud") > 0:
             config["heatcloud"] = {
                 "label": "Wärmecloud",
@@ -526,6 +531,7 @@ def get_annual_statement_data(data, year, manuell_data):
         manuell_data = {}
     statement = {
         "year": year,
+        "contact": get_contact(data.get("contact_id")),
         "counters": [],
         "configs": [],
         "errors": [],
@@ -645,34 +651,34 @@ def get_annual_statement_data(data, year, manuell_data):
                             }
                         ]
                         statement["available_values"] = statement["available_values"] + values
-                        counter = normalize_counter_values(
+                        counters = normalize_counter_values(
                             statement_config[product]["delivery_begin"],
                             statement_config[product]["delivery_end"],
-                            statement_config[product].get("smartme_number"),
+                            [statement_config[product].get("smartme_number")],
                             values
                         )
-                        if counter is not None:
-                            statement_config[product]["actual_usage"] = counter["usage"]
-                            statement["counters"].append(counter)
+                        if counters is not None and len(counters) > 0:
+                            statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
+                            statement["counters"] = statement["counters"] + counters
                 if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
                     counter_numbers.append(config[product].get("power_meter_number"))
                     values = []
                     for value in statement["available_values"]:
-                        if value["number"] == statement_config[product].get("power_meter_number"):
+                        if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
                             values.append(value)
-                    counter = normalize_counter_values(
+                    counters = normalize_counter_values(
                         statement_config[product]["delivery_begin"],
                         statement_config[product]["delivery_end"],
-                        statement_config[product].get("power_meter_number"),
+                        [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
                         values
                     )
-
-                    if counter is not None:
+                    if counters is not None and len(counters) > 0:
                         if product == "lightcloud":
-                            statement_config[product]["actual_usage_net"] = counter["usage"]
+                            statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
                         else:
-                            statement_config[product]["actual_usage"] = counter["usage"]
-                        statement["counters"].append(counter)
+                            statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
+                        statement["counters"] = statement["counters"] + counters
+
                 percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
                 if statement_config[product]["actual_usage"] <= 0:
                     statement["errors"].append(f"{statement_config[product]['label']} hat keinen Verbrauch")
@@ -945,95 +951,132 @@ def normalize_date(datetime):
     return parse(parse(str(datetime)).strftime("%Y-%m-%d"))
 
 
-def normalize_counter_values(start_date, end_date, number, values):
-    start_date = normalize_date(start_date)
-    end_date = normalize_date(end_date)
-    start_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
-        .filter(CounterValue.date <= start_date)\
-        .limit(1)\
-        .all()
-    print("asd", number, start_value_earlier)
-    if len(start_value_earlier) > 0:
-        values.append({
-            "date": normalize_date(start_value_earlier[0].date),
-            "value": start_value_earlier[0].value,
-            "origin": start_value_earlier[0].origin
+def normalize_counter_values(start_date, end_date, numbers, values):
+    counters = []
+    for number in numbers:
+        start_date = normalize_date(start_date)
+        end_date = normalize_date(end_date)
+        start_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
+            .filter(CounterValue.date <= start_date)\
+            .limit(1)\
+            .all()
+        if len(start_value_earlier) > 0:
+            values.append({
+                "date": normalize_date(start_value_earlier[0].date),
+                "value": start_value_earlier[0].value,
+                "origin": start_value_earlier[0].origin
+            })
+        start_value_later = CounterValue.query.filter(CounterValue.number == number)\
+            .filter(CounterValue.date > start_date)\
+            .limit(1)\
+            .all()
+        if len(start_value_later) > 0:
+            values.append({
+                "date": normalize_date(start_value_later[0].date),
+                "value": start_value_later[0].value,
+                "origin": start_value_later[0].origin
+            })
+        end_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
+            .filter(CounterValue.date <= end_date)\
+            .limit(1)\
+            .all()
+        if len(end_value_earlier) > 0:
+            values.append({
+                "date": normalize_date(end_value_earlier[0].date),
+                "value": end_value_earlier[0].value,
+                "origin": end_value_earlier[0].origin
+            })
+        end_value_later = CounterValue.query.filter(CounterValue.number == number)\
+            .filter(CounterValue.date > end_date)\
+            .limit(1)\
+            .all()
+        if len(end_value_later) > 0:
+            values.append({
+                "date": normalize_date(end_value_later[0].date),
+                "value": end_value_later[0].value,
+                "origin": end_value_later[0].origin
+            })
+        values = sorted(values, key=lambda d: d['date'])
+        start_value = None
+        end_value = None
+        for value in values:
+            if value["number"] == number:
+                if value["date"] < start_date:
+                    start_value = value
+                if value["date"] == start_date:
+                    start_value = value
+                if value["date"] > start_date:
+                    if start_value is None:
+                        start_value = value
+                    elif (start_date - start_value["date"]).days > (value["date"] - start_date).days:
+                        start_value = value
+                if value["date"] < end_date:
+                    end_value = value
+                if value["date"] == end_date:
+                    end_value = value
+                if value["date"] > end_date:
+                    if end_value is None:
+                        end_value = value
+                    elif (end_date - end_value["date"]).days > (value["date"] - end_date).days:
+                        end_value = value
+        if end_value is None or start_value is None:
+            return None
+        origin = start_value["origin"]
+        if start_value["origin"] != end_value["origin"]:
+            origin = f'{start_value["origin"]}/{end_value["origin"]}'
+        counters.append({
+            "number": number,
+            "type": origin,
+            "start_date": start_value["date"],
+            "start_value": start_value["value"],
+            "start_estimated": False,
+            "end_date": end_value["date"],
+            "end_value": end_value["value"],
+            "end_estimated": False,
         })
-    start_value_later = CounterValue.query.filter(CounterValue.number == number)\
-        .filter(CounterValue.date > start_date)\
-        .limit(1)\
-        .all()
-    if len(start_value_later) > 0:
-        values.append({
-            "date": normalize_date(start_value_later[0].date),
-            "value": start_value_later[0].value,
-            "origin": start_value_later[0].origin
-        })
-    end_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
-        .filter(CounterValue.date <= end_date)\
-        .limit(1)\
-        .all()
-    if len(end_value_earlier) > 0:
-        values.append({
-            "date": normalize_date(end_value_earlier[0].date),
-            "value": end_value_earlier[0].value,
-            "origin": end_value_earlier[0].origin
-        })
-    end_value_later = CounterValue.query.filter(CounterValue.number == number)\
-        .filter(CounterValue.date > end_date)\
-        .limit(1)\
-        .all()
-    if len(end_value_later) > 0:
-        values.append({
-            "date": normalize_date(end_value_later[0].date),
-            "value": end_value_later[0].value,
-            "origin": end_value_later[0].origin
-        })
-    values = sorted(values, key=lambda d: d['date'])
-    start_value = None
-    end_value = None
-    for value in values:
-        if value["date"] < start_date:
-            start_value = value
-        if value["date"] == start_date:
-            start_value = value
-        if value["date"] > start_date:
-            if start_value is None:
-                start_value = value
-            elif (start_date - start_value["date"]).days > (value["date"] - start_date).days:
-                start_value = value
-        if value["date"] < end_date:
-            end_value = value
-        if value["date"] == end_date:
-            end_value = value
-        if value["date"] > end_date:
-            if end_value is None:
-                end_value = value
-            elif (end_date - end_value["date"]).days > (value["date"] - end_date).days:
-                end_value = value
-    if end_value is None or start_value is None:
+        # print(counters)
+    if len(counters) == 0:
         return None
+
+    average_value_per_day = 0
+    for counter_value in counters:
+        counter_value["diff_days"] = (counter_value["end_date"] - counter_value["start_date"] ).days
+        counter_value["value_per_day"] = (counter_value["end_value"] - counter_value["start_value"]) / counter_value["diff_days"]
+        average_value_per_day = average_value_per_day + counter_value["value_per_day"]
+    average_value_per_day = average_value_per_day / len(counters)
+
+    counters = sorted(counters, key=lambda d: d["start_date"])
+
+    first_counter = counters[0]
+    last_counter = counters[len(counters) - 1]
+
     diff_days_target = (end_date - start_date).days
-    diff_days_value = (end_value["date"] - start_value["date"]).days
+    diff_days_value = (last_counter["end_date"] - first_counter["start_date"]).days
     if diff_days_target * 0.3 > diff_days_value:
         return None
-    value_per_day = (end_value["value"] - start_value["value"]) / diff_days_value
-    counter = {
-        "number": number,
-        "type": start_value["origin"],
-        "start_date": str(start_date),
-        "start_value": round(start_value["value"] + (start_date - start_value["date"]).days * value_per_day),
-        "start_estimated": True if start_date != start_value["date"] else False,
-        "end_date": str(end_date),
-        "end_value": round(end_value["value"] + (end_date - end_value["date"]).days * value_per_day),
-        "end_estimated": True if end_date != end_value["date"] else False,
-    }
-    if counter["start_value"] < 0:
-        counter["start_value"] = 0
-    if start_value["origin"] != end_value["origin"]:
-        counter["type"] = f'{start_value["origin"]}/{end_value["origin"]}'
-    counter["usage"] = counter["end_value"] - counter["start_value"]
-    return counter
+
+    if first_counter["start_date"] != start_date:
+        diff_start_days = (first_counter["start_date"] - start_date).days
+        first_counter["start_date"] = start_date
+        first_counter["start_estimated"] = True
+        first_counter["start_value"] = first_counter["start_value"] - diff_start_days * average_value_per_day
+        if first_counter["start_value"] < 0:
+            first_counter["start_value"] = 0
+    first_counter["usage"] = first_counter["end_value"] - first_counter["start_value"]
+
+    if last_counter["end_date"] != end_date:
+        diff_start_days = (last_counter["end_date"] - end_date).days
+        last_counter["end_date"] = end_date
+        last_counter["end_estimated"] = True
+        last_counter["end_value"] = last_counter["end_value"] - diff_start_days * average_value_per_day
+        if last_counter["end_value"] < 0:
+            last_counter["end_value"] = 0
+    last_counter["usage"] = last_counter["end_value"] - last_counter["start_value"]
+
+    for counter in counters:
+        counter["start_date"] = str(counter["start_date"])
+        counter["end_date"] = str(counter["end_date"])
+    return counters
 
 
 def test_normalize_counter_values():

@@ -56,8 +56,8 @@
 
 <div>
   <small style="text-decoration: underline;font-size: 10px;">energie360 GmbH & Co KG<br>Wildunger Landstr. 14b 34497 Korbach</small><br>
-  {% if data.contact %}
-    {{ data.contact | addressblock2 | nltobr }}
+  {% if statement.contact %}
+    {{ statement.contact | addressblock2 | nltobr }}
   {% endif %}
 </div>
 
