@@ -541,12 +541,12 @@ def get_annual_statement_data(data, year, manuell_data):
     }
     counter_numbers = []
     sherpa_counters = []
-    sherpaInvoice = SherpaInvoice.query\
+    sherpaInvoices = SherpaInvoice.query\
         .filter(SherpaInvoice.identnummer == data.get("contract_number"))\
         .filter(SherpaInvoice.abrechnungszeitraum_von >= f"{year}-01-01") \
         .filter(SherpaInvoice.abrechnungszeitraum_von <= f"{year}-12-31") \
-        .first()
-    if sherpaInvoice is not None:
+        .all()
+    for sherpaInvoice in sherpaInvoices:
         sherpa_items = SherpaInvoiceItem.query.filter(SherpaInvoiceItem.sherpa_invoice_id == sherpaInvoice.id).all()
         for item in sherpa_items:
             existing_counter = next((i for i in sherpa_counters if i["number"] == item.zahlernummer and i["start_date"] == str(item.datum_stand_alt) and i["end_date"] == str(item.datum_stand_neu)), None)
