@@ -1060,8 +1060,12 @@ def normalize_counter_values(start_date, end_date, numbers, values):
 
     diff_days_target = (end_date - start_date).days
     diff_days_value = (last_counter["end_date"] - first_counter["start_date"]).days
-    if diff_days_target * 0.3 > diff_days_value:
-        return None
+    if diff_days_target < 100:
+        if diff_days_target * 0.2 > diff_days_value:
+            return None
+    else:
+        if diff_days_target * 0.3 > diff_days_value:
+            return None
 
     if first_counter["start_date"] != start_date:
         diff_start_days = (first_counter["start_date"] - start_date).days
