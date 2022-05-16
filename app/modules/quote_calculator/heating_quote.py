@@ -1,3 +1,4 @@
+import json
 import traceback
 
 from app.exceptions import ApiException
@@ -78,12 +79,13 @@ def get_heating_products(data):
                         product_name = "Luft/Wasser-Wärmepumpe (Neubau 400)"
                 if 400 < data["data"]["heating_quote_sqm"]:
                     extra_quantity = data["data"]["heating_quote_sqm"] - 400
-                add_direct_product(
-                    label=product_name,
-                    category=f"Online - Heizung - WP",
-                    quantity=1,
-                    products=data["heating_quote"]["products"]
-                )
+                product = get_product(label=product_name, category=f"Online - Heizung - WP")
+                if product is not None:
+                    product["quantity"] = 1
+                    if data["data"].get("heating_quote_house_type") in ["Mehrfamilienhaus"]:
+                        product["PRICE"] = float(product["PRICE"]) + 7000
+                    data["heating_quote"]["products"].append(product)
+
             if extra_quantity > 0:
                 add_direct_product(
                     label="Erweiterung Heizfläche",
