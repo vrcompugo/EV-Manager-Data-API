@@ -12,6 +12,18 @@ def cron_heatpump_auto_quote_generator():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 210,
+        "FILTER[STAGE_ID]": "C210:NEW"
+    }, force_reload=True)
+    for deal in deals:
+        if deal.get("contact_id") in [None, "", 0, "0"]:
+            lead = get_lead(deal.get("unique_identifier"))
+            update_deal(deal["id"], {
+                "contact_id": lead.get("contact_id")
+            })
+
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 210,
         "FILTER[STAGE_ID]": "C210:PREPAYMENT_INVOI"
     }, force_reload=True)
     for deal in deals:
