@@ -451,6 +451,12 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 config["lightcloud"]["additional_power_meter_numbers"].append(data["main_deal"].get("delivery_counter_number2"))
             if data["main_deal"].get("delivery_counter_number3") not in empty_values:
                 config["lightcloud"]["additional_power_meter_numbers"].append(data["main_deal"].get("delivery_counter_number3"))
+            if data["main_deal"].get("old_power_meter_numbers") not in empty_values:
+                numbers = data["main_deal"].get("old_power_meter_numbers").split("\n")
+                for number in numbers:
+                    number = number.strip()
+                    if number != "" and number not in config["lightcloud"]["additional_power_meter_numbers"]:
+                        config["lightcloud"]["additional_power_meter_numbers"].append(number)
         if offer_v2.calculated.get("min_kwp_heatcloud") > 0:
             config["heatcloud"] = {
                 "label": "Wärmecloud",
@@ -458,6 +464,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_heatcloud"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_heatcloud_incl_refund"),
                 "extra_price_per_kwh": offer_v2.calculated.get("heatcloud_extra_price_per_kwh"),
+                "additional_power_meter_numbers": [],
                 "deal": None
             }
             deals = get_deals({
@@ -481,11 +488,18 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 }
                 if config["heatcloud"]["power_meter_number"] not in empty_values:
                     config["heatcloud"]["power_meter_number"] = config["heatcloud"]["power_meter_number"].strip()
+                if deals[0].get("old_power_meter_numbers") not in empty_values:
+                    numbers =  deals[0].get("old_power_meter_numbers").split("\n")
+                    for number in numbers:
+                        number = number.strip()
+                        if number != "" and number not in config["heatcloud"]["additional_power_meter_numbers"]:
+                            config["heatcloud"]["additional_power_meter_numbers"].append(number)
         if offer_v2.calculated.get("min_kwp_ecloud") > 0:
             config["ecloud"] = {
                 "label": "eCloud",
                 "usage": offer_v2.calculated.get("ecloud_usage"),
                 "power_meter_number": offer_v2.calculated.get("ecloud_usage"),
+                "additional_power_meter_numbers": [],
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_ecloud"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_ecloud_incl_refund"),
                 "extra_price_per_kwh": offer_v2.calculated.get("ecloud_extra_price_per_kwh"),
@@ -512,6 +526,12 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 }
                 if config["ecloud"]["power_meter_number"] not in empty_values:
                     config["ecloud"]["power_meter_number"] = config["ecloud"]["power_meter_number"].strip()
+                if  deals[0].get("old_power_meter_numbers") not in empty_values:
+                    numbers =  deals[0].get("old_power_meter_numbers").split("\n")
+                    for number in numbers:
+                        number = number.strip()
+                        if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
+                            config["ecloud"]["additional_power_meter_numbers"].append(number)
         if offer_v2.calculated.get("min_kwp_emove") > 0:
             config["emove"] = {
                 "label": "eMove",
