@@ -52,7 +52,8 @@ def get_import_data(raw):
             "street": street,
             "street_nb": street_nb,
             "zip": raw["zipcode"],
-            "city": raw["city"]
+            "city": raw["city"],
+            "interested_in": f"{raw['subject']} {raw['service']}"
         },
         "timeline_comment": {
             "entity_type": "lead",
