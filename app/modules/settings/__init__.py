@@ -564,7 +564,8 @@ def get_settings(section=None, domain_raw=None):
                     "order_sign_date": "UF_CRM_1633684390348",
                     "contracting_version": "UF_CRM_1639388043",
                     "heatpump_survey_link": "UF_CRM_1651676940",
-                    "interested_in": "UF_CRM_1652363669"
+                    "interested_in": "UF_CRM_1652363669",
+                    "comment": "UF_CRM_1652706710"
                 }
             },
             "company": {

@@ -7,7 +7,7 @@ from app import db
 from app.modules.user import auto_assign_lead_to_user
 from app.modules.external.bitrix24.company import add_company
 from app.modules.external.bitrix24.contact import get_contact_by_email, add_contact
-from app.modules.external.bitrix24.lead import get_lead, add_lead
+from app.modules.external.bitrix24.lead import get_lead, add_lead, update_lead
 from app.modules.external.bitrix24.timeline_comment import add_timeline_comment
 from app.modules.settings import get_settings, set_settings
 from app.utils.error_handler import error_handler
@@ -53,7 +53,8 @@ def get_import_data(raw):
             "street_nb": street_nb,
             "zip": raw["zipcode"],
             "city": raw["city"],
-            "interested_in": f"{raw['subject']} {raw['service']}"
+            "interested_in": f"{raw['subject']} {raw['service']}",
+            "comment": ""
         },
         "timeline_comment": {
             "entity_type": "lead",
@@ -69,6 +70,7 @@ def get_import_data(raw):
         for key in raw["infos"].keys():
             data["timeline_comment"]["comment"] = data["timeline_comment"]["comment"] \
                 + f"{key}: {raw['infos'][key]}\n"
+    data["lead"]["comment"] = data["timeline_comment"]["comment"]
     return data
 
 
@@ -121,6 +123,7 @@ def run_cron_import():
                 lead_data = add_lead(data["lead"])
 
                 data["timeline_comment"]["entity_id"] = lead_data["id"]
+                update_lead(lead_data["id"], {"unique_identifier": lead_data["id"]})
                 add_timeline_comment(data["timeline_comment"])
 
                 auto_assign_lead_to_user(lead_data["id"])
