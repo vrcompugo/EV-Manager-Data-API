@@ -45,7 +45,12 @@
         Solarstrom sind.
       </div>
       <br>
-      <img style="width: 80%;" src="{{ data.base_url }}/static/feasibility_study_2020/certificates.jpg" />
+
+      {% if offer.reseller.document_style == "bsh" %}
+        <img style="width: 80%;" src="{{ data.base_url }}/static/feasibility_study_2020/certificates-bsh.jpg" />
+      {% else %}
+        <img style="width: 80%;" src="{{ data.base_url }}/static/feasibility_study_2020/certificates.jpg" />
+      {% endif %}
 
     </div>
     <div class="right-side">&nbsp;</div>
