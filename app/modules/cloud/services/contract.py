@@ -465,7 +465,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 f"FILTER[{settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
                 f"FILTER[{settings['deal']['fields']['is_cloud_heatcloud']}]": "1",
                 "FILTER[CATEGORY_ID]": 15
-            })
+            }, force_reload=True)
             if len(deals) != 1:
                 config["errors"].append({
                     "code": "deal_not_found",
@@ -496,7 +496,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 f"FILTER[{settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
                 f"FILTER[{settings['deal']['fields']['is_cloud_ecloud']}]": "1",
                 "FILTER[CATEGORY_ID]": 15
-            })
+            }, force_reload=True)
             if len(deals) != 1:
                 config["errors"].append({
                     "code": "deal_not_found",
