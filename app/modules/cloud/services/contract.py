@@ -971,6 +971,7 @@ def normalize_counter_values(start_date, end_date, numbers, values):
         if len(start_value_earlier) > 0:
             values.append({
                 "date": normalize_date(start_value_earlier[0].date),
+                "number": number,
                 "value": start_value_earlier[0].value,
                 "origin": start_value_earlier[0].origin
             })
@@ -981,6 +982,7 @@ def normalize_counter_values(start_date, end_date, numbers, values):
         if len(start_value_later) > 0:
             values.append({
                 "date": normalize_date(start_value_later[0].date),
+                "number": number,
                 "value": start_value_later[0].value,
                 "origin": start_value_later[0].origin
             })
@@ -991,6 +993,7 @@ def normalize_counter_values(start_date, end_date, numbers, values):
         if len(end_value_earlier) > 0:
             values.append({
                 "date": normalize_date(end_value_earlier[0].date),
+                "number": number,
                 "value": end_value_earlier[0].value,
                 "origin": end_value_earlier[0].origin
             })
@@ -1001,6 +1004,7 @@ def normalize_counter_values(start_date, end_date, numbers, values):
         if len(end_value_later) > 0:
             values.append({
                 "date": normalize_date(end_value_later[0].date),
+                "number": number,
                 "value": end_value_later[0].value,
                 "origin": end_value_later[0].origin
             })
@@ -1049,7 +1053,10 @@ def normalize_counter_values(start_date, end_date, numbers, values):
     average_value_per_day = 0
     for counter_value in counters:
         counter_value["diff_days"] = (counter_value["end_date"] - counter_value["start_date"] ).days
-        counter_value["value_per_day"] = (counter_value["end_value"] - counter_value["start_value"]) / counter_value["diff_days"]
+        if counter_value["diff_days"] <= 0:
+            counter_value["value_per_day"] = (counter_value["end_value"] - counter_value["start_value"])
+        else:
+            counter_value["value_per_day"] = (counter_value["end_value"] - counter_value["start_value"]) / counter_value["diff_days"]
         average_value_per_day = average_value_per_day + counter_value["value_per_day"]
     average_value_per_day = average_value_per_day / len(counters)
 
