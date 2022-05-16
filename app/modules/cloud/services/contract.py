@@ -435,7 +435,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_light"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_light_incl_refund"),
                 "smartme_number": data["main_deal"].get("smartme_number"),
-                "power_meter_number": data["main_deal"].get("delivery_counter_number").strip(),
+                "power_meter_number": data["main_deal"].get("delivery_counter_number"),
                 "additional_power_meter_numbers": [],
                 "delivery_begin": data["main_deal"].get("cloud_delivery_begin"),
                 "deal": {
@@ -443,6 +443,10 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                     "title": data["main_deal"].get("title")
                 }
             }
+            if config["lightcloud"]["smartme_number"] not in empty_values:
+                config["lightcloud"]["smartme_number"] = config["lightcloud"]["smartme_number"].strip()
+            if config["lightcloud"]["power_meter_number"] not in empty_values:
+                config["lightcloud"]["power_meter_number"] = config["lightcloud"]["power_meter_number"].strip()
             if data["main_deal"].get("delivery_counter_number2") not in empty_values:
                 config["lightcloud"]["additional_power_meter_numbers"].append(data["main_deal"].get("delivery_counter_number2"))
             if data["main_deal"].get("delivery_counter_number3") not in empty_values:
@@ -469,12 +473,14 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 })
             else:
                 config["heatcloud"]["smartme_number"] = deals[0].get("smartme_number_heatcloud")
-                config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number").strip()
+                config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number")
                 config["heatcloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
                 config["heatcloud"]["deal"] = {
                     "id": deals[0].get("id"),
                     "title": deals[0].get("title")
                 }
+                if config["heatcloud"]["power_meter_number"] not in empty_values:
+                    config["heatcloud"]["power_meter_number"] = config["heatcloud"]["power_meter_number"].strip()
         if offer_v2.calculated.get("min_kwp_ecloud") > 0:
             config["ecloud"] = {
                 "label": "eCloud",
@@ -498,12 +504,14 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 })
             else:
                 config["ecloud"]["smartme_number"] = None
-                config["ecloud"]["power_meter_number"] = deals[0].get("counter_ecloud", "").strip()
+                config["ecloud"]["power_meter_number"] = deals[0].get("counter_ecloud")
                 config["ecloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
                 config["ecloud"]["deal"] = {
                     "id": deals[0].get("id"),
                     "title": deals[0].get("title")
                 }
+                if config["ecloud"]["power_meter_number"] not in empty_values:
+                    config["ecloud"]["power_meter_number"] = config["ecloud"]["power_meter_number"].strip()
         if offer_v2.calculated.get("min_kwp_emove") > 0:
             config["emove"] = {
                 "label": "eMove",
