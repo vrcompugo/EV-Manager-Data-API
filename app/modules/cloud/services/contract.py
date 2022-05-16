@@ -498,7 +498,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 })
             else:
                 config["ecloud"]["smartme_number"] = None
-                config["ecloud"]["power_meter_number"] = deals[0].get("counter_ecloud").strip()
+                config["ecloud"]["power_meter_number"] = deals[0].get("counter_ecloud", "").strip()
                 config["ecloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
                 config["ecloud"]["deal"] = {
                     "id": deals[0].get("id"),
