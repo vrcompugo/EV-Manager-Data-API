@@ -233,6 +233,7 @@ def quote_calculator_update(lead_id):
             '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
             status=501,
             mimetype='application/json')
+    print(auth_info)
     post_data = None
     try:
         post_data = request.json
@@ -244,14 +245,16 @@ def quote_calculator_update(lead_id):
             '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
             status=404,
             mimetype='application/json')
-    return quote_calculator_add_history(lead_id, post_data)
+
+    return quote_calculator_add_history(lead_id, post_data, auth_info)
 
 
-def quote_calculator_add_history(lead_id, post_data):
+def quote_calculator_add_history(lead_id, post_data, auth_info=None):
+    if auth_info is not None:
+        auth_info["user"].get("uf_department")
     contact_id = None
     lead = get_lead(lead_id, True)
-    print("coll", lead.get("collection_url"))
-    if lead.get("collection_url") not in [None, "", 0, "0"]:
+    if lead.get("collection_url") not in [None, "", 0, "0"] and (auth_info is None or auth_info["user"].get("uf_department") not in [7]):
         return Response(
             '{"status": "error", "error_code": "already_signed", "message": "Der Lead wurde bereits unterschrieben. Angebotserstellung nicht mehr möglich"}',
             status=200,
