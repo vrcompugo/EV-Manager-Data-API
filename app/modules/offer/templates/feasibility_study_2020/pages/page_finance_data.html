@@ -152,7 +152,16 @@
             <td>19 %</td>
           </tr>
           <tr class="highlight">
-            <td colspan="2">Finanzierung</td>
+            <td colspan="2">
+              Finanzierung
+              {% if data.loan_calculation and data.loan_calculation.type == "financing" %}
+                {% if offer.data.financing_bank == "bsh" %}
+                  über BSH
+                {% else %}
+                  über Hausbank
+                {% endif %}
+              {% endif %}
+            </td>
           </tr>
           {% if data.loan_calculation %}
             {% if data.loan_calculation.upfront_payment > 0 %}
