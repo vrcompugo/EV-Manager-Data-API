@@ -190,7 +190,7 @@ def load_contract_data(contract_number):
                 "SELECT": "full",
                 f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
                 "FILTER[CATEGORY_ID]": 126
-            })
+            }, force_reload=True)
             if len(deals) > 0:
                 annual_statement["deal"] = {
                     "id": deals[0]["id"],
