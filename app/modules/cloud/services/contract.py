@@ -457,6 +457,21 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                     number = number.strip()
                     if number != "" and number not in config["lightcloud"]["additional_power_meter_numbers"]:
                         config["lightcloud"]["additional_power_meter_numbers"].append(number)
+        if offer_v2.calculated.get("min_kwp_emove") > 0:
+            config["emove"] = {
+                "label": "eMove",
+                "tarif": offer_v2.data.get("emove_tarif"),
+                "cloud_price": offer_v2.calculated.get(f"cloud_price_emove"),
+                "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_emove_incl_refund"),
+                "extra_price_per_kwh": offer_v2.calculated.get("lightcloud_extra_price_per_kwh"),
+                "usage": float(data["main_deal"].get("emove_usage_inhouse")),
+                "usage_outside": float(data["main_deal"].get("emove_usage_outside")),
+                "delivery_begin": data["main_deal"].get("cloud_delivery_begin"),
+                "deal": {
+                    "id": data["main_deal"].get("id"),
+                    "title": data["main_deal"].get("title")
+                }
+            }
         if offer_v2.calculated.get("min_kwp_heatcloud") > 0:
             config["heatcloud"] = {
                 "label": "Wärmecloud",
@@ -498,7 +513,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
             config["ecloud"] = {
                 "label": "eCloud",
                 "usage": offer_v2.calculated.get("ecloud_usage"),
-                "power_meter_number": offer_v2.calculated.get("ecloud_usage"),
+                "power_meter_number": None,
                 "additional_power_meter_numbers": [],
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_ecloud"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_ecloud_incl_refund"),
@@ -532,22 +547,50 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                         number = number.strip()
                         if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
                             config["ecloud"]["additional_power_meter_numbers"].append(number)
-        if offer_v2.calculated.get("min_kwp_emove") > 0:
-            config["emove"] = {
-                "label": "eMove",
-                "tarif": offer_v2.data.get("emove_tarif"),
-                "cloud_price": offer_v2.calculated.get(f"cloud_price_emove"),
-                "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_emove_incl_refund"),
-                "extra_price_per_kwh": offer_v2.calculated.get("lightcloud_extra_price_per_kwh"),
-                "usage": float(data["main_deal"].get("emove_usage_inhouse")),
-                "usage_outside": float(data["main_deal"].get("emove_usage_outside")),
-                "delivery_begin": data["main_deal"].get("cloud_delivery_begin"),
-                "deal": {
-                    "id": data["main_deal"].get("id"),
-                    "title": data["main_deal"].get("title")
-                }
+        if offer_v2.calculated.get("min_kwp_consumer") > 0:
+            for index, consumer in enumerate(offer_v2.data.get("consumers")):
+                config["consumers"].append({
+                    "label": f"Consumer {index + 1}",
+                    "usage": int(consumer.get("usage")),
+                    "address": consumer.get("address"),
+                    "power_meter_number": None,
+                    "additional_power_meter_numbers": [],
+                    "cloud_price": offer_v2.calculated.get(f"cloud_price_consumer") / len(offer_v2.data.get("consumers")),
+                    "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_consumer_incl_refund") / len(offer_v2.data.get("consumers")),
+                    "extra_price_per_kwh": offer_v2.calculated.get("consumercloud_extra_price_per_kwh"),
+                    "deal": None
+                })
+            deals = get_deals({
+                "SELECT": "full",
+                f"FILTER[{settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
+                f"FILTER[{settings['deal']['fields']['is_cloud_consumer']}]": "1",
+                "FILTER[CATEGORY_ID]": 15
+            }, force_reload=True)
+            for index, consumer in enumerate(config["consumers"]):
+                existing_deal = next((i for i in deals if str(i["delivery_usage"]) == str(consumer["usage"])), None)
+                if existing_deal is None:
+                    config["errors"].append({
+                        "code": "deal_not_found",
+                        "message": f"Consumer {index + 1} Auftrag nicht gefunden"
+                    })
+                else:
+                    consumer["power_meter_number"] = existing_deal.get("delivery_counter_number")
+                    consumer["delivery_begin"] = existing_deal.get("cloud_delivery_begin")
+                    if  existing_deal.get("old_power_meter_numbers") not in empty_values:
+                        numbers =  existing_deal.get("old_power_meter_numbers").split("\n")
+                        for number in numbers:
+                            number = number.strip()
+                            if number != "" and number not in consumer["additional_power_meter_numbers"]:
+                                consumer["additional_power_meter_numbers"].append(number)
+                    consumer["deal"] = {
+                        "id": existing_deal.get("id"),
+                        "title": existing_deal.get("title")
+                    }
+            config["consumer_data"] = {
+                "cloud_price": offer_v2.calculated.get(f"cloud_price_consumer"),
+                "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_consumer_incl_refund"),
+                "extra_price_per_kwh": offer_v2.calculated.get("consumercloud_extra_price_per_kwh"),
             }
-            print(json.dumps(config["emove"], indent=2))
 
     data["configs"].append(config)
     return data
@@ -614,6 +657,11 @@ def get_annual_statement_data(data, year, manuell_data):
 
     for config in data["configs"]:
         statement_config = json.loads(json.dumps(config))
+        customer_products = []
+        for index, consumer in enumerate(statement_config["consumers"]):
+            customer_products.append(f"consumer{index}")
+            statement_config[f"consumer{index}"] = consumer
+
         if manuell_data.get("cashback_price_per_kwh") not in [None, ""]:
             statement_config["cashback_price_per_kwh"] = float(manuell_data.get("cashback_price_per_kwh")) / 100
         if manuell_data.get("ecloud_cashback_price_per_kwh") not in [None, ""]:
@@ -630,13 +678,13 @@ def get_annual_statement_data(data, year, manuell_data):
         if parse(config.get("delivery_begin")).year == year:
             delivery_begin = str(config.get("delivery_begin"))
         if parse(delivery_begin).year <= year and parse(delivery_end).year >= year:
-            for product in ["lightcloud", "heatcloud", "ecloud"] + config["consumers"]:
-                if config.get(product) is None:
+            for product in ["lightcloud", "heatcloud", "ecloud"] + customer_products:
+                if statement_config.get(product) is None:
                     continue
-                if config[product].get("delivery_begin") in [None, "", 0, "0"]:
+                if statement_config[product].get("delivery_begin") in [None, "", 0, "0"]:
                     del statement_config[product]
                     continue
-                if parse(config[product].get("delivery_begin")).year > year:
+                if parse(statement_config[product].get("delivery_begin")).year > year:
                     del statement_config[product]
                     continue
                 if statement_config[product]["extra_price_per_kwh"] < 0.3379:
@@ -644,8 +692,8 @@ def get_annual_statement_data(data, year, manuell_data):
                 if manuell_data.get(f"{product}_extra_price_per_kwh") not in [None, ""]:
                     statement_config[product]["extra_price_per_kwh"] = float(manuell_data.get(f"{product}_extra_price_per_kwh")) / 100
                 product_delivery_begin = f"{year}-01-01"
-                if parse(config[product].get("delivery_begin")).year == year:
-                    product_delivery_begin = parse(config[product].get("delivery_begin"))
+                if parse(statement_config[product].get("delivery_begin")).year == year:
+                    product_delivery_begin = parse(statement_config[product].get("delivery_begin"))
                 statement_config[product]["delivery_begin"] = str(product_delivery_begin)
                 statement_config[product]["delivery_end"] = str(delivery_end)
                 diff_days = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days
@@ -655,11 +703,11 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement_config[product]["label"] = statement_config[product]["label"] + " inkl. eMove"
                     statement_config[product]["allowed_usage_emove"] = float(statement_config["emove"]["usage"]) * (diff_days / 365)
                     statement_config[product]["allowed_usage"] = statement_config[product]["allowed_usage"] + statement_config[product]["allowed_usage_emove"]
-
                 statement_config[product]["actual_usage"] = 0
                 statement_config[product]["actual_usage_net"] = 0
+                print(product, json.dumps(statement_config[product], indent=2))
                 if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
-                    counter_numbers.append(config[product].get("power_meter_number"))
+                    counter_numbers.append(statement_config[product].get("power_meter_number"))
                     values = []
                     for value in statement["available_values"]:
                         if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
@@ -676,8 +724,8 @@ def get_annual_statement_data(data, year, manuell_data):
                         else:
                             statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
                         statement["counters"] = statement["counters"] + counters
-                if config[product].get("smartme_number") not in [None, "", "123", 0, "0"]:
-                    counter_numbers.append(config[product].get("smartme_number"))
+                if statement_config[product].get("smartme_number") not in [None, "", "123", 0, "0"]:
+                    counter_numbers.append(statement_config[product].get("smartme_number"))
                     beginning_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_begin"])
                     end_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_end"])
                     counter = None
@@ -739,6 +787,10 @@ def get_annual_statement_data(data, year, manuell_data):
             statement["total_cloud_price"] = statement["total_cloud_price"] + statement_config["total_cloud_price"]
             statement["total_cloud_price_incl_refund"] = statement["total_cloud_price_incl_refund"] + statement_config["total_cloud_price_incl_refund"]
             statement["total_extra_price"] = statement["total_extra_price"] + statement_config["total_extra_price"]
+
+            statement_config["consumers"] = []
+            for customer_product in customer_products:
+                statement_config["consumers"].append(statement_config[customer_product])
             statement["configs"].append(statement_config)
     statement["total_extra_price_net"] = statement["total_extra_price"] / 1.19
     statement["total_cloud_price_net"] = statement["total_cloud_price"] / 1.19
