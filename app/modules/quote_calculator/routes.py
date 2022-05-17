@@ -254,11 +254,13 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
         auth_info["user"].get("uf_department")
     contact_id = None
     lead = get_lead(lead_id, True)
-    if lead.get("collection_url") not in [None, "", 0, "0"] and (auth_info is None or auth_info["user"].get("uf_department") not in [7]):
-        return Response(
-            '{"status": "error", "error_code": "already_signed", "message": "Der Lead wurde bereits unterschrieben. Angebotserstellung nicht mehr möglich"}',
-            status=200,
-            mimetype='application/json')
+    if lead.get("collection_url") not in [None, "", 0, "0"]:
+        print(auth_info["user"].get("uf_department"))
+        if auth_info is None or (7 not in auth_info["user"].get("uf_department") and 41 not in auth_info["user"].get("uf_department")):
+            return Response(
+                '{"status": "error", "error_code": "already_signed", "message": "Der Lead wurde bereits unterschrieben. Angebotserstellung nicht mehr möglich"}',
+                status=200,
+                mimetype='application/json')
 
     if lead["contact_id"] is None or lead["contact_id"] is False or lead["contact_id"] == "" or int(lead["contact_id"]) == 0:
         contact = add_contact(lead["contact"])
