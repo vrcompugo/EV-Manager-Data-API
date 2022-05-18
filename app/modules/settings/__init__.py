@@ -497,7 +497,8 @@ def get_settings(section=None, domain_raw=None):
                     "heating_quote_shower_count": "UF_CRM_1650894452",
                     "heating_quote_bathtub_count": "UF_CRM_1650894476",
                     "heating_quote_people": "UF_CRM_1650894495",
-                    "pdf_heatpump_auto_generate_link": "UF_CRM_1651497860"
+                    "pdf_heatpump_auto_generate_link": "UF_CRM_1651497860",
+                    "contracting_heatpump_link": "UF_CRM_1652867226"
                 }
             },
             "quote": {
@@ -565,7 +566,8 @@ def get_settings(section=None, domain_raw=None):
                     "contracting_version": "UF_CRM_1639388043",
                     "heatpump_survey_link": "UF_CRM_1651676940",
                     "interested_in": "UF_CRM_1652363669",
-                    "comment": "UF_CRM_1652706710"
+                    "comment": "UF_CRM_1652706710",
+                    "contracting_heatpump_link": "UF_CRM_1652867586"
                 }
             },
             "company": {

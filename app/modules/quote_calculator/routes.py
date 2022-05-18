@@ -890,6 +890,7 @@ def get_insign_callback(token):
     customer_folder_id = get_folder_id(myprotal_folder["folder_id"], path=f"Kunde {lead['contact_id']}/Vertragsunterlagen")
     collection_files = []
     heatpump_survey_link = None
+    contracting_heatpump_link = None
     for file in token_data.get("documents", []):
         file_content = download_file(sessionId=session_id, file_id=file["id"])
         if isinstance(file_content, dict):
@@ -929,6 +930,8 @@ def get_insign_callback(token):
                 "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                 "file_content": file_content
             })
+            if file["displayname"] == "Contractigvertrag WP":
+                contracting_heatpump_link = get_public_link(file_id, 518400)
             if file_id is not None:
                 collection_files.append({
                     "id": file_id,
@@ -943,6 +946,8 @@ def get_insign_callback(token):
             "zoom_appointment": str(datetime.datetime.now()),
             "zoom_link": "1"
         }
+        if contracting_heatpump_link is not None:
+            lead_data["contracting_heatpump_link"] = contracting_heatpump_link
         if heatpump_survey_link is not None:
             lead_data["heatpump_survey_link"] = heatpump_survey_link
         if "pv_quote_sum_net" in token_data:
