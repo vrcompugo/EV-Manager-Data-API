@@ -24,7 +24,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote, calculate_heating_usage
-from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_bluegen_wi_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf, generate_heatpump_auto_generate_pdf
+from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_bluegen_wi_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf, generate_contract_summary_part5_pdf, generate_heatpump_auto_generate_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -785,6 +785,7 @@ def quote_calculator_contract_summary_pdf_action(lead_id):
     genrate_pdf(data, generate_contract_summary_part3_pdf, lead_id, "pdf_contract_summary_part3_file_id", "Contracting.pdf", subfolder_id)
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Heizungskonzept.pdf", subfolder_id)
+        genrate_pdf(data, generate_contract_summary_part5_pdf, lead_id, "pdf_contract_summary_part5_file_id", "Contracting WP.pdf", subfolder_id)
         data["pdf_contract_summary_part4_file_link"] = get_public_link(data["pdf_contract_summary_part4_file_id"])
     genrate_pdf(data, generate_contract_summary_pdf, lead_id, "pdf_contract_summary_file_id", "Vertragsunterlagen.pdf", subfolder_id)
     data["pdf_contract_summary_link"] = get_public_link(data["pdf_contract_summary_file_id"])
@@ -1034,6 +1035,7 @@ def send_insign_email(lead_id):
 
 def get_insign_session(data):
     from app.modules.external.insign.signature import get_session_id
+    from app.utils.jinja_filters import numberformat
     config = get_settings("general")
     signatures = [
         {
@@ -1082,6 +1084,13 @@ def get_insign_session(data):
             "preFilledFields": [],
             "signatures": signatures
         })
+        prefillable_documents.append({
+            "id": data["pdf_contract_summary_part5_file_id"],
+            "displayname": "Contractigvertrag WP",
+            "preFilledFields": [],
+            "signatures": signatures
+        })
+
     prefillable_documents.append({
         "id": data["pdf_contract_summary_part1_file_id"],
         "displayname": "Verkaufsunterlagen",
@@ -1094,17 +1103,21 @@ def get_insign_session(data):
     })
     auto_fill_fields = [
         { "id": "Name und Vorname", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
+        { "id": "name vorname 1", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
         { "id": "Name, Vorname ", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
         { "id": "Name", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
         { "id": "Vorname", "text": data.get("contact", {}).get("firstname") },
         { "id": "Nachname", "text": data.get("contact", {}).get("lastname") },
         { "id": "Strasse", "text": data.get("contact", {}).get("street") },
         { "id": "Hausnummer", "text": data.get("contact", {}).get("street_nb") },
+        { "id": "Straße Hausnr", "text": data.get("contact", {}).get("street") + " " + data.get("contact", {}).get("street_nb") },
         { "id": "PLZ", "text": data.get("contact", {}).get("zip") },
         { "id": "Ort", "text": data.get("contact", {}).get("city") },
         { "id": "Wohnort", "text": data.get("contact", {}).get("city") },
         { "id": "Standort", "text": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
         { "id": "PLZ, Ort", "text": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
+        { "id": "PLZ Ort", "text": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
+        { "id": "Kwp Nennleistung", "text": numberformat(data.get("data", {}).get("pv_kwp")) },
         { "id": "IBAN", "text": data.get("data", {}).get("iban") },
         { "id": "BIC", "text": data.get("data", {}).get("bic") },
         { "id": "Zähler Nummer", "text": data.get("data", {}).get("power_meter_number") },

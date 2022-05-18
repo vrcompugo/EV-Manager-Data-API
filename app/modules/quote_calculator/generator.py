@@ -494,6 +494,10 @@ def generate_contract_summary_part3_pdf(lead_id, data):
     return get_file_content_cached(443350)  # Contractigvertrag
 
 
+def generate_contract_summary_part5_pdf(lead_id, data):
+    return get_file_content_cached(4195114)  # Contractigvertrag WP https://keso.bitrix24.de/disk/downloadFile/4195114/?&ncc=1&filename=contracting_2022_formular.pdf
+
+
 def generate_contract_summary_part4_pdf(lead_id, data, return_string=False):
     from app.utils.jinja_filters import dateformat, numberformat, currencyformat
     config_general = get_settings(section="general")
