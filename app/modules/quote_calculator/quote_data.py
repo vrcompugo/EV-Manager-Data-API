@@ -31,7 +31,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
     default_module_type = None
     for product in products:
         if str(product["SECTION_ID"]) == str(categories["PV Module"]):
-            if default_module_type is None and product["NAME"].find("380 Watt") > 0:
+            if default_module_type is None and product["NAME"].find("SENEC.SOLAR 380 Watt") > 0:
                 default_module_type = int(product["ID"])
             if 'kwp' in product:
                 module_type_options.append(
