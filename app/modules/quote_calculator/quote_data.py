@@ -120,7 +120,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         return_data["heating_quote"]["has_special_condition"] = False
         return_data["bluegen_quote"]["has_special_condition"] = False
         if data.get("has_roof_reconstruction_quote") is True:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=34)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=12)
         elif data.get("has_heating_quote") is True:
             delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=16)
         else:
