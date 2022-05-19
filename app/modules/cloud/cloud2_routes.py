@@ -369,20 +369,29 @@ def post_invoices_upload_file():
                                 db.session.add(invoice)
                                 db.session.flush()
                                 invoice_id = invoice.id
-                                print(invoice_id)
                         else:
                             if invoice_id is not None:
+                                old_value = convert_sherpa_number(row_data, "Stand alt")
+                                new_value = convert_sherpa_number(row_data, "Stand neu")
+                                diff = new_value - old_value
+                                usage = convert_sherpa_number(row_data, "Verbrauch")
+                                if not (diff - 1 <= usage <= diff + 1):
+                                    if diff != 0:
+                                        old_value = old_value * usage / diff
+                                        new_value = new_value * usage / diff
                                 invoice_item = SherpaInvoiceItem(
                                     sherpa_invoice_id=invoice_id,
                                     zahlernummer=row_data.get("Zählernummer"),
                                     art_des_zahlerstandes=row_data.get("Art des Zählerstands"),
                                     zahlerart=row_data.get("Zählerart"),
-                                    stand_alt=convert_sherpa_number(row_data, "Stand alt"),
+                                    stand_alt=old_value,
+                                    stand_alt_sherpa=convert_sherpa_number(row_data, "Stand alt"),
                                     datum_stand_alt=datetime.datetime.strptime(row_data.get("Datum Stand alt"), "%d.%m.%Y"),
                                     ablesegrund=row_data.get("Ablesegrund"),
-                                    stand_neu=convert_sherpa_number(row_data, "Stand neu"),
+                                    stand_neu=new_value,
+                                    stand_neu_sherpa=convert_sherpa_number(row_data, "Stand neu"),
                                     datum_stand_neu=datetime.datetime.strptime(row_data.get("Datum Stand neu"), "%d.%m.%Y"),
-                                    verbrauch=convert_sherpa_number(row_data, "Verbrauch"),
+                                    verbrauch=usage,
                                     tage=convert_sherpa_number(row_data, "Tage"),
                                     wandlerfaktor=row_data.get("Wandlerfaktor"),
                                 )

@@ -83,6 +83,27 @@ def get_test_lead():
 
 
 @manager.command
+def redo_sherpa_gas_usgae():
+    from app.models import SherpaInvoiceItem
+    invoice_items = SherpaInvoiceItem.query.all()
+    for invoice_item in invoice_items:
+        old_value = invoice_item.stand_alt
+        new_value = invoice_item.stand_neu
+        diff = new_value - old_value
+        usage = invoice_item.verbrauch
+        if not (diff - 1 <= usage <= diff + 1):
+            if diff == 0:
+                continue
+            old_value = old_value * usage / diff
+            new_value = new_value * usage / diff
+            invoice_item.stand_alt_sherpa = invoice_item.stand_alt
+            invoice_item.stand_alt = old_value
+            invoice_item.stand_neu_sherpa = invoice_item.stand_neu
+            invoice_item.stand_neu = new_value
+            db.session.commit()
+
+
+@manager.command
 def get_test_insign():
     from app.modules.external.insign.signature import download_file
     content = download_file("3fe264f4a2497fba4f6e59e", 3007910)
