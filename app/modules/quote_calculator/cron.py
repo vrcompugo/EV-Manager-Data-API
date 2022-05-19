@@ -74,10 +74,12 @@ def cron_heatpump_auto_quote_generator():
             for field in fields:
                 quote_data[field] = deal.get(field)
             if quote_data["old_heating_type"] == "oil":
+                quote_data["heating_quote_usage_oil"] = float(deal.get("heating_quote_usage_oil"))
                 quote_data["heating_quote_usage_old"] = float(deal.get("heating_quote_usage_oil")) * 10
             elif quote_data["old_heating_type"] == "gas":
                 quote_data["heating_quote_usage_old"] = float(deal.get("heating_quote_usage_gas"))
             elif quote_data["old_heating_type"] == "pellez":
+                quote_data["heating_quote_usage_pellets"] = float(deal.get("heating_quote_usage_pellets"))
                 quote_data["heating_quote_usage_old"] = (float(deal.get("heating_quote_usage_pellets")) / 1000) * 4.9
             else:
                 quote_data["heating_quote_usage_old"] = float(deal.get("heating_quote_usage_mixed"))
