@@ -100,6 +100,7 @@ def cron_heatpump_auto_quote_generator():
             move_to_manuell(deal["id"])
 
 def move_to_manuell(deal_id):
+    return
     update_deal(deal_id, {
         "stage_id": "C210:UC_BY30OU"
     })

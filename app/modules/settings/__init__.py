@@ -489,10 +489,10 @@ def get_settings(section=None, domain_raw=None):
                     "heating_quote_old_heating_build": "UF_CRM_1650893723",
                     "new_heating_type": "UF_CRM_1650893816",
                     "heating_quote_usage_mixed": "UF_CRM_1650893974",
-                    "heating_quote_usage_oil": "UF_CRM_1650893974",
+                    "heating_quote_usage_oil": "UF_CRM_1652876566",
                     "heating_quote_usage_gas": "UF_CRM_1652876602",
                     "heating_quote_usage_pellets": "UF_CRM_1652876630",
-                    "heating_quote_sqm": "UF_CRM_1650894021",
+                    "heating_quote_sqm": "UF_CRM_1652876938",
                     "heating_quote_radiator_type": "UF_CRM_1650894088",
                     "heating_quote_warm_water_type": "UF_CRM_1650894323",
                     "heating_quote_circulation_pump": "UF_CRM_1650894404",
@@ -501,7 +501,7 @@ def get_settings(section=None, domain_raw=None):
                     "heating_quote_bathtub_count": "UF_CRM_1650894476",
                     "heating_quote_people": "UF_CRM_1650894495",
                     "pdf_heatpump_auto_generate_link": "UF_CRM_1651497860",
-                    "contracting_heatpump_link": "UF_CRM_1652867226"
+                    "contracting_heatpump_link": "UF_CRM_1652867226",
                 }
             },
             "quote": {
