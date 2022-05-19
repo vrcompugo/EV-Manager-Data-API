@@ -2,6 +2,7 @@ import json
 
 from app import db
 from app.models import QuoteHistory
+from app.utils.error_handler import error_handler
 from app.modules.external.bitrix24.deal import get_deal, get_deals, update_deal
 from app.modules.external.bitrix24.lead import get_lead, add_lead
 from app.modules.quote_calculator.routes import quote_calculator_set_defaults, quote_calculator_add_history, quote_calculator_heating_pdf_action, quote_calculator_datasheets_pdf_action, quote_calculator_quote_summary_pdf_action, quote_calculator_contract_summary_pdf_action, quote_calculator_summary_pdf_action, quote_calculator_heatpump_autogenerate_pdf_action
@@ -98,9 +99,9 @@ def cron_heatpump_auto_quote_generator():
                 move_to_manuell(deal["id"])
         except Exception as e:
             move_to_manuell(deal["id"])
+            error_handler()
 
 def move_to_manuell(deal_id):
-    return
     update_deal(deal_id, {
         "stage_id": "C210:UC_BY30OU"
     })
