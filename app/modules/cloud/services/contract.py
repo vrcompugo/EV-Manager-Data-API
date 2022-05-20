@@ -687,7 +687,7 @@ def get_annual_statement_data(data, year, manuell_data):
                 if parse(statement_config[product].get("delivery_begin")).year > year:
                     del statement_config[product]
                     continue
-                if statement_config[product]["extra_price_per_kwh"] < 0.3379:
+                if product == lightcloud and statement_config[product]["extra_price_per_kwh"] < 0.3379:
                     statement_config[product]["extra_price_per_kwh"] = 0.3379
                 if manuell_data.get(f"{product}_extra_price_per_kwh") not in [None, ""]:
                     statement_config[product]["extra_price_per_kwh"] = float(manuell_data.get(f"{product}_extra_price_per_kwh")) / 100
