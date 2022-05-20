@@ -678,7 +678,7 @@ def get_annual_statement_data(data, year, manuell_data):
         if parse(config.get("delivery_begin")).year == year:
             delivery_begin = str(config.get("delivery_begin"))
         if parse(delivery_begin).year <= year and parse(delivery_end).year >= year:
-            for product in ["lightcloud", "heatcloud", "ecloud"] + customer_products:
+            for product in ["heatcloud", "lightcloud", "ecloud"] + customer_products:
                 if statement_config.get(product) is None:
                     continue
                 if statement_config[product].get("delivery_begin") in [None, "", 0, "0"]:
@@ -705,30 +705,49 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement_config[product]["allowed_usage"] = statement_config[product]["allowed_usage"] + statement_config[product]["allowed_usage_emove"]
                 statement_config[product]["actual_usage"] = 0
                 statement_config[product]["actual_usage_net"] = 0
-                print(product, json.dumps(statement_config[product], indent=2))
                 if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
                     counter_numbers.append(statement_config[product].get("power_meter_number"))
                     values = []
                     for value in statement["available_values"]:
                         if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
                             values.append(value)
-                    counters = normalize_counter_values(
-                        statement_config[product]["delivery_begin"],
-                        statement_config[product]["delivery_end"],
-                        [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                        values
-                    )
-                    if counters is not None and len(counters) > 0:
-                        if product == "lightcloud":
-                            statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
-                        else:
-                            statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
-                        statement["counters"] = statement["counters"] + counters
+                    if product == "lightcloud" and "heatcloud" in statement_config and statement_config["lightcloud"]["delivery_begin"] != statement_config["heatcloud"]["delivery_begin"]:
+                        counters = normalize_counter_values(
+                            statement_config["lightcloud"]["delivery_begin"],
+                            statement_config["heatcloud"]["delivery_begin"],
+                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
+                            values.copy()
+                        )
+                        counters2 = normalize_counter_values(
+                            statement_config["heatcloud"]["delivery_begin"],
+                            statement_config["lightcloud"]["delivery_end"],
+                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
+                            values.copy(),
+                            True
+                        )
+                        if counters is not None and len(counters) > 0 and counters2 is not None and len(counters2) > 0:
+                            statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters2)
+                            statement_config["heatcloud"]["actual_usage_net"] = statement_config["heatcloud"]["actual_usage_net"] - statement_config[product]["actual_usage_net"]
+                            statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters)
+                            statement["counters"] = statement["counters"] + counters
+                            statement["counters"] = statement["counters"] + counters2
+                    else:
+                        counters = normalize_counter_values(
+                            statement_config[product]["delivery_begin"],
+                            statement_config[product]["delivery_end"],
+                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
+                            values
+                        )
+                        if counters is not None and len(counters) > 0:
+                            if product in ["lightcloud", "heatcloud"]:
+                                statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
+                            else:
+                                statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
+                            statement["counters"] = statement["counters"] + counters
                 if statement_config[product].get("smartme_number") not in [None, "", "123", 0, "0"]:
                     counter_numbers.append(statement_config[product].get("smartme_number"))
                     beginning_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_begin"])
                     end_of_year = get_device_by_datetime(statement_config[product].get("smartme_number"), statement_config[product]["delivery_end"])
-                    counter = None
                     if beginning_of_year is not None and end_of_year is not None:
                         values = [
                             {
@@ -756,14 +775,6 @@ def get_annual_statement_data(data, year, manuell_data):
                             statement["counters"] = statement["counters"] + counters
 
                 percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
-                if statement_config[product]["actual_usage"] <= 0:
-                    statement["errors"].append(f"{statement_config[product]['label']} hat keinen Verbrauch")
-                if statement_config[product]["actual_usage"] < statement_config[product]["actual_usage_net"]:
-                    statement["errors"].append(f"{statement_config[product]['label']} Netzbezug ist größer als der Gesamtverbrauch")
-                if statement_config[product]["actual_usage"] > 0 and statement_config[product]["actual_usage_net"]/statement_config[product]["actual_usage"] > 0.8 :
-                    statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist mehr als 80% vom Gesamtverbrauch")
-                if product == "lightcloud" and statement_config[product]["actual_usage_net"] <= 0:
-                    statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist nicht vorhanden")
                 statement_config[product]["total_cloud_price"] = statement_config[product]["cloud_price"] * 12 * percent_year
                 statement_config[product]["total_cloud_price_incl_refund"] = statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
                 statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
@@ -791,6 +802,17 @@ def get_annual_statement_data(data, year, manuell_data):
             statement_config["consumers"] = []
             for customer_product in customer_products:
                 statement_config["consumers"].append(statement_config[customer_product])
+            for product in ["heatcloud", "lightcloud", "ecloud"] + customer_products:
+                if product not in statement_config:
+                    continue
+                if statement_config[product]["actual_usage"] <= 0:
+                    statement["errors"].append(f"{statement_config[product]['label']} hat keinen Verbrauch")
+                if statement_config[product]["actual_usage"] < statement_config[product]["actual_usage_net"]:
+                    statement["errors"].append(f"{statement_config[product]['label']} Netzbezug ist größer als der Gesamtverbrauch")
+                if statement_config[product]["actual_usage"] > 0 and statement_config[product]["actual_usage_net"]/statement_config[product]["actual_usage"] > 0.8 :
+                    statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist mehr als 80% vom Gesamtverbrauch")
+                if product == "lightcloud" and statement_config[product]["actual_usage_net"] <= 0:
+                    statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist nicht vorhanden")
             statement["configs"].append(statement_config)
     statement["total_extra_price_net"] = statement["total_extra_price"] / 1.19
     statement["total_cloud_price_net"] = statement["total_cloud_price"] / 1.19
@@ -1031,7 +1053,7 @@ def normalize_date(datetime):
     return parse(parse(str(datetime)).strftime("%Y-%m-%d"))
 
 
-def normalize_counter_values(start_date, end_date, numbers, values):
+def normalize_counter_values(start_date, end_date, numbers, values, debug=False):
     counters = []
     for number in numbers:
         start_date = normalize_date(start_date)
@@ -1082,6 +1104,7 @@ def normalize_counter_values(start_date, end_date, numbers, values):
             })
         values = sorted(values, key=lambda d: d['date'])
         start_value = None
+        start_value2 = None
         end_value = None
         for value in values:
             if value["number"] == number:
@@ -1093,6 +1116,7 @@ def normalize_counter_values(start_date, end_date, numbers, values):
                     if start_value is None:
                         start_value = value
                     elif (start_date - start_value["date"]).days > (value["date"] - start_date).days:
+                        start_value2 = start_value
                         start_value = value
                 if value["date"] < end_date:
                     end_value = value
@@ -1103,6 +1127,8 @@ def normalize_counter_values(start_date, end_date, numbers, values):
                         end_value = value
                     elif (end_date - end_value["date"]).days > (value["date"] - end_date).days:
                         end_value = value
+        if start_value == end_value:
+            start_value = start_value2
         if end_value is None or start_value is None:
             return None
         origin = start_value["origin"]
