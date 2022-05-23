@@ -204,3 +204,10 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "cron_bitrix_file_sync":
+        from app.modules.file.file_services import cron_bitrix_export_item
+        try:
+            cron_bitrix_export_item()
+        except Exception as e:
+            error_handler()
+

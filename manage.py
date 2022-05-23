@@ -84,18 +84,6 @@ def get_test_lead():
 
 
 @manager.command
-def convert_s3_bitrix_files():
-    from app.modules.file.file_services import bitrix_export_item, S3File
-
-    items = db.session.query(S3File).filter(S3File.bitrix_file_id.is_(None)).all()
-    for index, item in enumerate(items):
-        if item.filename is None:
-            item.filename = str(item.uuid)
-        bitrix_export_item(item)
-        time.sleep(2)
-
-
-@manager.command
 def redo_sherpa_gas_usgae():
     from app.models import SherpaInvoiceItem
     invoice_items = SherpaInvoiceItem.query.all()

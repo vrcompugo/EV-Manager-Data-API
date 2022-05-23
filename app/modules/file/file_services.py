@@ -1,6 +1,7 @@
 import datetime
 import uuid
 import jwt
+import time
 
 from app import db
 from app.exceptions import ApiException
@@ -66,6 +67,15 @@ def update_item(id, data):
         return item
     else:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
+
+
+def cron_bitrix_export_item():
+    items = db.session.query(S3File).filter(S3File.bitrix_file_id.is_(None)).all()
+    for index, item in enumerate(items):
+        if item.filename is None:
+            item.filename = str(item.uuid)
+        bitrix_export_item(item)
+        time.sleep(2)
 
 
 def bitrix_export_item(item):
