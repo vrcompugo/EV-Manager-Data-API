@@ -819,7 +819,7 @@ def get_annual_statement_data(data, year, manuell_data):
     statement["total_cloud_price_incl_refund_net"] = statement["total_cloud_price_incl_refund"] / 1.19
 
     statement["pre_payments_total"] = statement["total_cloud_price_incl_refund"]
-    if data.get("fakturia") is not None:
+    if data.get("fakturia") is not None and data.get("fakturia").get("contractStatus") not in ["ENDED"]:
         statement["payments"] = []
         statement["pre_payments_total"] = 0
         for payment in data.get("invoices_credit_notes"):
