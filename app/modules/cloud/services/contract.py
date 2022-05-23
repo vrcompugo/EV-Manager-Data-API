@@ -661,6 +661,7 @@ def get_annual_statement_data(data, year, manuell_data):
         for index, consumer in enumerate(statement_config["consumers"]):
             customer_products.append(f"consumer{index}")
             statement_config[f"consumer{index}"] = consumer
+        statement_config["customer_products"] = customer_products
 
         if manuell_data.get("cashback_price_per_kwh") not in [None, ""]:
             statement_config["cashback_price_per_kwh"] = float(manuell_data.get("cashback_price_per_kwh")) / 100
@@ -801,6 +802,8 @@ def get_annual_statement_data(data, year, manuell_data):
 
             statement_config["consumers"] = []
             for customer_product in customer_products:
+                if statement_config.get(product) is None:
+                    continue
                 statement_config["consumers"].append(statement_config[customer_product])
             for product in ["heatcloud", "lightcloud", "ecloud"] + customer_products:
                 if product not in statement_config:

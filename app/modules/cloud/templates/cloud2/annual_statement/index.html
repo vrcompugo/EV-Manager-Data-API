@@ -80,7 +80,7 @@
         <th>Differenz</th>
       </tr>
       {% for config in statement.configs %}
-        {% for product in ["lightcloud", "heatcloud", "ecloud"] %}
+        {% for product in ["lightcloud", "heatcloud", "ecloud"] + config["customer_products"] %}
           {% if config[product] %}
             <tr>
               <td>{{ config[product].label }}</td>
@@ -110,7 +110,7 @@
       </tr>
       {% set total_extra_usage = 0 %}
       {% for config in statement.configs %}
-        {% for product in ["lightcloud", "heatcloud", "ecloud"] %}
+        {% for product in ["lightcloud", "heatcloud", "ecloud"] + config["customer_products"] %}
           {% if config[product] and config[product].total_extra_price != 0 %}
             <tr>
               <td>
