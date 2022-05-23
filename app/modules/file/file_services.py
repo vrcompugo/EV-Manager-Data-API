@@ -87,8 +87,8 @@ def bitrix_export_item(item):
         print(bitrix_file_id)
         if bitrix_file_id is None:
             raise ApiException("upload-failed", "file upload failed", 500)
-        # item.bitrix_file_id = bitrix_file_id
-        # db.session.commit()
+        item.bitrix_file_id = bitrix_file_id
+        db.session.commit()
         return item
     else:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
