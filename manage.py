@@ -83,6 +83,15 @@ def get_test_lead():
 
 
 @manager.command
+def convert_s3_bitrix_files():
+    from app.modules.file.file_services import bitrix_export_item, S3File
+
+    items = db.session.query(S3File).all()
+    for item in items:
+        bitrix_export_item(item)
+
+
+@manager.command
 def redo_sherpa_gas_usgae():
     from app.models import SherpaInvoiceItem
     invoice_items = SherpaInvoiceItem.query.all()

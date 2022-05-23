@@ -70,7 +70,10 @@ def update_item(id, data):
 
 def bitrix_export_item(item):
     if item is not None and item.bitrix_file_id is None:
-        data = {}
+        data = {
+            "filename": item.filename,
+            "file_content": item.get_file()
+        }
         print("update file")
         folder_id = create_folder_path(446126, f"{item.uuid}")
         print("update file2")
@@ -78,8 +81,8 @@ def bitrix_export_item(item):
         print("update file3")
         if bitrix_file_id is None:
             raise ApiException("upload-failed", "file upload failed", 500)
-        item.bitrix_file_id = bitrix_file_id
-        db.session.commit()
+        # item.bitrix_file_id = bitrix_file_id
+        # db.session.commit()
         return item
     else:
         raise ApiException("item_doesnt_exist", "Item doesn't exist.", 409)
