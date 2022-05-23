@@ -70,15 +70,21 @@ def update_item(id, data):
 
 def bitrix_export_item(item):
     if item is not None and item.bitrix_file_id is None:
+        try:
+            file_content = item.get_file()
+        except Exception as e:
+            return None
+        file_content = file_content.read()
         data = {
             "filename": item.filename,
-            "file_content": item.get_file()
+            "file_content": file_content
         }
         print("update file")
         folder_id = create_folder_path(446126, f"{item.uuid}")
         print("update file2")
         bitrix_file_id = add_file(folder_id, data)
         print("update file3")
+        print(bitrix_file_id)
         if bitrix_file_id is None:
             raise ApiException("upload-failed", "file upload failed", 500)
         # item.bitrix_file_id = bitrix_file_id

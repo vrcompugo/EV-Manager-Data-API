@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from time import sleep
 import unittest
 from flask_migrate import Migrate, MigrateCommand, upgrade
@@ -86,9 +87,12 @@ def get_test_lead():
 def convert_s3_bitrix_files():
     from app.modules.file.file_services import bitrix_export_item, S3File
 
-    items = db.session.query(S3File).all()
-    for item in items:
+    items = db.session.query(S3File).filter(S3File.bitrix_file_id.is_(None)).all()
+    for index, item in enumerate(items):
+        if item.filename is None:
+            item.filename = str(item.uuid)
         bitrix_export_item(item)
+        time.sleep(2)
 
 
 @manager.command
