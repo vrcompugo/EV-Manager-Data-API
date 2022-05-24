@@ -225,6 +225,10 @@ def store_counter_value(counter):
             origin="energie360"
         )
         db.session.add(storedCounter)
+    if counter.get("date") is None:
+        counter["date"] = datetime.datetime.now()
+    if counter.get("value") is None:
+        counter["value"] = 0
     storedCounter.date = counter.get("date")
     storedCounter.value = counter.get("value")
     db.session.commit()
