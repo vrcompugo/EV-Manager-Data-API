@@ -1059,9 +1059,10 @@ def normalize_date(datetime):
 
 def normalize_counter_values(start_date, end_date, numbers, values, debug=False):
     counters = []
+    start_date = normalize_date(start_date)
+    end_date = normalize_date(end_date)
+    diff_days_target = (end_date - start_date).days
     for number in numbers:
-        start_date = normalize_date(start_date)
-        end_date = normalize_date(end_date)
         start_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
             .filter(CounterValue.date <= start_date)\
             .limit(1)\
@@ -1129,6 +1130,8 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
                 if value["date"] > end_date:
                     if end_value is None:
                         end_value = value
+                    elif (end_value["date"] - start_date).days < diff_days_target * 0.3:
+                        end_value = value
                     elif (end_date - end_value["date"]).days > (value["date"] - end_date).days:
                         end_value = value
         if start_value == end_value:
@@ -1166,7 +1169,6 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
     first_counter = counters[0]
     last_counter = counters[len(counters) - 1]
 
-    diff_days_target = (end_date - start_date).days
     diff_days_value = (last_counter["end_date"] - first_counter["start_date"]).days
     if diff_days_target < 100:
         if diff_days_target * 0.2 > diff_days_value:
