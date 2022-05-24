@@ -1199,30 +1199,30 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
     return counters
 
 
-def test_normalize_counter_values():
-    values = [
-        { "date": normalize_date("2020-11-23"), "value": 500, "origin": "smartme"},
-        { "date": normalize_date("2021-01-12"), "value": 1500, "origin": "smartme"},
-        { "date": normalize_date("2021-09-12"), "value": 2500, "origin": "smartme"},
-        { "date": normalize_date("2021-12-12"), "value": 2500, "origin": "smartme"},
-        { "date": normalize_date("2022-02-01"), "value": 3500, "origin": "smartme"},
-    ]
-    print(json.dumps(normalize_counter_values(normalize_date("2021-01-01"), normalize_date("2021-12-31"), "sad", values), indent=2))
-    values = [
-        { "date": normalize_date("2020-11-23"), "value": 500, "origin": "smartme"}
-    ]
-    print(json.dumps(normalize_counter_values(normalize_date("2021-01-01"), normalize_date("2021-12-31"), "sad", values), indent=2))
-    values = [
-        { "date": normalize_date("2022-02-01"), "value": 500, "origin": "smartme"}
-    ]
-    print(json.dumps(normalize_counter_values(normalize_date("2021-01-01"), normalize_date("2021-12-31"), "sad", values), indent=2))
-    values = [
-        { "date": normalize_date("2021-04-01"), "value": 500, "origin": "manuell"},
-        { "date": normalize_date("2022-02-01"), "value": 2500, "origin": "smartme"}
-    ]
-    print(json.dumps(normalize_counter_values(normalize_date("2021-01-01"), normalize_date("2021-12-31"), "sad", values), indent=2))
-    values = [
-        { "date": normalize_date("2021-01-01"), "value": 500, "origin": "manuell"},
-        { "date": normalize_date("2023-12-21"), "value": 2500, "origin": "smartme"}
-    ]
-    print(json.dumps(normalize_counter_values(normalize_date("2021-01-01"), normalize_date("2021-12-31"), "1APADB72207196", values), indent=2))
+def cron_transfer_fakturia_annual_invoice():
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 126,
+        "FILTER[STAGE_ID]": "C126:UC_L0M7DR"
+    }, force_reload=True)
+    for deal in deals:
+        if float(deal.get("opportunity")) == 0.0:
+            update_deal(deal.get("id"), {
+                "stage_id": "C126:FINAL_INVOICE"
+            })
+            continue
+        print("deal", deal.get("id"), float(deal.get("opportunity")))
+        contract = get_contract_data(deal.get("contract_number"))
+        if isinstance(contract.get("fakturia"), list) and len(contract.get("fakturia")) == 0:
+            print("orgamaxx")
+            update_deal(deal.get("id"), {
+                "stage_id": "C126:EXECUTING"
+            })
+            continue
+        if contract.get("fakturia") is not None and contract.get("fakturia").get("contractStatus") in ["ACTIVE"]:
+            print("fakturia")
+        else:
+            print("orgamaxx")
+            update_deal(deal.get("id"), {
+                "stage_id": "C126:EXECUTING"
+            })

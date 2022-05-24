@@ -204,6 +204,13 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "cron_transfer_fakturia_annual_invoice":
+        from app.modules.cloud.services.contract import cron_transfer_fakturia_annual_invoice
+        try:
+            cron_transfer_fakturia_annual_invoice()
+        except Exception as e:
+            error_handler()
+
     if section == "cron_bitrix_file_sync":
         from app.modules.file.file_services import cron_bitrix_export_item
         try:
