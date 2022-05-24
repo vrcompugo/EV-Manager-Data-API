@@ -1134,7 +1134,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
         if start_value == end_value:
             start_value = start_value2
         if end_value is None or start_value is None:
-            return None
+            continue
         origin = start_value["origin"]
         if start_value["origin"] != end_value["origin"]:
             origin = f'{start_value["origin"]}/{end_value["origin"]}'
