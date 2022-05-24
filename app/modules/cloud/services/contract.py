@@ -1148,7 +1148,6 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
             "end_value": end_value["value"],
             "end_estimated": False,
         })
-        # print(counters)
     if len(counters) == 0:
         return None
 
