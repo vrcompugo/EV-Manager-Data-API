@@ -226,7 +226,7 @@ def store_counter_value(counter):
         )
         db.session.add(storedCounter)
     if counter.get("date") is None:
-        counter["date"] = datetime.datetime.now()
+        counter["date"] = str(datetime.datetime.now())
     if counter.get("value") is None:
         counter["value"] = 0
     storedCounter.date = counter.get("date")
