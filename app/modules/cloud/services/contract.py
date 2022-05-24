@@ -740,10 +740,11 @@ def get_annual_statement_data(data, year, manuell_data):
                             values
                         )
                         if counters is not None and len(counters) > 0:
-                            if product in ["lightcloud", "heatcloud"]:
+                            if product == "lightcloud" or (product == "heatcloud" and statement_config[product].get("smartme_number") not in empty_values):
                                 statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
                             else:
                                 statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
+
                             statement["counters"] = statement["counters"] + counters
                 if statement_config[product].get("smartme_number") not in [None, "", "123", 0, "0"]:
                     counter_numbers.append(statement_config[product].get("smartme_number"))
