@@ -254,10 +254,7 @@ def get_settings(section=None, domain_raw=None):
                     "": "nicht ausgewählt",
                     "6210": "gas",
                     "6212": "oil",
-                    "6214": "heatpump",
-                    "6216": "pellez",
-                    "6218": "electro",
-                    "6220": "nightofen",
+                    "6214": "pellez",
                     "6222": "other"
                 },
                 "heating_quote_old_heating_build": {
