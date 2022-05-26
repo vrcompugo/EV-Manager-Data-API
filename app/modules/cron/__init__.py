@@ -216,5 +216,5 @@ def cron(section=None):
         try:
             cron_bitrix_export_item()
         except Exception as e:
-            error_handler()
+            pass
 
