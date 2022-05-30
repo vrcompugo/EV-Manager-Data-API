@@ -264,9 +264,10 @@ class OrderUpload(Resource):
         user = get_logged_in_user()
         if user is None:
             raise ApiException("item_doesnt_exist", "Item doesn't exist. user", 401)
-        offer = get_offer_by_offer_number(data["offer_number"].strip())
+        data["offer_number"] = data["offer_number"].strip()
+        offer = get_offer_by_offer_number(data["offer_number"])
         if offer is None:
-            raise ApiException("item_doesnt_exist", f"Item doesn't exist. {data['offer_number'].strip()} asd", 404)
+            raise ApiException("item_doesnt_exist", f"Item doesn't exist. {data['offer_number']} asd", 404)
         offer_v2_data = {"data": json.loads(json.dumps(offer.data))}
         offer_v2_data["data"]["offer_number"] = data["offer_number"]
         offer_v2_data["data"]["construction_date"] = data["construction_date"]
