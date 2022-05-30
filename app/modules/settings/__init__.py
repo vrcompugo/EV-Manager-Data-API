@@ -441,6 +441,7 @@ def get_settings(section=None, domain_raw=None):
                     "counter_main": "UF_CRM_1585821761",
                     "heatcloud_power_meter_number": "UF_CRM_1597757955687",
                     "old_power_meter_numbers": "UF_CRM_1637842516",
+                    "old_smartme_numbers": "UF_CRM_1653908504",
                     "counter_heatcloud": "UF_CRM_1597757955687",
                     "counter_ecloud": "UF_CRM_1611239704",
                     "service_contract_number": "UF_CRM_1629883807207",
