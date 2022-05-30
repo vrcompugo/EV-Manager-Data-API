@@ -719,6 +719,7 @@ def get_annual_statement_data(data, year, manuell_data):
                 statement_config[product]["actual_usage_net"] = 0
                 if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
                     counter_numbers.append(statement_config[product].get("power_meter_number"))
+                    counter_numbers = counter_numbers + statement_config[product].get("additional_power_meter_numbers", [])
                     values = []
                     for value in statement["available_values"]:
                         if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
