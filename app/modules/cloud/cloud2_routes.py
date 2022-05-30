@@ -230,7 +230,7 @@ def store_counter_value(counter):
     if counter.get("value") is None:
         counter["value"] = 0
     storedCounter.date = counter.get("date")
-    storedCounter.value = counter.get("value")
+    storedCounter.value = int(counter.get("value"))
     db.session.commit()
     return storedCounter
 
