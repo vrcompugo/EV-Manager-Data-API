@@ -729,14 +729,15 @@ def get_annual_statement_data(data, year, manuell_data):
                             statement_config["lightcloud"]["delivery_begin"],
                             statement_config["heatcloud"]["delivery_begin"],
                             [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                            values.copy()
+                            values.copy(),
+                            manuell_data
                         )
                         counters2 = normalize_counter_values(
                             statement_config["heatcloud"]["delivery_begin"],
                             statement_config["lightcloud"]["delivery_end"],
                             [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
                             values.copy(),
-                            True
+                            manuell_data
                         )
                         if counters is not None and len(counters) > 0 and counters2 is not None and len(counters2) > 0 and manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
                             statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters2)
@@ -749,7 +750,8 @@ def get_annual_statement_data(data, year, manuell_data):
                             statement_config[product]["delivery_begin"],
                             statement_config[product]["delivery_end"],
                             [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                            values
+                            values,
+                            manuell_data
                         )
                         if counters is not None and len(counters) > 0:
                             if product == "lightcloud" or (product == "heatcloud" and statement_config[product].get("smartme_number") not in empty_values):
@@ -789,7 +791,8 @@ def get_annual_statement_data(data, year, manuell_data):
                                 statement_config[product]["delivery_begin"],
                                 statement_config[product]["delivery_end"],
                                 numbers,
-                                values
+                                values,
+                                manuell_data
                             )
                             if counters is not None and len(counters) > 0:
                                 statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
@@ -1076,7 +1079,7 @@ def normalize_date(datetime):
     return parse(parse(str(datetime)).strftime("%Y-%m-%d"))
 
 
-def normalize_counter_values(start_date, end_date, numbers, values, debug=False):
+def normalize_counter_values(start_date, end_date, numbers, values, manuell_data):
     counters = []
     start_date = normalize_date(start_date)
     end_date = normalize_date(end_date)
@@ -1084,6 +1087,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
     for number in numbers:
         start_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
             .filter(CounterValue.date <= start_date)\
+            .order_by(CounterValue.date.desc()) \
             .limit(1)\
             .all()
         if len(start_value_earlier) > 0:
@@ -1095,6 +1099,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
             })
         start_value_later = CounterValue.query.filter(CounterValue.number == number)\
             .filter(CounterValue.date > start_date)\
+            .order_by(CounterValue.date.asc()) \
             .limit(1)\
             .all()
         if len(start_value_later) > 0:
@@ -1106,6 +1111,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
             })
         end_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
             .filter(CounterValue.date <= end_date)\
+            .order_by(CounterValue.date.desc()) \
             .limit(1)\
             .all()
         if len(end_value_earlier) > 0:
@@ -1117,6 +1123,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
             })
         end_value_later = CounterValue.query.filter(CounterValue.number == number)\
             .filter(CounterValue.date > end_date)\
+            .order_by(CounterValue.date.asc()) \
             .limit(1)\
             .all()
         if len(end_value_later) > 0:
@@ -1155,6 +1162,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
                         end_value = value
         if start_value == end_value:
             start_value = start_value2
+        print(number, start_value, end_value, values)
         if end_value is None or start_value is None:
             continue
         origin = start_value["origin"]
@@ -1189,12 +1197,13 @@ def normalize_counter_values(start_date, end_date, numbers, values, debug=False)
     last_counter = counters[len(counters) - 1]
 
     diff_days_value = (last_counter["end_date"] - first_counter["start_date"]).days
-    if diff_days_target < 100:
-        if diff_days_target * 0.2 > diff_days_value:
-            return None
-    else:
-        if diff_days_target * 0.3 > diff_days_value:
-            return None
+    if manuell_data.get("skip_counter_date_range_limiter") not in [True, 1, "1", "true"]:
+        if diff_days_target < 100:
+            if diff_days_target * 0.2 > diff_days_value:
+                return None
+        else:
+            if diff_days_target * 0.3 > diff_days_value:
+                return None
 
     if first_counter["start_date"] != start_date:
         diff_start_days = (first_counter["start_date"] - start_date).days
