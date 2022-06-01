@@ -282,7 +282,7 @@ def calculate_products(data):
                     product["quantity"] = 1
                     product["PRICE"] = -float(product["PRICE"])
                     data["products"].append(product)
-            if "technik_service_packet_spring_extra" in data["data"]["extra_options"]:
+            if "technik_service_packet_spring_extra2" in data["data"]["extra_options"]:
                 product = get_product(label="Service, Technik & Garantie Paket Frühlings Highlight", category="Extra Pakete")
                 if product is not None:
                     product["quantity"] = 1
