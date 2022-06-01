@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from PyPDF2 import PdfFileWriter, PdfFileReader
-from PyPDF2.pdf import NameObject, TextStringObject
 
 
 def _getFields(obj, tree=None, retval=None, fileobj=None):
