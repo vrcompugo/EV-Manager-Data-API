@@ -46,10 +46,12 @@ def get_task(id, with_comments=False, force_reload=False):
         "select[17]": "UF_AUTO_513701476131"
     })
     if "result" in data:
-        if isinstance(data["result"], str):
+        try:
+            task_data = convert_config_values(data["result"]["task"])
+        except Exception as e:
+            print(e)
             print("error get task: ", data)
             return None
-        task_data = convert_config_values(data["result"]["task"])
         comments = post("task.commentitem.getlist", {
             "taskId": id
         }, force_reload=force_reload)
