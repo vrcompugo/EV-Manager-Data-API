@@ -804,11 +804,11 @@ def get_annual_statement_data(data, year, manuell_data):
                 statement_config["total_cloud_price_incl_refund"] = statement_config["total_cloud_price_incl_refund"] + statement_config[product]["total_cloud_price_incl_refund"]
                 statement_config[product]["total_extra_usage"] = statement_config[product]["actual_usage"] - statement_config[product]["allowed_usage"]
                 statement_config[product]["total_extra_price"] = 0
+                if product == "ecloud":
+                    statement_config[product]["cashback_price_per_kwh"] = statement_config["ecloud_cashback_price_per_kwh"]
+                else:
+                    statement_config[product]["cashback_price_per_kwh"] = statement_config["cashback_price_per_kwh"]
                 if statement_config[product]["total_extra_usage"] < -250:
-                    if product == "ecloud":
-                        statement_config[product]["cashback_price_per_kwh"] = statement_config["ecloud_cashback_price_per_kwh"]
-                    else:
-                        statement_config[product]["cashback_price_per_kwh"] = statement_config["cashback_price_per_kwh"]
                     statement_config[product]["total_extra_price"] = (statement_config[product]["total_extra_usage"] + 250) * statement_config[product]["cashback_price_per_kwh"]
 
                 elif statement_config[product]["total_extra_usage"] > 0:

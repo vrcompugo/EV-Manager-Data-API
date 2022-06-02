@@ -111,7 +111,7 @@
       {% set total_extra_usage = 0 %}
       {% for config in statement.configs %}
         {% for product in ["lightcloud", "heatcloud", "ecloud"] + config["customer_products"] %}
-          {% if config[product] and config[product].total_extra_price != 0 %}
+          {% if config[product] and config[product].total_extra_usage != 0 %}
             <tr>
               <td>
                 {{ config[product].label }}
@@ -126,7 +126,7 @@
               <td>{{ config[product].delivery_begin | dateformat }}</td>
               <td>{{ config[product].delivery_end | dateformat }}</td>
               <td style="text-align: right;">{% if config[product].total_extra_price > 0 %}{{ config[product].total_extra_price | currencyformat }}{% endif%}</td>
-              <td style="text-align: right;">{% if config[product].total_extra_price < 0 %}{{ -config[product].total_extra_price | currencyformat }}{% endif%}</td>
+              <td style="text-align: right;">{% if config[product].total_extra_price <= 0 %}{{ -config[product].total_extra_price | currencyformat }}{% endif%}</td>
             </tr>
           {% endif %}
         {% endfor %}
@@ -139,7 +139,7 @@
             <td>{{ config.delivery_begin | dateformat }}</td>
             <td>{{ config.delivery_end | dateformat }}</td>
             <td style="text-align: right;">{% if config.total_cloud_price_incl_refund > 0 %}{{ config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
-            <td style="text-align: right;">{% if config.total_cloud_price_incl_refund < 0 %}{{ -config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
+            <td style="text-align: right;">{% if config.total_cloud_price_incl_refund <= 0 %}{{ -config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
           </tr>
         {% endif %}
       {% endfor %}
