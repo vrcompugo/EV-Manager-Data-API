@@ -767,7 +767,7 @@ def get_annual_statement_data(data, year, manuell_data):
                         numbers = numbers + statement_config[product].get("additional_smartme_numbers")
                     for number in numbers:
                         counter_numbers.append(number)
-                        values = None
+                        values = []
                         beginning_of_year = get_device_by_datetime(number, statement_config[product]["delivery_begin"])
                         end_of_year = get_device_by_datetime(number, statement_config[product]["delivery_end"])
                         if beginning_of_year is not None and end_of_year is not None:
@@ -786,17 +786,16 @@ def get_annual_statement_data(data, year, manuell_data):
                                 }
                             ]
                             statement["available_values"] = statement["available_values"] + values
-                        if values is not None and len(values) > 0:
-                            counters = normalize_counter_values(
-                                statement_config[product]["delivery_begin"],
-                                statement_config[product]["delivery_end"],
-                                numbers,
-                                values,
-                                manuell_data
-                            )
-                            if counters is not None and len(counters) > 0:
-                                statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
-                                statement["counters"] = statement["counters"] + counters
+                        counters = normalize_counter_values(
+                            statement_config[product]["delivery_begin"],
+                            statement_config[product]["delivery_end"],
+                            numbers,
+                            values,
+                            manuell_data
+                        )
+                        if counters is not None and len(counters) > 0:
+                            statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
+                            statement["counters"] = statement["counters"] + counters
 
                 percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
                 statement_config[product]["total_cloud_price"] = statement_config[product]["cloud_price"] * 12 * percent_year
