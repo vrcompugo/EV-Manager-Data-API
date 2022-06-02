@@ -12,6 +12,11 @@ from app.modules.auth.auth_services import get_logged_in_user
 
 from app.modules.offer.services.offer_generation._utils import base_offer_data, add_item_to_offer, add_optional_item_to_offer
 
+def make_float(value):
+    if value in [None, ""]:
+        return 0
+    return float(value)
+
 
 def calculate_cloud(data):
     bsh_changedate = datetime(2021,12,16,0,0,0)
@@ -35,9 +40,39 @@ def calculate_cloud(data):
         if 330 in data["assigned_user"]["UF_DEPARTMENT"] or "330" in data["assigned_user"]["UF_DEPARTMENT"]:
             user = {"id": 120, "name": "bsh"}
             user_id_for_prices = 120
+    pricing_options = []
+    pre_dez_2021 = None
+    if data.get("cloud_number") not in [None, ""]:
+        offer_v2 = OfferV2.query.filter(OfferV2.number == data.get("cloud_number")).first()
+        if offer_v2 is not None:
+            pre_dez_2021 = OfferV2.query\
+                .filter(OfferV2.customer_id == offer_v2.customer_id)\
+                .filter(OfferV2.datetime < "2021-12-16")\
+                .order_by(OfferV2.datetime.desc())\
+                .first()
+            if pre_dez_2021 is not None:
+                pricing_options.append({
+                    "label": "Preisdefintion vor dem 16.12.2021",
+                    "value": "l2k3fblk3baxv55",
+                    "reference_number": pre_dez_2021.number,
+                    "comment": "eCloud wird mit aktuellem Minderverbau berechnet"
+                })
+
     settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
     settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
     settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
+    if pre_dez_2021 is not None:
+        print(make_float(pre_dez_2021.data.get("pv_kwp", 0)) <= make_float(data.get("pv_kwp", 0)),
+          make_float(pre_dez_2021.data.get("power_usage", 0)) >= make_float(data.get("power_usage", 0)),
+          make_float(pre_dez_2021.data.get("ecloud_usage", 0)) >= make_float(data.get("ecloud_usage", 0)))
+        if make_float(pre_dez_2021.data.get("pv_kwp")) <= make_float(data.get("pv_kwp")) and \
+          make_float(pre_dez_2021.data.get("power_usage")) >= make_float(data.get("power_usage")) and \
+          make_float(pre_dez_2021.data.get("ecloud_usage")) >= make_float(data.get("ecloud_usage")):
+            settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.2769
+            settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2279
+            settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.0499
+            pricing_option = next((i for i in pricing_options if str(i["value"]) == "l2k3fblk3baxv55"), None)
+            pricing_option["comment"] = "eCloud wird mit Minderverbau nach Preisdefinition vor dem 16.12.2021 berechnet"
     if data.get("old_price_calculation", "") != "l2k3fblk3baxv55":
         if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate):
             settings["data"]["cloud_settings"]["extra_kwh_cost"] = "33.79"
@@ -84,6 +119,7 @@ def calculate_cloud(data):
 
 
     result = {
+        "pricing_options": pricing_options,
         "lightcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
         "heatcloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"],
         "ecloud_extra_price_per_kwh": settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"],
