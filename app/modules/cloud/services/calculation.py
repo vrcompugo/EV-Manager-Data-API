@@ -61,10 +61,7 @@ def calculate_cloud(data):
     settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
     settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
     settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
-    if pre_dez_2021 is not None:
-        print(make_float(pre_dez_2021.data.get("pv_kwp", 0)) <= make_float(data.get("pv_kwp", 0)),
-          make_float(pre_dez_2021.data.get("power_usage", 0)) >= make_float(data.get("power_usage", 0)),
-          make_float(pre_dez_2021.data.get("ecloud_usage", 0)) >= make_float(data.get("ecloud_usage", 0)))
+    if pre_dez_2021 is not None and pre_dez_2021.data is not None:
         if make_float(pre_dez_2021.data.get("pv_kwp")) <= make_float(data.get("pv_kwp")) and \
           make_float(pre_dez_2021.data.get("power_usage")) >= make_float(data.get("power_usage")) and \
           make_float(pre_dez_2021.data.get("ecloud_usage")) >= make_float(data.get("ecloud_usage")):

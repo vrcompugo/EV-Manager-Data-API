@@ -793,6 +793,10 @@ def quote_calculator_contract_summary_pdf_action(lead_id):
     history.data = data
     db.session.commit()
     lead_update_data = {"pdf_contract_summary_link": data["pdf_contract_summary_link"]}
+    if "pdf_contract_summary_part4_file_link" in data:
+        lead_update_data["heatpump_concept_link"] = data["pdf_contract_summary_part4_file_link"]
+    else:
+        lead_update_data["heatpump_concept_link"] = ""
     lead_update_data["contracting_version"] = "Version F1"
     if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
         lead_update_data["contracting_version"] = "Version G1"
