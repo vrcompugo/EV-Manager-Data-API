@@ -596,6 +596,31 @@ def generate_contract_summary_part4_pdf(lead_id, data, return_string=False):
     return None
 
 
+def generate_contract_summary_part4_1_pdf(lead_id, data, return_string=False):
+    from app.utils.jinja_filters import dateformat, numberformat, currencyformat
+    config_general = get_settings(section="general")
+    if data is not None:
+        data["base_url"] = config_general["base_url"]
+        print(json.dumps(data["contact"], indent=2))
+        if "datetime" not in data:
+            data["datetime"] = datetime.datetime.now()
+        content = render_template(
+            "quote_calculator/generator/tab/index.html",
+            base_url=config_general["base_url"],
+            lead_id=lead_id,
+            data=data
+        )
+        data["datetime"] = str(data["datetime"])
+        if return_string:
+            return content
+        pdf = gotenberg_pdf(
+            content,
+            margins=["0", "0", "0", "0"],
+            landscape=False)
+        return pdf
+    return None
+
+
 def generate_order_confirmation_pdf(lead_id, data):
     config = get_settings(section="offer/summary_pdf")
     output_file = io.BytesIO()

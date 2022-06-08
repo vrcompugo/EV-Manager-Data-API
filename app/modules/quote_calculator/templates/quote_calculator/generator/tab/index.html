@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PV-Angebot</title>
+  {% include('quote_calculator/generator/style.html') %}
+  {% include('quote_calculator/generator/elements/table.html') %}
+  <style>
+      h1 {
+          font-size: 1.6em;
+          font-weight: normal;
+          padding-top: 2em;
+      }
+      h2 {
+        font-size: 1.4em;
+        font-weight: normal;
+        background-color: #b1ca07;
+        padding: 0.5em 1em;
+        margin: 2em 0 0.8em;
+        color: #fff;
+      }
+      .page {
+          page-break-before: always;
+          padding: 4em 0;
+      }
+      .radio-elements > * {
+        text-align: center;
+        margin: 0 0.6em 1em;
+        opacity: 0.3;
+      }
+      .radio-elements > .active {
+        opacity: 1;
+      }
+      .radio-elements .image {
+        height: 4em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .radio-elements .image img {
+        width: auto;
+        height: 100%;
+      }
+      .radio-elements .image.radio-image3 {
+        height: 5.8em;
+      }
+      .radio-elements .image.radio-image2 {
+        height: 17vw;
+      }
+  </style>
+</head>
+<body>
+    <div style="padding:0 4em 0; line-height: 1.5em;">
+        <br>
+        <br>
+        <div class="layout horizontal" style="padding-bottom: 1em; border-bottom: 1px solid #ccc">
+            <h1 class="flex">Technischer Aufnahmebogen</h1>
+            {% include "offer/logo-kez.html" %}
+        </div>
+        <br>
+        <br>
+        <br>
+        <b>Konfiguration - Projektierung Photovoltaik</b>
+        <p>
+            Unsere Projektierer achten beim belegen der Dachflächen, auf verschiedenste Gegebenheiten. Hierbei spielen die Neigung der Dachflächen,
+            Ausrichtung, die Verschattung aber auch Kompatibilität mit dem Speicher und oder Wechselrichter eine wichtige Rolle. Standort und Windlast
+            haben ebenfalls einen Einfluss auf die Belegung.<br>
+            <br>
+            Zudem wollen wir Ihre Wünsche versuchen bestmöglich zu berücksichtigen, deshalb füllen Sie dieses Konfigurationsblatt Photovoltaik mit Ihrem
+            Energieberater sorgfältig aus.
+        </p>
+        <br>
+        Projektaufnahme durch Fachberater: {{ data.assigned_user.NAME }} {{ data.assigned_user.LAST_NAME }}<br>
+        <br>
+        Zu Angebotsnummer: {{ data.number }}<br>
+        <br>
+        <table>
+            <tr>
+                <th>Kunde</th>
+                <th>Aufbauadresse entspricht Kundenadresse?</th>
+            </tr>
+            <tr>
+                <td>Name, Vorname: {{ data.contact.fistname }} {{ data.contact.lastname }}</td>
+                <td>{% if data.street %}Nein{% else %}Ja{% endif %}</td>
+            </tr>
+            <tr>
+                <td>Straße: {{ data.contact.street }} {{ data.contact.street_nb }}</td>
+                <td>Straße: {{ data.street }}  {{ data.street_nb }}</td>
+            </tr>
+            <tr>
+                <td>PLZ, Ort: {{ data.contact.zip }} {{ data.contact.city }}</td>
+                <td>PLZ, Ort: {{ data.zip }}  {{ data.city }}</td>
+            </tr>
+            <tr>
+                <td>Tel.: {% if data.contact.phone %}{{ data.contact.phone.0.VALUE }}{% endif%}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>E-Mail: {{ data.contact.email.0.VALUE }}</td>
+                <td></td>
+            </tr>
+        </table>
+        <br>
+        <br>
+        <br>
+        <b>Datenschutzeinwilligungserklärung</b>
+        <p>
+            Im Rahmen dieses Beratungsgespräches werden in diesem Technischen Anforderungsbogen personenbezogene Daten erhoben.
+            Ich bin damit einverstanden, dass der Solarfachberater diese erhobenen Daten zu Zwecken der Planung und Konfigurierung meiner Solarstromanlage und deren Anmeldung bei den zuständigen Behörden verarbeitet und nutzt. Eine darüber hinaus gehende Verarbeitung und Nutzung ist
+            nicht gestattet. Eine spätere Nutzung erfolgt ausschließlich zu den vorgenannten Zwecken.
+        </p>
+        <p>
+            Diese Einwilligung gilt unabhängig vom Zustandekommen des Auftrags sowie auch für zukünftige Anträge, kann aber jederzeit von mir
+            widerrufen werden. Eine darüber hinaus gehende verarbeitung und Nutzung der Daten ist nicht gestattet.
+        </p>
+
+        {% for roof in data.data.roofs %}
+            <div class="page">
+                Name der zu bebauenden Fläche: {{ roof.label }}
+                <h2>1. Gebäudebeschreibung</h2>
+                <div class="layout horizontal radio-elements">
+                    <div class="{% if roof.roof_type == 'Sattel' %}active{% endif %}">
+                        <div class="image"><img src="{{ data.base_url }}static/tab/sattel.jpeg" /></div>
+                        Sattel
+                    </div>
+                    <div class="{% if roof.roof_type == 'Pult' %}active{% endif %}">
+                        <div class="image"><img src="{{ data.base_url }}static/tab/pult.jpeg" /></div>
+                        Pult
+                    </div>
+                    <div class="{% if roof.roof_type == 'Walm' %}active{% endif %}">
+                        <div class="image"><img src="{{ data.base_url }}static/tab/walm.jpeg" /></div>
+                        Walm
+                    </div>
+                    <div class="{% if roof.roof_type == 'Schopfwalm' %}active{% endif %}">
+                        <div class="image"><img src="{{ data.base_url }}static/tab/schopfwalm.jpeg" /></div>
+                        Schopfwalm
+                    </div>
+                    <div class="{% if roof.roof_type == 'Zelt' %}active{% endif %}">
+                        <div class="image"><img src="{{ data.base_url }}static/tab/zelt.jpeg" /></div>
+                        Zelt
+                    </div>
+                    <div class="{% if roof.roof_type == 'Mansard' %}active{% endif %}">
+                        <div class="image"><img src="{{ data.base_url }}static/tab/mansard.jpeg" /></div>
+                        Mansard
+                    </div>
+                    <div class="{% if roof.roof_type == 'Halle' %}active{% endif %}">
+                        <div class="image"><img src="{{ data.base_url }}static/tab/halle.jpeg" /></div>
+                        Halle
+                    </div>
+                    <div class="{% if roof.roof_type == 'Garage' %}active{% endif %}">
+                        <div class="image"><img src="{{ data.base_url }}static/tab/garage.jpeg" /></div>
+                        Garage
+                    </div>
+                    <div class="{% if roof.roof_type == 'Flachdach' %}active{% endif %}">
+                        <div class="image">&nbsp;</div>
+                        Flachdach
+                    </div>
+                </div>
+                Blitzschutz vorhanden: {{ roof.lightning_protection | boolformat }}<br>
+                {% if roof.lightning_protection %}
+                    Blitzschutz soll demontiert werden zusätzlicher Kostenaufwand: 290€: {{ roof.lightning_protection_removal | boolformat }}<br>
+                    Blitzschutz soll integriert werden zusätzlicher Kostenaufwand: 1.200€: {{ roof.lightning_protection_installation | boolformat }}<br>
+                {% endif %}
+                <h2>2. Dacheindeckung</h2>
+                <div class="layout horizontal radio-elements" style="flex-wrap: wrap;">
+                    {% if roof_type not in ["Flachdach"] %}
+                        <div class="{% if roof.roof_topping == 'Betonziegel' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/betonziegel.jpeg" /></div>
+                            <div>
+                            <b>Betonziegel<br>(Frankfurter Pfanne)</b><br>
+                            Decklänge: 33,0 cm<br>
+                            Deckbreite: 30,0 cm
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Tonziegel' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/tonziegel.jpeg" /></div>
+                            <div>
+                            <b>Tonziegel<br>(Flachdachpfanne)</b><br>
+                            Decklänge: {{ roof.tonziegel_decklange }} cm<br>
+                            Deckbreite: 24,3 cm
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Biberschwanz' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/biberschwanz.jpeg" /></div>
+                            <div>
+                            <b>Biberschwanz</b><br>
+                            Decklänge: 16,0 cm <br>
+                            Deckbreite: 18,0 cm
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Schieferdeckung' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/schieferdeckung.jpeg" /></div>
+                            <div>
+                            <b>Schieferdeckung</b>
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Bitumenschindeln' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/bitumenschindeln.jpeg" /></div>
+                            <div>
+                            <b>Bitumenschindeln</b>
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Wellblech' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/wellblech.jpeg" style="padding: 2.2em 0;" /></div>
+                            <div>
+                            <b>Wellblech</b>
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Trapezblech' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/trapezblech.jpeg" style="padding: 2.2em 0;" /></div>
+                            <div>
+                            <b>Trapezblech</b><br>
+                            Dicke: {{ roof.trapezblech_thickness }} mm<br>
+                            <small>mindestens 0,75 mm</small>
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Sandwichelement' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/sandwichelement.jpeg" style="padding: 2.2em 0;" /></div>
+                            <div>
+                            <b>Sandwichelement</b><br />
+                            Typ: {{ roof.sandwichelement_type }}
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Falzblech' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/falzblech.jpeg" style="padding: 2.2em 0;" /></div>
+                            <div>
+                                <b>Falzblech</b>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="{% if roof.roof_topping == 'Bitumendach' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/bitumendach.jpeg" /></div>
+                            <div>
+                            <b>Bitumendach</b>
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Foliendach' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/foliendach.jpeg" /></div>
+                            <div>
+                            <b>Foliendach</b>
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Kiesschüttung' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/kiesschuttung.jpeg" /></div>
+                            <div>
+                            <b>Kiesschüttung</b>
+                            </div>
+                        </div>
+                        <div class="{% if roof.roof_topping == 'Begrüntes Dach' %}active{% endif %}">
+                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/begruntes_dach.jpeg" /></div>
+                            <div>
+                            <b>Begrüntes Dach</b>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <div class="image radio-image3">&nbsp;</div>
+                        <div>
+                            <b>Sonstige</b>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>3. Daten Belegungsfläche</h2>
+                {% if roof_type not in ["Flachdach"] %}
+                    <div class="layout horizontal">
+                        <div style="margin-right: 2em">
+                            <img src="{{ data.base_url }}static/tab/flache_sattel.jpeg" style="width: 35vw;" />
+                        </div>
+                        <div class="layout horizontal">
+                            <div style="margin-right: 2em">
+                                Gebäudelänge: {{ roof.gebaudelange }} m<br>
+                                Ortganglänge: {{ roof.ortganglange }} m<br>
+                                Anzahl Ziegel (vertikal): {{ roof.anzahl_ziegel }}
+                            </div>
+                            <div>
+                                Traufhöhe: {{ roof.traufhohe }} m<br>
+                                Dachneigung: {{ roof.dachneigung }}°
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="layout horizontal">
+                        <div style="margin-right: 2em">
+                            <img src="{{ data.base_url }}static/tab/flache_flachdach.jpeg" style="width: 40vw;" />
+                        </div>
+                        <div>
+                            <div class="layout horizontal">
+                                <div style="margin-right: 1em">
+                                    Dachlänge: {{ roof.dachlange }} m
+                                    Dachbreite: {{ roof.dachbreite }} m
+                                </div>
+                                <div>
+                                    Dachöhe: {{ roof.dachhohe }}
+                                    Dachneigung: {{ roof.dachneigung }} m
+                                </div>
+                            </div>
+                            <br />
+                            <div class="layout horizontal">
+                                <div style="margin-right: 2em">
+                                    <b>Attika (falls vorhanden)</b><br />
+                                    <img src="{{ data.base_url }}static/tab/attika.jpeg" />
+                                </div>
+                                <div>
+                                    <br />
+                                    Höhe (h): {{ roof.hohe }} m
+                                    Breite (b): {{ roof.breite }} m
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <h2 style="page-break-before: always; margin-top: 4em">4. Dämmung</h2>
+                <div class="layout horizontal radio-elements">
+                    <div class="{% if roof.insulation_type == 'Aufdachdämmung' %}active{% endif %}">
+                        <div class="image radio-image2"><img src="{{ data.base_url }}static/tab/aufdachdammung.jpeg" /></div>
+                        Aufdachdämmung
+                    </div>
+                    <div class="{% if roof.insulation_type == 'Zwischensparrendämmung' %}active{% endif %}">
+                        <div class="image radio-image2"><img src="{{ data.base_url }}static/tab/zwichensparrendammung.jpeg" /></div>
+                        Zwischensparrendämmung
+                    </div>
+                    <div class="{% if roof.insulation_type == 'Keine Dämmung' %}active{% endif %}" style="display: flex; justify-content: center; align-items: flex-end;">
+                        <b>Keine Dämmung</b>
+                    </div>
+                </div>
+                {% if roof.insulation_type == 'Zwischensparrendämmung' %}
+                <div class="layout horizontal">
+                    <div>Dämmstärke: {{ roof.insulation_thickness }} cm</div>
+                    <div>Dämmmaterial: {{ roof.insulation_material }}</div>
+                </div>
+                {% endif %}
+                Bemerkungen: {{ roof.comment }}
+            </div>
+        {% endfor %}
+        <br>
+        <br>
+        <div class="layout horizontal">
+          <div class="flex">
+            <div style="color: #fefefe; border-bottom: 1px solid #000; width: 300px;">__main_sig__</div>
+            Ort, Datum Unterschrift Kunde
+          </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

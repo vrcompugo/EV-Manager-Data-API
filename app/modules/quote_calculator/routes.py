@@ -24,7 +24,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote, calculate_heating_usage
-from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_bluegen_wi_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf, generate_contract_summary_part5_pdf, generate_heatpump_auto_generate_pdf
+from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_bluegen_wi_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf, generate_contract_summary_part4_1_pdf, generate_contract_summary_part5_pdf, generate_heatpump_auto_generate_pdf
 from .models.quote_history import QuoteHistory
 
 
@@ -783,6 +783,8 @@ def quote_calculator_contract_summary_pdf_action(lead_id):
     genrate_pdf(data, generate_contract_summary_part1_pdf, lead_id, "pdf_contract_summary_part1_file_id", "Verkaufsunterlagen.pdf", subfolder_id)
     genrate_pdf(data, generate_contract_summary_part2_pdf, lead_id, "pdf_contract_summary_part2_file_id", "Abtrettung.pdf", subfolder_id)
     genrate_pdf(data, generate_contract_summary_part3_pdf, lead_id, "pdf_contract_summary_part3_file_id", "Contracting.pdf", subfolder_id)
+    if "has_pv_quote" in data["data"] and data["data"]["has_pv_quote"]:
+        genrate_pdf(data, generate_contract_summary_part4_1_pdf, lead_id, "pdf_contract_summary_part4_1_file_id", "Technischer Aufnahmebogen.pdf", subfolder_id)
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Heizungskonzept.pdf", subfolder_id)
         genrate_pdf(data, generate_contract_summary_part5_pdf, lead_id, "pdf_contract_summary_part5_file_id", "Contracting WP.pdf", subfolder_id)
@@ -837,14 +839,13 @@ def quote_calculator_heatpump_autogenerate_pdf_action(lead_id):
     return data
 
 
-
-@blueprint.route("/<lead_id>/contract_summary_pdf2", methods=['GET'])
+@blueprint.route("/<lead_id>/contract_summary_pdf3", methods=['GET'])
 @log_request
-def quote_calculator_contract_summary_pdf2(lead_id):
+def quote_calculator_contract_summary_pdf3(lead_id):
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
 
-    pdf = generate_contract_summary_part4_pdf(lead_id, data)
+    pdf = generate_contract_summary_part4_1_pdf(lead_id, data)
 
     return Response(pdf,
         status=200,
@@ -1086,6 +1087,13 @@ def get_insign_session(data):
             "displayname": "Bluegen-Angebot",
             "signatures": signatures
         })
+    if "pdf_contract_summary_part4_1_file_id" in data:
+        prefillable_documents.append({
+            "id": data["pdf_contract_summary_part4_1_file_id"],
+            "displayname": "Technischer Aufnahmebogen",
+            "preFilledFields": [],
+            "signatures": signatures
+        })
     if "pdf_contract_summary_part4_file_id" in data:
         prefillable_documents.append({
             "id": data["pdf_contract_summary_part4_file_id"],
@@ -1099,7 +1107,6 @@ def get_insign_session(data):
             "preFilledFields": [],
             "signatures": signatures
         })
-
     prefillable_documents.append({
         "id": data["pdf_contract_summary_part1_file_id"],
         "displayname": "Verkaufsunterlagen",
