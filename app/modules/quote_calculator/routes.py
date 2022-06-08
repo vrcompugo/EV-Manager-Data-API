@@ -1101,6 +1101,11 @@ def get_insign_session(data):
         })
 
     prefillable_documents.append({
+        "id": data["pdf_contract_summary_part2_file_id"],
+        "displayname": "Abrettungsformular",
+        "preFilledFields": []
+    })
+    prefillable_documents.append({
         "id": data["pdf_contract_summary_part1_file_id"],
         "displayname": "Verkaufsunterlagen",
         "preFilledFields": []
