@@ -785,6 +785,7 @@ def quote_calculator_contract_summary_pdf_action(lead_id):
     genrate_pdf(data, generate_contract_summary_part3_pdf, lead_id, "pdf_contract_summary_part3_file_id", "Contracting.pdf", subfolder_id)
     if "has_pv_quote" in data["data"] and data["data"]["has_pv_quote"]:
         genrate_pdf(data, generate_contract_summary_part4_1_pdf, lead_id, "pdf_contract_summary_part4_1_file_id", "Technischer Aufnahmebogen.pdf", subfolder_id)
+        data["pdf_contract_summary_part4_1_file_link"] = get_public_link(data["pdf_contract_summary_part4_1_file_id"])
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Heizungskonzept.pdf", subfolder_id)
         genrate_pdf(data, generate_contract_summary_part5_pdf, lead_id, "pdf_contract_summary_part5_file_id", "Contracting WP.pdf", subfolder_id)
