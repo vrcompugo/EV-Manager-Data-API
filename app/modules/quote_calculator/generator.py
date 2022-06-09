@@ -388,8 +388,12 @@ def generate_datasheet_pdf(lead_id, data):
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "heatpump":
             # add_pdf_by_drive_id(merger, 436226)  # password protected Waterkotte Wärmepumpen.pdf
-            add_pdf_by_drive_id(merger, 436222, cached=True)  # Nibe Wärmepumpen.pdf
-            add_pdf_by_drive_id(merger, 2353740, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2353740/?&ncc=1&filename=Nibe+F2120+Technik.pdf
+            if data["data"].get("heating_quote_sqm", 0) > 300:
+                add_pdf_by_drive_id(merger, 436222, cached=True)  # Nibe Wärmepumpen.pdf
+                add_pdf_by_drive_id(merger, 2353740, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2353740/?&ncc=1&filename=Nibe+F2120+Technik.pdf
+            else:
+                add_pdf_by_drive_id(merger, 4511340, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/4511340/?&ncc=1&filename=vaillant-wegweiser-modernisierung-einfamilienhaus-2309132.pdf
+                add_pdf_by_drive_id(merger, 4511320, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/4511320/?&ncc=1&filename=vaillant-systembroschuere-luftwasser-waermepumpen-2092159.pdf
         if "new_heating_type" in data["data"] and data["data"]["new_heating_type"] == "hybrid_gas":
             add_pdf_by_drive_id(merger, 2353742, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2353742/?&ncc=1&filename=Vaillant+Gas-Brennwert+ecoTec+plus+Technik.pdf
             add_pdf_by_drive_id(merger, 2353744, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2353744/?&ncc=1&filename=Vaillant+WP+arotherm-plus-Technische+Daten.pdf
