@@ -362,6 +362,10 @@ def calculate_products(data):
             if "new_power_closet" in data["data"]["extra_options"]:
                 quantity = 1
             product_label = "Neuer Zählerschrank"
+            if data["data"].get("extra_options_new_power_closet_size") in ["3"]:
+                product_label = "Neuer Zählerschrank (3)"
+            if data["data"].get("extra_options_new_power_closet_size") in ["4"]:
+                product_label = "Neuer Zählerschrank (4)"
             if kwp >= 25:
                 product_label = "Neuer Zählerschrank (ZS)"
             if kwp >= 40:
