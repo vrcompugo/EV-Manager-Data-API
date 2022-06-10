@@ -166,7 +166,7 @@ def generate_roof_reconstruction_pdf(lead_id, data, return_string=False, order_c
             else:
                 appendix_product = get_product("Nachtext Angebot 8 Tage Dach", "Texte")
             if appendix_product is not None:
-                delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=12)
+                delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=14)
                 data["appendix"] = appendix_product["DESCRIPTION"].replace("[[delivery_week_year]]", delivery_date.strftime("%U/%Y"))
                 data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
         header_content = render_template(
