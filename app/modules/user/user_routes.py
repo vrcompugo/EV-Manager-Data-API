@@ -40,7 +40,8 @@ def sales_users():
         386,   # Team Maier
         430,   # Team Miele
         426,   # Team Niggemann
-        384    # Team Schuster
+        384,   # Team Schuster
+        458    # Team Oftring
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
@@ -131,7 +132,8 @@ def supervisors():
         386,   # Team Maier
         430,   # Team Miele
         426,   # Team Niggemann
-        384    # Team Schuster
+        384,   # Team Schuster
+        458    # Team Oftring
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
