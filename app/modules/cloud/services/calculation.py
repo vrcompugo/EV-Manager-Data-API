@@ -840,7 +840,7 @@ def cloud_offer_calculation_by_pv_offer(offer: OfferV2):
     return offer_data["calculated"]
 
 
-def cloud_offer_items_by_pv_offer(offer: OfferV2):
+def cloud_offer_items_by_pv_offer(offer: OfferV2, return_data = False):
     settings = get_settings("pv-settings")
     if settings is None:
         return None
@@ -877,11 +877,14 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2):
     for optional_product in offer.survey.data["pv_options"]:
         if optional_product["label"] == "ZERO-Paket" and "is_selected" in optional_product and optional_product["is_selected"]:
             data["zero_option"] = True
+    offer_data["data"] = data
     offer_data["calculated"] = calculate_cloud(data=data)
     offer_data["items"] = get_cloud_products(data={
         "data": data,
         "calculated": offer_data["calculated"]
     }, offer=offer)
+    if return_data:
+        return offer_data
     return offer_data["items"]
 
 

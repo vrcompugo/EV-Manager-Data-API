@@ -20,6 +20,7 @@ from app.modules.external.smartme.powermeter_measurement import get_device_by_da
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem, Survey
 from .annual_statement import generate_annual_statement_pdf
+from .calculation import cloud_offer_items_by_pv_offer
 
 
 empty_values = [None, "", "0", 0]
@@ -404,16 +405,34 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
     else:
         if data.get("cancel_date") not in empty_values:
             config["delivery_end"] = data.get("cancel_date")
+    legacy_cloud = False
     offer_v2 = OfferV2.query.filter(OfferV2.number == cloud_number).first()
     if offer_v2 is None:
-        config["errors"].append({
-            "code": "config not found",
-            "message": "Angebotsnummer konnte nicht gefunden werden."
-        })
-    else:
+        offer_v2 = OfferV2.query.filter(OfferV2.id == cloud_number.replace("C-", "")).first()
+        survey = Survey.query.filter(Survey.id == offer_v2.survey_id).first()
+
+        if survey is None:
+            offer_v2 = None
+            config["errors"].append({
+                "code": "config not found",
+                "message": "Angebotsnummer konnte nicht gefunden werden."
+            })
+        else:
+            legacy_cloud = True
+            legacy_data = cloud_offer_items_by_pv_offer(offer_v2, True)
+            del legacy_data["datetime"]
+            offer_v2.data = legacy_data["data"]
+            offer_v2.calculated = legacy_data["calculated"]
+            offer_v2.calculated["cloud_price"] = legacy_data["total"]
+            offer_v2.calculated["power_usage"] = round(offer_v2.calculated["power_usage"] / 10) * 10
+
+    if offer_v2 is not None:
         data["pv_system"]["pv_kwp"] = offer_v2.calculated.get("pv_kwp")
         data["pv_system"]["storage_size"] = offer_v2.calculated.get("storage_size")
-        config["pdf_link"] = offer_v2.pdf.public_link
+        if legacy_cloud:
+            config["pdf_link"] = offer_v2.cloud_pdf.public_link
+        else:
+            config["pdf_link"] = offer_v2.pdf.public_link
         config["cloud_price"] = offer_v2.calculated.get("cloud_price")
         config["cloud_price_incl_refund"] = offer_v2.calculated.get("cloud_price_incl_refund")
         config["cloud_price_incl_refund_net"] = offer_v2.calculated.get("cloud_price_incl_refund") / 1.19
