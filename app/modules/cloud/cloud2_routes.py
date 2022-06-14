@@ -229,6 +229,8 @@ def store_counter_value(counter):
         counter["date"] = str(datetime.datetime.now())
     if counter.get("value") is None:
         counter["value"] = 0
+    if counter.get("origin") not in [None, "", 0, "0"]:
+        storedCounter.origin = counter.get("origin")
     storedCounter.date = counter.get("date")
     storedCounter.value = int(counter.get("value"))
     db.session.commit()
