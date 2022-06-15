@@ -1,7 +1,6 @@
 from datetime import datetime
 import json
 
-from app.modules.user import auto_assign_lead_to_user
 from app.modules.settings import get_settings, set_settings
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.user import get_user
@@ -271,6 +270,7 @@ def run_bennemann_lead_convert():
 
 
 def run_cron_auto_assign_leads():
+    from app.modules.user import auto_assign_lead_to_user
     leads = get_leads({
         "SELECT": "full",
         "FILTER[SOURCE_ID]": "41",
