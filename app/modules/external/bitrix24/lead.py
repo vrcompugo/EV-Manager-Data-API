@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 
+from app.modules.user import auto_assign_lead_to_user
 from app.modules.settings import get_settings, set_settings
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.user import get_user
@@ -187,11 +188,11 @@ def get_leads_by_createdate(created_after_datetime):
     return result
 
 
-def get_leads(payload):
+def get_leads(payload, force_reload=False):
     payload["start"] = 0
     result = []
     while payload["start"] is not None:
-        data = post("crm.lead.list", payload)
+        data = post("crm.lead.list", payload, force_reload=force_reload)
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]:
@@ -267,3 +268,13 @@ def run_bennemann_lead_convert():
         if config is not None:
             config["last_import"] = now.astimezone().isoformat()
         set_settings("external/bitrix24/bennemann_lead_convert", config)
+
+
+def run_cron_auto_assign_leads():
+    leads = get_leads({
+        "SELECT": "full",
+        "FILTER[SOURCE_ID]": "41",
+        "FILTER[ASSIGNED_BY_ID]": "106"
+    }, force_reload=True)
+    for lead in leads:
+        auto_assign_lead_to_user(lead["id"])
