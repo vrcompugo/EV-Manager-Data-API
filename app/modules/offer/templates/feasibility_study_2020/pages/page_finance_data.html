@@ -196,7 +196,16 @@
             {% if data.loan_calculation.type != "leasing" %}
               <tr>
                 <td>Sollzinssatz (Beispiel)</td>
-                <td>{{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr</td>
+                <td>
+                  {{ data.loan_calculation.interest_rate | percentformat(2) }} pro Jahr
+                  {% if data.loan_calculation and data.loan_calculation.type == "financing" and offer.data.financing_bank == "bsh" and data.loan_calculation.interest_rate == 4.99 %}
+                    {% if data.cloud_runtime > 2 %}
+                      ***
+                    {% else %}
+                      **
+                    {% endif %}
+                  {% endif %}
+                </td>
               </tr>
             {% endif %}
             <tr>
@@ -248,9 +257,18 @@
         {% if data.cloud_runtime > 2 %}
           * für {{ data.cloud_runtime }} Jahre garantiert<br>
           ** Derzeitig gültige EEG-Vergütungssätze Stand: {{ offer.datetime.strftime('%m') }}.{{ offer.datetime.year }}<br>
+          {% if data.loan_calculation and data.loan_calculation.type == "financing" and offer.data.financing_bank == "bsh" and data.loan_calculation.interest_rate == 4.99 %}
+            *** Achtung: Es handelt sich hierbei um einen Sonderzinssatz. Die finale Kreditentscheidung obliegt unserer Partnerbank.
+            Sollte Ihre Anfrage mit 4,99% nicht genehmigt werden, wird Ihre Anfrage automatisch auf den aktuell gültigen Zinssatz i.H.v. 5,79% umgestellt.
+          {% endif %}
         {% else %}
           * Derzeitig gültige EEG-Vergütungssätze Stand: {{ offer.datetime.strftime('%m') }}.{{ offer.datetime.year }}<br>
+          {% if data.loan_calculation and data.loan_calculation.type == "financing" and offer.data.financing_bank == "bsh" and data.loan_calculation.interest_rate == 4.99 %}
+            ** Achtung: Es handelt sich hierbei um einen Sonderzinssatz. Die finale Kreditentscheidung obliegt unserer Partnerbank.
+            Sollte Ihre Anfrage mit 4,99% nicht genehmigt werden, wird Ihre Anfrage automatisch auf den aktuell gültigen Zinssatz i.H.v. 5,79% umgestellt.
+          {% endif %}
         {% endif %}
+        <br>
         <br>
         <small>
           Bezüglich des Netto- oder Bruttoausweises der vorliegenden<br>
