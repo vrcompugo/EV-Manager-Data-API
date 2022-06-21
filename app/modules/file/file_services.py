@@ -3,6 +3,8 @@ import uuid
 import jwt
 import time
 
+from sqlalchemy import or_
+
 from app import db
 from app.exceptions import ApiException
 from app.utils.get_items_by_model import get_items_by_model, get_one_item_by_model
@@ -10,7 +12,7 @@ from app.utils.set_attr_by_dict import set_attr_by_dict
 
 from .models.s3_file import S3File, S3FileSchema
 from .minio import put_file
-from app.modules.external.bitrix24.drive import add_file, create_folder_path
+from app.modules.external.bitrix24.drive import add_file, create_folder_path, get_file_content
 
 
 key = "0u9cQU8YNmUSAgIuq7MaBKh7YpE4z1ZO"
@@ -70,12 +72,13 @@ def update_item(id, data):
 
 
 def cron_bitrix_export_item():
-    items = db.session.query(S3File).filter(S3File.bitrix_file_id.is_(None)).all()
+    items = db.session.query(S3File).filter(S3File.bitrix_file_id > 0).filter(or_(S3File.is_s3_deleted.is_(None), S3File.is_s3_deleted.is_(False))).order_by(S3File.uploaded.asc()).limit(1000).all()
     for index, item in enumerate(items):
-        if item.filename is None:
-            item.filename = str(item.uuid)
-        bitrix_export_item(item)
-        time.sleep(2)
+        content = get_file_content(item.bitrix_file_id)
+        if len(content) > 1000:
+            print(item.id)
+            item.delete_s3_file()
+            time.sleep(2)
 
 
 def bitrix_export_item(item):

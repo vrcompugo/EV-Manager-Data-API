@@ -54,6 +54,9 @@ def convert_config_values(data_raw):
             if "email" in contact_data:
                 data["email"] = contact_data["email"]
                 data["contact"]["email"] = contact_data["email"]
+            if "phone" in contact_data:
+                data["phone"] = contact_data["phone"]
+                data["contact"]["phone"] = contact_data["phone"]
             data["name"] = contact_data["first_name"]
             data["first_name"] = contact_data["first_name"]
             data["last_name"] = contact_data["last_name"]

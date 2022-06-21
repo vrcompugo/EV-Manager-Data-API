@@ -54,6 +54,11 @@ def get_file(bucket, filename):
     return minioClient.get_object(bucket, filename)
 
 
+def delete_file(bucket, filename):
+    minioClient = connect()
+    return minioClient.remove_object(bucket, filename)
+
+
 def get_file_public(bucket, filename, minutes):
     minioClient = connect()
     return minioClient.presigned_get_object(bucket, filename, expires=timedelta(minutes=minutes))

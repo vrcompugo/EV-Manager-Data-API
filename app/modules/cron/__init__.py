@@ -1,6 +1,7 @@
 from app.exceptions import ApiException
 import datetime
 import json
+import traceback
 from app.modules.external.bitrix24.deal import get_deal
 from app.utils.error_handler import error_handler
 
@@ -224,5 +225,5 @@ def cron(section=None):
         try:
             cron_bitrix_export_item()
         except Exception as e:
-            pass
+            print(traceback.format_exc())
 
