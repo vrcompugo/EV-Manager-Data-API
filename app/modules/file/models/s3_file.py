@@ -64,6 +64,8 @@ class S3File(db.Model):
             except Exception as e:
                 if str(e).find("NoSuchBucket") >= 0:
                     result = True
+                if str(e).find("NoSuchKey") >= 0:
+                    result = True
                 if result is False:
                     print(traceback.format_exc())
             if result is True:
