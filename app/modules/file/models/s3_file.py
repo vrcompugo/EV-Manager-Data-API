@@ -3,6 +3,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 import uuid
+import traceback
 import base64
 from io import StringIO, BytesIO
 
@@ -11,7 +12,7 @@ from ..minio import get_file_public, make_public
 from app import db
 from app.modules.external.bitrix24.drive import get_file_content, get_public_link
 
-from ..minio import get_file
+from ..minio import get_file, delete_file
 
 
 class S3File(db.Model):
@@ -25,6 +26,7 @@ class S3File(db.Model):
     uploaded = db.Column(db.DateTime)
     filename = db.Column(db.String(120))
     bitrix_file_id = db.Column(db.Integer)
+    is_s3_deleted = db.Column(db.Boolean)
 
     @hybrid_property
     def public_link(self):
@@ -50,6 +52,24 @@ class S3File(db.Model):
         if self.bitrix_file_id is not None and self.bitrix_file_id > 0:
             return BytesIO(get_file_content(self.bitrix_file_id))
         return get_file(str(self.uuid), self.filename)
+
+    def delete_s3_file(self):
+        if self.uuid is not None and self.bitrix_file_id is not None and self.bitrix_file_id > 0:
+            result = False
+
+            try:
+                delete_file(str(self.uuid), self.filename)
+                file = get_file(str(self.uuid), self.filename)
+                print(file)
+            except Exception as e:
+                if str(e).find("NoSuchBucket") >= 0:
+                    result = True
+                if result is False:
+                    print(traceback.format_exc())
+            if result is True:
+                self.is_s3_deleted = True
+                db.session.commit()
+        return False
 
 
 class S3FileSchema(ModelSchema):
