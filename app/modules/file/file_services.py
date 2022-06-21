@@ -78,7 +78,7 @@ def cron_bitrix_export_item():
         if len(content) > 1000:
             print(item.id)
             item.delete_s3_file()
-            time.sleep(2)
+            time.sleep(6)
 
 
 def bitrix_export_item(item):
