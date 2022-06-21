@@ -161,6 +161,11 @@
                 {% if roof.lightning_protection %}
                     Blitzschutz soll demontiert werden zusätzlicher Kostenaufwand: 290€: {{ roof.lightning_protection_removal | boolformat }}<br>
                     Blitzschutz soll integriert werden zusätzlicher Kostenaufwand: 1.200€: {{ roof.lightning_protection_installation | boolformat }}<br>
+                    {% if not roof.lightning_protection_removal and not roof.lightning_protection_installation %}
+                        <div>
+                            Blitzschutz wird bauseits in die Pv Anlage integriert.
+                        </div>
+                    {% endif %}
                 {% endif %}
                 <h2>2. Dacheindeckung</h2>
                 <div class="layout horizontal radio-elements" style="flex-wrap: wrap;">
@@ -211,7 +216,7 @@
                             <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/trapezblech.jpeg" style="padding: 2.2em 0;" /></div>
                             <div>
                             <b>Trapezblech</b><br>
-                            Dicke: {{ roof.trapezblech_thickness }} mm<br>
+                            Materialstärke: {{ roof.trapezblech_thickness }} mm<br>
                             <small>mindestens 0,75 mm</small>
                             </div>
                         </div>
@@ -219,7 +224,7 @@
                             <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/sandwichelement.jpeg" style="padding: 2.2em 0;" /></div>
                             <div>
                             <b>Sandwichelement</b><br />
-                            Typ: {{ roof.sandwichelement_type }}
+                            Materialstärke: {{ roof.sandwichelement_thickness }}
                             </div>
                         </div>
                         <div class="{% if roof.roof_topping == 'Falzblech' %}active{% endif %}">
@@ -271,12 +276,14 @@
                         <div class="layout horizontal">
                             <div style="margin-right: 2em">
                                 Gebäudelänge: {{ roof.gebaudelange }} m<br>
+                                Firstlänge: {{ roof.firstlange }} m<br>
                                 Ortganglänge: {{ roof.ortganglange }} m<br>
-                                Anzahl Ziegel (vertikal): {{ roof.anzahl_ziegel }}
+                                Fläche: {{ roof.sqm }} m²
                             </div>
                             <div>
                                 Traufhöhe: {{ roof.traufhohe }} m<br>
-                                Dachneigung: {{ roof.dachneigung }}°
+                                Dachneigung: {{ roof.dachneigung }}°<br>
+                                Anzahl Ziegel (vertikal): {{ roof.anzahl_ziegel }}
                             </div>
                         </div>
                     </div>
@@ -289,11 +296,12 @@
                             <div class="layout horizontal">
                                 <div style="margin-right: 1em">
                                     Dachlänge: {{ roof.dachlange }} m
-                                    Dachbreite: {{ roof.dachbreite }} m
+                                    Dachbreite: {{ roof.dachbreite }} m<br>
+                                    Fläche: {{ roof.sqm }} m²
                                 </div>
                                 <div>
                                     Dachöhe: {{ roof.dachhohe }}
-                                    Dachneigung: {{ roof.dachneigung }} m
+                                    Dachneigung: {{ roof.dachneigung }} °
                                 </div>
                             </div>
                             <br />
@@ -325,12 +333,20 @@
                         <b>Keine Dämmung</b>
                     </div>
                 </div>
-                {% if roof.insulation_type == 'Zwischensparrendämmung' %}
-                <div class="layout horizontal">
+                {% if roof.insulation_type == 'Aufdachdämmung' %}
                     <div>Dämmstärke: {{ roof.insulation_thickness }} cm</div>
                     <div>Dämmmaterial: {{ roof.insulation_material }}</div>
-                </div>
                 {% endif %}
+                <h2>5. Ergänzende Informationen</h2>
+                Besteht eine Oberleitung: {{ roof.oberleitung_vorhanden | boolformat }}<br>
+                <br>
+                Als Kabelkanal aussen am Haus soll folgende Farbe verwendet werden: {{ roof.kabelkanal_color }}<br>
+                <br>
+                Die hier beschriebenen Dachfläche kann komplett zur Belegung genutzt werden: {{ roof.full_use | boolformat }}<br>
+                {% if not roof.full_use %}
+                    Eingeschränkte Belegung: {{ roof.specific_use }}<br>
+                {% endif %}
+                <br>
                 Bemerkungen: {{ roof.comment }}
             </div>
         {% endfor %}
