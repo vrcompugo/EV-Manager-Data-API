@@ -790,20 +790,22 @@ def get_annual_statement_data(data, year, manuell_data):
                         beginning_of_year = get_device_by_datetime(number, statement_config[product]["delivery_begin"])
                         end_of_year = get_device_by_datetime(number, statement_config[product]["delivery_end"])
                         if beginning_of_year is not None and end_of_year is not None:
-                            values = [
-                                {
+                            values = []
+                            if normalize_date(beginning_of_year.get("Date")) > datetime.datetime(2002,1,1):
+                                values.append({
                                     "number": number,
                                     "date": normalize_date(beginning_of_year.get("Date")),
                                     "value": abs(beginning_of_year.get("CounterReading", 0)),
                                     "origin": "smartme"
-                                },
-                                {
+                                })
+                            if normalize_date(end_of_year.get("Date")) > datetime.datetime(2002,1,1):
+                                values.append({
                                     "number": number,
                                     "date": normalize_date(end_of_year.get("Date")),
                                     "value": abs(end_of_year.get("CounterReading", 0)),
                                     "origin": "smartme"
-                                }
-                            ]
+                                })
+
                             statement["available_values"] = statement["available_values"] + values
                         counters = normalize_counter_values(
                             statement_config[product]["delivery_begin"],

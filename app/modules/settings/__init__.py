@@ -460,6 +460,7 @@ def get_settings(section=None, domain_raw=None):
                     "contracting_version": "UF_CRM_1639388034",
                     "netprovider": "UF_CRM_1607947330",
                     "netprovider_code": "UF_CRM_1581074754",
+                    "energie_delivery_provider": "UF_CRM_1607947248",
                     "energie_delivery_code": "UF_CRM_1597138326",
                     "transaction_code": "UF_CRM_1607947140",
                     "cloud_monthly_price": "UF_CRM_1612265225",

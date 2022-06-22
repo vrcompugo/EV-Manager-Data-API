@@ -84,6 +84,12 @@ def get_test_lead():
 
 
 @manager.command
+def send_test_enbw_contract():
+    from app.modules.external.enbw.contract import send_contract
+    send_contract("C2205307037")
+
+
+@manager.command
 def redo_sherpa_gas_usgae():
     from app.models import SherpaInvoiceItem
     invoice_items = SherpaInvoiceItem.query.all()

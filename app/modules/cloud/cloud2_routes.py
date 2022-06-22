@@ -481,7 +481,7 @@ def cloud2_index():
         return "Keine Placement Optionen gesetzt"
     options = json.loads(options)
     if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
-        deal = get_deal(options["ID"])
+        deal = get_deal(options["ID"], force_reload=True)
         if deal is not None:
             contract_number = normalize_contract_number(deal.get("cloud_contract_number"))
     if contract_number is None:

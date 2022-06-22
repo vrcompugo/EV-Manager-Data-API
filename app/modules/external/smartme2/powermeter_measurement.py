@@ -54,14 +54,14 @@ def run_cron_import():
         set_settings("external/smartme2", config)
 
 
-def get_device_by_datetime(smartme_number, datetime):
+def get_device_by_datetime(smartme_number, datetime_item):
     device = get("/DeviceBySerial", parameters={ "serial": smartme_number})
     if device is None:
-        data = smart2_get_device_by_datetime(smartme_number, datetime)
+        data = smart2_get_device_by_datetime(smartme_number, datetime_item)
     else:
-        data = get(f"/MeterValues/{device['Id']}", parameters={ "date": str(datetime) })
+        data = get(f"/MeterValues/{device['Id']}", parameters={ "date": str(datetime_item) })
     if data is not None:
-        requested_date = normalize_date(datetime)
+        requested_date = normalize_date(datetime_item)
         responded_date = normalize_date(data.get("Date"))
         if requested_date != responded_date:
             if responded_date <= requested_date:
@@ -74,6 +74,9 @@ def get_device_by_datetime(smartme_number, datetime):
                     if data2 is not None:
                         responded_date2 = normalize_date(data2.get("Date"))
                         if responded_date2 > requested_date:
+                            if normalize_date(data.get("Date")) < datetime(2002,1,1):
+                                print("prop2",data2)
+                                return data2
                             kwh_diff = data2.get("CounterReading") - data.get("CounterReading", 0)
                             days_diff = (responded_date2 - responded_date).days
                             days_to_add = (requested_date - responded_date).days
@@ -81,6 +84,9 @@ def get_device_by_datetime(smartme_number, datetime):
                             data["CounterReading"] = new_reading
                             data["Date"] = str(requested_date)
                             return data
+        if normalize_date(data.get("Date")) < datetime(2002,1,1):
+            print("problem")
+            return data
     return data
 
 
