@@ -543,6 +543,8 @@ def get_settings(section=None, domain_raw=None):
                     "pdf_contract_summary_link": "UF_CRM_1603982051",
                     "pdf_heatpump_auto_generate_link": "UF_CRM_1651676940",
                     "upload_link_roof": "UF_CRM_1603982144",
+                    "upload_link_roof_extra": "UF_CRM_1655979017408",
+                    "upload_link_tab": "UF_CRM_1655979001689",
                     "upload_link_electric": "UF_CRM_1603982169",
                     "upload_link_heating": "UF_CRM_1603982160",
                     "upload_link_invoices": "UF_CRM_1603982179",
