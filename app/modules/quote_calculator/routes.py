@@ -141,8 +141,8 @@ def quote_calculator_set_defaults(lead_id):
     ]
     for folder in folders:
         if f"upload_link_{folder['key']}" not in data["data"] or data["data"][f"upload_link_{folder['key']}"].find(f"Vorgang {lead['unique_identifier']}") < 0:
-            data["data"][f"upload_folder_id_{folder['key']}"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/{folder['path']}")
-            data["data"][f"upload_link_{folder['key']}"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/{folder['path']}"
+            data["data"][f"upload_folder_id_{folder['key']}"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}{folder['path']}")
+            data["data"][f"upload_link_{folder['key']}"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}{folder['path']}"
             update_data[f"upload_folder_id_{folder['key']}"] = data["data"][f"upload_folder_id_{folder['key']}"]
             update_data[f"upload_link_{folder['key']}"] = data["data"][f"upload_link_{folder['key']}"]
     if len(update_data.keys()) > 0:
