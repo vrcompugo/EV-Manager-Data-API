@@ -125,37 +125,27 @@ def quote_calculator_set_defaults(lead_id):
         data["quote_datetime"] = str(datetime.datetime.now())
 
     lead = get_lead(lead_id)
+    update_data = {}
     if "unique_identifier" not in lead or lead["unique_identifier"] is None or lead["unique_identifier"] == "":
         lead["unique_identifier"] = lead_id
-    if "upload_link_roof" not in data["data"] or data["data"]["upload_link_roof"].find(f"Vorgang {lead['unique_identifier']}") < 0:
-        data["data"]["upload_folder_id_roof"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Dachbilder")
-        data["data"]["upload_link_roof"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Dachbilder"
-        data["data"]["upload_folder_id_roof_extra"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Weitere Dachbilder")
-        data["data"]["upload_link_roof_extra"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Weitere Dachbilder"
-        data["data"]["upload_folder_id_electric"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Elektrik-Bilder")
-        data["data"]["upload_link_electric"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Elektrik-Bilder"
-        data["data"]["upload_folder_id_heating"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Heizungsbilder")
-        data["data"]["upload_link_heating"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Heizungsbilder"
-        data["data"]["upload_folder_id_invoices"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter")
-        data["data"]["upload_link_invoices"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Rechnung vom bisherigem Anbieter"
-        data["data"]["upload_folder_id_contract"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen")
-        data["data"]["upload_link_contract"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/Vertragsunterlagen"
-
-        update_data = {
-            "unique_identifier": str(lead_id),
-            "upload_link_roof": data["data"]["upload_link_roof"],
-            "upload_link_electric": data["data"]["upload_link_electric"],
-            "upload_link_heating": data["data"]["upload_link_heating"],
-            "upload_link_invoices": data["data"]["upload_link_invoices"],
-            "upload_link_contract": data["data"]["upload_link_contract"]
-        }
-        update_lead(lead_id, update_data)
-    if "upload_link_firstcall" not in data["data"] or data["data"]["upload_link_firstcall"].find(f"Vorgang {lead['unique_identifier']}") < 0:
-        data["data"]["upload_folder_id_firstcall"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/First Call")
-        data["data"]["upload_link_firstcall"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/First Call"
-        update_data = {
-            "upload_link_firstcall": data["data"]["upload_link_firstcall"]
-        }
+        update_data["unique_identifier"] = str(lead_id)
+    folders = [
+        { "key": "roof", "path": "/Uploads/Dachbilder" },
+        { "key": "roof_extra", "path": "/Uploads/Weitere Dachbilder" },
+        { "key": "tab", "path": "/Uploads/TAB" },
+        { "key": "electric", "path": "/Uploads/Elektrik-Bilder" },
+        { "key": "heating", "path": "/Uploads/Heizungsbilder" },
+        { "key": "invoices", "path": "/Uploads/Rechnung vom bisherigem Anbieter" },
+        { "key": "contract", "path": "/Uploads/Vertragsunterlagen" },
+        { "key": "firstcall", "path": "/Uploads/First Call" },
+    ]
+    for folder in folders:
+        if f"upload_link_{folder['key']}" not in data["data"] or data["data"][f"upload_link_{folder['key']}"].find(f"Vorgang {lead['unique_identifier']}") < 0:
+            data["data"][f"upload_folder_id_{folder['key']}"] = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/{folder['path']}")
+            data["data"][f"upload_link_{folder['key']}"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}/Uploads/{folder['path']}"
+            update_data[f"upload_folder_id_{folder['key']}"] = data["data"][f"upload_folder_id_{folder['key']}"]
+            update_data[f"upload_link_{folder['key']}"] = data["data"][f"upload_link_{folder['key']}"]
+    if len(update_data.keys()) > 0:
         update_lead(lead_id, update_data)
     histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).all()
     data["histories"] = []
