@@ -168,7 +168,7 @@ def load_contract_data(contract_number):
         if config["delivery_begin"] not in [None, ""] and (min_delivery_begin is None or min_delivery_begin < parse(config["delivery_begin"])):
             min_delivery_begin = parse(config["delivery_begin"])
     if min_delivery_begin is not None:
-        for year in range(min_delivery_begin.year, datetime.datetime.now().year):
+        for year in range(min_delivery_begin.year, datetime.datetime.now().year + 1):
             annual_statement = {
                 "year": year,
                 "status": [],
@@ -702,10 +702,10 @@ def get_annual_statement_data(data, year, manuell_data):
         statement_config["total_extra_price"] = 0
         statement_config["total_cloud_price"] = 0
         statement_config["total_cloud_price_incl_refund"] = 0
-        delivery_end = str(parse(config.get("delivery_begin")).year) + "-12-31"
+        delivery_end = str(year) + "-12-31"
         if config.get("delivery_end") is not None:
             delivery_end = str(config.get("delivery_end"))
-        delivery_begin = str(parse(config.get("delivery_begin")).year) + "-01-01"
+        delivery_begin = str(year) + "-01-01"
         if parse(config.get("delivery_begin")).year == year:
             delivery_begin = str(config.get("delivery_begin"))
         if parse(delivery_begin).year <= year and parse(delivery_end).year >= year:
