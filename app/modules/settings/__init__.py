@@ -507,7 +507,8 @@ def get_settings(section=None, domain_raw=None):
                     "heating_quote_people": "UF_CRM_1650894495",
                     "pdf_heatpump_auto_generate_link": "UF_CRM_1651497860",
                     "contracting_heatpump_link": "UF_CRM_1652867226",
-                    "measuring_concept": "UF_CRM_1652795881724"
+                    "measuring_concept": "UF_CRM_1652795881724",
+                    "cancel_date": "UF_CRM_1612265895"
                 }
             },
             "quote": {

@@ -148,6 +148,7 @@ def load_contract_data(contract_number):
     data["main_deal"] = deals[0]
 
     data["contact_id"] = data["main_deal"].get("contact_id")
+    data["cancel_date"] = data["main_deal"].get("cancel_date")
     data["pv_system"]["malo_id"] = data["main_deal"].get("malo_id")
     data["pv_system"]["netprovider"] = data["main_deal"].get("netprovider")
     data["pv_system"]["street"] = data["main_deal"].get("cloud_street")
@@ -703,7 +704,7 @@ def get_annual_statement_data(data, year, manuell_data):
         statement_config["total_cloud_price"] = 0
         statement_config["total_cloud_price_incl_refund"] = 0
         delivery_end = str(year) + "-12-31"
-        if config.get("delivery_end") is not None:
+        if config.get("delivery_end") is not None and parse(config.get("delivery_end")).year == year:
             delivery_end = str(config.get("delivery_end"))
         delivery_begin = str(year) + "-01-01"
         if parse(config.get("delivery_begin")).year == year:
