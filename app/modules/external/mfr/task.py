@@ -72,8 +72,10 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
     if deal_data is not None:
         folder_id = None
         if str(deal_data.get("category_id")) in ["1", "44"]:
-            folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_tab").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
-            files = get_folder(folder_id)
+            files = []
+            if deal_data.get("upload_link_tab") not in [None, ""]:
+                folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_tab").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
+                files = get_folder(folder_id)
             if len(files) == 0:
                 folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_roof").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
         if str(deal_data.get("category_id")) == "32":
