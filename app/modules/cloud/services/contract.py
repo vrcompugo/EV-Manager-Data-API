@@ -175,7 +175,9 @@ def load_contract_data(contract_number):
                 "status": [],
                 "deal": None,
                 "data": None,
-                "manuell_data": None
+                "manuell_data": {
+                    "assumed_autocracy": 50
+                }
             }
             contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
             if contract_status is not None:
@@ -186,6 +188,8 @@ def load_contract_data(contract_number):
                     annual_statement["pdf_link"] = get_public_link(contract_status.pdf_file_id)
                 if contract_status.manuell_data is not None:
                     annual_statement["manuell_data"] = contract_status.manuell_data
+                    if annual_statement["manuell_data"].get("assumed_autocracy") in [None, "", 0, "0"]:
+                        annual_statement["manuell_data"]["assumed_autocracy"] = 50
                 annual_statement["data"] = contract_status.data
 
             deals = get_deals({
@@ -737,50 +741,6 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement_config[product]["allowed_usage"] = statement_config[product]["allowed_usage"] + statement_config[product]["allowed_usage_emove"]
                 statement_config[product]["actual_usage"] = 0
                 statement_config[product]["actual_usage_net"] = 0
-                if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
-                    counter_numbers.append(statement_config[product].get("power_meter_number"))
-                    counter_numbers = counter_numbers + statement_config[product].get("additional_power_meter_numbers", [])
-                    values = []
-                    for value in statement["available_values"]:
-                        if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
-                            values.append(value)
-                    if product == "lightcloud" and "heatcloud" in statement_config and statement_config["lightcloud"]["delivery_begin"] != statement_config["heatcloud"]["delivery_begin"]:
-                        counters = normalize_counter_values(
-                            statement_config["lightcloud"]["delivery_begin"],
-                            statement_config["heatcloud"]["delivery_begin"],
-                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                            values.copy(),
-                            manuell_data
-                        )
-                        counters2 = normalize_counter_values(
-                            statement_config["heatcloud"]["delivery_begin"],
-                            statement_config["lightcloud"]["delivery_end"],
-                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                            values.copy(),
-                            manuell_data
-                        )
-                        if counters is not None and len(counters) > 0 and counters2 is not None and len(counters2) > 0 and manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
-                            statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters2)
-                            statement_config["heatcloud"]["actual_usage_net"] = statement_config["heatcloud"]["actual_usage_net"] - statement_config[product]["actual_usage_net"]
-                            statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters)
-                            statement["counters"] = statement["counters"] + counters
-                            statement["counters"] = statement["counters"] + counters2
-                    else:
-                        counters = normalize_counter_values(
-                            statement_config[product]["delivery_begin"],
-                            statement_config[product]["delivery_end"],
-                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                            values,
-                            manuell_data
-                        )
-                        if counters is not None and len(counters) > 0:
-                            if product == "lightcloud" or (product == "heatcloud" and statement_config[product].get("smartme_number") not in empty_values):
-                                if manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
-                                    statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
-                                    statement["counters"] = statement["counters"] + counters
-                            else:
-                                statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
-                                statement["counters"] = statement["counters"] + counters
                 if statement_config[product].get("smartme_number") not in [None, "", "123", 0, "0"]:
                     numbers = [statement_config[product].get("smartme_number")]
                     if statement_config[product].get("additional_smartme_numbers") is not None:
@@ -818,6 +778,72 @@ def get_annual_statement_data(data, year, manuell_data):
                         if counters is not None and len(counters) > 0:
                             statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
                             statement["counters"] = statement["counters"] + counters
+                if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
+                    counter_numbers.append(statement_config[product].get("power_meter_number"))
+                    counter_numbers = counter_numbers + statement_config[product].get("additional_power_meter_numbers", [])
+                    values = []
+                    for value in statement["available_values"]:
+                        if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
+                            values.append(value)
+                    if product == "lightcloud" and "heatcloud" in statement_config and statement_config["lightcloud"]["delivery_begin"] != statement_config["heatcloud"]["delivery_begin"]:
+                        counters = normalize_counter_values(
+                            statement_config["lightcloud"]["delivery_begin"],
+                            statement_config["heatcloud"]["delivery_begin"],
+                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
+                            values.copy(),
+                            manuell_data
+                        )
+                        counters2 = normalize_counter_values(
+                            statement_config["heatcloud"]["delivery_begin"],
+                            statement_config["lightcloud"]["delivery_end"],
+                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
+                            values.copy(),
+                            manuell_data
+                        )
+                        if counters is not None and len(counters) > 0 and counters2 is not None and len(counters2) > 0 and manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
+                            statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters2)
+                            statement_config["heatcloud"]["actual_usage_net"] = statement_config["heatcloud"]["actual_usage_net"] - statement_config[product]["actual_usage_net"]
+                            statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters)
+                            statement["counters"] = statement["counters"] + counters
+                            statement["counters"] = statement["counters"] + counters2
+                    else:
+                        counters = normalize_counter_values(
+                            statement_config[product]["delivery_begin"],
+                            statement_config[product]["delivery_end"],
+                            [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
+                            values,
+                            manuell_data
+                        )
+                        if product == "lightcloud" or (product == "heatcloud" and statement_config[product].get("smartme_number") not in empty_values):
+                            if counters is not None and len(counters) > 0:
+                                if manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
+                                    statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
+                                    statement["counters"] = statement["counters"] + counters
+                            else:
+                                if manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
+                                    print(manuell_data)
+                                    statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"] * (1 - int(manuell_data.get("assumed_autocracy")) / 100)
+                                    counter = {
+                                        "number": statement_config[product].get("power_meter_number"),
+                                        "type": "Netzbetreiber",
+                                        "calculation_type": "Schätzung",
+                                        "start_date": statement_config[product]["delivery_begin"],
+                                        "start_value": 0,
+                                        "start_estimated": True,
+                                        "end_date": statement_config[product]["delivery_end"],
+                                        "end_value": statement_config[product]["actual_usage_net"],
+                                        "end_estimated": True,
+                                        "usage": statement_config[product]["actual_usage_net"]
+                                    }
+                                    if manuell_data.get("estimate_netusage_startvalue") not in [None, ""]:
+                                        counter["start_value"] = int(manuell_data.get("estimate_netusage_startvalue"))
+                                        counter["start_estimated"] = False
+                                        counter["end_value"] = int(manuell_data.get("estimate_netusage_startvalue")) + statement_config[product]["actual_usage_net"]
+                                    statement["counters"].append(counter)
+                        else:
+                            if counters is not None and len(counters) > 0:
+                                statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
+                                statement["counters"] = statement["counters"] + counters
 
                 percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
                 statement_config[product]["total_cloud_price"] = statement_config[product]["cloud_price"] * 12 * percent_year
@@ -1183,7 +1209,6 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
                         end_value = value
         if start_value == end_value:
             start_value = start_value2
-        print(number, start_value, end_value, values)
         if end_value is None or start_value is None:
             continue
         origin = start_value["origin"]
