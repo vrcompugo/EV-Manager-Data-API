@@ -176,7 +176,8 @@ def load_contract_data(contract_number):
                 "deal": None,
                 "data": None,
                 "manuell_data": {
-                    "assumed_autocracy": 50
+                    "assumed_autocracy_lightcloud": 50,
+                    "assumed_autocracy_heatcloud": 23
                 }
             }
             contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
@@ -188,8 +189,10 @@ def load_contract_data(contract_number):
                     annual_statement["pdf_link"] = get_public_link(contract_status.pdf_file_id)
                 if contract_status.manuell_data is not None:
                     annual_statement["manuell_data"] = contract_status.manuell_data
-                    if annual_statement["manuell_data"].get("assumed_autocracy") in [None, "", 0, "0"]:
-                        annual_statement["manuell_data"]["assumed_autocracy"] = 50
+                    if annual_statement["manuell_data"].get("assumed_autocracy_lightcloud") in [None, "", 0, "0"]:
+                        annual_statement["manuell_data"]["assumed_autocracy_lightcloud"] = 50
+                    if annual_statement["manuell_data"].get("assumed_autocracy_heatcloud") in [None, "", 0, "0"]:
+                        annual_statement["manuell_data"]["assumed_autocracy_heatcloud"] = 23
                 annual_statement["data"] = contract_status.data
 
             deals = get_deals({
@@ -822,24 +825,7 @@ def get_annual_statement_data(data, year, manuell_data):
                             else:
                                 if manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
                                     print(manuell_data)
-                                    statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"] * (1 - int(manuell_data.get("assumed_autocracy")) / 100)
-                                    counter = {
-                                        "number": statement_config[product].get("power_meter_number"),
-                                        "type": "Netzbetreiber",
-                                        "calculation_type": "Schätzung",
-                                        "start_date": statement_config[product]["delivery_begin"],
-                                        "start_value": 0,
-                                        "start_estimated": True,
-                                        "end_date": statement_config[product]["delivery_end"],
-                                        "end_value": statement_config[product]["actual_usage_net"],
-                                        "end_estimated": True,
-                                        "usage": statement_config[product]["actual_usage_net"]
-                                    }
-                                    if manuell_data.get("estimate_netusage_startvalue") not in [None, ""]:
-                                        counter["start_value"] = int(manuell_data.get("estimate_netusage_startvalue"))
-                                        counter["start_estimated"] = False
-                                        counter["end_value"] = int(manuell_data.get("estimate_netusage_startvalue")) + statement_config[product]["actual_usage_net"]
-                                    statement["counters"].append(counter)
+                                    statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"] * (1 - int(manuell_data.get(f"assumed_autocracy_{product}")) / 100)
                         else:
                             if counters is not None and len(counters) > 0:
                                 statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
@@ -1072,6 +1058,10 @@ def generate_annual_report(contract_number, year):
 
     contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
 
+    if contract_status.manuell_data.get("assumed_autocracy_lightcloud") in [None, "", 0, "0"]:
+        contract_status.manuell_data["assumed_autocracy_lightcloud"] = 50
+    if contract_status.manuell_data.get("assumed_autocracy_heatcloud") in [None, "", 0, "0"]:
+        contract_status.manuell_data["assumed_autocracy_heatcloud"] = 23
     statement = get_annual_statement_data(data, year, contract_status.manuell_data)
     contract_status.data = statement
     db.session.commit()
