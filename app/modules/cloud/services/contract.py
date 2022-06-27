@@ -824,8 +824,11 @@ def get_annual_statement_data(data, year, manuell_data):
                                     statement["counters"] = statement["counters"] + counters
                             else:
                                 if manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
-                                    print(manuell_data)
+                                    statement["estimate_netusage"] = True
+                                    if statement.get("total_self_usage") in [None, ""]:
+                                        statement["total_self_usage"] = 0
                                     statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"] * (1 - int(manuell_data.get(f"assumed_autocracy_{product}")) / 100)
+                                    statement["total_self_usage"] = statement["total_self_usage"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
                         else:
                             if counters is not None and len(counters) > 0:
                                 statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
