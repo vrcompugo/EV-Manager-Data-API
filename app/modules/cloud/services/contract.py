@@ -1066,7 +1066,7 @@ def generate_annual_report(contract_number, year):
     if contract_status.manuell_data.get("assumed_autocracy_lightcloud") in [None, "", 0, "0"]:
         contract_status.manuell_data["assumed_autocracy_lightcloud"] = 50
     if contract_status.manuell_data.get("assumed_autocracy_heatcloud") in [None, "", 0, "0"]:
-        contract_status.manuell_data["assumed_autocracy_heatcloud"] = 23
+        contract_status.manuell_data["assumed_autocracy_heatcloud"] = 28
     statement = get_annual_statement_data(data, year, contract_status.manuell_data)
     contract_status.data = statement
     db.session.commit()
