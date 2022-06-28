@@ -1061,6 +1061,8 @@ def generate_annual_report(contract_number, year):
 
     contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
 
+    if contract_status.manuell_data is None:
+        contract_status.manuell_data = {}
     if contract_status.manuell_data.get("assumed_autocracy_lightcloud") in [None, "", 0, "0"]:
         contract_status.manuell_data["assumed_autocracy_lightcloud"] = 50
     if contract_status.manuell_data.get("assumed_autocracy_heatcloud") in [None, "", 0, "0"]:
