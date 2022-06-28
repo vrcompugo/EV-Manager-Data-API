@@ -214,11 +214,15 @@
     <br>
     {% if statement.estimate_netusage %}
       <br>
-      Der in dieser Abrechnung für Sie ermittelte Eigenverbrauchsanteil*** beträgt {{ statement.total_self_usage | numberformat('de', 0) }} kWh. Näheres hierzu können Sie über einen Steuerberater ihrer Wahl erfahren.<br>
+      {% if statement.total_self_usage_heatcloud and statement.total_self_usage_heatcloud > 0 %}
+        Der in dieser Abrechnung für Sie ermittelte Eigenverbrauchsanteil*** beträgt {{ statement.total_self_usage_lightcloud | numberformat('de', 0) }} kWh für Lichtstrom und {{ statement.total_self_usage_heatcloud | numberformat('de', 0) }} kWh für Wärmestrom von {{ statement.total_self_usage | numberformat('de', 0) }} kWh Gesamtverbrauch. Näheres hierzu können Sie über einen Steuerberater ihrer Wahl erfahren.<br>
+      {% else %}
+        Der in dieser Abrechnung für Sie ermittelte Eigenverbrauchsanteil*** beträgt {{ statement.total_self_usage | numberformat('de', 0) }} kWh. Näheres hierzu können Sie über einen Steuerberater ihrer Wahl erfahren.<br>
+      {% endif %}
       <br>
       *** Der bei Ihnen ermittelte Eigenverbrauchswert basiert auf einer formelbasierten Berechnung und stellt den Richtwert für den von Ihnen zu versteuernden Eigenverbrauchsanteile als steuerbegründenden Wert dar. Die Datenbasis beruht hierbei im Regelfall auf vom Netzbetreiber zyklisch ermittelten Werten, kann durch diesen aber auch geschätzt werden.<br>
       Sollten keine Daten durch den Netzbetreiber vorliegen, werden die Werte für die formelbasierte Berechnung durch Energie 360 im zulässigen Umfang vorläufig auf Basis von vergangenen Netzbetreiberangaben und dem durch uns verbauten Smartme-Zähler geschätzt. Die hierbei durch uns geschätzten Werte können im Einzelfall teilweise im nicht unerheblichen Umfang von den realen Werten abweichen. Entsprechend haftet Energie 360 nicht für hieraus entstehende Schäden, gleich aus welchem Rechtsgrund.<br>
-      Ihr Eigenverbrauchsanteil ist hierbei von verschiedenen Umwelt- und Einflussfaktoren abhängig (Beispielsweise: Verbrauchszeitpunkt, Produktionszeitpunkt bzw. -menge, Speicherauslastung und Speicherverlust).<br>
+      Ihr Eigenverbrauchsanteil ist hierbei von verschiedenen Umwelt- und Einflussfaktoren abhängig (Beispielsweise: Verbrauchszeitpunkt, Produktionszeitpunkt bzw. -menge, Speicherauslastung und Speicherverlust, individuelle Wärmepumpennutzung).<br>
     {% endif %}
   </div>
 
