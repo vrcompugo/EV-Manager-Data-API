@@ -177,7 +177,7 @@ def load_contract_data(contract_number):
                 "data": None,
                 "manuell_data": {
                     "assumed_autocracy_lightcloud": 50,
-                    "assumed_autocracy_heatcloud": 23
+                    "assumed_autocracy_heatcloud": 28
                 }
             }
             contract_status = ContractStatus.query.filter(ContractStatus.year == str(year)).filter(ContractStatus.contract_number == contract_number).first()
@@ -192,7 +192,7 @@ def load_contract_data(contract_number):
                     if annual_statement["manuell_data"].get("assumed_autocracy_lightcloud") in [None, "", 0, "0"]:
                         annual_statement["manuell_data"]["assumed_autocracy_lightcloud"] = 50
                     if annual_statement["manuell_data"].get("assumed_autocracy_heatcloud") in [None, "", 0, "0"]:
-                        annual_statement["manuell_data"]["assumed_autocracy_heatcloud"] = 23
+                        annual_statement["manuell_data"]["assumed_autocracy_heatcloud"] = 28
                 annual_statement["data"] = contract_status.data
 
             deals = get_deals({
