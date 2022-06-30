@@ -735,7 +735,7 @@ def get_annual_statement_data(data, year, manuell_data):
                     product_delivery_begin = parse(statement_config[product].get("delivery_begin"))
                 statement_config[product]["delivery_begin"] = str(product_delivery_begin)
                 statement_config[product]["delivery_end"] = str(delivery_end)
-                diff_days = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days
+                diff_days = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days + 1
                 statement_config[product]["allowed_usage"] = statement_config[product]["usage"] * (diff_days / 365)
 
                 if product == "lightcloud" and config.get("emove") is not None:
