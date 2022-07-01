@@ -105,3 +105,7 @@ def update_task(id, data, domain=None):
         print(json.dumps(response, indent=2))
         print(json.dumps(update_data, indent=2))
         return False
+
+def add_task(payload):
+    data = post("tasks.task.add", payload)
+    return data

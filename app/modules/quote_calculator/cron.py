@@ -1,10 +1,15 @@
+import datetime
+import dateutil.relativedelta
 import json
+from dateutil.parser import parse
 
 from app import db
 from app.models import QuoteHistory
+from app.modules.settings import get_settings, set_settings
 from app.utils.error_handler import error_handler
 from app.modules.external.bitrix24.deal import get_deal, get_deals, update_deal
 from app.modules.external.bitrix24.lead import get_lead, add_lead
+from app.modules.external.bitrix24.task import add_task
 from app.modules.quote_calculator.routes import quote_calculator_set_defaults, quote_calculator_add_history, quote_calculator_heating_pdf_action, quote_calculator_datasheets_pdf_action, quote_calculator_quote_summary_pdf_action, quote_calculator_contract_summary_pdf_action, quote_calculator_summary_pdf_action, quote_calculator_heatpump_autogenerate_pdf_action
 from app.modules.quote_calculator.quote_data import calculate_heating_usage
 
@@ -104,7 +109,44 @@ def cron_heatpump_auto_quote_generator():
             move_to_manuell(deal["id"])
             error_handler()
 
+
 def move_to_manuell(deal_id):
     update_deal(deal_id, {
         "stage_id": "C210:UC_BY30OU"
     })
+
+
+def cron_bsh_quote_numbers():
+    print("cron_bsh_quote_numbers")
+    config = get_settings("bsh_quote_numbers")
+    now = datetime.datetime.now()
+    last_excecute = datetime.datetime(now.year, now.month, 1)
+    print(last_excecute)
+    if config.get("last_excecute") is None:
+        config["last_excecute"] = datetime.datetime(2022, 4, 1)
+    else:
+        config["last_excecute"] = parse(config["last_excecute"])
+    diff_months = (last_excecute.year - config["last_excecute"].year) * 12 + last_excecute.month - config["last_excecute"].month
+    for i in range(diff_months):
+        range_start = last_excecute - dateutil.relativedelta.relativedelta(months=diff_months - i)
+        range_end = str(last_excecute - dateutil.relativedelta.relativedelta(months=diff_months - i - 1))
+        title = f"BSH-Angebote für {range_start.month} {range_start.year}:\n"
+        description = f"BSH-Angebote für {range_start.month} {range_start.year}:\n"
+        range_start = str(range_start)
+
+        result = db.session.execute(f"select customer_id, count(offer_v2.id) as quote_per_customer from offer_v2 where reseller_id = 92 and datetime >= '{range_start}' and datetime < '{range_end}' group by  customer_id")
+        description = description + f"Eindeutige Kunden mit Angebots: {result.rowcount}\n"
+        result = db.session.execute(f"select customer_id from offer_v2 where reseller_id = 92 and datetime >= '{range_start}' and datetime < '{range_end}'")
+        description = description + f"Angebote gesamt: {result.rowcount}\n"
+        print(description)
+        add_task({
+            "fields[TITLE]": title,
+            "fields[DESCRIPTION]": description,
+            "fields[RESPONSIBLE_ID]": 33
+        })
+    config = json.loads(json.dumps(get_settings("bsh_quote_numbers")))
+    config["last_excecute"] = str(last_excecute)
+    set_settings("bsh_quote_numbers", config)
+
+
+

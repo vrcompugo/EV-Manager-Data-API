@@ -213,6 +213,13 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "productive" or section == "bsh_quote_numbers":
+        from app.modules.quote_calculator.cron import cron_bsh_quote_numbers
+        try:
+            cron_bsh_quote_numbers()
+        except Exception as e:
+            error_handler()
+
     if section == "cron_transfer_fakturia_annual_invoice":
         from app.modules.cloud.services.contract import cron_transfer_fakturia_annual_invoice
         try:
