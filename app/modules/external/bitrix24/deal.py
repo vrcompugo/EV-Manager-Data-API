@@ -247,6 +247,8 @@ def run_cron_add_missing_values():
                         update_data["extra_packages2"].append("Zählerschrank")
                     if "emergency_power_box" in history.data["data"]["extra_options"]:
                         update_data["extra_packages2"].append("Notstrombox")
+                    if history.data["calculated"]["min_kwp_heatcloud"] > 0 and history.data["data"].get("has_heating_quote") is True:
+                        update_data["extra_packages2"].append("Wärme Cloud Paket (zusätzlicher Zählerplatz für Wärme)")
                     if "tax_consult" in history.data["data"]["extra_options"]:
                         update_data["tax_consultant"] = "Ja"
                     if "wwwp" in history.data["data"]["extra_options"]:
