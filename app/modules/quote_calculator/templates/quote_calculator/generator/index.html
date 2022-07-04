@@ -100,6 +100,13 @@
     </div>
   {% endif%}
 
+  {% if data.data.financing_bank and data.data.financing_bank in ['energie360'] %}
+    <div style="border: 1px solid #ccc; padding: 1em; margin: 1.5em 0;">
+      <b>Finanzierung über energie360 GmbH &amp; Co. KG</b><br>
+      Der Kaufvertrag kommt nur bei einer genehmigten Finanzierung zu Stande. Die monatliche netto Rate soll mit einer Anzahlung von {{ data.loan_calculation.upfront_payment | currencyformat }} bei ca {{ data.loan_calculation.monthly_payment | currencyformat }} liegen.
+    </div>
+  {% endif%}
+
   {% if data.appendix %}
     <div class="appendix">
       {% if data.appendix_type == "html" %}

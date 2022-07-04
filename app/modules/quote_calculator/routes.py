@@ -109,6 +109,8 @@ def quote_calculator_set_defaults(lead_id):
         data = history.data
         if "financing_rate" not in data["data"]:
             data["data"]["financing_rate"] = 3.79
+        if "financing_rate_heating" not in data["data"]:
+            data["data"]["financing_rate_heating"] = 3.79
         if "extra_options_zero" not in data["data"]:
             data["data"]["extra_options_zero"] = []
         data["quote_datetime"] = data["datetime"]

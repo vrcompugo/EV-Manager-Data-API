@@ -12,6 +12,7 @@ from app.modules.external.bitrix24.user import get_user
 from app.modules.external.bitrix24.products import get_list as get_product_list, get_product
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.settings import get_settings
+from app.modules.loan_calculation import loan_calculation
 from app.utils.jinja_filters import currencyformat
 
 from .conditional_products.pvmodule import add_product as add_product_pv_module
@@ -445,6 +446,12 @@ def calculate_products(data):
                 quantity=quantity,
                 products=data["products"]
             )'''
+        add_direct_product(
+            label="Preisgarantie",
+            category="Extra Pakete",
+            quantity=1,
+            products=data["products"]
+        )
     except Exception as e:
         trace_output = traceback.format_exc()
         print(trace_output)
@@ -462,6 +469,12 @@ def calculate_products(data):
     data["total_tax"] = data["total_net"] * (config["taxrate"] / 100)
     data["total"] = data["total_net"] + data["total_tax"]
     data["tax_rate"] = config["taxrate"]
+    if data.get("data").get("investment_type") == 'financing' and data.get("data").get("financing_bank") in ["energie360"]:
+        if data.get("data").get("loan_runtime") in [None, "", "0", 0]:
+            data["data"]["loan_runtime"] = 240
+        if data.get("data").get("loan_upfront") in [None, "", "0", 0]:
+            data["data"]["loan_upfront"] = 0
+        data["loan_calculation"] = loan_calculation(data["total_net"], data.get("data")["loan_upfront"], data.get("data")["financing_rate"], data["data"]["loan_runtime"])
     return data
 
 

@@ -4,6 +4,7 @@ import traceback
 from app.exceptions import ApiException
 from app.modules.external.bitrix24.products import get_product
 from app.modules.settings import get_settings
+from app.modules.loan_calculation import loan_calculation
 
 from .commission import calculate_commission_data
 
@@ -341,6 +342,12 @@ def get_heating_products(data):
     data["heating_quote"]["total_tax"] = data["heating_quote"]["total_net"] * (config["taxrate"] / 100)
     data["heating_quote"]["total"] = data["heating_quote"]["total_net"] + data["heating_quote"]["total_tax"]
     data["heating_quote"]["tax_rate"] = config["taxrate"]
+    if data.get("data").get("investment_type_heating") == 'financing' and data.get("data").get("financing_bank_heating") in ["energie360"]:
+        if data.get("data").get("loan_runtime_heating") in [None, "", "0", 0]:
+            data["data"]["loan_runtime_heating"] = 240
+        if data.get("data").get("loan_upfront_heating") in [None, "", "0", 0]:
+            data["data"]["loan_upfront_heating"] = 0
+        data["loan_calculation_heating"] = loan_calculation(data["heating_quote"]["total_net"], data.get("data")["loan_upfront_heating"], data.get("data")["financing_rate_heating"], data["data"]["loan_runtime_heating"])
     return data
 
 

@@ -139,6 +139,12 @@ def test_special():
 
 
 @manager.command
+def tool_fakturia_sepa_fix():
+    from app.modules.fakturia.tools import fix_sepa_files
+    fix_sepa_files()
+
+
+@manager.command
 def create_cloud_contract_deals():
     from app.modules.external.bitrix24.deal import get_deals, add_deal, get_deal, update_deal
     from app.modules.cloud.cloud2_routes import get_invoce_list
