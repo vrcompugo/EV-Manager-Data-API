@@ -15,23 +15,23 @@ def send_contract(contract_number):
     enbw_data = {
         "partner_id": config.get("partner_id"),
         "CorrespondenseAdressData": {
-            "area_code": contact.get("zip"),
-            "city": contact.get("city"),
-            "email": contact.get("email")[0].get("VALUE"),
-            "phone_number": contact.get("phone")[0].get("VALUE"),
-            "street_name": contact.get("street"),
-            "street_number": contact.get("street_nb"),
-            "zipcode": contact.get("zip")
+            "area_code": "34497",
+            "city": "Korbach",
+            "email": "versorger@energie360.de",
+            "phone_number": "0 56 31 50 17 17",
+            "street_name": "Marienburger Straße",
+            "street_number": "6",
+            "zipcode": "34497"
         },
         "CorrespondensePrivateData": {
-            "first_name": contact.get("firstname"),
-            "last_name": contact.get("lastname"),
-            "suffix": contact.get("salutation")
+            "first_name": "Andre",
+            "last_name": "Schon",
+            "suffix": "Herr"
         },
         "PrivateData": {
-            "first_name": "Petra",
-            "last_name": "Testkunde",
-            "suffix": contact.get("salutation")
+            "first_name": contact.get("firstname"),
+            "last_name": contact.get("lastname"),
+            "suffix": "Frau" if contact.get("salutation") in ["ms"] else "Herr"
         },
         "permissions": {
             "datetime": "08052018000000",
@@ -59,16 +59,16 @@ def send_contract(contract_number):
         products = ["lightcloud", "heatcloud"] + customer_products
         for product in products:
             if product not in enbw_data and product in cloud_config and cloud_config.get(product).get("delivery_begin") not in [None, "", 0, "0"]:
-                enbw_data[product] = {
+                contract_data = {
                     "extern_id": f"{contract_number}-{product}",
                     "AddressData": {
-                        "area_code": contact.get("delivery_zip"),
-                        "city": contact.get("delivery_city"),
+                        "area_code": contract.get("main_deal").get("delivery_zip"),
+                        "city": contract.get("main_deal").get("delivery_city"),
                         "email": contact.get("email")[0].get("VALUE"),
                         "phone_number": contact.get("phone")[0].get("VALUE"),
-                        "street_name": contact.get("delivery_street"),
-                        "street_number": contact.get("delivery_street_nb"),
-                        "zipcode": contact.get("delivery_zip")
+                        "street_name": contract.get("main_deal").get("delivery_street"),
+                        "street_number": contract.get("main_deal").get("delivery_street_nb"),
+                        "zipcode": contract.get("main_deal").get("delivery_zip")
                     },
                     "Client": {
                         "account_holder": config.get("account_holder"),
@@ -105,4 +105,6 @@ def send_contract(contract_number):
                         "vp_client_extern_id": f"{contract_number}-{product}"
                     },
                 }
-    print(json.dumps(enbw_data, indent=2))
+                for key in enbw_data.keys():
+                    contract_data[key] = enbw_data.get(key)
+                print(json.dumps(contract_data, indent=2))
