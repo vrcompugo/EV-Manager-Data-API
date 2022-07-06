@@ -299,12 +299,22 @@ def calculate_feasibility_study(offer: OfferV2):
         data["pv_offer_total"] = float(offer.data["total_net"])
     if heating_offer is not None:
         data["heating_offer_total"] = float(heating_offer.get("total", 0))
+        data["heating_offer_total_substitional"] = float(heating_offer.get("total", 0))
+        data["heating_offer_total_nonsubstitional"] = 0
+        if data["heating_offer_total"] > 60000:
+            data["heating_offer_total_substitional"] = 60000
+            data["heating_offer_total_nonsubstitional"] = data["heating_offer_total"] - data["heating_offer_total_substitional"]
+        if data["heating_offer_total"] > 90000 and offer.data is not None and offer.data.get("heating_quote_house_type") in ["Mehrfamilienhaus"]:
+            data["heating_offer_total_substitional"] = 90000
+            data["heating_offer_total_nonsubstitional"] = data["heating_offer_total"] - data["heating_offer_total_substitional"]
         if offer.data.get("old_heating_type") == "gas":
-            data["heating_offer_substitute_total"] = float(heating_offer.get("total", 0)) * 0.60
+            data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.65 + data["heating_offer_total_nonsubstitional"]
         if offer.data.get("old_heating_type") == "oil":
-            data["heating_offer_substitute_total"] = float(heating_offer.get("total", 0)) * 0.50
+            data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.55 + data["heating_offer_total_nonsubstitional"]
+            print(data["heating_offer_substitute_total"])
         if offer.data.get("old_heating_type") in ["new", "heatpump"]:
-            data["heating_offer_substitute_total"] = float(heating_offer.get("total", 0)) * 0.65
+            data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.65 + data["heating_offer_total_nonsubstitional"]
+
     data["loan_amount"] = data["pv_offer_total"] + data["heating_offer_substitute_total"]
     data["yearly_loan_payment"] = data["loan_amount"] / 20
     data["loan_total_interest"] = 0
