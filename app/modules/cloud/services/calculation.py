@@ -418,21 +418,22 @@ def calculate_cloud(data):
             consumer["price"] = consumer_price[0]["value"]
             if len(consumer_price) > 0:
                 result["cloud_price_consumer"] = result["cloud_price_consumer"] + consumer_price[0]["value"]
-        result["consumer_usage"] = consumer_usage
-        result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor_kwp) / 1000
-        result["conventional_price_consumer"] = (
-            (
-                settings["data"]["wi_settings"]["conventional_base_cost_per_year"] * len(data["consumers"])
-                + result["consumer_usage"] * result["consumercloud_extra_price_per_kwh"]
-            ) / 12
-        )
-        if "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] != "":
+        if consumer_usage > 0:
+            result["consumer_usage"] = consumer_usage
+            result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor_kwp) / 1000
             result["conventional_price_consumer"] = (
                 (
                     settings["data"]["wi_settings"]["conventional_base_cost_per_year"] * len(data["consumers"])
-                    + result["consumer_usage"] * data["conventional_power_cost_per_kwh"] / 100
+                    + result["consumer_usage"] * result["consumercloud_extra_price_per_kwh"]
                 ) / 12
             )
+            if "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] != "":
+                result["conventional_price_consumer"] = (
+                    (
+                        settings["data"]["wi_settings"]["conventional_base_cost_per_year"] * len(data["consumers"])
+                        + result["consumer_usage"] * data["conventional_power_cost_per_kwh"] / 100
+                    ) / 12
+                )
     result["conventional_price_emove"] = 0
     result["emove_usage"] = 0
     if "emove_tarif" in data:
