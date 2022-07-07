@@ -35,7 +35,7 @@ def authenticate(domain=None):
     return None
 
 
-def post(url, post_data=None, files=None, domain=None, force_reload=False, recursion=False):
+def post(url, post_data=None, files=None, domain=None, force_reload=False, recursion=False, depth=0):
     cached_response = lookup_cache("post", url=url, post_data=post_data, domain=domain, force_reload=force_reload)
     if cached_response is not None:
         return cached_response.response
@@ -48,7 +48,9 @@ def post(url, post_data=None, files=None, domain=None, force_reload=False, recur
             data = response.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
                 time.sleep(2)
-                return post(url, post_data, files, recursion=True)
+                if depth > 4:
+                    raise Exception("to manny retrys")
+                return post(url, post_data, files, recursion=True, depth=depth + 1)
             if recursion is False:
                 store_cache("post", url=url, post_data=post_data, domain=domain, data=data)
             return data
@@ -57,7 +59,7 @@ def post(url, post_data=None, files=None, domain=None, force_reload=False, recur
     return {}
 
 
-def get(url, parameters=None, force_reload=False, recursion=False):
+def get(url, parameters=None, force_reload=False, recursion=False, depth=0):
     cached_response = lookup_cache("get", url=url, parameters=parameters, force_reload=force_reload)
     if cached_response is not None:
         return cached_response.response
@@ -70,7 +72,9 @@ def get(url, parameters=None, force_reload=False, recursion=False):
             data = response.json()
             if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
                 time.sleep(2)
-                return get(url, parameters, recursion=True)
+                if depth > 4:
+                    raise Exception("to manny retrys")
+                return get(url, parameters, recursion=True, depth=depth + 1)
             if recursion is False:
                 store_cache("get", url=url, parameters=parameters, data=data)
             return data
