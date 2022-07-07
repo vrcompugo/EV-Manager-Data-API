@@ -54,3 +54,4 @@ pdfkit
 verify-email
 azure-servicebus
 python-magic
+schwifty

@@ -3,6 +3,7 @@ import json
 import base64
 import datetime
 from dateutil.parser import parse
+from schwifty import IBAN
 
 from app import db
 from app.exceptions import ApiException
@@ -20,7 +21,7 @@ def get_contract_data_by_deal(deal_id):
     deal = get_deal(deal_id, force_reload=True)
     if deal is None:
         raise ApiException('deal not found', 'Auftrag nicht gefunden')
-    if deal.get("category_id") not in ["15", "68", "70", "176"]:
+    if deal.get("category_id") not in ["15", "68", "70", "176", "202"]:
         return {"status": "failed", "data": {"error": "Nur in Cloud Pipeline verfügbar"}, "message": ""}
     if deal.get("category_id") in ["15", "176"]:
         return get_cloud_contract_data_by_deal(deal)
@@ -28,6 +29,82 @@ def get_contract_data_by_deal(deal_id):
         return get_service_contract_data_by_deal(deal)
     if deal.get("category_id") == "70":
         return get_insurance_contract_data_by_deal(deal)
+    if deal.get("category_id") == "70":
+        return get_insurance_contract_data_by_deal(deal)
+    if deal.get("category_id") == "202":
+        return get_hv_contract_data_by_deal(deal)
+
+
+def get_hv_contract_data_by_deal(deal):
+    from app.modules.importer.sources.bitrix24.order import run_import as order_import
+    from app.modules.order.order_services import generate_contract_number
+
+    contract_number = normalize_contract_number(deal.get("contract_number"))
+    print(contract_number)
+    if contract_number in [None, ""]:
+        order = order_import(remote_id=deal["id"])
+        if order is None:
+            raise ApiException('order import failed', 'Order Import failed')
+        contract_number = generate_contract_number(order, number_prefix="")
+        if contract_number not in [None, ""]:
+            order.contract_number = contract_number
+            db.session.commit()
+            deal["contract_number"] = contract_number
+            update_deal(id=deal["id"], data={
+                "contract_number": contract_number
+            })
+    if contract_number in [None, ""]:
+        raise ApiException('contract_number_failed', 'Vertragsnummer konnte nicht erzeugt werden')
+    data = load_json_data(deal.get("fakturia_data"))
+    if data is None:
+        data = initilize_hv_contract_data(deal)
+    if data is None:
+        raise ApiException('init_failed', 'Initialisierung fehlgeschlagen')
+    deal["item_lists"] = data["item_lists"]
+    deal["link"] = f"https://keso.bitrix24.de/crm/deal/details/{deal['id']}/"
+    delivery_begin = None
+    if deal.get("begindate") not in [None, "", "None"]:
+        delivery_begin = deal.get("begindate")[0:deal.get("begindate").find("T")]
+        deal["sepa_mandate_since"] = delivery_begin
+        update_deal(id=deal["id"], data={
+            "sepa_mandate_since": delivery_begin
+        })
+        delivery_begin = datetime.datetime.strptime(delivery_begin, "%Y-%m-%d")
+        year = delivery_begin.year + 1
+        delivery_begin = str(year) + delivery_begin.strftime("-%m-%d")
+    if len(deal["item_lists"]) > 0:
+        deal["item_lists"][0]["start"] = delivery_begin
+        deal["item_lists"][0]["items"][0]["deal"]["link"] = deal["link"]
+    contact = get_contact(deal["contact_id"], force_reload=True)
+    if contact.get("fakturia_iban") in [None, ""]:
+        if deal.get("hv_iban") in [None, ""]:
+            raise ApiException('missing_iban', 'Iban nicht vorhanden')
+        iban = IBAN(deal.get("hv_iban"))
+        bic = iban.bic.compact
+        iban = iban.compact
+        update_contact(contact.get("id"), {
+            "fakturia_iban": iban,
+            "fakturia_bic": bic
+        })
+    else:
+        iban = contact.get("fakturia_iban")
+        bic = contact.get("fakturia_bic")
+
+    deal["fakturia"] = {
+        "customer_number": contact.get("fakturia_number"),
+        "iban": iban,
+        "bic": bic,
+        "owner": f"{contact.get('name')} {contact.get('last_name')}",
+        "delivery_begin": delivery_begin,
+        "contract_number": ""
+    }
+    if contract_number not in [None, "", "0", 0]:
+        deal["fakturia"]["contract_number"] = int(contract_number)
+        deal["fakturia"]["invoices"] = get(f"/Invoices", parameters={
+            "contractNumber": deal["fakturia"]["contract_number"],
+            "extendedData": True
+        })
+    return deal
 
 
 def get_insurance_contract_data_by_deal(deal):
@@ -130,6 +207,32 @@ def get_service_contract_data_by_deal(deal):
             "extendedData": True
         })
     return deal
+
+
+def initilize_hv_contract_data(deal):
+    total_price_net = 25
+    total_price = total_price_net * 1.19
+    data = {
+        "item_lists": [
+            {
+                "start": None,
+                "end": None,
+                "items": [{
+                    "type": "hv-vertrag",
+                    "label": "HV Vertrag",
+                    "description": "",
+                    "tax_rate": 19,
+                    "total_price": total_price,
+                    "total_price_net": total_price_net,
+                    "deal": {"id": deal["id"], "title": deal["title"]}
+                }]
+            }
+        ]
+    }
+    update_deal(deal.get("id"), {
+        "fakturia_data": store_json_data(data)
+    })
+    return data
 
 
 def initilize_service_contract_data(deal):
@@ -816,7 +919,7 @@ def run_cron_export():
                     export_deal(deal["id"])
                 except Exception as e:
                     continue
-                deal = get_deal(deal["id"])
+                deal = get_deal(deal["id"], force_reload=True)
         if deal.get("fakturia_contract_number") not in [None, "", "None"]:
             print(deal.get("fakturia_contract_number"))
             update_deal(deal["id"], {
@@ -834,9 +937,19 @@ def run_cron_export():
                     export_deal(deal["id"])
                 except Exception as e:
                     continue
-                deal = get_deal(deal["id"])
+                deal = get_deal(deal["id"], force_reload=True)
         if deal.get("fakturia_contract_number") not in [None, "", "None"]:
             print(deal.get("fakturia_contract_number"))
             update_deal(deal["id"], {
                 "stage_id": "C68:PREPARATION"
             })
+
+
+def run_export_by_id(deal_id):
+    export_deal(deal_id)
+    deal = get_deal(deal["id"], force_reload=True)
+    if deal.get("fakturia_contract_number") not in [None, "", "None"]:
+        print(deal.get("fakturia_contract_number"))
+        update_deal(deal["id"], {
+            "stage_id": "C202:PREPARATION"
+        })

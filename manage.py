@@ -144,6 +144,15 @@ def tool_fakturia_sepa_fix():
     fix_sepa_files()
 
 
+@manager.option("-i", "--id", dest='deal_id', default=None)
+def run_fakturia_deal_export(deal_id):
+    from app.modules.external.fakturia.deal import run_export_by_id
+    if deal_id is None:
+        print("no deal id")
+        return
+    run_export_by_id(deal_id)
+
+
 @manager.command
 def create_cloud_contract_deals():
     from app.modules.external.bitrix24.deal import get_deals, add_deal, get_deal, update_deal
