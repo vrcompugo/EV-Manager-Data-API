@@ -69,9 +69,6 @@ def get_hv_contract_data_by_deal(deal):
         update_deal(id=deal["id"], data={
             "sepa_mandate_since": delivery_begin
         })
-        delivery_begin = datetime.datetime.strptime(delivery_begin, "%Y-%m-%d")
-        year = delivery_begin.year + 1
-        delivery_begin = str(year) + delivery_begin.strftime("-%m-%d")
     if len(deal["item_lists"]) > 0:
         deal["item_lists"][0]["start"] = delivery_begin
         deal["item_lists"][0]["items"][0]["deal"]["link"] = deal["link"]
@@ -700,7 +697,7 @@ def get_export_data_hv(deal, contact):
         "projectName": "HV Verträge",
         "subscription": {
             "termPeriod": 1,
-            "termUnit": "YEAR",
+            "termUnit": "MONTH",
             "noticePeriod": 0,
             "noticeUnit": "DAY",
             "continuePeriod": 0,
@@ -713,7 +710,7 @@ def get_export_data_hv(deal, contact):
         "name": deal["fakturia"].get("contract_number"),
         "issueDate": deal["fakturia"].get("delivery_begin"),
         "recur": 1,
-        "recurUnit": "YEAR",
+        "recurUnit": "MONTH",
         "duePeriod": 0,
         "dueUnit": "DAY",
         "paymentMethod": "SEPA_DEBIT",
