@@ -105,7 +105,9 @@ def export_contact(contact, force=False):
     else:
         if True:
             export_data = get_export_data(contact, company)
+            print(contact["id"], "export", contact.get("date_modify"))
             customer_data = put(f"/Customers/{contact.get('fakturia_number')}", post_data=export_data)
+            print(export_data, customer_data)
             if contact.get("sepa_mandate_since") not in [None, "None", ""]:
                 mandates = get(f"/Customers/{contact.get('fakturia_number')}/SepaDebitMandates")
                 if mandates is not None and len(mandates) == 0:
