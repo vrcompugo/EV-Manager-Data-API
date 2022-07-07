@@ -947,7 +947,7 @@ def run_cron_export():
 
 def run_export_by_id(deal_id):
     export_deal(deal_id)
-    deal = get_deal(deal["id"], force_reload=True)
+    deal = get_deal(deal_id, force_reload=True)
     if deal.get("fakturia_contract_number") not in [None, "", "None"]:
         print(deal.get("fakturia_contract_number"))
         update_deal(deal["id"], {
