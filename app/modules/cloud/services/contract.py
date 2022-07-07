@@ -433,6 +433,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
             offer_v2.calculated = legacy_data["calculated"]
             offer_v2.calculated["cloud_price"] = legacy_data["total"]
             offer_v2.calculated["power_usage"] = round(offer_v2.calculated["power_usage"] / 10) * 10
+            offer_v2.calculated["lightcloud_extra_price_per_kwh"] = 0.3379
 
     if offer_v2 is not None:
         data["pv_system"]["pv_kwp"] = offer_v2.calculated.get("pv_kwp")
