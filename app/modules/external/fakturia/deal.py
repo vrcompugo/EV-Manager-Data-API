@@ -1019,7 +1019,7 @@ def run_cron_export():
         "SELECT": "full"
     }, force_reload=True)
     for deal in deals:
-        if deal.get("iban") not in [None, "", "None"]:
+        if deal.get("hv_iban") not in [None, "", "None"]:
             if deal.get("fakturia_contract_number") in [None, "", "None"]:
                 try:
                     export_deal(deal["id"])
