@@ -663,12 +663,85 @@ def get_export_data(deal, contact):
         return get_export_data_service(deal, contact)
     if deal["category_id"] == "70":
         return get_export_data_insurance(deal, contact)
+    if deal["category_id"] == "202":
+        return get_export_data_hv(deal, contact)
     return None, None, None
+
+
+def get_export_data_hv(deal, contact):
+    config = get_settings("external/fakturia")
+    subscriptionItemsPrices = []
+    subscriptionItems = []
+    for item_list in deal.get("item_lists"):
+        for item in item_list["items"]:
+            if item_list["start"] in [None, "", "0000-00-00"]:
+                item_list["start"] = deal["fakturia"].get("delivery_begin")
+            item_data = {
+                "itemNumber": "hv-vertrag",
+                "quantity": 1,
+                "extraDescription": "",
+                "description": "",
+                "unit": "YEAR",
+                "validFrom": item_list["start"],
+                "ccQuantityChange": False,
+                "status": "ACTIVE",
+                "activityType": "DEFAULT_PERFORMANCE"
+            }
+            cost = round(float(item["total_price"]) / 1.19, 4)
+            subscriptionItemsPrices.append({
+                "cost": cost,
+                "currency": "EUR",
+                "validFrom": "",
+                "minimumQuantity": 1
+            })
+            subscriptionItems.append(item_data)
+    data = {
+        "customerNumber": contact.get("fakturia_number"),
+        "projectName": "HV Verträge",
+        "subscription": {
+            "termPeriod": 1,
+            "termUnit": "YEAR",
+            "noticePeriod": 0,
+            "noticeUnit": "DAY",
+            "continuePeriod": 0,
+            "continueUnit": "DAY",
+            "billedInAdvance": True,
+            "subscriptionItems": subscriptionItems,
+            "status": "ACTIVE"
+        },
+        "contractNumber": deal["fakturia"].get("contract_number"),
+        "name": deal["fakturia"].get("contract_number"),
+        "issueDate": deal["fakturia"].get("delivery_begin"),
+        "recur": 1,
+        "recurUnit": "YEAR",
+        "duePeriod": 0,
+        "dueUnit": "DAY",
+        "paymentMethod": "SEPA_DEBIT",
+        "contractStatus": "ACTIVE",
+        "trialPeriod": 0,
+        "trialUnit": "DAY",
+        "trialPeriodEndAction": "CONTINUE",
+        "hasTrialperiod": False,
+        "ccDisallowTermination": True,
+        "taxConfig": "APPLY_ALWAYS",
+        "documentDeliveryMode": "EMAIL"
+    }
+    issue_date = datetime.datetime.strptime(data["issueDate"], '%Y-%m-%d')
+    if issue_date.day > 15:
+        next_billing_date = issue_date + datetime.timedelta(days=20)
+        data["issueDate"] = next_billing_date.strftime("%Y-%m-01")
+    else:
+        if issue_date.day == 1:
+            data["issueDate"] = issue_date.strftime("%Y-%m-01")
+        else:
+            data["issueDate"] = issue_date.strftime("%Y-%m-15")
+    return data, subscriptionItemsPrices, config.get("api-key-contracting")
 
 
 def get_export_data_insurance(deal, contact):
     data, subscriptionItemsPrices, api_key = get_export_data_service(deal, contact)
     return data, subscriptionItemsPrices, api_key
+
 
 def get_export_data_service(deal, contact):
     config = get_settings("external/fakturia")
@@ -855,7 +928,7 @@ def export_deal(deal_id):
         raise ApiException('wrong-iban', 'Kunden IBAN stimmt nicht mit Auftrags IBAN übrein')
     export_contact(contact, force=True)
     export_data, subscriptionItemsPrices, api_key = get_export_data(deal, contact)
-    print(json.dumps(export_data, indent=2))
+    print("asd", json.dumps(export_data, indent=2))
     if export_data is not None:
         contract_data = None
         if deal.get("fakturia_contract_number") in ["", None, 0, "0"]:
