@@ -103,7 +103,7 @@ def export_contact(contact, force=False):
         else:
             print(json.dumps(customer_data, indent=2))
     else:
-        if force:
+        if True:
             export_data = get_export_data(contact, company)
             customer_data = put(f"/Customers/{contact.get('fakturia_number')}", post_data=export_data)
             if contact.get("sepa_mandate_since") not in [None, "None", ""]:
