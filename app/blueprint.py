@@ -14,7 +14,6 @@ from app.modules.order.order_routes import api as order_ns
 from app.modules.reseller.routes.reseller_group_routes import api as reseller_group_ns
 from app.modules.reseller.routes.reseller_routes import api as reseller_ns
 from app.modules.survey.survey_routes import api as survey_ns
-from app.modules.settings.settings_routes import api as settings_ns
 from .modules.auth.auth_decorators import full_permission_list
 
 auth = HTTPBasicAuth()
@@ -82,7 +81,6 @@ api.add_namespace(lead_ns, path='/leads')
 api.add_namespace(offer_ns, path='/offers')
 api.add_namespace(order_ns, path='/orders')
 api.add_namespace(auth_ns, path='/auth')
-api.add_namespace(settings_ns, path='/settings')
 
 
 def register_blueprints(app):
