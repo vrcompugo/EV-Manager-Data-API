@@ -215,7 +215,7 @@ def calculate_feasibility_study(offer: OfferV2):
         "orientation_label": orientation_label,
         "investment_type": investment_type,
         "in_use_date": in_use_date,
-        "conventional_base_cost_per_year": settings["data"]["wi_settings"]["conventional_base_cost_per_year"],
+        "conventional_base_cost_per_year": 0,
         "conventional_base_cost_per_kwh": settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"],
         "conventional_gas_cost_per_kwh": 0.0598,
         "conventional_heat_cost_per_kwh": 0.23,
