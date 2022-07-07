@@ -15,6 +15,8 @@ def get_export_data(contact, company):
     salutation = "MR"
     if contact["salutation"] == "ms":
         salutation = "MRS"
+    if contact["fakturia_owner"] in [None, ""]:
+        contact["fakturia_owner"] = contact["first_name"] + " " + contact["last_name"]
     data = {
         "salutation": salutation,
         "firstName": contact["first_name"],
