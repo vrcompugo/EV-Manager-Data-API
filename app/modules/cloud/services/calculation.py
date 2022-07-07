@@ -407,7 +407,7 @@ def calculate_cloud(data):
             result["conventional_price_ecloud"] = result["conventional_price_heating_usage"] * result["conventional_price_heating"] / 12
         if data.get("has_heating_quote", False) is True and data.get("new_heating_type", "") == "hybrid_gas":
             result["conventional_price_ecloud"] = 0
-    if "consumers" in data:
+    if "consumers" in data and len(data["consumers"]) > 0:
         consumer_usage = 0
         for consumer in data["consumers"]:
             consumer_usage = consumer_usage + int(consumer["usage"])
