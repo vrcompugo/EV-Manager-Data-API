@@ -61,7 +61,7 @@ def generate_sherpa2_file(deal, contact):
             excel_layout = "gas"
         if deal.get("contract_number")[0:1] == "E":
             excel_layout = "power"
-    wb = load_workbook(os.path.join(os.path.dirname(__file__), f'excel/basefiles/{excel_layout}.xlsx'))
+    wb = load_workbook(os.path.join(os.path.dirname(__file__), f'excel2/basefiles/{excel_layout}.xlsx'))
     wb.current_row = 4
     part01_general(wb, excel_layout, deal, contact)
     part02_rechnungsanschrift(wb, excel_layout, deal, contact)
