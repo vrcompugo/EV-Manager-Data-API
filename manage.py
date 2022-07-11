@@ -236,6 +236,12 @@ def run_legacy_folder_creation():
 
 
 @manager.command
+def run_cron_export_anual_payments():
+    from app.modules.external.fakturia.deal import run_cron_export_anual_payments
+    run_cron_export_anual_payments()
+
+
+@manager.command
 def run_mfr_subscriptor():
     from app.modules.external.mfr.amqp import run_mfr_amqp_messaging_subscriptor
     run_mfr_amqp_messaging_subscriptor()
