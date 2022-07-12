@@ -589,6 +589,12 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                         number = number.strip()
                         if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
                             config["ecloud"]["additional_power_meter_numbers"].append(number)
+                if data["main_deal"].get("old_power_meter_numbers_ecloud") not in empty_values:
+                    numbers = data["main_deal"].get("old_power_meter_numbers_ecloud").split("\n")
+                    for number in numbers:
+                        number = number.strip()
+                        if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
+                            config["ecloud"]["additional_power_meter_numbers"].append(number)
         if offer_v2.calculated.get("min_kwp_consumer") > 0:
             for index, consumer in enumerate(offer_v2.data.get("consumers")):
                 config["consumers"].append({
