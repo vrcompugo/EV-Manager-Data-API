@@ -166,8 +166,10 @@ def load_contract_data(contract_number):
 
     min_delivery_begin = None
     for config in data["configs"]:
-        if config["delivery_begin"] not in [None, ""] and (min_delivery_begin is None or min_delivery_begin < parse(config["delivery_begin"])):
+        if config["delivery_begin"] not in [None, ""] and (min_delivery_begin is None or min_delivery_begin > parse(config["delivery_begin"])):
             min_delivery_begin = parse(config["delivery_begin"])
+        if config["earliest_delivery_begin"] not in [None, ""] and (min_delivery_begin is None or min_delivery_begin > parse(config["earliest_delivery_begin"])):
+            min_delivery_begin = parse(config["earliest_delivery_begin"])
     if min_delivery_begin is not None:
         for year in range(min_delivery_begin.year, datetime.datetime.now().year + 1):
             annual_statement = {
@@ -403,6 +405,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
     settings = get_settings(section="external/bitrix24")
     config = {
         "cloud_number": cloud_number,
+        "earliest_delivery_begin": delivery_begin,
         "delivery_begin": delivery_begin,
         "delivery_end": None,
         "consumers": [],
@@ -539,6 +542,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 config["heatcloud"]["smartme_number"] = deals[0].get("smartme_number_heatcloud")
                 config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number")
                 config["heatcloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
+                if parse(config["earliest_delivery_begin"]) > parse( config["heatcloud"]["delivery_begin"]):
+                    config["earliest_delivery_begin"] =  config["heatcloud"]["delivery_begin"]
                 config["heatcloud"]["deal"] = {
                     "id": deals[0].get("id"),
                     "title": deals[0].get("title")
@@ -577,6 +582,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 config["ecloud"]["smartme_number"] = None
                 config["ecloud"]["power_meter_number"] = deals[0].get("counter_ecloud")
                 config["ecloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
+                if parse(config["earliest_delivery_begin"]) > parse( config["ecloud"]["delivery_begin"]):
+                    config["earliest_delivery_begin"] =  config["ecloud"]["delivery_begin"]
                 config["ecloud"]["deal"] = {
                     "id": deals[0].get("id"),
                     "title": deals[0].get("title")
@@ -624,7 +631,9 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 else:
                     consumer["power_meter_number"] = existing_deal.get("delivery_counter_number")
                     consumer["delivery_begin"] = existing_deal.get("cloud_delivery_begin")
-                    if  existing_deal.get("old_power_meter_numbers") not in empty_values:
+                    if parse(config["earliest_delivery_begin"]) > parse(consumer["delivery_begin"]):
+                        config["earliest_delivery_begin"] = consumer["delivery_begin"]
+                    if existing_deal.get("old_power_meter_numbers") not in empty_values:
                         numbers =  existing_deal.get("old_power_meter_numbers").split("\n")
                         for number in numbers:
                             number = number.strip()
@@ -745,7 +754,10 @@ def get_annual_statement_data(data, year, manuell_data):
                     product_delivery_begin = parse(statement_config[product].get("delivery_begin"))
                 statement_config[product]["delivery_begin"] = str(product_delivery_begin)
                 statement_config[product]["delivery_end"] = str(delivery_end)
-                diff_days = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days + 1
+                if normalize_date(statement_config[product]["delivery_begin"]) < normalize_date(statement_config["delivery_begin"]):
+                    diff_days = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config["delivery_begin"])).days + 1
+                else:
+                    diff_days = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days + 1
                 statement_config[product]["allowed_usage"] = statement_config[product]["usage"] * (diff_days / 365)
 
                 if product == "lightcloud" and config.get("emove") is not None:
