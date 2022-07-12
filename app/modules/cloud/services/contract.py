@@ -590,7 +590,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 }
                 if config["ecloud"]["power_meter_number"] not in empty_values:
                     config["ecloud"]["power_meter_number"] = config["ecloud"]["power_meter_number"].strip()
-                if  deals[0].get("old_power_meter_numbers") not in empty_values:
+                if deals[0].get("old_power_meter_numbers") not in empty_values:
                     numbers =  deals[0].get("old_power_meter_numbers").split("\n")
                     for number in numbers:
                         number = number.strip()
@@ -598,6 +598,12 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                             config["ecloud"]["additional_power_meter_numbers"].append(number)
                 if data["main_deal"].get("old_power_meter_numbers_ecloud") not in empty_values:
                     numbers = data["main_deal"].get("old_power_meter_numbers_ecloud").split("\n")
+                    for number in numbers:
+                        number = number.strip()
+                        if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
+                            config["ecloud"]["additional_power_meter_numbers"].append(number)
+                if deals[0].get("old_power_meter_numbers_ecloud") not in empty_values:
+                    numbers = deals[0].get("old_power_meter_numbers_ecloud").split("\n")
                     for number in numbers:
                         number = number.strip()
                         if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
