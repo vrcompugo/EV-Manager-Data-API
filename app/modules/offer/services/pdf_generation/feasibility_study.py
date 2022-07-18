@@ -525,7 +525,7 @@ def calculate_feasibility_study(offer: OfferV2):
     data["cloud_total"] = data["cloud_total"] + repair_cost_yearly
 
     data["eeg_direct_usage_cost"] = 0
-    if "pv_kwp" in data["cloud_calulation"] and data["cloud_calulation"]["pv_kwp"] > 30:
+    if False and "pv_kwp" in data["cloud_calulation"] and data["cloud_calulation"]["pv_kwp"] > 30:
         data["eeg_direct_usage_cost"] = cloud_calulation["power_usage"] * 0.6 * (0.06756 / 2) * data["runtime"]
         data["cloud_total"] = data["cloud_total"] + data["eeg_direct_usage_cost"]
     data["cost_total"] = data["cloud_total"] + data["loan_total"]
