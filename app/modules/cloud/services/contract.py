@@ -416,6 +416,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
     else:
         if data.get("cancel_date") not in empty_values:
             config["delivery_end"] = data.get("cancel_date")
+    config["measuring_concept"] = data["main_deal"].get("measuring_concept")
     legacy_cloud = False
     offer_v2 = OfferV2.query.filter(OfferV2.number == cloud_number).first()
     if offer_v2 is None:
@@ -666,6 +667,7 @@ def get_annual_statement_data(data, year, manuell_data):
     statement = {
         "year": year,
         "contact": get_contact(data.get("contact_id")),
+        "measuring_concept": data.get("measuring_concept"),
         "counters": [],
         "configs": [],
         "errors": [],
@@ -855,7 +857,7 @@ def get_annual_statement_data(data, year, manuell_data):
                             values,
                             manuell_data
                         )
-                        if product == "lightcloud" or (product == "heatcloud" and statement_config[product].get("smartme_number") not in empty_values):
+                        if product == "lightcloud" or (product == "heatcloud" and statement_config[product].get("smartme_number") not in empty_values and statement_config.get("measuring_concept") not in ["parallel_concept"]):
                             if manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
                                 statement["estimate_netusage"] = True
                                 if statement.get("total_self_usage") in [None, ""]:
