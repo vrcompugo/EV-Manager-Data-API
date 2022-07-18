@@ -875,6 +875,7 @@ def get_annual_statement_data(data, year, manuell_data):
                         else:
                             if counters is not None and len(counters) > 0:
                                 statement_config[product]["actual_usage"] = sum(item['usage'] for item in counters)
+                                statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
                                 statement["counters"] = statement["counters"] + counters
 
                 percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
