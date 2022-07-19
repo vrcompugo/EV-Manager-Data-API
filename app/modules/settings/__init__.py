@@ -624,6 +624,7 @@ def get_settings(section=None, domain_raw=None):
                     "drive_rental_contract_folder": "UF_CRM_1612533461553",
                     "drive_rental_documents_folder": "UF_CRM_1612533480143",
                     "drive_cloud_folder": "UF_CRM_1612533500465",
+                    "iban": "UF_CRM_1576139642",
                     "fakturia_iban": "UF_CRM_1624003459",
                     "fakturia_bic": "UF_CRM_1624003474",
                     "fakturia_owner": "UF_CRM_1624003488",

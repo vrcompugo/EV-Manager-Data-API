@@ -45,8 +45,11 @@ def get_export_data(contact, company):
             "bitrix_id": contact['id']
         }
     }
-    if contact.get("fakturia_iban") not in ["", None]:
-        iban = IBAN(contact["fakturia_iban"])
+    iban = contact.get("fakturia_iban")
+    if contact.get("fakturia_iban") in ["", None]:
+        iban = contact.get("iban")
+    if iban not in ["", None]:
+        iban = IBAN(iban)
         bic = iban.bic.compact
         iban = iban.compact
         data["bankAccountIban"] = iban
@@ -75,6 +78,9 @@ def run_cron_export():
         "SELECT": "full",
         "FILTER[>DATE_MODIFY]": str(config.get("last_contact_export_time", "2021-01-20 00:00:00"))
     }, force_reload=True)
+    if contacts is None:
+        print("contacts could not be loaded")
+        return
     for contact in contacts:
         export_contact(contact)
     config = get_settings("external/fakturia")
