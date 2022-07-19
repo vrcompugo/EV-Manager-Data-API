@@ -969,6 +969,9 @@ def run_cron_export():
         "FILTER[STAGE_ID]": "C70:3",
         "SELECT": "full"
     }, force_reload=True)
+    if deals is None:
+        print("deals could not be loaded")
+        return
     for deal in deals:
         if deal.get("iban") not in [None, "", "None"]:
             contracting_deals = get_deals({

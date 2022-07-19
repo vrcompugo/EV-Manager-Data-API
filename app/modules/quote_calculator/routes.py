@@ -898,12 +898,6 @@ def get_insign_callback(token):
                 "message": f"GET /get/document s:{session_id} d:{file['id']} did respond with error in data",
                 "data": file_content
             }, indent=2)
-            message = Message(text=error_response,
-                            subject="Insign Error Response",
-                            mail_from=("EV-Manager", "bugs@api.korbacher-energiezentrum.de"),
-                            config=email_config)
-            message.mail_to = "a.hedderich@hbb-werbung.de"
-            message.send()
             return Response(
                 error_response,
                 status=400,

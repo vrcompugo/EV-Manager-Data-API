@@ -180,7 +180,7 @@ def run_cron_add_missing_values():
     if "last_import_datetime" in config:
         payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]
     deals = get_deals(payload, force_reload=True)
-    if len(deals) > 0:
+    if deals is not None and len(deals) > 0:
         for deal in deals:
             if "unique_identifier" in deal:
                 history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal["unique_identifier"]).order_by(QuoteHistory.datetime.desc()).first()

@@ -164,6 +164,9 @@ def auto_assignment_facebook_leads():
         leads = get_leads_by_createdate('2021-01-22 00:00:00')
     else:
         leads = get_leads_by_createdate(config["last_lead_import_time"])
+    if leads is None:
+        print("leads could not be loaded")
+        return
     for lead_data in leads:
         if lead_data["SOURCE_ID"] == "21":
             print(lead_data["ID"])

@@ -223,15 +223,19 @@ def run_cron_export():
         "filter[>ACTIVITY_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     }, force_reload=True)
+    if tasks is None:
+        print("tasks could not be loaded")
+        return
     tasks2 = get_tasks({
         "select": "full",
         "filter[>CHANGED_DATE]": last_task_export_time,
         "filter[TITLE]": "%[mfr]%"
     }, force_reload=True)
-    for task in tasks2:
-        found = next((item for item in tasks if item.get("id") == task.get("id")), None)
-        if found is None:
-            tasks.append(task)
+    if tasks2 is not None:
+        for task in tasks2:
+            found = next((item for item in tasks if item.get("id") == task.get("id")), None)
+            if found is None:
+                tasks.append(task)
     print("time: ", last_task_export_time)
     last_task_export_time = datetime.now()
     for task in tasks:

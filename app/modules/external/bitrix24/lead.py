@@ -279,5 +279,8 @@ def run_cron_auto_assign_leads():
         "FILTER[SOURCE_ID]": "41",
         "FILTER[ASSIGNED_BY_ID]": "106"
     }, force_reload=True)
+    if leads is None:
+        print("leads could not be loaded")
+        return
     for lead in leads:
         auto_assign_lead_to_user(lead["id"])

@@ -239,7 +239,9 @@ def run_cron_folder_creation():
         "FILTER[>DATE_MODIFY]": last_import,
         "SELECT": "full"
     }, force_reload=True)
-
+    if contacts is None:
+        print("contacts could not be loaded")
+        return
     for contact in contacts:
         post_data = {}
         for folder in config["folders"]:
@@ -341,6 +343,9 @@ def run_cron_heating_folder_creation():
         "SELECT[1]": "ID",
         "SELECT[2]": "UF_CRM_60A60FF556B0C"
     }, force_reload=True)
+    if deals is None:
+        print("deals could not be loaded")
+        return
     for deal in deals:
         print("deal", deal["id"])
         if deal.get("upload_link_heatingcontract") in [None, "", 0]:
@@ -372,6 +377,9 @@ def run_cron_external_company_folder_creation():
         "FILTER[CATEGORY_ID]": 142,
         "SELECT": "full"
     }, force_reload=True)
+    if deals is None:
+        print("deals could not be loaded")
+        return
     for deal in deals:
         print("deal", deal["id"])
         if deal.get("upload_link_roof") in [None, "", 0]:
