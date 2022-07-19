@@ -15,6 +15,9 @@ def cron_split_cloud_contract():
         "FILTER[CATEGORY_ID]": "15",
         "FILTER[STAGE_ID]": "C15:17",
     }, force_reload=True)
+    if deals is None:
+        print("deals could not be loaded")
+        return
     for deal in deals:
         print(deal.get("id"), deal.get("is_cloud_master_deal"))
         if deal.get("is_cloud_master_deal") not in [1, "1", True, "true"]:
