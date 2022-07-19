@@ -20,6 +20,9 @@ def cron_heatpump_auto_quote_generator():
         "FILTER[CATEGORY_ID]": 210,
         "FILTER[STAGE_ID]": "C210:NEW"
     }, force_reload=True)
+    if deals is None:
+        print("deals could not be loaded")
+        return
     for deal in deals:
         if deal.get("contact_id") in [None, "", 0, "0"]:
             lead = get_lead(deal.get("unique_identifier"))
