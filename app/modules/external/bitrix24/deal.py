@@ -301,7 +301,15 @@ def run_cron_add_missing_values():
                 update_data["dz4_customer"] = "kein DZ-4 Kunde"
                 if history.data.get("has_special_condition") is False:
                     update_data["stage_id"] = "15"
-
+                update_data["engerie360_financing"] = "Nein"
+                if history.data["data"].get("has_pv_quote") is True \
+                    and history.data["data"].get("investment_type") == "financing" \
+                    and history.data["data"].get("financing_bank") == "energie360":
+                    update_data["engerie360_financing"] = "Ja"
+                if history.data["data"].get("has_heating_quote") is True \
+                    and history.data["data"].get("investment_type_heating") == "financing" \
+                    and history.data["data"].get("financing_bank_heating") == "energie360":
+                    update_data["engerie360_financing"] = "Ja"
                 update_deal(deal["id"], update_data)
 
         config = get_settings("external/bitrix/add_deals_missing_values")

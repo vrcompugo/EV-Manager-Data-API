@@ -290,6 +290,11 @@ def get_settings(section=None, domain_raw=None):
                     "6944": "cascading_concept",
                     "6946": "parallel_concept",
                     "6968": "cascading_concept"
+                },
+                "energie360_financing": {
+                    "": "nicht ausgewählt",
+                    "6996": "Ja",
+                    "6998": "Nein"
                 }
             },
             "product": {
@@ -511,7 +516,8 @@ def get_settings(section=None, domain_raw=None):
                     "measuring_concept": "UF_CRM_1652795881724",
                     "cancel_date": "UF_CRM_1612265895",
                     "hv_iban": "UF_CRM_1625662334",
-                    "hv_begindate": "UF_CRM_1625665316"
+                    "hv_begindate": "UF_CRM_1625665316",
+                    "energie360_financing": "UF_CRM_1654122143"
                 }
             },
             "quote": {
