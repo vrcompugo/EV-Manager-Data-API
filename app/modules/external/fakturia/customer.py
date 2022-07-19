@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from schwifty import IBAN
 
 from app import db
 from app.modules.external.bitrix24.contact import get_contacts, update_contact as update_bitrix_contact
@@ -28,9 +29,6 @@ def get_export_data(contact, company):
         "taxRegion": "NATIONAL",
         "duePeriod": "14",
         "dueUnit": "DAY",
-        "bankAccountIban": contact["fakturia_iban"],
-        "bankAccountBic": contact["fakturia_bic"],
-        "bankAccountOwner": contact["fakturia_owner"],
         "postalAddress": {
             "addressLine1": f"{contact['street']} {contact['street_nb']}",
             "zipCode": contact['zip'],
@@ -47,6 +45,15 @@ def get_export_data(contact, company):
             "bitrix_id": contact['id']
         }
     }
+    if contact.get("fakturia_iban") not in ["", None]:
+        iban = IBAN(contact["fakturia_iban"])
+        bic = iban.bic.compact
+        iban = iban.compact
+        data["bankAccountIban"] = iban
+        data["bankAccountBic"] = bic
+        data["bankAccountOwner"] = contact["fakturia_owner"]
+        if contact.get("fakturia_owner") in ["", None]:
+            data["bankAccountOwner"] = f'{contact["first_name"]} {contact["last_name"]}'
     if company is not None:
         data["companyName"] = company["title"]
     if contact.get("phone", None) is not None and len(contact.get("phone")) > 0:
