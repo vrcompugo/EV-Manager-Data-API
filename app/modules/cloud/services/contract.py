@@ -543,8 +543,9 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 config["heatcloud"]["smartme_number"] = deals[0].get("smartme_number_heatcloud")
                 config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number")
                 config["heatcloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
-                if parse(config["earliest_delivery_begin"]) > parse( config["heatcloud"]["delivery_begin"]):
-                    config["earliest_delivery_begin"] =  config["heatcloud"]["delivery_begin"]
+                if config["heatcloud"]["delivery_begin"] not in ["", None]:
+                    if parse(config["earliest_delivery_begin"]) > parse(config["heatcloud"]["delivery_begin"]):
+                        config["earliest_delivery_begin"] =  config["heatcloud"]["delivery_begin"]
                 config["heatcloud"]["deal"] = {
                     "id": deals[0].get("id"),
                     "title": deals[0].get("title")
