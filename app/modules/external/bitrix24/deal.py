@@ -209,7 +209,7 @@ def run_cron_add_missing_values():
                         cloud_type.append("Consumer")
 
                     if history.data["data"].get("additional_cloud_contract") in ["true", True, 1]:
-                        if history.data["calculated"]["min_kwp_lightcloud"] > 0:
+                        if history.data["calculated"]["min_kwp_light"] > 0:
                             update_data["expansion_type"] = "ja, mit zusätzlichen Speicher"
                         else:
                             update_data["expansion_type"] = "ja, ohne zusätzlichen Speicher"
