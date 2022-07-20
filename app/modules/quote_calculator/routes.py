@@ -1088,6 +1088,7 @@ def get_insign_session(data):
             "preFilledFields": [],
             "signatures": signatures
         })
+    if "pdf_contract_summary_part5_file_id" in data:
         prefillable_documents.append({
             "id": data["pdf_contract_summary_part5_file_id"],
             "displayname": "Contractigvertrag WP",
