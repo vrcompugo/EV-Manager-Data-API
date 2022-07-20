@@ -196,7 +196,8 @@ def run_cron_add_missing_values():
                     "pv_module": ["keine Auswahl"],
                     "count_modules": 0,
                     "emove_packet": "none",
-                    "hwp": ["keine Auswahl"]
+                    "hwp": ["keine Auswahl"],
+                    "expansion_type": "nein"
                 }
                 if history.data["data"].get("has_pv_quote") is True:
                     cloud_type = ["Zero"]
@@ -206,6 +207,12 @@ def run_cron_add_missing_values():
                         cloud_type.append("Wärmecloud")
                     if history.data["calculated"]["min_kwp_consumer"] > 0:
                         cloud_type.append("Consumer")
+
+                    if history.data["data"].get("additional_cloud_contract") in ["true", True, 1]:
+                        if history.data["calculated"]["min_kwp_lightcloud"] > 0:
+                            update_data["expansion_type"] = "ja, mit zusätzlichen Speicher"
+                        else:
+                            update_data["expansion_type"] = "ja, ohne zusätzlichen Speicher"
 
                     stack_count = math.ceil((history.data["calculated"]["storage_size"] - 2.5) / 2.5)
                     stack_count = stack_count * 2.5 + 2.5
@@ -226,10 +233,12 @@ def run_cron_add_missing_values():
                         "pv_module": ["keine Auswahl"],
                         "count_modules": 0,
                         "emove_packet": "none",
-                        "hwp": ["keine Auswahl"]
+                        "hwp": ["keine Auswahl"],
+                        "expansion_type": "nein"
                     }
                     update_data["storage_model"] = ["Senec Home 2.1"]
                     update_data["extra_packages2"].append("Senec Wechselrichtergarantie 20 Jahre")
+
                     if "solaredge" in history.data["data"]["extra_options"]:
                         update_data["inverter_type"] = ["Solar Edge (Optimierer laut Auslegung)"]
                     if "technik_service_packet" in history.data["data"]["extra_options"]:
