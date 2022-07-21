@@ -345,6 +345,9 @@ def generate_datasheet_pdf(lead_id, data):
                 add_pdf_by_drive_id(merger, 2341958, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2341958/?&ncc=1&filename=322095_TDB_Wallbox_Home_Eco_DE_X3.pdf
 
         if "products" in data:
+            pv_module = next((item for item in data["products"] if item["NAME"].find("PV Modul SENEC.SOLAR 380") == 0), None)
+            if pv_module is not None:
+                add_pdf_by_drive_id(merger, 4924692, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/4924692/?&ncc=1&filename=TD220-065.10_SENEC.Solar_380M.BLK+HC+G3_Technisches+Datenblatt_DE_1.0.pdf
             pv_module = next((item for item in data["products"] if item["NAME"].find("Soluxtec Glas Glas 330 Watt") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 558088, cached=True)
