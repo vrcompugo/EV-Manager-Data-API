@@ -870,7 +870,7 @@ def get_annual_statement_data(data, year, manuell_data):
                             )
                             if counters is not None and len(counters) > 0 and counters2 is not None and len(counters2) > 0 and manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
                                 statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
-                                statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters2)
+                                statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters) + sum(item['usage'] for item in counters2)
                                 statement["counters"] = statement["counters"] + counters
                                 statement["counters"] = statement["counters"] + counters2
                         else:
