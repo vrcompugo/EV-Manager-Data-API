@@ -821,7 +821,7 @@ def get_annual_statement_data(data, year, manuell_data):
                     for value in statement["available_values"]:
                         if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
                             values.append(value)
-                    if product == "lightcloud" and "heatcloud" in statement_config and statement_config["lightcloud"]["delivery_begin"] != statement_config["heatcloud"]["delivery_begin"]:
+                    if product == "lightcloud" and "heatcloud" in statement_config and statement_config["lightcloud"]["delivery_begin"] != statement_config["heatcloud"]["delivery_begin"] and statement_config.get("measuring_concept") not in ["parallel_concept"]:
                         if manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
                             statement["estimate_netusage"] = True
                             if statement.get("total_self_usage") in [None, ""]:
