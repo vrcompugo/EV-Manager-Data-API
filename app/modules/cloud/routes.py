@@ -219,6 +219,10 @@ class OfferUpload(Resource):
                 "label": "Unterschriebene SEPA-Formular"
             },
             {
+                "key": "ibn_protocoll",
+                "label": "IBN Protokoll"
+            },
+            {
                 "key": "old_power_invoice",
                 "label": "Alte Stromabrechnung"
             },
@@ -277,6 +281,7 @@ class OrderUpload(Resource):
         offer_v2_data["data"]["refund_transfer_pdf_id"] = data["refund_transfer_pdf_id"]
         offer_v2_data["data"]["old_power_invoice_id"] = data["old_power_invoice_id"]
         offer_v2_data["data"]["sepa_form_id"] = data["sepa_form_id"]
+        offer_v2_data["data"]["ibn_protocoll_id"] = data["ibn_protocoll_id"]
         offer_v2_data["data"]["bankowner"] = data["bankowner"]
         offer_v2_data["data"]["iban"] = data["iban"]
         offer_v2_data["data"]["bic"] = data["bic"]
