@@ -145,7 +145,8 @@ def cron_bsh_quote_numbers():
         add_task({
             "fields[TITLE]": title,
             "fields[DESCRIPTION]": description,
-            "fields[RESPONSIBLE_ID]": 33
+            "fields[RESPONSIBLE_ID]": 33,
+            "fields[DEADLINE]": str(datetime.datetime.now() + datetime.timedelta(days=14))
         })
     config = json.loads(json.dumps(get_settings("bsh_quote_numbers")))
     config["last_excecute"] = str(last_excecute)
