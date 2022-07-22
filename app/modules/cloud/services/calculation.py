@@ -677,7 +677,7 @@ def get_cloud_products(data=None, offer=None):
     else:
         light_cloud_usage = int(data["calculated"]["power_usage"])
         lightcloud_extra_price_per_kwh = float(data["calculated"]["lightcloud_extra_price_per_kwh"])
-        if offer is not None and offer.reseller.document_style == "bsh":
+        if offer is not None and offer.reseller is not None and offer.reseller.document_style == "bsh":
             cloud_label = "cCloud-Zero"
         else:
             cloud_label = "Cloud ZERO 4.0"
