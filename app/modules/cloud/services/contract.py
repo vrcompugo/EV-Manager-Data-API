@@ -881,7 +881,7 @@ def get_annual_statement_data(data, year, manuell_data):
                                 values,
                                 manuell_data
                             )
-                            if product == "lightcloud" or (product == "heatcloud" and statement_config[product].get("smartme_number") not in empty_values and statement_config.get("measuring_concept") not in ["parallel_concept"]):
+                            if product == "lightcloud" or (product == "heatcloud" and (statement_config[product].get("smartme_number") not in empty_values or statement_config.get("measuring_concept") not in ["parallel_concept"])):
                                 if manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
                                     statement["estimate_netusage"] = True
                                     if statement.get("total_self_usage") in [None, ""]:
