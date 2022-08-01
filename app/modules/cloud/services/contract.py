@@ -15,6 +15,7 @@ from app.modules.settings import get_settings
 from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.fakturia.deal import get_payments, get_payments2, get_contract
+from app.modules.external.fakturia.activity import generate_invoice
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
@@ -1360,6 +1361,35 @@ def cron_transfer_fakturia_annual_invoice():
             continue
         if contract.get("fakturia") is not None and contract.get("fakturia").get("contractStatus") in ["ACTIVE"]:
             print("fakturia")
+            print(json.dumps(contract, indent=2))
+            min_delivery_begin = None
+            for config in contract["configs"]:
+                print(config["delivery_begin"])
+                if config["delivery_begin"] not in [None, ""] and (min_delivery_begin is None or min_delivery_begin > parse(config["delivery_begin"])):
+                    min_delivery_begin = parse(config["delivery_begin"])
+                if config.get("earliest_delivery_begin") not in [None, ""] and (min_delivery_begin is None or min_delivery_begin > parse(config["earliest_delivery_begin"])):
+                    min_delivery_begin = parse(config["earliest_delivery_begin"])
+            payment_data = {
+                "itemNumber": "Jahresabrechnung",
+                "quantity": 1,
+                "individualPrice": float(deal.get("opportunity")) / 1.19,
+                "description": f"Jahresabrechnung 2021 zum Vertrag {deal.get('contract_number')}",
+                "performanceDateStart": "2021-01-01",
+                "performanceDateEnd": "2021-12-31",
+                "type": "DEFAULT_PERFORMANCE"
+            }
+            if min_delivery_begin.year == 2021:
+                payment_data["performanceDateStart"] = min_delivery_begin.strftime("%Y-%m-%d")
+            if float(deal.get("opportunity")) < 0:
+                payment_data["individualPrice"] = payment_data["individualPrice"] * -1
+                payment_data["type"] = "REVERSE_PERFORMANCE_OTHER"
+            print(json.dumps(payment_data, indent=2))
+            generate_invoice(contract.get("fakturia").get("contractNumber"), payment_data)
+
+            update_deal(deal.get("id"), {
+                "stage_id": "C126:FINAL_INVOICE"
+            })
+            return
         else:
             print("orgamaxx")
             update_deal(deal.get("id"), {
