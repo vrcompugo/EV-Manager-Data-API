@@ -230,6 +230,12 @@ def generate_cloud_contract_reports():
 
 
 @manager.command
+def cron_transfer_fakturia_annual_invoice():
+    from app.modules.cloud.services.contract import cron_transfer_fakturia_annual_invoice
+    cron_transfer_fakturia_annual_invoice()
+
+
+@manager.command
 def run_legacy_folder_creation():
     from app.modules.external.bitrix24.drive import run_legacy_folder_creation
     run_legacy_folder_creation()

@@ -1046,29 +1046,3 @@ def run_export_by_id(deal_id):
             "stage_id": "C202:PREPARATION"
         })
 
-
-def run_cron_export_anual_payments():
-    from app.modules.cloud.services.contract import get_contract_data
-
-    deals = get_deals({
-        "FILTER[CATEGORY_ID]": "126",
-        "FILTER[STAGE_ID]": "C126:UC_L0M7DR",
-        "SELECT": "full"
-    }, force_reload=True)
-    for deal in deals:
-        contract = get_contract_data(deal.get("contract_number"))
-        print(json.dumps(deal, indent=2))
-        print(json.dumps(contract, indent=2))
-        # print(json.dumps(get(f"/Contracts/{contract.get('fakturia').get('contractNumber')}/Activities"), indent=2))
-        for statement in contract.get("annual_statements"):
-            print(statement.get("year"))
-            print({
-                "itemNumber": "Jahresabrechnung",
-                "quantity": 1,
-                "individualPrice": deal.get("opportunity"),
-                "description": "Jahresabrechnung 2021",
-                "performanceDateStart": "2022-07-07",
-                "performanceDateEnd": "2022-07-07",
-                "type": "DEFAULT_PERFORMANCE"
-            })
-        return
