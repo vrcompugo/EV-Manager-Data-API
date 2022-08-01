@@ -1389,7 +1389,6 @@ def cron_transfer_fakturia_annual_invoice():
             update_deal(deal.get("id"), {
                 "stage_id": "C126:FINAL_INVOICE"
             })
-            return
         else:
             print("orgamaxx")
             update_deal(deal.get("id"), {
