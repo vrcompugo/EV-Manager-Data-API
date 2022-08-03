@@ -25,7 +25,7 @@ def post(url, post_data=None, files=None):
         response = requests.post(base_url + url, data=post_data)
         try:
             data = response.json()
-            if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
+            if "error" in data and data["error"] in ["QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"]:
                 time.sleep(5)
                 if post_data.get("fileContent[1]") is not None:
                     print(url, "with filecontent")
@@ -49,7 +49,7 @@ def get(url, parameters=None):
         response = requests.get(base_url + url, params=parameters)
         try:
             data = response.json()
-            if "error" in data and data["error"] == "QUERY_LIMIT_EXCEEDED":
+            if "error" in data and data["error"] in ["QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"]:
                 time.sleep(5)
                 return get(url, parameters)
             return data
