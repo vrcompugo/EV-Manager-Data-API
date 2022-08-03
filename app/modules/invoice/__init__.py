@@ -5,6 +5,7 @@ import base64
 from zipfile import ZipFile, ZipInfo
 
 from app import db
+from app.exceptions import ApiException
 from app.modules.external.fakturia.invoice import get_invoices, get_invoice_document, get_invoice_corrections, get_invoice_correction_document
 from app.modules.external.fakturia.credit_note import get_credit_notes, get_credit_note_document, get_credit_note_corrections, get_credit_note_correction_document
 from app.modules.external.bitrix24.drive import get_public_link
@@ -68,7 +69,10 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
         }
         s3_file = S3File.query.filter(S3File.model == "invoice_bundle").filter(S3File.model_id == bundle.id).first()
         if s3_file is None:
-            s3_file = add_item(zipfile_data)
+            try:
+                s3_file = add_item(zipfile_data)
+            except ApiException as e:
+                print("zipfile upload failed")
         else:
             s3_file = update_item(s3_file.id, zipfile_data)
         bundle.download_link = get_public_link(s3_file.bitrix_file_id, 172800)
@@ -107,8 +111,8 @@ def append_item(item, bundle, zip_archive, document_function):
     if s3_file is None:
         try:
             add_item(file_data)
-        except Exception as e:
-            pass
+        except ApiException as e:
+            print("upload failed")
     else:
         # update_item(s3_file.id, file_data)
         pass
