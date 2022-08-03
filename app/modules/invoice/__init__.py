@@ -76,7 +76,8 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
                 print(zipfile)
         else:
             s3_file = update_item(s3_file.id, zipfile_data)
-        bundle.download_link = get_public_link(s3_file.bitrix_file_id, 172800)
+        if s3_file is not None:
+            bundle.download_link = get_public_link(s3_file.bitrix_file_id, 172800)
     db.session.commit()
     #invoice corrections
 
