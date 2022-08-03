@@ -29,8 +29,9 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
         db.session.add(bundle)
         db.session.flush()
     else:
-        print("nothing to do")
-        return
+        if bundle.download_link not in [None, ""]:
+            print("nothing to do")
+            return
     bundle.items_count = 0
     zipfile = BytesIO()
     zipfile.name = f"KW {week_number} {year} Dokumente.zip"
