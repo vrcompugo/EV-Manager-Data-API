@@ -34,3 +34,5 @@ from app.modules.external.bitrix24.models.bitrix24_file_cache import Bitrix24Fil
 from app.modules.external.bitrix24.models.bitrix24_product_cache import Bitrix24ProductCache
 from app.modules.external.bitrix24.models.bitrix24_request_cache import Bitrix24RequestCache
 from app.modules.stats.models.request_log import RequestLog
+from app.modules.invoice.models.invoice_bundle import InvoiceBundle
+from app.modules.invoice.models.invoice_bundle_item import InvoiceBundleItem

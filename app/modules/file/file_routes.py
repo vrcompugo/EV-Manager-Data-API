@@ -4,6 +4,7 @@ from flask_restplus import Namespace, fields
 import werkzeug
 import base64
 import requests
+import magic
 from luqum.parser import parser
 
 from app.decorators import token_required, api_response
@@ -88,12 +89,13 @@ class User(Resource):
 @api.route("/view/<token>")
 class ViewFile(Resource):
     def get(self, token):
+        mime = magic.Magic(mime=True)
         try:
             data = decode_jwt(token)
             file = get_file(data["file_id"])
             content = get_file_content(data["file_id"])
             response = make_response(content)
-            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Type'] = mime.from_buffer(content)
             response.headers['Content-Disposition'] = \
                 'inline; filename=%s' % file["NAME"]
             return response
@@ -110,7 +112,7 @@ class ViewFile(Resource):
             return "not found"
         content = file.get_file().read()
         response = make_response(content)
-        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Type'] = mime.from_buffer(content)
         response.headers['Content-Disposition'] = \
             'inline; filename=%s' % file.filename
         return response

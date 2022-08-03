@@ -87,6 +87,7 @@ def register_blueprints(app):
     from app.modules.bitrix24.bitrix24_routes import bitrix24_bp
     from app.modules.cloud.cloud2_routes import blueprint as cloud2_bp
     from app.modules.fakturia.routes import blueprint as fakturia_bp
+    from app.modules.invoice.invoice_routes import blueprint as invoice_bp
     from app.modules.quote_calculator.routes import blueprint as quote_calculator_bp
     from app.modules.order_confirmation.routes import blueprint as order_confirmation_bp
     from app.modules.user.user_routes import blueprint as users_bp
@@ -95,5 +96,6 @@ def register_blueprints(app):
     app.register_blueprint(users_bp, url_prefix="/users")
     app.register_blueprint(cloud2_bp, url_prefix="/cloud2")
     app.register_blueprint(fakturia_bp, url_prefix="/fakturia")
+    app.register_blueprint(invoice_bp, url_prefix="/invoice")
     app.register_blueprint(quote_calculator_bp, url_prefix="/quote_calculator")
     app.register_blueprint(order_confirmation_bp, url_prefix="/order_confirmation")
