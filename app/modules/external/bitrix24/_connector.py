@@ -46,7 +46,7 @@ def post(url, post_data=None, files=None, domain=None, force_reload=False, recur
         response = requests.post(base_url + url, data=post_data)
         try:
             data = response.json()
-            if "error" in data and data["error"] in ["QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"]:
+            if "error" in data and data["error"] in ["QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT", "INTERNAL_SERVER_ERROR"]:
                 time.sleep(2)
                 if depth > 4:
                     raise Exception("to manny retrys")
@@ -70,7 +70,7 @@ def get(url, parameters=None, force_reload=False, recursion=False, depth=0):
         response = requests.get(base_url + url, params=parameters)
         try:
             data = response.json()
-            if "error" in data and data["error"] in ["QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"]:
+            if "error" in data and data["error"] in ["QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT", "INTERNAL_SERVER_ERROR"]:
                 time.sleep(2)
                 if depth > 4:
                     raise Exception("to manny retrys")
