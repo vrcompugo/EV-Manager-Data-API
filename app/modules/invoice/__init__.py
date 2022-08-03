@@ -73,6 +73,7 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
                 s3_file = add_item(zipfile_data)
             except ApiException as e:
                 print("zipfile upload failed")
+                print(zipfile)
         else:
             s3_file = update_item(s3_file.id, zipfile_data)
         bundle.download_link = get_public_link(s3_file.bitrix_file_id, 172800)
