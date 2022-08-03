@@ -105,7 +105,10 @@ def append_item(item, bundle, zip_archive, document_function):
     }
     s3_file = S3File.query.filter(S3File.model == "invoice_bundle_item").filter(S3File.model_id == invoice_item.id).first()
     if s3_file is None:
-        add_item(file_data)
+        try:
+            add_item(file_data)
+        except Exception as e:
+            pass
     else:
         # update_item(s3_file.id, file_data)
         pass
