@@ -1,6 +1,7 @@
 import datetime
 from io import BytesIO
 import json
+import math
 import base64
 from zipfile import ZipFile, ZipInfo
 
@@ -30,59 +31,55 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
         db.session.add(bundle)
         db.session.flush()
     else:
-        if bundle.download_link not in [None, ""]:
+        if bundle.is_complete in [True, "true", 1]:
             print("nothing to do")
             return
     bundle.items_count = 0
+    index = 1
     zipfile = BytesIO()
-    zipfile.name = f"KW {week_number} {year} Dokumente.zip"
-    with ZipFile(zipfile, 'w') as zip_archive:
-        print(last_week_begin, last_week_end)
-        items = get_invoices(last_week_begin, last_week_end)
-        print("2")
-        if len(items) > 0:
-            for item in items:
-                append_item(item, bundle, zip_archive, get_invoice_document)
+    zipfile.name = f"KW {week_number} {year} Dokumente-{index}.zip"
+    zip_archive = ZipFile(zipfile, 'w')
+    print(last_week_begin, last_week_end)
+    items = get_invoices(last_week_begin, last_week_end)
+    if len(items) > 0:
+        for item in items:
+            zip_archive, zipfile, index = append_item(item, bundle, zip_archive, zipfile, get_invoice_document, week_number, year, index)
 
-        items = get_invoice_corrections(last_week_begin, last_week_end)
-        if len(items) > 0:
-            for item in items:
-                append_item(item, bundle, zip_archive, get_invoice_correction_document)
+    items = get_invoice_corrections(last_week_begin, last_week_end)
+    if len(items) > 0:
+        for item in items:
+            zip_archive, zipfile, index = append_item(item, bundle, zip_archive, zipfile, get_invoice_correction_document, week_number, year, index)
 
-        items = get_credit_notes(last_week_begin, last_week_end)
-        if len(items) > 0:
-            for item in items:
-                append_item(item, bundle, zip_archive, get_credit_note_document)
+    items = get_credit_notes(last_week_begin, last_week_end)
+    if len(items) > 0:
+        for item in items:
+            zip_archive, zipfile, index = append_item(item, bundle, zip_archive, zipfile, get_credit_note_document, week_number, year, index)
 
-        items = get_credit_note_corrections(last_week_begin, last_week_end)
-        if len(items) > 0:
-            for item in items:
-                append_item(item, bundle, zip_archive, get_credit_note_correction_document)
+    items = get_credit_note_corrections(last_week_begin, last_week_end)
+    if len(items) > 0:
+        for item in items:
+            zip_archive, zipfile, index = append_item(item, bundle, zip_archive, zipfile, get_credit_note_correction_document, week_number, year, index)
 
     if bundle.items_count > 0:
-        zipfile.seek(0)
-        zipfile_data = {
-            "model": "invoice_bundle",
-            "model_id": bundle.id,
-            "filename": zipfile.name,
-            "file": zipfile
-        }
-        s3_file = S3File.query.filter(S3File.model == "invoice_bundle").filter(S3File.model_id == bundle.id).first()
-        if s3_file is None:
-            try:
-                s3_file = add_item(zipfile_data)
-            except ApiException as e:
-                print("zipfile upload failed")
-                print(zipfile)
-        else:
-            s3_file = update_item(s3_file.id, zipfile_data)
+        s3_file = upload_zipfile(zip_archive, zipfile, bundle, index)
         if s3_file is not None:
-            bundle.download_link = get_public_link(s3_file.bitrix_file_id, 172800)
+            bundle.is_complete = True
     db.session.commit()
-    #invoice corrections
 
-def append_item(item, bundle, zip_archive, document_function):
+
+def append_item(item, bundle, zip_archive, zipfile, document_function, week_number, year, index):
     print(item.get("number"))
+    print(zip_archive)
+    print(zipfile.getbuffer().nbytes)
+    if zipfile.getbuffer().nbytes > 69000000:
+        upload_zipfile(zip_archive, zipfile, bundle, index)
+        index = index + 1
+        zipfile = BytesIO()
+        zipfile.name = f"KW {week_number} {year} Dokumente-{index}.zip"
+        print("new_zip", zipfile.name)
+        zip_archive = ZipFile(zipfile, 'w')
+        print(zip_archive)
+
     invoice_item = InvoiceBundleItem.query.filter(InvoiceBundleItem.invoice_number == item.get("number")).first()
     if invoice_item is None:
         invoice_item = InvoiceBundleItem(invoice_number=item.get("number"))
@@ -118,3 +115,25 @@ def append_item(item, bundle, zip_archive, document_function):
     else:
         # update_item(s3_file.id, file_data)
         pass
+    return zip_archive, zipfile, index
+
+
+def upload_zipfile(zip_archive, zipfile, bundle, index):
+    zip_archive.close()
+    zipfile.seek(0)
+    zipfile_data = {
+        "model": f"invoice_bundle-{index}",
+        "model_id": bundle.id,
+        "filename": zipfile.name,
+        "file": zipfile
+    }
+    s3_file = S3File.query.filter(S3File.model == "invoice_bundle").filter(S3File.model_id == bundle.id).first()
+    if s3_file is None:
+        try:
+            s3_file = add_item(zipfile_data)
+        except ApiException as e:
+            print("zipfile upload failed")
+            print(zipfile)
+    else:
+        s3_file = update_item(s3_file.id, zipfile_data)
+    return s3_file

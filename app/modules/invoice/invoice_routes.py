@@ -51,11 +51,12 @@ def get_bundles_list():
                 order_by_list.append(getattr(InvoiceBundle, col).asc())
     order_by_list.append(InvoiceBundle.id.desc())
     sql = sql.order_by(*order_by_list)
-    print(sql)
-    transactions = sql.offset((page - 1) * limit).limit(limit).all()
+    bundles = sql.offset((page - 1) * limit).limit(limit).all()
     items = []
-    for transaction in transactions:
-        items.append(transaction.to_dict())
+    for bundle in bundles:
+        bundle_data = bundle.to_dict()
+        bundle_data["download_links"] = bundle.download_links
+        items.append(bundle_data)
 
     return {"status": "success", "data": {"items": items, "total": total}}
 
