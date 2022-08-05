@@ -232,14 +232,14 @@ def generate_cloud_contract_reports():
 @manager.command
 def cron_generate_weekly_invoice_bundles():
     from app.modules.invoice import cron_generate_weekly_invoice_bundles
-    #cron_generate_weekly_invoice_bundles(offset_weeks=1)
-    #cron_generate_weekly_invoice_bundles(offset_weeks=2)
-    #cron_generate_weekly_invoice_bundles(offset_weeks=3)
+    cron_generate_weekly_invoice_bundles(offset_weeks=1)
+    cron_generate_weekly_invoice_bundles(offset_weeks=2)
+    cron_generate_weekly_invoice_bundles(offset_weeks=3)
     cron_generate_weekly_invoice_bundles(offset_weeks=4)
-    #cron_generate_weekly_invoice_bundles(offset_weeks=5)
-    #cron_generate_weekly_invoice_bundles(offset_weeks=6)
-    #cron_generate_weekly_invoice_bundles(offset_weeks=7)
-    #cron_generate_weekly_invoice_bundles(offset_weeks=8)
+    cron_generate_weekly_invoice_bundles(offset_weeks=5)
+    cron_generate_weekly_invoice_bundles(offset_weeks=6)
+    cron_generate_weekly_invoice_bundles(offset_weeks=7)
+    cron_generate_weekly_invoice_bundles(offset_weeks=8)
 
 
 @manager.command
