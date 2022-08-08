@@ -42,6 +42,7 @@ def sales_users():
         426,   # Team Niggemann
         384,   # Team Schuster
         458,   # Team Oftring
+        464,   # Team Rieger
         462    # Spba-Finanz*
     ]
     for department_id in departments:
@@ -135,6 +136,7 @@ def supervisors():
         426,   # Team Niggemann
         384,   # Team Schuster
         458,   # Team Oftring
+        464,   # Team Rieger
         462    # Spba-Finanz*
     ]
     for department_id in departments:
