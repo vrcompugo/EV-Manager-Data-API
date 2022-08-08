@@ -49,14 +49,17 @@ def get_export_data(contact, company):
     if contact.get("fakturia_iban") in ["", None]:
         iban = contact.get("iban")
     if iban not in ["", None]:
-        iban = IBAN(iban)
-        bic = iban.bic.compact
-        iban = iban.compact
-        data["bankAccountIban"] = iban
-        data["bankAccountBic"] = bic
-        data["bankAccountOwner"] = contact["fakturia_owner"]
-        if contact.get("fakturia_owner") in ["", None]:
-            data["bankAccountOwner"] = f'{contact["first_name"]} {contact["last_name"]}'
+        try:
+            iban = IBAN(iban)
+            bic = iban.bic.compact
+            iban = iban.compact
+            data["bankAccountIban"] = iban
+            data["bankAccountBic"] = bic
+            data["bankAccountOwner"] = contact["fakturia_owner"]
+            if contact.get("fakturia_owner") in ["", None]:
+                data["bankAccountOwner"] = f'{contact["first_name"]} {contact["last_name"]}'
+        except Exception as e:
+            print("error iban", contact)
     if company is not None:
         data["companyName"] = company["title"]
     if contact.get("phone", None) is not None and len(contact.get("phone")) > 0:
