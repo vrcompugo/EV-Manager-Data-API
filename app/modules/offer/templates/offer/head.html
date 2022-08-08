@@ -24,7 +24,7 @@
   <br>
   <br>
   <div style="font-size: 12px; line-height: 1.5em;">
-    <div style="display: grid; grid-template-columns: 7em 1fr;">
+    <div style="display: grid; grid-template-columns: 8em 1fr;">
       <div>Datum:</div>
       <div>{{ offer.datetime | dateformat }}</div>
       <div>Angebots-Nr.:</div>
@@ -34,6 +34,12 @@
         <div>{{ offer.customer.customer_number }}</div>
       {% else %}
         <div>-</div>
+      {% endif %}
+      {% if offer.data and offer.data.object_address %}
+        <div><b>Objektaddresse</b></div>
+        <div>
+          {{ offer.data.object_address | addressblock2 | nltobr }}
+        </div>
       {% endif %}
     </div>
   </div>
