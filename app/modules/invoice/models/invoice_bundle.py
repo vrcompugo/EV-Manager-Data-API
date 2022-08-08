@@ -14,6 +14,7 @@ class InvoiceBundle(BaseModel, db.Model):
     year = db.Column(db.Integer)
     items_count = db.Column(db.Integer)
     is_complete = db.Column(db.Boolean)
+    is_running = db.Column(db.Boolean)
     download_link = db.Column(db.String(250))
     download_datetime = db.Column(db.DateTime)
     download_by_user_id = db.Column(db.Integer)

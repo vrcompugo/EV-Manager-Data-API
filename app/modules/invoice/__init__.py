@@ -29,12 +29,13 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
     if bundle is None:
         bundle = InvoiceBundle(kw=week_number, year=year, items_count=0)
         db.session.add(bundle)
-        db.session.flush()
     else:
-        if bundle.is_complete in [True, "true", 1]:
+        if bundle.is_complete in [True, "true", 1] or bundle.is_running in [True, "true", 1]:
             print("nothing to do")
             return
+    bundle.is_running = True
     bundle.items_count = 0
+    db.session.commit()
     index = 1
     zipfile = BytesIO()
     zipfile.name = f"KW {week_number} {year} Dokumente-{index}.zip"
