@@ -234,7 +234,7 @@ def cron(section=None):
         except Exception as e:
             print(traceback.format_exc())
 
-    if section == "productive" or section == "cron_generate_weekly_invoice_bundles":
+    if section == "productive2" or section == "cron_generate_weekly_invoice_bundles":
         from app.modules.invoice import cron_generate_weekly_invoice_bundles
         try:
             cron_generate_weekly_invoice_bundles()
