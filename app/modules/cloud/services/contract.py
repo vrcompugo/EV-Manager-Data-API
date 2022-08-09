@@ -955,7 +955,7 @@ def get_annual_statement_data(data, year, manuell_data):
         statement["pre_payments_total"] = 0
         for payment in data.get("invoices_credit_notes"):
             if payment["date"][:4] == str(year):
-                statement["pre_payments_total"] = statement["pre_payments_total"] + payment["amountGross"]
+                statement["pre_payments_total"] = statement["pre_payments_total"] + payment["amountGross_normalized"]
                 statement["payments"].append(payment)
 
     statement["to_pay"] = statement["total_cloud_price_incl_refund"] - statement["pre_payments_total"] + statement["total_extra_price"]
