@@ -1394,3 +1394,23 @@ def cron_transfer_fakturia_annual_invoice():
             update_deal(deal.get("id"), {
                 "stage_id": "C126:EXECUTING"
             })
+
+
+def find_credit_memo_bugs():
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 126,
+        "FILTER[STAGE_ID]": "C126:WON"
+    }, force_reload=True)
+    deals = deals + get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 126,
+        "FILTER[STAGE_ID]": "C126:FINAL_INVOICE"
+    }, force_reload=True)
+    count = 0
+    for deal in deals:
+        print(deal.get("contract_number"))
+        data = get_contract_data(deal.get("contract_number"))
+        if data.get("invoices_credit_notes") not in [None] and len(data.get("invoices_credit_notes")) > 0 and data["invoices_credit_notes"][0]["type"] == "credit_note":
+            count = count + 1
+    print(count)
