@@ -1423,7 +1423,6 @@ def find_credit_memo_bugs():
                 for payment in statement.get("data").get("payments"):
                     if payment.get("type") != "credit_note":
                         continue
-                    print(payment.get("amountNet"))
                     contract_amount = contract_amount + payment.get("amountNet")
             if contract_amount > 0:
                 count = count + 1
