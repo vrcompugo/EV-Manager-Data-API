@@ -23,7 +23,6 @@ def get_export_data(contact, company):
             contact["fakturia_owner"] = str(contact.get("last_name"))
     data = {
         "salutation": salutation,
-        "companyName": contact["company"],
         "firstName": contact["first_name"],
         "lastName": contact["last_name"],
         "locale": "de_DE",
@@ -46,7 +45,8 @@ def get_export_data(contact, company):
             "bitrix_id": contact['id']
         }
     }
-    if data["companyName"] not in [None, ""]:
+    if contact["company"] not in [None, ""]:
+        data["companyName"] = contact["company"]
         data["salutation"] = "COMPANY"
     iban = contact.get("fakturia_iban")
     if contact.get("fakturia_iban") in ["", None]:
