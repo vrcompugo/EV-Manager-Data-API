@@ -612,6 +612,7 @@ def get_settings(section=None, domain_raw=None):
             "contact": {
                 "fields": {
                     "salutation": "HONORIFIC",
+                    "company": "UF_CRM_1660115511606",
                     "first_name": "NAME",
                     "street": "UF_CRM_1572950758",
                     "street_nb": "UF_CRM_1572950777",
@@ -636,7 +637,7 @@ def get_settings(section=None, domain_raw=None):
                     "fakturia_bic": "UF_CRM_1624003474",
                     "fakturia_owner": "UF_CRM_1624003488",
                     "sepa_mandate_since": "UF_CRM_1629210645",
-                    "important_note": "UF_CRM_1573021516"
+                    "important_note": "UF_CRM_1573021516",
                 }
             },
             "timeline_comment": {

@@ -23,6 +23,7 @@ def get_export_data(contact, company):
             contact["fakturia_owner"] = str(contact.get("last_name"))
     data = {
         "salutation": salutation,
+        "companyName": contact["company"],
         "firstName": contact["first_name"],
         "lastName": contact["last_name"],
         "locale": "de_DE",
