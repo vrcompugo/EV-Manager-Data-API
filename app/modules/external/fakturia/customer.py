@@ -46,6 +46,8 @@ def get_export_data(contact, company):
             "bitrix_id": contact['id']
         }
     }
+    if data["companyName"] not in [None, ""]:
+        data["salutation"] = "COMPANY"
     iban = contact.get("fakturia_iban")
     if contact.get("fakturia_iban") in ["", None]:
         iban = contact.get("iban")
@@ -63,6 +65,7 @@ def get_export_data(contact, company):
             print("error iban", contact)
     if company is not None:
         data["companyName"] = company["title"]
+        data["salutation"] = "COMPANY"
     if contact.get("phone", None) is not None and len(contact.get("phone")) > 0:
         data["phone1"] = contact.get("phone")[0]["VALUE"]
     if contact.get("email", None) is not None and len(contact.get("email")) > 0:
