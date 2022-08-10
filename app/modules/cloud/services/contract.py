@@ -1424,7 +1424,7 @@ def find_credit_memo_bugs():
                     if payment.get("type") != "credit_note":
                         continue
                     contract_amount = contract_amount + payment.get("amountNet")
-            if contract_amount > 20:
+            if contract_amount > 30:
                 count = count + 1
                 print(deal.get("contract_number"))
                 print(contract_amount)
