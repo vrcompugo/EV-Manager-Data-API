@@ -89,6 +89,7 @@ def run_cron_export():
         print("contacts could not be loaded")
         return
     for contact in contacts:
+
         export_contact(contact)
     config = get_settings("external/fakturia")
     if config is not None:
@@ -132,7 +133,7 @@ def export_contact(contact, force=False):
             export_data = get_export_data(contact, company)
             print(contact["id"], "export", contact.get("date_modify"))
             customer_data = put(f"/Customers/{contact.get('fakturia_number')}", post_data=export_data)
-            print(export_data, customer_data)
+            print(export_data, contact)
             if contact.get("sepa_mandate_since") not in [None, "None", ""]:
                 mandates = get(f"/Customers/{contact.get('fakturia_number')}/SepaDebitMandates")
                 if mandates is not None and len(mandates) == 0:
