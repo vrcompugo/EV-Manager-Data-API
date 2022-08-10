@@ -1419,9 +1419,9 @@ def find_credit_memo_bugs():
                     continue
                 if statement.get("data") is None:
                     continue
-                if statement.get("payments") is None:
+                if statement.get("data").get("payments") is None:
                     continue
-                for payment in statement.get("payments"):
+                for payment in statement.get("data").get("payments"):
                     if payment.get("type") != "credit_note":
                         continue
                     print(payment.get("amountNet"))
