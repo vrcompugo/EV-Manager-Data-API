@@ -351,6 +351,9 @@ def generate_datasheet_pdf(lead_id, data):
             pv_module = next((item for item in data["products"] if item["NAME"].find("Soluxtec Glas Glas 330 Watt") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 558088, cached=True)
+            pv_module = next((item for item in data["products"] if item["NAME"].find("ASWS-SM 390M Glas Glas") == 0), None)
+            if pv_module is not None:
+                add_pdf_by_drive_id(merger, 5156212, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/5156212/?&ncc=1&filename=datenblatt-ASWS-390-MH120N-BG-german.pdf
             pv_module = next((item for item in data["products"] if item["NAME"].find("PV-Modul Amerisolar 280 Watt") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 436126, cached=True)

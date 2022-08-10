@@ -117,6 +117,8 @@ def quote_calculator_set_defaults(lead_id):
         if "status_id" not in data["data"]:
             lead_data = get_lead(lead_id)
             data["data"]["status_id"] = lead_data.get("status_id")
+        data2 = calculate_quote(lead_id)
+        data["select_options"] = data2["select_options"]
     else:
         post_data = None
         try:
