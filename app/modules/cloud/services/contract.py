@@ -1408,9 +1408,21 @@ def find_credit_memo_bugs():
         "FILTER[STAGE_ID]": "C126:FINAL_INVOICE"
     }, force_reload=True)
     count = 0
+    amount = 0
     for deal in deals:
         print(deal.get("contract_number"))
         data = get_contract_data(deal.get("contract_number"))
         if data.get("invoices_credit_notes") not in [None] and len(data.get("invoices_credit_notes")) > 0 and data["invoices_credit_notes"][0]["type"] == "credit_note":
             count = count + 1
+            for statement in data.get("annual_statements"):
+                if statement.get("year") != 2021:
+                    continue
+                if statement.get("data") is None:
+                    continue
+                for payment in statement.get("payments"):
+                    if payment.get("type") != "credit_note":
+                        continue
+                    print(payment.get("amountNet"))
+                    amount = amount + payment.get("amountNet")
     print(count)
+    print(amount)
