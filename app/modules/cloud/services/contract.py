@@ -157,8 +157,9 @@ def load_contract_data(contract_number):
     data["pv_system"]["city"] = data["main_deal"].get("cloud_city")
     data["pv_system"]["zip"] = data["main_deal"].get("cloud_zip")
     data["construction_date"] = data["main_deal"].get("construction_date2")
-    if data["main_deal"].get("cloud_delivery_begin") not in empty_values and data["main_deal"].get("cloud_number") not in empty_values:
-        data = get_cloud_config(data, data["main_deal"].get("cloud_number"), data["main_deal"].get("cloud_delivery_begin"), data["main_deal"].get("cloud_delivery_begin_1"))
+    cloud_number = data["main_deal"].get("cloud_number").replace(" ", "")
+    if data["main_deal"].get("cloud_delivery_begin") not in empty_values and cloud_number not in empty_values:
+        data = get_cloud_config(data, cloud_number, data["main_deal"].get("cloud_delivery_begin"), data["main_deal"].get("cloud_delivery_begin_1"))
     if data["main_deal"].get("cloud_delivery_begin_1") not in empty_values and data["main_deal"].get("cloud_number_1") not in empty_values:
         data = get_cloud_config(data, data["main_deal"].get("cloud_number_1"), data["main_deal"].get("cloud_delivery_begin_1"), data["main_deal"].get("cloud_delivery_begin_2"))
     if data["main_deal"].get("cloud_delivery_begin_2") not in empty_values and data["main_deal"].get("cloud_number_2") not in empty_values:
@@ -1266,6 +1267,8 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
                 "origin": end_value_later[0].origin
             })
         values = sorted(values, key=lambda d: d['date'])
+        if '6310269' == number:
+            print("asd", start_date, end_date, values)
         start_value = None
         start_value2 = None
         end_value = None
