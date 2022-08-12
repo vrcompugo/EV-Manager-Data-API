@@ -961,7 +961,7 @@ def get_annual_statement_data(data, year, manuell_data):
                 if statement_config[product]["actual_usage"] <= 0:
                     statement["errors"].append(f"{statement_config[product]['label']} hat keinen Verbrauch")
                 if statement_config[product]["actual_usage"] < statement_config[product]["actual_usage_net"]:
-                    statement["errors"].append(f"{statement_config[product]['label']} Netzbezug ist größer als der Gesamtverbrauch")
+                    statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist größer als der Gesamtverbrauch")
                 if statement_config[product]["actual_usage"] > 0 and statement_config[product]["actual_usage_net"]/statement_config[product]["actual_usage"] > 0.8 :
                     statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist mehr als 80% vom Gesamtverbrauch")
                 if product == "lightcloud" and statement_config[product]["actual_usage_net"] <= 0:
