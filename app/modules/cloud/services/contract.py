@@ -782,13 +782,13 @@ def get_annual_statement_data(data, year, manuell_data):
                     numbers = [statement_config[product].get("smartme_number")]
                     if statement_config[product].get("additional_smartme_numbers") is not None:
                         numbers = numbers + statement_config[product].get("additional_smartme_numbers")
+                    values = []
                     for number in numbers:
                         counter_numbers.append(number)
                         values = []
                         beginning_of_year = get_device_by_datetime(number, statement_config[product]["delivery_begin"])
                         end_of_year = get_device_by_datetime(number, statement_config[product]["delivery_end"])
                         if beginning_of_year is not None and end_of_year is not None:
-                            values = []
                             if normalize_date(beginning_of_year.get("Date")) > datetime.datetime(2002,1,1):
                                 values.append({
                                     "number": number,
@@ -805,6 +805,27 @@ def get_annual_statement_data(data, year, manuell_data):
                                 })
 
                             statement["available_values"] = statement["available_values"] + values
+
+                    if statement["construction_date"] not in [None, ""] and normalize_date(statement["construction_date"]) > normalize_date(statement_config[product]["delivery_begin"]):
+                        counters = normalize_counter_values(
+                            statement_config[product]["delivery_begin"],
+                            statement["construction_date"],
+                            numbers,
+                            values,
+                            manuell_data
+                        )
+                        counters2 = normalize_counter_values(
+                            statement["construction_date"],
+                            statement_config[product]["delivery_end"],
+                            numbers,
+                            values,
+                            manuell_data
+                        )
+                        if counters is not None and counters2 is not None:
+                            counters = counters + counters2
+                        elif counters2 is not None:
+                            counters = counters2
+                    else:
                         counters = normalize_counter_values(
                             statement_config[product]["delivery_begin"],
                             statement_config[product]["delivery_end"],
@@ -812,9 +833,9 @@ def get_annual_statement_data(data, year, manuell_data):
                             values,
                             manuell_data
                         )
-                        if counters is not None and len(counters) > 0:
-                            statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
-                            statement["counters"] = statement["counters"] + counters
+                    if counters is not None and len(counters) > 0:
+                        statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
+                        statement["counters"] = statement["counters"] + counters
                 if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
                     counter_numbers.append(statement_config[product].get("power_meter_number"))
                     counter_numbers = counter_numbers + statement_config[product].get("additional_power_meter_numbers", [])
