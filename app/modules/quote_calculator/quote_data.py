@@ -445,13 +445,13 @@ def calculate_products(data):
                 category="Extra Pakete",
                 quantity=quantity,
                 products=data["products"]
-            )'''
+            )
         add_direct_product(
             label="Preisgarantie",
             category="Extra Pakete",
             quantity=1,
             products=data["products"]
-        )
+        )'''
     except Exception as e:
         trace_output = traceback.format_exc()
         print(trace_output)
