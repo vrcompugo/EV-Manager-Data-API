@@ -410,7 +410,9 @@ def run_export(local_id=None, remote_id=None):
     post_data2 = convert_data_to_post_data(post_data, "deal")
     if link is None:
         print("run export order new")
-        response = post("crm.deal.add", convert_data_to_post_data(post_data, "deal"))
+        data = convert_data_to_post_data(post_data, "deal")
+        print(json.dumps(data, indent=2))
+        response = post("crm.deal.add", data)
         if "result" in response:
             associate_item("Order", local_id=local_id, remote_id=response["result"])
         else:
