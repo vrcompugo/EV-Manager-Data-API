@@ -807,7 +807,8 @@ def get_annual_statement_data(data, year, manuell_data):
 
                             statement["available_values"] = statement["available_values"] + values
 
-                    if statement["construction_date"] not in [None, ""] and normalize_date(statement["construction_date"]) > normalize_date(statement_config[product]["delivery_begin"]):
+                    print(statement["construction_date"])
+                    if statement["construction_date"] not in [None, ""] and normalize_date(statement["construction_date"]) > normalize_date(statement_config[product]["delivery_begin"]) and normalize_date(statement["construction_date"]).year == year:
                         counters = normalize_counter_values(
                             statement_config[product]["delivery_begin"],
                             statement["construction_date"],
