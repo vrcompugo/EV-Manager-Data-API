@@ -47,7 +47,7 @@
                 <td>{{ config[product].label }} Netzbezug </td>
                 <td style="text-align: right;">{{ config[product].actual_usage_net | numberformat("de", 0) }} kWh</td>
               </tr>
-              {% if product not in ["ecloud"] %}
+              {% if product product != "ecloud" and (product != "heatcloud" or config.get("measuring_concept") not in ["parallel_concept"]) %}
                 <tr>
                   <td>{{ config[product].delivery_begin | dateformat }}</td>
                   <td>{{ config[product].delivery_end | dateformat }}</td>
