@@ -898,7 +898,7 @@ def get_annual_statement_data(data, year, manuell_data):
                                     statement["counters"] = statement["counters"] + counters2
                             else:
                                 if product == "heatcloud" and statement_config.get("measuring_concept") in ["parallel_concept"] and manuell_data.get("parallel_concept_counter") in ["smartme"]:
-                                    statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"]
+                                    pass
                                 else:
                                     counters = normalize_counter_values(
                                         statement_config[product]["delivery_begin"],
@@ -929,6 +929,8 @@ def get_annual_statement_data(data, year, manuell_data):
                                             statement_config[product]["actual_usage_net"] = sum(item['usage'] for item in counters)
                                             statement["counters"] = statement["counters"] + counters
 
+                if product == "heatcloud" and statement_config.get("measuring_concept") in ["parallel_concept"]:
+                    statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"]
                 percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
                 statement_config[product]["total_cloud_price"] = statement_config[product]["cloud_price"] * 12 * percent_year
                 statement_config[product]["total_cloud_price_incl_refund"] = statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
