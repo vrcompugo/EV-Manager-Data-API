@@ -28,7 +28,7 @@ def get_settings(section=None, domain_raw=None):
             }
         if os.getenv('ENVIRONMENT') == "staging":
             return {
-                "base_url": "https://staging.api.korbacher-energiezentrum.de.ah.hbbx.de/"
+                "base_url": "https://api.korbacher-energiezentrum.de.ah.hbbx.de/"
             }
         return {
             "base_url": "https://api.korbacher-energiezentrum.de/"

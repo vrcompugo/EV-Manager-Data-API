@@ -266,6 +266,15 @@ def get_cloud_contract_data_by_deal(deal):
     deal = set_default_data(deal)
     if deal is None:
         return {"status": "failed", "data": {"error": "Cloud Nummer konnten nicht gefunden werden"}, "message": ""}
+    if deal.get("category_id") in ["176"]:
+        master_deal = get_deals_normalized({
+            "category_id": 15,
+            "cloud_contract_number": f'{cloud_contract_number}',
+            "is_cloud_master_deal": 1
+        })
+        if master_deal is not None and len(master_deal) > 0:
+            deal = master_deal[0]
+
     if deal.get("is_cloud_master_deal") == "1" and deal.get("fakturia_data") not in [None, ""]:
         data = load_json_data(deal.get("fakturia_data"))
     else:
