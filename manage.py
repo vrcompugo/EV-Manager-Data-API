@@ -236,13 +236,11 @@ def create_cloud_contract_deals2():
             print("double", deal.get('contract_number'))
 
     year = 2021
+        #.filter(Contract.begin <= f"{year}-12-31") \
     contracts = db.session.query(Contract)\
-        .filter(Contract.begin <= f"{year}-12-31") \
+        .filter(Contract.begin.is_(None)) \
         .order_by(Contract.contract_number.desc())
     for contract in contracts:
-        print(contract.contract_number)
-        if "C2001200274" == contract.contract_number:
-            print("-----------------------------------")
         if contract.contract_number not in existing_deals:
             print(contract.contract_number)
             try:
