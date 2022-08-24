@@ -426,9 +426,13 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
     legacy_cloud = False
     offer_v2 = OfferV2.query.filter(OfferV2.number == cloud_number).first()
     if offer_v2 is None:
-        offer_v2 = OfferV2.query.filter(OfferV2.id == cloud_number.replace("C-", "")).first()
-        survey = Survey.query.filter(Survey.id == offer_v2.survey_id).first()
-
+        survey = None
+        try:
+            cloud_number = int(cloud_number.replace("C-", ""))
+            offer_v2 = OfferV2.query.filter(OfferV2.id == int(cloud_number.replace("C-", ""))).first()
+            survey = Survey.query.filter(Survey.id == offer_v2.survey_id).first()
+        except Exception as e:
+            pass
         if survey is None:
             offer_v2 = None
             config["errors"].append({
