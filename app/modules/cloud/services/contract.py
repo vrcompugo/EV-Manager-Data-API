@@ -233,6 +233,9 @@ def load_contract_data(contract_number):
                 if deals[0]["stage_id"] == "C126:UC_L0M7DR":
                     annual_statement["status"].append("wartet auf Zahlung")
                     annual_statement["deal"]["status"] = "Fakturia Zahlung erzeugen"
+                if deals[0]["stage_id"] == "C126:UC_RBVLQV":
+                    annual_statement["status"].append("Korrektur nötog")
+                    annual_statement["deal"]["status"] = "Abrechnungskorrektur erzeugen"
                 if deals[0]["stage_id"] == "C126:WON":
                     annual_statement["status"].append("done")
                     annual_statement["deal"]["status"] = "Abgeschossen"
