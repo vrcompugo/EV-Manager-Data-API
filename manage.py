@@ -237,7 +237,6 @@ def create_cloud_contract_deals2():
 
     year = 2021
     contracts = db.session.query(Contract)\
-        .filter(Contract.begin >= f"{year}-01-01") \
         .filter(Contract.begin <= f"{year}-12-31") \
         .order_by(Contract.contract_number.desc())
     for contract in contracts:
