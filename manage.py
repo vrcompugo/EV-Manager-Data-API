@@ -227,7 +227,7 @@ def create_cloud_contract_deals2():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 126
-    })
+    }, force_reload=True)
     existing_deals = []
     for deal in deals:
         if deal.get('contract_number') not in existing_deals:
