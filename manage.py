@@ -215,6 +215,56 @@ def create_cloud_contract_deals():
     '''
 
 @manager.command
+def create_cloud_contract_deals2():
+    from app.modules.external.bitrix24.deal import get_deals, add_deal, get_deal, update_deal
+    from app.modules.cloud.cloud2_routes import get_invoce_list
+    from app.modules.order.models.order import Order
+    from app.modules.cloud.services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data
+    from app.modules.settings import get_settings
+    from app.models import Contract
+
+    config = get_settings(section="external/bitrix24")
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 126
+    })
+    existing_deals = []
+    for deal in deals:
+        if deal.get('contract_number') not in existing_deals:
+            existing_deals.append(deal.get('contract_number'))
+        else:
+            print("double", deal.get('contract_number'))
+
+    year = 2021
+    contracts = db.session.query(Contract)\
+        .filter(Contract.begin >= f"{year}-01-01") \
+        .filter(Contract.begin <= f"{year}-12-31") \
+        .order_by(Contract.contract_number.desc())
+    for contract in contracts:
+        if contract.contract_number not in existing_deals:
+            print(contract.contract_number )
+            try:
+                contract_data = get_contract_data(contract.contract_number)
+                deal_data = {
+                    "contact_id": contract_data.get("contact_id"),
+                    config["deal"]["fields"]["cloud_number"]: contract_data["cloud"].get("cloud_number"),
+                    config["deal"]["fields"]["contract_number"]: contract.contract_number,
+                    "title": contract.contract_number,
+                    "category_id": 126,
+                    "stage_id": "C126:NEW"
+                }
+                add_deal(deal_data)
+            except Exception as e:
+                deal_data = {
+                    config["deal"]["fields"]["contract_number"]: contract.contract_number,
+                    "title": contract.contract_number,
+                    "category_id": 126,
+                    "stage_id": "C126:UC_CQNYI7"
+                }
+                add_deal(deal_data)
+
+
+@manager.command
 def generate_cloud_contract_reports():
     from app.modules.external.bitrix24.deal import get_deals, get_deal
     from app.modules.cloud.services.contract import generate_annual_report
