@@ -67,7 +67,7 @@ def calculate_cloud(data):
                     "label": "Preisdefintion vor dem 28.02.2022",
                     "value": "PWTCAlQ6apVi6",
                     "reference_number": pre_feb_2022.number,
-                    "comment": "eCloud wird mit aktuellem Minderverbau berechnet"
+                    "comment": ""
                 })
 
     settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
@@ -82,7 +82,7 @@ def calculate_cloud(data):
             settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.0499
             pricing_option = next((i for i in pricing_options if str(i["value"]) == "l2k3fblk3baxv55"), None)
             pricing_option["comment"] = "eCloud wird mit Minderverbau nach Preisdefinition vor dem 16.12.2021 berechnet"
-    if data.get("old_price_calculation", "") not in ["l2k3fblk3baxv55", "PWTCAlQ6apVi6"]:
+    if data.get("old_price_calculation", "") not in ["l2k3fblk3baxv55"]:
         if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate):
             settings["data"]["cloud_settings"]["extra_kwh_cost"] = "33.79"
             settings["data"]["cloud_settings"]["power_to_kwp_factor"] = 2.296
@@ -125,7 +125,6 @@ def calculate_cloud(data):
                 { "from": 300001, "to": 749999, "value": 2999.99 },
                 { "from": 750000, "to": 9999999, "value": 3490.99 }
             ]
-
 
     result = {
         "pricing_options": pricing_options,
