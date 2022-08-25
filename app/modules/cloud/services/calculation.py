@@ -57,18 +57,6 @@ def calculate_cloud(data):
                     "reference_number": pre_dez_2021.number,
                     "comment": "eCloud wird mit aktuellem Minderverbau berechnet"
                 })
-            pre_feb_2022 = OfferV2.query\
-                .filter(OfferV2.customer_id == offer_v2.customer_id)\
-                .filter(OfferV2.datetime < kez_changedate2)\
-                .order_by(OfferV2.datetime.desc())\
-                .first()
-            if pre_feb_2022 is not None:
-                pricing_options.append({
-                    "label": "Preisdefintion vor dem 28.02.2022",
-                    "value": "PWTCAlQ6apVi6",
-                    "reference_number": pre_feb_2022.number,
-                    "comment": ""
-                })
 
     settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
     settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
