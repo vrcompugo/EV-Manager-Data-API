@@ -133,13 +133,14 @@ def create_folder_path(parent_folder_id, path):
         if new_folder_id is None:
             new_folder = add_subfolder(parent_folder_id, part)
             new_folder_id = new_folder["ID"]
-            folder = BitrixDriveFolder(
-                bitrix_id=new_folder_id,
-                parent_folder_id=parent_folder_id,
-                path=part
-            )
-            db.session.add(folder)
-            db.session.commit()
+            if new_folder_id is not None:
+                folder = BitrixDriveFolder(
+                    bitrix_id=new_folder_id,
+                    parent_folder_id=parent_folder_id,
+                    path=part
+                )
+                db.session.add(folder)
+                db.session.commit()
         parent_folder_id = new_folder_id
     return parent_folder_id
 
