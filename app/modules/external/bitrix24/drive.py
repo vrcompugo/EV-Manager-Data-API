@@ -153,7 +153,6 @@ def add_subfolder(parent_id, subfolder_name):
         "data[NAME]": subfolder_name
     })
     if "result" in data:
-        print("error new folder3:", data)
         return data["result"]
     else:
         if data["error"] == "DISK_OBJ_22000":
