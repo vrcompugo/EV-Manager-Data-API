@@ -141,6 +141,8 @@ def create_folder_path(parent_folder_id, path):
                 )
                 db.session.add(folder)
                 db.session.commit()
+            else:
+                print("error creat folder", new_folder)
         parent_folder_id = new_folder_id
     return parent_folder_id
 
