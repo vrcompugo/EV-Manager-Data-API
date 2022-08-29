@@ -71,7 +71,7 @@ def get_attached_file(id):
     return None
 
 
-def get_folder(id, namefilter=None):
+def get_folder(id, namefilter=None, force=False):
     payload = {
         "id": id,
         "start": 0
@@ -80,7 +80,7 @@ def get_folder(id, namefilter=None):
         payload["filter[NAME]"] = namefilter
     result = []
     while payload["start"] is not None:
-        data = post("disk.folder.getchildren", payload)
+        data = post("disk.folder.getchildren", payload, force_reload=force)
         if "result" in data:
             payload["start"] = data["next"] if "next" in data else None
             result = result + data["result"]
@@ -92,7 +92,7 @@ def get_folder(id, namefilter=None):
     return result
 
 
-def get_folder_id(parent_folder_id, subfolder=None, path=None):
+def get_folder_id(parent_folder_id, subfolder=None, path=None, force=False):
     if subfolder is not None:
         subfolder = subfolder.strip("/")
         folder = BitrixDriveFolder.query\
@@ -101,7 +101,7 @@ def get_folder_id(parent_folder_id, subfolder=None, path=None):
             .first()
         if folder is not None:
             return folder.bitrix_id
-        children = get_folder(parent_folder_id, subfolder)
+        children = get_folder(parent_folder_id, subfolder, force=force)
         existing_child = next((item for item in children if item["NAME"] == str(subfolder)), None)
         if existing_child is not None:
             folder = BitrixDriveFolder(
@@ -129,7 +129,7 @@ def create_folder_path(parent_folder_id, path):
     parts = path.split("/")
     new_path = ""
     for part in parts:
-        new_folder_id = get_folder_id(parent_folder_id, part)
+        new_folder_id = get_folder_id(parent_folder_id, part, force=True)
         if new_folder_id is None:
             new_folder = add_subfolder(parent_folder_id, part)
             new_folder_id = new_folder["ID"]
