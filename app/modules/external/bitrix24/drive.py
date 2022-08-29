@@ -86,6 +86,7 @@ def get_folder(id, namefilter=None):
             result = result + data["result"]
         else:
             print("error3:", data)
+            print(payload)
             payload["start"] = None
             return None
     return result
