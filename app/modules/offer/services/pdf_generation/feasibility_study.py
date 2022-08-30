@@ -14,6 +14,7 @@ from app.models import OfferV2, S3File, EEGRefundRate
 from app.utils.gotenberg import generate_pdf as gotenberg_pdf
 from app.modules.cloud.services.calculation import cloud_offer_calculation_by_pv_offer
 from app.modules.loan_calculation import loan_calculation, loan_calculation_gross, leasing_calculation
+from app.modules.settings import get_settings as get_settings2
 
 from ..offer_generation.cloud_offer import cloud_offer_items_by_pv_offer
 
@@ -310,8 +311,8 @@ def calculate_feasibility_study(offer: OfferV2):
         data["heating_offer_substitute_total"] = data["heating_offer_total"]
         if offer.data.get("new_heating_type") in ["heatpump"]:
             if offer.data.get("old_heating_type") in ["oil", "gas"]:
-                data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.60 + data["heating_offer_total_nonsubstitional"]
-                print("60")
+                data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.65 + data["heating_offer_total_nonsubstitional"]
+                print("65")
             if offer.data.get("old_heating_type") in ["new", "heatpump"]:
                 data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.70 + data["heating_offer_total_nonsubstitional"]
                 print("70")
@@ -543,10 +544,11 @@ def calculate_feasibility_study(offer: OfferV2):
 
 def generate_feasibility_study_2020_pdf(offer: OfferV2, return_string=False):
     settings = get_settings("pv-settings")
+    settings2 = get_settings2("general")
     if settings is None:
         return None
     data = calculate_feasibility_study(offer)
-    data["base_url"] = "https://api.korbacher-energiezentrum.de"
+    data["base_url"] = settings2["base_url"].strip("/")
     content = render_template("feasibility_study_2020/index.html", offer=offer, data=data, settings=settings)
     pdf = gotenberg_pdf(content, landscape=True, margins=[0, 0, 0, 0], wait_delay="0.2")
     temp_pdf_file_output = tempfile.NamedTemporaryFile()

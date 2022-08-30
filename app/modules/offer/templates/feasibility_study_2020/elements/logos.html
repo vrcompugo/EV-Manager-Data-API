@@ -3,7 +3,7 @@
     padding-left: 40%;
   }
   .logos img {
-    height: 60px
+    height: 39px
   }
   .logos .kez,
   .logos .senec {
@@ -58,6 +58,10 @@
     </div>
   {% endif %}
   <div class="senec flex">
-    <img src="{{ data.base_url }}/static/feasibility_study_2020/senec-logo.jpg" />
+    {% if offer and offer.reseller.document_style == "bsh" %}
+      <img src="{{ data.base_url }}/static/feasibility_study_2020/senec_logo2.png" />
+    {% else %}
+      <img src="{{ data.base_url }}/static/feasibility_study_2020/senec-logo.jpg" />
+    {% endif %}
   </div>
 </div>
