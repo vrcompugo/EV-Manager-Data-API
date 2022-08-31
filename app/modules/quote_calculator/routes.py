@@ -1112,6 +1112,11 @@ def get_insign_session(data):
         "displayname": "Contractigvertrag",
         "preFilledFields": []
     })
+    prefillable_documents.append({
+        "id": 5400174,  # https://keso.bitrix24.de/disk/downloadFile/5400174/?&ncc=1&filename=energie360-vollmacht.pdf
+        "displayname": "Maklervollmacht",
+        "preFilledFields": []
+    })
     auto_fill_fields = [
         { "id": "Name und Vorname", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
         { "id": "name vorname 1", "text": data.get("contact", {}).get("firstname") + " " + data.get("contact", {}).get("lastname") },
@@ -1128,6 +1133,7 @@ def get_insign_session(data):
         { "id": "Standort", "text": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
         { "id": "PLZ, Ort", "text": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
         { "id": "PLZ Ort", "text": data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
+        { "id": "Anschrift", "text": data.get("contact", {}).get("street") + " " + data.get("contact", {}).get("street_nb") + " " + data.get("contact", {}).get("zip") + " " + data.get("contact", {}).get("city") },
         { "id": "Kwp Nennleistung", "text": numberformat(data.get("data", {}).get("pv_kwp")) },
         { "id": "IBAN", "text": data.get("data", {}).get("iban") },
         { "id": "BIC", "text": data.get("data", {}).get("bic") },
