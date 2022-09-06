@@ -524,7 +524,9 @@ def get_settings(section=None, domain_raw=None):
                     "hv_iban": "UF_CRM_1625662334",
                     "hv_begindate": "UF_CRM_1625665316",
                     "energie360_financing": "UF_CRM_1654122143",
-                    "expansion_type": "UF_CRM_1657793559"
+                    "expansion_type": "UF_CRM_1657793559",
+                    "construction_calendar_week": "UF_CRM_1579532396",
+                    "planned_teamlead": "UF_CRM_1573567239"
                 }
             },
             "quote": {

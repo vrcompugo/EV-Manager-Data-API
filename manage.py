@@ -304,9 +304,9 @@ def run_mfr_subscriptor():
 
 
 @manager.command
-def run_test_normalize_counter_values():
-    from app.modules.cloud.services.contract import test_normalize_counter_values
-    test_normalize_counter_values()
+def export_mfr_task_by_bitrix_id():
+    from app.modules.external.mfr.task import export_by_bitrix_id
+    export_by_bitrix_id(283384)
 
 
 @manager.option("-s", "--section", dest='section', default=None)

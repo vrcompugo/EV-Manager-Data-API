@@ -5,7 +5,7 @@ from flask_cors.core import try_match
 from app.modules.external.bitrix24.company import get_company
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.deal import get_deal
-from app.modules.external.bitrix24.user import get_user_by_email
+from app.modules.external.bitrix24.user import get_user_by_email, get_user
 import time
 import magic
 import json
@@ -20,6 +20,7 @@ from app.modules.external.bitrix24.task import get_task, update_task, get_tasks
 from app.modules.external.bitrix24.drive import add_file, create_folder_path, get_file_content, get_folder_id, get_folder
 from app.modules.settings import get_settings, set_settings
 from app.modules.external.bitrix24._connector import post as post_bitrix
+from app.models import QuoteHistory
 
 from ._connector import get, post, put, get_download
 from .contact import export_by_bitrix_id as export_contact_by_bitrix_id
@@ -72,6 +73,23 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
     if deal_data is not None:
         folder_id = None
         if str(deal_data.get("category_id")) in ["1", "44"]:
+            traufhohe = 0
+            roof_toppings = ""
+            quote_history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal_data.get("unique_identifier")).order_by(QuoteHistory.datetime.desc()).first()
+            if quote_history is not None and "data" in quote_history.data and "roofs" in quote_history.data["data"]:
+                for roof in quote_history.data["data"]["roofs"]:
+                    if float(roof.get("traufhohe", 0)) > traufhohe:
+                        traufhohe = float(roof.get("traufhohe", 0))
+                    if roof.get('roof_topping') not in [None, ""]:
+                        roof_toppings = roof_toppings + f"{roof.get('roof_topping')}, "
+            if roof_toppings == "":
+                roof_toppings = "?"
+            if traufhohe == 0:
+                traufhohe = "?"
+            planned_teamlead = "?"
+            if deal_data["planned_teamlead"] is not None and len(deal_data["planned_teamlead"]) > 0 and deal_data["planned_teamlead"][0] not in ["106", 106]:
+                planned_teamlead = get_user(deal_data["planned_teamlead"][0])["LAST_NAME"]
+            data["Name"] =  data["Name"] + f", {traufhohe} Meter, Team {planned_teamlead}, {roof_toppings}, KW {deal_data.get('construction_calendar_week')}"
             files = []
             if deal_data.get("upload_link_tab") not in [None, ""]:
                 folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_tab").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
@@ -272,7 +290,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
             changes_found = True
             print(field)
             break
-    if changes_found is False:
+    if False and changes_found is False:
         print("no_change")
         return
     else:
@@ -293,6 +311,8 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         print("no contact", bitrix_id)
         return
     post_data = get_export_data(task_data, contact_data, deal_data, company_data)
+    print(post_data["Name"])
+    return
     documents = None
     if "documents" in post_data:
         documents = post_data["documents"]
