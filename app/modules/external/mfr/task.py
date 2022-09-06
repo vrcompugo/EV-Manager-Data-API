@@ -75,21 +75,22 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
         if str(deal_data.get("category_id")) in ["1", "44"]:
             traufhohe = 0
             roof_toppings = ""
-            quote_history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal_data.get("unique_identifier")).order_by(QuoteHistory.datetime.desc()).first()
-            if quote_history is not None and "data" in quote_history.data and "roofs" in quote_history.data["data"]:
-                for roof in quote_history.data["data"]["roofs"]:
-                    if float(roof.get("traufhohe", 0)) > traufhohe:
-                        traufhohe = float(roof.get("traufhohe", 0))
-                    if roof.get('roof_topping') not in [None, ""]:
-                        roof_toppings = roof_toppings + f"{roof.get('roof_topping')}, "
-            if roof_toppings == "":
-                roof_toppings = "?"
-            if traufhohe == 0:
-                traufhohe = "?"
-            planned_teamlead = "?"
-            if deal_data["planned_teamlead"] is not None and len(deal_data["planned_teamlead"]) > 0 and deal_data["planned_teamlead"][0] not in ["106", 106]:
-                planned_teamlead = get_user(deal_data["planned_teamlead"][0])["LAST_NAME"]
-            data["Name"] =  data["Name"] + f", {traufhohe} Meter, Team {planned_teamlead}, {roof_toppings}, KW {deal_data.get('construction_calendar_week')}"
+            if deal_data.get("unique_identifier") not in [None, ""]:
+                quote_history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal_data.get("unique_identifier")).order_by(QuoteHistory.datetime.desc()).first()
+                if quote_history is not None and "data" in quote_history.data and "roofs" in quote_history.data["data"]:
+                    for roof in quote_history.data["data"]["roofs"]:
+                        if float(roof.get("traufhohe", 0)) > traufhohe:
+                            traufhohe = float(roof.get("traufhohe", 0))
+                        if roof.get('roof_topping') not in [None, ""]:
+                            roof_toppings = roof_toppings + f"{roof.get('roof_topping')}, "
+                if roof_toppings == "":
+                    roof_toppings = "?"
+                if traufhohe == 0:
+                    traufhohe = "?"
+                planned_teamlead = "?"
+                if deal_data["planned_teamlead"] is not None and len(deal_data["planned_teamlead"]) > 0 and deal_data["planned_teamlead"][0] not in ["106", 106]:
+                    planned_teamlead = get_user(deal_data["planned_teamlead"][0])["LAST_NAME"]
+                data["Name"] =  data["Name"] + f", {traufhohe} Meter, Team {planned_teamlead}, {roof_toppings}, KW {deal_data.get('construction_calendar_week')}"
             files = []
             if deal_data.get("upload_link_tab") not in [None, ""]:
                 folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_tab").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
