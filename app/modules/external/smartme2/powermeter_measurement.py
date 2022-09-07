@@ -56,7 +56,7 @@ def run_cron_import():
 
 def get_device_by_datetime(smartme_number, datetime_item):
     device = get("/DeviceBySerial", parameters={ "serial": smartme_number})
-    if device is None:
+    if device is None or device.get("Id") in [None, "", 0]:
         data = smart2_get_device_by_datetime(smartme_number, datetime_item)
     else:
         data = get(f"/MeterValues/{device['Id']}", parameters={ "date": str(datetime_item) })
