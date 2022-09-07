@@ -850,7 +850,7 @@ def get_annual_statement_data(data, year, manuell_data):
                     for value in statement["available_values"]:
                         if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
                             values.append(value)
-                    if manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
+                    if product in ["lightcloud", "heatcloud"] and manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
                         if manuell_data.get(f"assumed_autocracy_{product}") is not None:
                             statement["estimate_netusage"] = True
                             if statement.get("total_self_usage") in [None, ""]:
