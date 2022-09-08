@@ -285,7 +285,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         task_buffer.data = {}
         db.session.add(task_buffer)
     changes_found = False
-    if task_data('mfr_id') in [None, ""]:
+    if task_data.get('mfr_id') in [None, ""]:
         changes_found = True
     else:
         important_fields = ["comments", "description"]
