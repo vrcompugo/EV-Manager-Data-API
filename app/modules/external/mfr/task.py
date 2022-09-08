@@ -285,12 +285,14 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         task_buffer.data = {}
         db.session.add(task_buffer)
     changes_found = False
-    important_fields = ["comments", "description"]
-    for field in important_fields:
-        if json.dumps(task_buffer.data.get(field)) != json.dumps(task_data.get(field)):
-            changes_found = True
-            print(field)
-            break
+    if task_data('mfr_id') in [None, ""]:
+        changes_found = True
+    else:
+        important_fields = ["comments", "description"]
+        for field in important_fields:
+            if json.dumps(task_buffer.data.get(field)) != json.dumps(task_data.get(field)):
+                changes_found = True
+                break
     if changes_found is False:
         print("no_change")
         return
