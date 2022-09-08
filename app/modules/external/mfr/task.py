@@ -291,7 +291,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
             changes_found = True
             print(field)
             break
-    if False and changes_found is False:
+    if changes_found is False:
         print("no_change")
         return
     else:
