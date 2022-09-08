@@ -592,7 +592,7 @@ def generate_contract_summary_part4_pdf(lead_id, data, return_string=False):
             landscape=False)))
         base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(3381834)))  # https://keso.bitrix24.de/disk/downloadFile/3381834/?&ncc=1&filename=waermepumpe_formular1.pdf
         pdf = PdfFileWriter()
-        for i in range(0,9):
+        for i in range(0, 10):
             if i in [0, 3, 4, 7]:
                 page = overlay_pdf.getPage(i)
             else:
