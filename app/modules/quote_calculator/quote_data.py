@@ -368,7 +368,7 @@ def calculate_products(data):
             if data["data"].get("extra_options_new_power_closet_size") in ["4"]:
                 product_label = "Neuer Zählerschrank (4)"
             if kwp >= 25:
-                product_label = "Neuer Zählerschrank (ZS) Wandler möglich"
+                product_label = "Neuer Zählerschrank (ZS) Wandler fähig"
             if kwp >= 30:
                 product_label = "Neuer Zählerschrank (ZS) Wandler-Schrank"
             add_direct_product(
