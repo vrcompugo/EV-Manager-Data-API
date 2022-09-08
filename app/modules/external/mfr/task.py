@@ -312,8 +312,6 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         print("no contact", bitrix_id)
         return
     post_data = get_export_data(task_data, contact_data, deal_data, company_data)
-    print(post_data["Name"])
-    return
     documents = None
     if "documents" in post_data:
         documents = post_data["documents"]
