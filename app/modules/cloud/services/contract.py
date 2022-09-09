@@ -785,7 +785,7 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement_config[product]["allowed_usage"] = statement_config[product]["allowed_usage"] + statement_config[product]["allowed_usage_emove"]
                 statement_config[product]["actual_usage"] = 0
                 statement_config[product]["actual_usage_net"] = 0
-                if statement_config[product].get("smartme_number") not in empty_values and (product != "heatcloud" or statement_config.get("measuring_concept") not in ["parallel_concept"] or manuell_data.get("parallel_concept_counter") in ["smartme"]):
+                if (statement_config[product].get("smartme_number") not in empty_values or statement_config[product].get("additional_smartme_numbers") not in empty_values) and (product != "heatcloud" or statement_config.get("measuring_concept") not in ["parallel_concept"] or manuell_data.get("parallel_concept_counter") in ["smartme"]):
                     numbers = [statement_config[product].get("smartme_number")]
                     if statement_config[product].get("additional_smartme_numbers") is not None:
                         numbers = numbers + statement_config[product].get("additional_smartme_numbers")
@@ -1236,9 +1236,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
     for number in numbers:
         if number is None:
             continue
-        print("asd", number, "asd")
         number = number.strip()
-        print("asd", number, "asd")
         start_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
             .filter(CounterValue.date <= start_date)\
             .order_by(CounterValue.date.desc()) \
