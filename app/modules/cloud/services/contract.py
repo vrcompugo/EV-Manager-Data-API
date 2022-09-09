@@ -1234,6 +1234,9 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
     end_date = normalize_date(end_date)
     diff_days_target = (end_date - start_date).days
     for number in numbers:
+        if number is None:
+            continue
+        number = number.strip()
         start_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
             .filter(CounterValue.date <= start_date)\
             .order_by(CounterValue.date.desc()) \
