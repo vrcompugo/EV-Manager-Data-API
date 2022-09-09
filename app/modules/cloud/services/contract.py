@@ -1236,7 +1236,9 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
     for number in numbers:
         if number is None:
             continue
+        print("asd", number, "asd")
         number = number.strip()
+        print("asd", number, "asd")
         start_value_earlier = CounterValue.query.filter(CounterValue.number == number)\
             .filter(CounterValue.date <= start_date)\
             .order_by(CounterValue.date.desc()) \
