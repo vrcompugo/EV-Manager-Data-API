@@ -25,6 +25,8 @@ def add_product(data):
         product["quantity"] = math.ceil(data["calculated"]["storage_size"] / 10)
         data["products"].append(product)
     else:
+        size = math.ceil(data["data"]["power_usage"] / 4200) * 4.2
+        print(size)
         if "solaredge" not in data["data"]["extra_options"]:
             version = "SENEC Home 4 Hybrid"
             product = get_product(label="SENEC Home 4 Hybrid (Gehäuse)", category="Stromspeicher")
@@ -32,7 +34,8 @@ def add_product(data):
             version = "SENEC Home 4 AC"
             product = get_product(label="SENEC Home 4 AC (Gehäuse)", category="Stromspeicher")
         product["quantity"] = 1
-        stack_count = math.ceil((data["calculated"]["storage_size"] - 4.2) / 4.2)
+        stack_count = math.ceil(size / 4.2)
+        print(stack_count)
         if stack_count < 3:
             stack_count = 3
         stack = get_product(label="SENEC Home 4 Batteriemodul 4,2 kW", category="Stromspeicher")
