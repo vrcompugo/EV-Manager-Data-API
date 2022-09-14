@@ -9,6 +9,9 @@ def add_product(data):
     if data["calculated"]["storage_size"] == 0:
         return None
     size = math.ceil(data["data"]["power_usage"] / 2500) * 2.5
+    if "overwrite_storage_size" in data["data"] and data["data"]["overwrite_storage_size"] != "":
+        if int(data["data"]["overwrite_storage_size"]) > size:
+            size = int(data["data"]["overwrite_storage_size"])
     if size <= 10 or ("solaredge" not in data["data"]["extra_options"] and data["data"]["power_usage"] < 10000):
         version = "Senec Lithium Speicher"
         stack_count = math.ceil((size - 2.5) / 2.5)
@@ -26,7 +29,6 @@ def add_product(data):
         data["products"].append(product)
     else:
         size = math.ceil(data["data"]["power_usage"] / 4200) * 4.2
-        print(size)
         if "solaredge" not in data["data"]["extra_options"]:
             version = "SENEC Home 4 Hybrid"
             product = get_product(label="SENEC Home 4 Hybrid (Gehäuse)", category="Stromspeicher")
