@@ -187,9 +187,11 @@ def run_cron_add_missing_values():
                 if history is None:
                     continue
                 update_data = {
-                    "inverter_type": [],
-                    "extra_packages": [],
-                    "extra_packages2": [],
+                    "cloud_type": ["keine Auswahl"],
+                    "storage_size": ["keine Auswahl"],
+                    "inverter_type": ["keine Auswahl"],
+                    "extra_packages": ["keine Auswahl"],
+                    "extra_packages2": ["keine Auswahl"],
                     "quote_type2": [],
                     "tax_consultant": "Nein",
                     "bwwp": ["keine Auswahl"],
@@ -197,7 +199,12 @@ def run_cron_add_missing_values():
                     "count_modules": 0,
                     "emove_packet": "none",
                     "hwp": ["keine Auswahl"],
-                    "expansion_type": "nein"
+                    "expansion_type": "nein",
+                    "construction_calendar_week_heating": 99,
+                    "solar_edge_guarantee_extend": "Nein",
+                    "has_overlandconnection": "nein",
+                    "storage_model": ["kein Speicher"],
+                    "construction_date": "1970-01-01"
                 }
                 if history.data["data"].get("has_pv_quote") is True:
                     cloud_type = ["Zero"]
@@ -222,6 +229,7 @@ def run_cron_add_missing_values():
                         storage_size = [f"Senec {stack_count} Li"]
 
                     update_data = {
+                        "storage_model": ["muss projektiert werden"],
                         "cloud_type": cloud_type,
                         "storage_size": storage_size,
                         "inverter_type": ["Fremdwechselrichter (Fronius bevorzugt) oder 10 Jahre Garantie WR"],
@@ -236,8 +244,11 @@ def run_cron_add_missing_values():
                         "hwp": ["keine Auswahl"],
                         "expansion_type": "nein"
                     }
-                    update_data["storage_model"] = ["Senec Home 2.1"]
-                    update_data["extra_packages2"].append("Senec Wechselrichtergarantie 20 Jahre")
+                    if history.data["data"].get("roofs") not in [None, ""]:
+                        for roof in history.data["data"].get("roofs"):
+                            if roof.get("oberleitung_vorhanden") in [True, "true"]:
+                                update_data["has_overlandconnection"] = "ja"
+                                break
 
                     if "solaredge" in history.data["data"]["extra_options"]:
                         update_data["inverter_type"] = ["Solar Edge (Optimierer laut Auslegung)"]
@@ -268,12 +279,13 @@ def run_cron_add_missing_values():
 
                     if "module_kwp" in history.data["data"]:
                         for value in [280, 320, 380, 400]:
-                            if history.data["data"]["module_kwp"]["kWp"] * 1000 == value:
+                            if history.data["data"]["module_kwp"]["kWp"] * 1000 == value: ### todo auf produkte matchen
                                 update_data["pv_module"] = [f"{value} Watt Amerisolar black"]
                                 if value == 280:
                                     update_data["pv_module"] = [f"{value} Watt Amerisolar"]
                                 if value == 380:
                                     update_data["pv_module"] = [f"{value} Watt Amerisolar Black"]
+
                     if history.data.get("construction_year") not in [None, "", "0", 0]:
                         update_data["construction_date"] = datetime.datetime.strptime(f'{history.data["construction_year"]}-01-01', "%Y-%m-%d")
                         update_data["construction_date"] = str(update_data["construction_date"] + datetime.timedelta(weeks=int(history.data["construction_week"])))
@@ -283,7 +295,7 @@ def run_cron_add_missing_values():
                     update_data["emove_packet"] = history.data["data"]["emove_tarif"]
 
                 update_data["quote_type"] = "keine Auswahl"
-                update_data["quote_type3"] = "keine Auswahl"
+                update_data["quote_type3"] = ["keine Auswahl"]
                 if history.data["data"].get("has_pv_quote") is True and history.data["data"].get("has_roof_reconstruction_quote") is True:
                     update_data["quote_type"] = "Photovoltaik und Dachsanierung"
                 else:
@@ -302,6 +314,9 @@ def run_cron_add_missing_values():
                     if history.data["data"].get("new_heating_type") in ["hybrid_gas", "heatpump"]:
                         update_data["quote_type3"] = ["Heizung WP"]
                         update_data["hwp"] = ["Ja"]
+                        if False and history.data["data"].get("has_pv_quote") is False:
+                            if "new_power_closet" in history.data["data"]["extra_options"]:  ###   laksl
+                                update_data["extra_packages2"].append("Zählerschrank")
 
                 if history.data["data"].get("has_roof_reconstruction_quote") is True:
                     update_data["quote_type2"].append("Dachsanierung")

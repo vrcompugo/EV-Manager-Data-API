@@ -141,7 +141,8 @@ def get_settings(section=None, domain_raw=None):
                     "240": "Sondermodul",
                     "1906": "keine Auswahl",
                     "174": "400 Watt Amerisolar blau",
-                    "170": "280 Watt Amerisolar"
+                    "170": "280 Watt Amerisolar",
+                    "7327": "SENEC 380 Watt Modul"
                 },
                 "extra_packages": {
                     "180": "Technik & Service (Anschlussgarantie, Technikpaket, Portal)",
@@ -224,7 +225,8 @@ def get_settings(section=None, domain_raw=None):
                     "266": "Senec Uno Hybrid",
                     "268": "Senec Duo Hybrid",
                     "3624": "Blei",
-                    "272": "kein Speicher"
+                    "272": "kein Speicher",
+                    "7323": "muss projektiert werden"
                 },
                 "has_emove_package": {
                     "": "nicht ausgewählt",
@@ -351,6 +353,11 @@ def get_settings(section=None, domain_raw=None):
                     "Dachsanierung online Bogen": 290,
                     "Optionen Heizung online": 302,
                     "Solarthermie online": 300
+                },
+                "has_overlandconnection": {
+                    "": None,
+                    "3772": "ja",
+                    "3774": "nein"
                 }
             },
             "task": {
@@ -526,7 +533,9 @@ def get_settings(section=None, domain_raw=None):
                     "energie360_financing": "UF_CRM_1654122143",
                     "expansion_type": "UF_CRM_1657793559",
                     "construction_calendar_week": "UF_CRM_1579532396",
-                    "planned_teamlead": "UF_CRM_1573567239"
+                    "construction_calendar_week_heating": "UF_CRM_1580214065",
+                    "planned_teamlead": "UF_CRM_1573567239",
+                    "has_overlandconnection": "UF_CRM_1611740621"
                 }
             },
             "quote": {

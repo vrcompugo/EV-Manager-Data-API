@@ -63,7 +63,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
             "price_increase_rate": 5.75,
             "inflation_rate": 1.75,
             "runtime": 30,
-            "financing_rate": 2.49,
+            "financing_rate": 3.75,
             "module_type": default_module_type,
             "investment_type": "financing",
             "price_guarantee": "12_years",
@@ -183,6 +183,14 @@ def calculate_products(data):
     else:
         if "calculated" in data and "min_kwp" in data["calculated"]:
             kwp = float(data["calculated"]["min_kwp"])
+    if "calculated" in data and "kwp_special_roof" in data["calculated"]:
+        kwp_special_roof = float(data["calculated"]["kwp_special_roof"])
+        kwp_cheap_roof = float(data["calculated"]["kwp_cheap_roof"])
+        kwp_normal_roof = float(data["calculated"]["kwp_normal_roof"])
+    else:
+        kwp_special_roof = kwp_cheap_roof = 0
+        kwp_normal_roof = kwp
+
     if kwp == 0:
         return data
     try:
@@ -237,9 +245,23 @@ def calculate_products(data):
         add_direct_product(
             label="Montage DC",
             category="PV Module",
-            quantity=kwp,
+            quantity=kwp_normal_roof,
             products=data["products"]
         )
+        if kwp_special_roof > 0:
+            add_direct_product(
+                label="Montage DC bes. Dacheindeckung",
+                category="PV Module",
+                quantity=kwp_special_roof,
+                products=data["products"]
+            )
+        if kwp_cheap_roof > 0:
+            add_direct_product(
+                label="Montage DC Trapez",
+                category="PV Module",
+                quantity=kwp_cheap_roof,
+                products=data["products"]
+            )
         add_direct_product(
             label="Planung",
             category="PV Module",
@@ -266,6 +288,19 @@ def calculate_products(data):
                 quantity=1,
                 products=data["products"]
             )
+        if "roofs" in data["data"]:
+            quantity = 0
+            if len(data["data"].get("roofs")) == 1 and float(data["data"].get("roofs")[0].get("traufhohe")) >= 5.85:
+                quantity = 1
+            if len(data["data"].get("roofs")) > 1:
+                quantity = len(data["data"].get("roofs")) - 1
+            if quantity > 0:
+                add_direct_product(
+                    label="Gerüst Paket",
+                    category="Extra Pakete",
+                    quantity=1,
+                    products=data["products"]
+                )
         technik_and_service_produkt = None
         if data["data"].get("additional_cloud_contract") in [None, "", "0", 0] and ("technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]):
             quantity = 0

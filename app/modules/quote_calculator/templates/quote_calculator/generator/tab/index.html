@@ -338,16 +338,16 @@
                     <div>Dämmmaterial: {{ roof.insulation_material }}</div>
                 {% endif %}
                 <h2>5. Ergänzende Informationen</h2>
-                Besteht eine Oberleitung: {{ roof.oberleitung_vorhanden | boolformat }}<br>
+                <b>Besteht eine Oberleitung:<b></b> {{ roof.oberleitung_vorhanden | boolformat }}<br>
                 <br>
-                Als Kabelkanal aussen am Haus soll folgende Farbe verwendet werden: {{ roof.kabelkanal_color }}<br>
+                <b>Als Kabelkanal aussen am Haus soll folgende Farbe verwendet werden:</b> {{ roof.kabelkanal_color }}<br>
                 <br>
-                Die hier beschriebenen Dachfläche kann komplett zur Belegung genutzt werden: {{ roof.full_use | boolformat }}<br>
+                <b>Die hier beschriebenen Dachfläche kann komplett zur Belegung genutzt werden:</b> {{ roof.full_use | boolformat }}<br>
                 {% if not roof.full_use %}
-                    Eingeschränkte Belegung: {{ roof.specific_use }}<br>
+                    <b>Eingeschränkte Belegung:</b> {{ roof.specific_use }}<br>
                 {% endif %}
                 <br>
-                Bemerkungen: {{ roof.comment }}
+                <b>Bemerkungen:</b> {{ roof.comment }}
             </div>
         {% endfor %}
         <br>

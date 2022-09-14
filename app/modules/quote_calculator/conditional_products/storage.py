@@ -8,10 +8,10 @@ def add_product(data):
         raise Exception("storage produkt could not be calculated")
     if data["calculated"]["storage_size"] == 0:
         return None
-    version = "SENEC V3 Hybrid"
-    if ("pv_kwp" in data["data"] and data["data"]["pv_kwp"] > 11) or "solaredge" in data["data"]["extra_options"]:
-        version = "Senec Lithium Speicher"
+    version = "Senec Lithium Speicher"
     stack_count = math.ceil((data["calculated"]["storage_size"] - 2.5) / 2.5)
+    if stack_count < 2:
+        stack_count = 2
     product = get_product(label=version, category="Stromspeicher")
     product["quantity"] = 1
     stack = get_product(label=f"{version} Akku Stack", category="Stromspeicher")
