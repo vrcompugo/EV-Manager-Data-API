@@ -500,6 +500,8 @@ def calculate_feasibility_study(offer: OfferV2):
                 data["maintainance_cost_yearly"] = int(14 * cloud_calulation["pv_kwp"])
             if 200 < cloud_calulation["pv_kwp"]:
                 data["maintainance_cost_yearly"] = int(12 * cloud_calulation["pv_kwp"])
+        if data["maintainance_cost_yearly"] < 174.5:
+            data["maintainance_cost_yearly"] = 174.5
         data["maintainance_cost_total"] = data["maintainance_cost_yearly"] * int(cloud_runtime)
         data["insurance_cost_total"] = data["insurance_cost_yearly"] * int(cloud_runtime)
         data["cloud_subscription_total"] = (data["cloud_monthly_cost"] * 12) * int(cloud_runtime)
