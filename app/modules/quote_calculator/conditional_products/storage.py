@@ -9,7 +9,7 @@ def add_product(data):
     if data["calculated"]["storage_size"] == 0:
         return None
     size = math.ceil(data["data"]["power_usage"] / 2500) * 2.5
-    if size < 10 or ("solaredge" not in data["data"]["extra_options"] and data["data"]["power_usage"] < 10000):
+    if size <= 10 or ("solaredge" not in data["data"]["extra_options"] and data["data"]["power_usage"] < 10000):
         version = "Senec Lithium Speicher"
         stack_count = math.ceil((size - 2.5) / 2.5)
         if stack_count < 1:
