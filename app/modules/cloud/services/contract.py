@@ -475,6 +475,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
             config["lightcloud"] = {
                 "label": "Lichtcloud",
                 "usage": offer_v2.calculated.get("power_usage"),
+                "min_kwp": offer_v2.calculated.get("min_kwp_light"),
                 "extra_price_per_kwh": offer_v2.calculated.get("lightcloud_extra_price_per_kwh"),
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_light"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_light_incl_refund"),
@@ -516,6 +517,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
             config["emove"] = {
                 "label": "eMove",
                 "tarif": offer_v2.data.get("emove_tarif"),
+                "min_kwp": offer_v2.calculated.get("min_kwp_emove"),
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_emove"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_emove_incl_refund"),
                 "extra_price_per_kwh": offer_v2.calculated.get("lightcloud_extra_price_per_kwh"),
@@ -531,6 +533,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
             config["heatcloud"] = {
                 "label": "Wärmecloud",
                 "usage": offer_v2.calculated.get("heater_usage"),
+                "min_kwp": offer_v2.calculated.get("min_kwp_heatcloud"),
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_heatcloud"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_heatcloud_incl_refund"),
                 "extra_price_per_kwh": offer_v2.calculated.get("heatcloud_extra_price_per_kwh"),
@@ -571,6 +574,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
             config["ecloud"] = {
                 "label": "eCloud",
                 "usage": offer_v2.calculated.get("ecloud_usage"),
+                "min_kwp": offer_v2.calculated.get("min_kwp_ecloud"),
                 "power_meter_number": None,
                 "additional_power_meter_numbers": [],
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_ecloud"),
@@ -995,8 +999,12 @@ def get_annual_statement_data(data, year, manuell_data):
             if payment["date"][:4] == str(year):
                 statement["pre_payments_total"] = statement["pre_payments_total"] + payment["amountGross_normalized"]
                 statement["payments"].append(payment)
-
-    statement["to_pay"] = statement["total_cloud_price_incl_refund"] - statement["pre_payments_total"] + statement["total_extra_price"]
+    statement["extra_credit_value"] = 0
+    statement["extra_credit_label"] = ""
+    if manuell_data.get("extra_credit_value") not in [None, "", 0]:
+        statement["extra_credit_label"] = manuell_data.get("extra_credit_label")
+        statement["extra_credit_value"] = -float(manuell_data.get("extra_credit_value"))
+    statement["to_pay"] = statement["total_cloud_price_incl_refund"] - statement["pre_payments_total"] + statement["total_extra_price"] + statement["extra_credit_value"]
     statement["to_pay_net"] = statement["to_pay"] / 1.19
     for value in statement["available_values"]:
         value["date"] = str(value["date"])
