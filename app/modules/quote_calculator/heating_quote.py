@@ -316,6 +316,22 @@ def get_heating_products(data):
                 products=data["heating_quote"]["products"]
             )
 
+        if ("has_pv_quote" not in data["data"] or not data["data"]["has_pv_quote"]) and "new_power_closet" in data["data"]["extra_options"] or "new_power_closet" in data["data"]["extra_options_zero"]:
+            quantity = 0
+            if "new_power_closet" in data["data"]["extra_options"]:
+                quantity = 1
+            product_label = "Neuer Zählerschrank"
+            if data["data"].get("extra_options_new_power_closet_size") in ["3"]:
+                product_label = "Neuer Zählerschrank (3)"
+            if data["data"].get("extra_options_new_power_closet_size") in ["4"]:
+                product_label = "Neuer Zählerschrank (4)"
+            add_direct_product(
+                label=product_label,
+                category="Extra Pakete",
+                quantity=quantity,
+                products=data["heating_quote"]["products"]
+            )
+
         if "deconstruct_old_heater" in data["data"].get("heating_quote_extra_options", []):
             add_direct_product(
                 label='Ausbau der "alten" Heizung ohne Tanks',

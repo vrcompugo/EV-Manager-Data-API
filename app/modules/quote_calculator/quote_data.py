@@ -183,13 +183,18 @@ def calculate_products(data):
     else:
         if "calculated" in data and "min_kwp" in data["calculated"]:
             kwp = float(data["calculated"]["min_kwp"])
-    if "calculated" in data and "kwp_special_roof" in data["calculated"]:
-        kwp_special_roof = float(data["calculated"]["kwp_special_roof"])
-        kwp_cheap_roof = float(data["calculated"]["kwp_cheap_roof"])
-        kwp_normal_roof = float(data["calculated"]["kwp_normal_roof"])
-    else:
-        kwp_special_roof = kwp_cheap_roof = 0
-        kwp_normal_roof = kwp
+    kwp_special_roof = kwp_cheap_roof = 0
+    kwp_normal_roof = kwp
+    if data["data"].get("roofs") not in [None, ""]:
+        for roof in data["data"]["roofs"]:
+            if roof.get("pv_kwp_used", 0) not in [None, 0] and roof.get("pv_kwp_used", 0) > 0:
+                print(roof.get("roof_topping"))
+                if roof.get("roof_topping") in ["Schieferdeckung"]:
+                    kwp_special_roof = kwp_special_roof + roof.get("pv_kwp_used", 0)
+                    kwp_normal_roof = kwp_normal_roof - roof.get("pv_kwp_used", 0)
+                if roof.get("roof_topping") in ["Trapezblech"]:
+                    kwp_cheap_roof = kwp_cheap_roof + roof.get("pv_kwp_used", 0)
+                    kwp_normal_roof = kwp_normal_roof - roof.get("pv_kwp_used", 0)
 
     if kwp == 0:
         return data
@@ -242,12 +247,13 @@ def calculate_products(data):
                 quantity=1,
                 products=data["products"]
             )
-        add_direct_product(
-            label="Montage DC",
-            category="PV Module",
-            quantity=kwp_normal_roof,
-            products=data["products"]
-        )
+        if kwp_normal_roof > 0:
+            add_direct_product(
+                label="Montage DC",
+                category="PV Module",
+                quantity=kwp_normal_roof,
+                products=data["products"]
+            )
         if kwp_special_roof > 0:
             add_direct_product(
                 label="Montage DC bes. Dacheindeckung",
@@ -290,8 +296,9 @@ def calculate_products(data):
             )
         if "roofs" in data["data"]:
             quantity = 0
-            if len(data["data"].get("roofs")) == 1 and float(data["data"].get("roofs")[0].get("traufhohe")) >= 5.85:
-                quantity = 1
+            if data["data"].get("roofs")[0].get("traufhohe") not in [None, "", 0]:
+                if len(data["data"].get("roofs")) == 1 and float(data["data"].get("roofs")[0].get("traufhohe")) >= 5.85:
+                    quantity = 1
             if len(data["data"].get("roofs")) > 1:
                 quantity = len(data["data"].get("roofs")) - 1
             if quantity > 0:
@@ -306,12 +313,20 @@ def calculate_products(data):
             quantity = 0
             if "technik_service_packet" in data["data"]["extra_options"]:
                 quantity = 1
-            technik_and_service_produkt = add_direct_product(
-                label="Service, Technik & Garantie Paket",
-                category="Extra Pakete",
-                quantity=quantity,
-                products=data["products"]
-            )
+            if storage_product["NAME"].find("Home 4") > 0:
+                technik_and_service_produkt = add_direct_product(
+                    label="Service, Technik & Garantie Paket Home4",
+                    category="Extra Pakete",
+                    quantity=quantity,
+                    products=data["products"]
+                )
+            else:
+                technik_and_service_produkt = add_direct_product(
+                    label="Service, Technik & Garantie Paket",
+                    category="Extra Pakete",
+                    quantity=quantity,
+                    products=data["products"]
+                )
             if "technik_service_packet_autumn_extra2" in data["data"]["extra_options"]:
                 product = get_product(label="Service, Technik & Garantie Paket Winter Highlight", category="Extra Pakete")
                 if product is not None:
@@ -420,6 +435,13 @@ def calculate_products(data):
                 add_direct_product(
                     label="SENEC Back up Power Pro",
                     category="Extra Pakete",
+                    quantity=quantity,
+                    products=data["products"]
+                )
+            elif storage_product["NAME"].find("Home 4") > 0:
+                add_direct_product(
+                    label="Home4 BackUp",
+                    category="Stromspeicher",
                     quantity=quantity,
                     products=data["products"]
                 )
