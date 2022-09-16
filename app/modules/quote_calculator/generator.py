@@ -379,6 +379,12 @@ def generate_datasheet_pdf(lead_id, data):
             pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec v3") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 2341370, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2341370/?&ncc=1&filename=Senec+Home+Datenbla%CC%88tter+v3.pdf
+            pv_module = next((item for item in data["products"] if item["NAME"].lower().find("Home 4 AC") == 0), None)
+            if pv_module is not None:
+                add_pdf_by_drive_id(merger, 5621741, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/5621741/?&ncc=1&filename=TD220-052.12_SENEC-AC-21-C-1_Technisches_Datenblatt_de_1.2-1.pdf
+            pv_module = next((item for item in data["products"] if item["NAME"].lower().find("Home 4 Hybrid") == 0), None)
+            if pv_module is not None:
+                add_pdf_by_drive_id(merger, 5621739, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/5621739/?&ncc=1&filename=TD220-048.11_SENEC-H-21-C-1_Technisches_Datenblatt_de_1.1-1.pdf
         add_pdf_by_drive_id(merger, 436112, cached=True)  # zebra_zertifgikat
         add_pdf_by_drive_id(merger, 436106, cached=True)  # Testsieger Garantiebedingunegn
         add_pdf_by_drive_id(merger, 436102, cached=True)  # Kapazitätsversprechen
