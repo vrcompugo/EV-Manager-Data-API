@@ -438,7 +438,7 @@ def calculate_products(data):
                     quantity=quantity,
                     products=data["products"]
                 )
-            elif storage_product["NAME"].find("Home 4") > 0:
+            elif storage_product["NAME"].find("Home 4") >= 0:
                 add_direct_product(
                     label="Home4 BackUp",
                     category="Stromspeicher",
