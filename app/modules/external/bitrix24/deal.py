@@ -323,8 +323,6 @@ def run_cron_add_missing_values():
                 if history.data["data"].get("has_bluegen_quote") is True:
                     update_data["quote_type2"].append("BlueGen")
                 update_data["dz4_customer"] = "kein DZ-4 Kunde"
-                if history.data.get("has_special_condition") is False:
-                    update_data["stage_id"] = "15"
                 update_data["energie360_financing"] = "Nein"
                 if history.data["data"].get("has_pv_quote") is True \
                     and history.data["data"].get("investment_type") == "financing" \
