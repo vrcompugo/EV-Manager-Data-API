@@ -15,5 +15,5 @@ def part02_rechnungsanschrift(wb, excel_layout, order: Order):
     wb["Neukunden"]["AK" + str(wb.current_row)] = order.zip
     wb["Neukunden"]["AL" + str(wb.current_row)] = order.city
     wb["Neukunden"]["AN" + str(wb.current_row)] = order.customer.phone
-    wb["Neukunden"]["AR" + str(wb.current_row)] = "kundenbetreuung@efi-strom.de"
+    wb["Neukunden"]["AR" + str(wb.current_row)] = "versorger@energie360.de"
     return wb
