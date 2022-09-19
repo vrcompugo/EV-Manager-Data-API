@@ -218,6 +218,15 @@ def load_contract_data(contract_number):
                 if deals[0]["stage_id"] == "C126:UC_883FVL":
                     annual_statement["status"].append("old_contract")
                     annual_statement["deal"]["status"] = "Altvertrag manuelle bearbeitung"
+                if deals[0]["stage_id"] == "C126:UC_FVSJ2M":
+                    annual_statement["status"].append("special_custumer")
+                    annual_statement["deal"]["status"] = "Spezialkunde"
+                if deals[0]["stage_id"] == "C126:UC_FT4TL0":
+                    annual_statement["status"].append("bsh_data")
+                    annual_statement["deal"]["status"] = "Senec Werte-Abfrage BSH"
+                if deals[0]["stage_id"] == "C126:UC_XPBTZ9":
+                    annual_statement["status"].append("request_consumer_data")
+                    annual_statement["deal"]["status"] = "Consumer Daten erfragen"
                 if deals[0]["stage_id"] == "C126:PREPARATION":
                     annual_statement["status"].append("waiting for data")
                     annual_statement["deal"]["status"] = "Daten von Kunden anfragen"
