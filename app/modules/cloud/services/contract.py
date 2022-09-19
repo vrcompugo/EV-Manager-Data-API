@@ -929,8 +929,6 @@ def get_annual_statement_data(data, year, manuell_data):
                                         if statement.get(f"total_self_usage_{product}") in [None, ""]:
                                             statement[f"total_self_usage_{product}"] = 0
                                         statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"] * (1 - int(manuell_data.get(f"assumed_autocracy_{product}")) / 100)
-                                        statement[f"total_self_usage_{product}"] = statement[f"total_self_usage_{product}"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
-                                        statement["total_self_usage"] = statement["total_self_usage"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
                                     else:
                                         if counters is not None and len(counters) > 0:
                                             if manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
@@ -949,8 +947,6 @@ def get_annual_statement_data(data, year, manuell_data):
                             if statement.get(f"total_self_usage_{product}") in [None, ""]:
                                 statement[f"total_self_usage_{product}"] = 0
                             statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"] * (1 - int(manuell_data.get(f"assumed_autocracy_{product}")) / 100)
-                            statement[f"total_self_usage_{product}"] = statement[f"total_self_usage_{product}"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
-                            statement["total_self_usage"] = statement["total_self_usage"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
 
                 if product == "heatcloud" and statement_config.get("measuring_concept") in ["parallel_concept"]:
                     statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"]
@@ -996,6 +992,18 @@ def get_annual_statement_data(data, year, manuell_data):
                 if product == "lightcloud" and statement_config[product]["actual_usage_net"] <= 0:
                     statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist nicht vorhanden")
             statement["configs"].append(statement_config)
+    statement["total_self_usage"] = 0
+    for product in ["heatcloud", "lightcloud", "ecloud"] + customer_products:
+        for statement_config in statement["configs"]:
+            if product not in statement_config:
+                continue
+            print("asd", statement_config[product].get("actual_usage_net"))
+            if statement_config[product].get("actual_usage_net") in [None, "", 0]:
+                continue
+            if f"total_self_usage_{product}" not in statement:
+                statement[f"total_self_usage_{product}"] = 0
+            statement[f"total_self_usage_{product}"] = statement[f"total_self_usage_{product}"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
+            statement["total_self_usage"] = statement["total_self_usage"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
     statement["total_extra_price_net"] = statement["total_extra_price"] / 1.19
     statement["total_cloud_price_net"] = statement["total_cloud_price"] / 1.19
     statement["total_cloud_price_incl_refund_net"] = statement["total_cloud_price_incl_refund"] / 1.19
