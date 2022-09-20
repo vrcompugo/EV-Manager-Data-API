@@ -303,6 +303,11 @@ def get_settings(section=None, domain_raw=None):
                     "7116": "nein",
                     "7118": "ja, mit zusätzlichen Speicher",
                     "7120": "ja, ohne zusätzlichen Speicher",
+                },
+                "has_overlandconnection": {
+                    "": None,
+                    "3772": "ja",
+                    "3774": "nein"
                 }
             },
             "product": {
@@ -353,11 +358,6 @@ def get_settings(section=None, domain_raw=None):
                     "Dachsanierung online Bogen": 290,
                     "Optionen Heizung online": 302,
                     "Solarthermie online": 300
-                },
-                "has_overlandconnection": {
-                    "": None,
-                    "3772": "ja",
-                    "3774": "nein"
                 }
             },
             "task": {
