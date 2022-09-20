@@ -19,5 +19,5 @@ def part02_rechnungsanschrift(wb, excel_layout, deal, contact):
         wb["Neukunden"]["AS" + str(wb.current_row)] = contact.get("phone")[0].get("VALUE", "")
     else:
         wb["Neukunden"]["AS" + str(wb.current_row)] = ""
-    wb["Neukunden"]["AW" + str(wb.current_row)] = "kundenbetreuung@efi-strom.de"
+    wb["Neukunden"]["AW" + str(wb.current_row)] = "versorger@energie360.de"
     return wb
