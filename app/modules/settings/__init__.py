@@ -536,7 +536,8 @@ def get_settings(section=None, domain_raw=None):
                     "construction_calendar_week_heating": "UF_CRM_1580214065",
                     "planned_teamlead": "UF_CRM_1573567239",
                     "has_overlandconnection": "UF_CRM_1611740621",
-                    "wishdate": "UF_CRM_1629723583"
+                    "wishdate": "UF_CRM_1629723583",
+                    "old_provider_account_number": "UF_CRM_1663666539683"
                 }
             },
             "quote": {

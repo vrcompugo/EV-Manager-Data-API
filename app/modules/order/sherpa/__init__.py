@@ -6,15 +6,15 @@ from app.models import Order
 
 
 def generate_sherpa_file(deal, order: Order):
-    from app.modules.order.sherpa.excel.part02_rechnungsanschrift import part02_rechnungsanschrift
-    from app.modules.order.sherpa.excel.part03_bankdaten import part03_bankdaten
-    from app.modules.order.sherpa.excel.part03_bankdaten_inhaber import part03_bankdaten_inhaber
-    from app.modules.order.sherpa.excel.part05_lieferstelle import part05_lieferstelle
-    from app.modules.order.sherpa.excel.part06_zahlerdaten import part06_zahlerdaten
-    from app.modules.order.sherpa.excel.part07_marktpartner import part07_marktpartner
-    from app.modules.order.sherpa.excel.part08_weitere_daten import part08_weitere_daten
-    from app.modules.order.sherpa.excel.part11_sonstige_daten import part11_sonstige_daten
-    from app.modules.order.sherpa.excel.part12_stammdaten_tarif import part12_stammdaten_tarif
+    from app.modules.order.sherpa.excel_unused.part02_rechnungsanschrift import part02_rechnungsanschrift
+    from app.modules.order.sherpa.excel_unused.part03_bankdaten import part03_bankdaten
+    from app.modules.order.sherpa.excel_unused.part03_bankdaten_inhaber import part03_bankdaten_inhaber
+    from app.modules.order.sherpa.excel_unused.part05_lieferstelle import part05_lieferstelle
+    from app.modules.order.sherpa.excel_unused.part06_zahlerdaten import part06_zahlerdaten
+    from app.modules.order.sherpa.excel_unused.part07_marktpartner import part07_marktpartner
+    from app.modules.order.sherpa.excel_unused.part08_weitere_daten import part08_weitere_daten
+    from app.modules.order.sherpa.excel_unused.part11_sonstige_daten import part11_sonstige_daten
+    from app.modules.order.sherpa.excel_unused.part12_stammdaten_tarif import part12_stammdaten_tarif
 
     book = Workbook()
     excel_layout = "cloud"
