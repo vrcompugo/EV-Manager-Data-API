@@ -121,11 +121,11 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         return_data["heating_quote"]["has_special_condition"] = False
         return_data["bluegen_quote"]["has_special_condition"] = False
         if data.get("has_roof_reconstruction_quote") is True:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=14)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=24)
         elif data.get("has_heating_quote") is True:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=16)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=26)
         else:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=14)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=24)
         return_data["construction_week"] = int(delivery_date.strftime("%U"))
         return_data["construction_year"] = int(delivery_date.strftime("%Y"))
     if lead_data["assigned_by_id"] is not None and lead_data["assigned_by_id"] != "":
@@ -467,6 +467,10 @@ def calculate_products(data):
                 wallbox_type = "Heidelberg Energy Control. 11 kW"
             if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-pro-11kW":
                 wallbox_type = "Wallbox SENEC pro S (11kW)"
+            if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-plus":
+                wallbox_type = "Wallbox SENEC Plus (11kW)"
+            if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-premium":
+                wallbox_type = "Wallbox SENEC Premium (11kW)"
             add_direct_product(
                 label=wallbox_type,
                 category="Extra Pakete",
