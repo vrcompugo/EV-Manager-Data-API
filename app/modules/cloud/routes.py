@@ -31,9 +31,7 @@ class Items(Resource):
         calculated = calculate_cloud(data)
         if calculated is None:
             raise ApiException("error-calculating", "Error Calculating", 500)
-        print(1, data["cloud_number"])
         if "cloud_number" in data and data["cloud_number"].find("BSH") >= 0:
-            print(2, data["cloud_number"])
             offer_v2 = OfferV2.query.filter(OfferV2.number == data["cloud_number"]).first()
             if offer_v2 is not None:
                 calculated["pdf_link"] = offer_v2.pdf.longterm_public_link
