@@ -84,7 +84,7 @@ def order_confirmation_generate(quote_id):
                 '{"status": "error", "error_code": "drive_upload_failed", "message": "bitrix drive upload failed"}',
                 status=404,
                 mimetype='application/json')
-        data["pdf_link"] = get_public_link(data["pdf_id"])
+        data["pdf_link"] = get_public_link(data["pdf_id"], expire_minutes=365*24*60)
         update_quote(quote_id, {
             "pdf_link": data["pdf_link"],
             "expected_construction_week": quote["expected_construction_week"]

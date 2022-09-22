@@ -35,7 +35,7 @@ class S3File(db.Model):
         return get_file_public(str(self.uuid), self.filename, 30)
 
     @hybrid_property
-    def longterm_public_link(self, days=90):
+    def longterm_public_link(self, days=365):
         from ..file_services import encode_file_token
 
         if self.bitrix_file_id is not None and self.bitrix_file_id > 0:

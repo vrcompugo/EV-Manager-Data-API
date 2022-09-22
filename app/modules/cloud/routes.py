@@ -96,7 +96,7 @@ class Items(Resource):
         item = add_item_v2(data=offer_v2_data)
         item_dict = get_one_item_v2(item.id)
         if item.pdf is not None:
-            item_dict["pdf_link"] = item.pdf.public_link
+            item_dict["pdf_link"] = item.pdf.longterm_public_link
         if "create_all_pdfs" in data and data["create_all_pdfs"] is True:
             generate_feasibility_study_pdf(item)
             if item.feasibility_study_pdf is not None:
@@ -126,7 +126,7 @@ class User(Resource):
         if offer.address_id is not None and offer.address_id > 0:
             item_dict["address"] = get_address_data(offer.address_id)
         if offer.pdf is not None:
-            item_dict["pdf_link"] = offer.pdf.public_link
+            item_dict["pdf_link"] = offer.pdf.longterm_public_link
         if offer.feasibility_study_pdf is not None:
             item_dict["pdf_wi_link"] = offer.feasibility_study_pdf.public_link
         return {
@@ -186,7 +186,7 @@ class User(Resource):
         generate_feasibility_study_pdf(item)
         item_dict = get_one_item_v2(item.id)
         if item.pdf is not None:
-            item_dict["pdf_link"] = item.pdf.public_link
+            item_dict["pdf_link"] = item.pdf.longterm_public_link
         if item.feasibility_study_pdf is not None:
             item_dict["pdf_wi_link"] = item.feasibility_study_pdf.public_link
         return {"status": "success",
