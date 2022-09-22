@@ -133,7 +133,7 @@
           {% endif %}
         {% endfor %}
 
-        {% if statement.payments %}
+        {% if config.total_cloud_price_incl_refund != 0 %}
           <tr>
             <td>
               Cloud Jahresgebühr
