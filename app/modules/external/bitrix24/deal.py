@@ -212,8 +212,7 @@ def set_missing_values(deal):
             "construction_calendar_week_heating": 99,
             "solar_edge_guarantee_extend": "Nein",
             "has_overlandconnection": "nein",
-            "storage_model": ["kein Speicher"],
-            "construction_date": "1970-01-01"
+            "storage_model": ["kein Speicher"]
         }
         if history.data["data"].get("has_pv_quote") is True:
             cloud_type = ["Zero"]
