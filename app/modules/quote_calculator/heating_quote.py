@@ -133,6 +133,18 @@ def get_heating_products(data):
                     data=data["data"]
                 )
             add_direct_product(
+                label="WP Elektrik",
+                category=f"Online - Heizung - WP",
+                quantity=1,
+                products=data["heating_quote"]["products"]
+            )
+            add_direct_product(
+                label="WP Befestigung",
+                category=f"Online - Heizung - WP",
+                quantity=1,
+                products=data["heating_quote"]["products"]
+            )
+            add_direct_product(
                 label="Hydraulischer Abgleich",
                 category=f"Online - Heizung - WP",
                 quantity=1,
