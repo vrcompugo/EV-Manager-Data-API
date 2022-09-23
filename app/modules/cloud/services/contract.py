@@ -11,6 +11,7 @@ from dateutil.parser import parse
 from app import db
 from app.modules.cloud.models.counter_value import CounterValue
 from app.utils.model_func import to_dict
+from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.settings import get_settings
 from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.contact import get_contact
@@ -19,9 +20,9 @@ from app.modules.external.fakturia.activity import generate_invoice
 from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
-from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem, Survey
+from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem, Survey, OfferV2Item
 from .annual_statement import generate_annual_statement_pdf
-from .calculation import cloud_offer_items_by_pv_offer
+from .calculation import cloud_offer_items_by_pv_offer, calculate_cloud, get_cloud_products
 
 
 empty_values = [None, "", "0", 0]
@@ -156,6 +157,7 @@ def load_contract_data(contract_number):
     data["pv_system"]["street_nb"] = data["main_deal"].get("cloud_street_nb")
     data["pv_system"]["city"] = data["main_deal"].get("cloud_city")
     data["pv_system"]["zip"] = data["main_deal"].get("cloud_zip")
+    data["pv_system"]["pv_kwp"] = data["main_deal"].get("pv_kwp")
     data["construction_date"] = data["main_deal"].get("construction_date2")
     cloud_number = data["main_deal"].get("cloud_number").replace(" ", "")
     if data["main_deal"].get("cloud_delivery_begin") not in empty_values and cloud_number not in empty_values:
@@ -224,6 +226,9 @@ def load_contract_data(contract_number):
                 if deals[0]["stage_id"] == "C126:UC_FT4TL0":
                     annual_statement["status"].append("bsh_data")
                     annual_statement["deal"]["status"] = "Senec Werte-Abfrage BSH"
+                if deals[0]["stage_id"] == "C126:UC_DZZRWI":
+                    annual_statement["status"].append("bsh_data")
+                    annual_statement["deal"]["status"] = "Senec Wert gemeldet"
                 if deals[0]["stage_id"] == "C126:UC_XPBTZ9":
                     annual_statement["status"].append("request_consumer_data")
                     annual_statement["deal"]["status"] = "Consumer Daten erfragen"
@@ -461,12 +466,16 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
             offer_v2.calculated["ecloud_extra_price_per_kwh"] = 0.1199
 
     if offer_v2 is not None:
+        if offer_v2.data.get("old_cloud_number") not in [None, ""]:
+            config["old_cloud_number"] = offer_v2.data.get("old_cloud_number")
         data["pv_system"]["pv_kwp"] = offer_v2.calculated.get("pv_kwp")
         data["pv_system"]["storage_size"] = offer_v2.calculated.get("storage_size")
         if legacy_cloud:
             config["pdf_link"] = offer_v2.cloud_pdf.public_link
         else:
-            config["pdf_link"] = offer_v2.pdf.public_link
+            if offer_v2.pdf is not None:
+                config["pdf_link"] = offer_v2.pdf.public_link
+
         config["cloud_price"] = offer_v2.calculated.get("cloud_price")
         config["cloud_price_incl_refund"] = offer_v2.calculated.get("cloud_price_incl_refund")
         config["cloud_price_incl_refund_net"] = offer_v2.calculated.get("cloud_price_incl_refund") / 1.19
@@ -485,8 +494,11 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 "label": "Lichtcloud",
                 "usage": offer_v2.calculated.get("power_usage"),
                 "min_kwp": offer_v2.calculated.get("min_kwp_light"),
+                "min_kwp_overwrite": offer_v2.data.get("lightcloud_min_kwp_overwrite"),
                 "extra_price_per_kwh": offer_v2.calculated.get("lightcloud_extra_price_per_kwh"),
+                "extra_price_per_kwh_overwrite": offer_v2.data.get("lightcloud_extra_price_per_kwh_overwrite"),
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_light"),
+                "cloud_price_overwrite": offer_v2.data.get("lightcloud_cloud_price_overwrite"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_light_incl_refund"),
                 "smartme_number": data["main_deal"].get("smartme_number"),
                 "power_meter_number": data["main_deal"].get("delivery_counter_number"),
@@ -633,6 +645,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                         if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
                             config["ecloud"]["additional_power_meter_numbers"].append(number)
         if offer_v2.calculated.get("min_kwp_consumer") > 0:
+            config["consumer_cloud_price_overwrite"] = offer_v2.data.get("consumer_cloud_price_overwrite")
+            config["consumer_extra_price_per_kwh_overwrite"] = offer_v2.data.get("consumer_extra_price_per_kwh_overwrite")
             for index, consumer in enumerate(offer_v2.data.get("consumers")):
                 config["consumers"].append({
                     "label": f"Consumer {index + 1}",
@@ -1010,6 +1024,7 @@ def get_annual_statement_data(data, year, manuell_data):
 
     statement["pre_payments_total"] = statement["total_cloud_price_incl_refund"]
     if data.get("fakturia") is not None and data.get("fakturia").get("contractStatus") not in ["ENDED"]:
+        statement["is_fakturia"] = True
         statement["payments"] = []
         statement["pre_payments_total"] = 0
         for payment in data.get("invoices_credit_notes"):
@@ -1499,3 +1514,146 @@ def find_credit_memo_bugs():
                 amount = amount + contract_amount
     print(count)
     print(amount)
+
+
+def add_custom_config(contract_number):
+    data = get_contract_data(contract_number)
+    if data.get("main_deal") in [None, ""]:
+        return False
+    offer_v2 = OfferV2()
+    offer_v2.datetime = datetime.datetime.now()
+    offer_v2.offer_group = "cloud-offer"
+    db.session.add(offer_v2)
+    db.session.flush()
+    offer_v2.number = f"Custom-{offer_v2.id}"
+    offer_v2.data = {
+        'old_cloud_number': data.get("main_deal").get("cloud_number"),
+        "bic": "",
+        "iban": "",
+        "bankname": "",
+        "roofs": [
+            { "sqm": 1, "direction": "west_east", "pv_kwp_used": data["main_deal"].get("pv_kwp"), "pv_sqm_used": 1 }
+        ],
+        "pv_kwp": data["main_deal"].get("pv_kwp"),
+        "pv_sqm": 1,
+        "address": {
+            "name": "",
+            "first_name": "",
+            "last_name": "",
+            "firstname": "",
+            "lastname": "",
+            "street": "",
+            "street_nb": "",
+            "zip": "",
+            "city": "",
+            "email": [{ "VALUE": "", "TYPE_ID": "EMAIL", "VALUE_TYPE": "WORK" }],
+            "phone": [{ "VALUE": "", "TYPE_ID": "PHONE", "VALUE_TYPE": "WORK" }]
+        },
+        "consumers": [],
+        "module_kwp": { },
+        "emove_tarif": "none",
+        "extra_notes": "",
+        "power_usage": 1000,
+        "cloud_number": offer_v2.number,
+        "ecloud_usage": 0,
+        "has_pv_quote": True,
+        "heater_usage": 0,
+        "main_malo_id": "",
+        "assigned_user": data.get("main_deal").get("assigned_user"),
+        "extra_options": [],
+        "financing_bank": "",
+        "financing_rate": 4.89,
+        "inflation_rate": 1.2,
+        "roof_direction": "west_east",
+        "investment_type": "financing",
+        "is_new_building": False,
+        "price_guarantee": "2_years",
+        "consumers_ecloud": [],
+        "price_increase_rate": 5,
+        "consumers_lightcloud": [],
+        "conventional_power_cost_per_kwh": 31.0,
+        "tax_rate": 19
+    }
+    offer_v2.calculated = calculate_cloud(data=offer_v2.data)
+    items = get_cloud_products(data={"calculated": offer_v2.calculated, "data": offer_v2.data})
+    offer_v2.items = []
+    for item_data in items:
+        item_object = OfferV2Item()
+        item_object = set_attr_by_dict(item_object, item_data, ["id"])
+        offer_v2.items.append(item_object)
+    db.session.commit()
+    update_deal(data.get("main_deal").get("id"), {
+        "cloud_number": offer_v2.number
+    })
+    return True
+
+
+def store_custom_config(data):
+    offer_v2 = OfferV2.query.filter(OfferV2.number == data["cloud_number"]).first()
+    if offer_v2 is None:
+        return False
+    offer_data = json.loads(json.dumps(offer_v2.data))
+    for product in ["lightcloud", "heatcloud", "ecloud"]:
+        if product == "lightcloud":
+            usage_key = "power_usage"
+        if product == "heatcloud":
+            usage_key = "heater_usage"
+        if product == "ecloud":
+            usage_key = "ecloud_usage"
+        if data.get(product) not in [None, ""]:
+            offer_data[usage_key] = int(data[product].get("usage"))
+        else:
+            offer_data[usage_key] = 0
+    offer_data["consumers"] = []
+    for consumer in data["consumers"]:
+        offer_data["consumers"].append({
+            "usage": consumer["usage"],
+            "address": {}
+        })
+    offer_v2.calculated = calculate_cloud(data=offer_data)
+    offer_v2.calculated["cloud_price"] = 0
+    for product in ["lightcloud", "heatcloud", "ecloud"]:
+        product2 = product
+        if product == "lightcloud":
+            product2 = "light"
+        if data.get(product) not in [None, ""]:
+            offer_data[f"{product}_cloud_price_overwrite"] = data.get(product).get("cloud_price_overwrite")
+            if data.get(product).get("cloud_price_overwrite"):
+                offer_v2.calculated[f"cloud_price_{product2}"] = float(data[product].get("cloud_price"))
+                offer_v2.calculated[f"cloud_price_{product2}_inkl_refund"] = float(data[product].get("cloud_price"))
+
+            offer_data[f"{product}_extra_price_per_kwh_overwrite"] = data.get(product).get("extra_price_per_kwh_overwrite")
+            if data.get(product).get("extra_price_per_kwh_overwrite"):
+                offer_v2.calculated[f"{product}_extra_price_per_kwh"] = float(data[product].get("extra_price_per_kwh"))
+
+
+            offer_data[f"{product}_min_kwp_overwrite"] = data.get(product).get("min_kwp_overwrite")
+            if data.get(product).get("min_kwp_overwrite"):
+                offer_v2.calculated[f"min_kwp_{product2}"] = float(data[product].get("min_kwp"))
+        offer_v2.calculated["cloud_price"] = offer_v2.calculated["cloud_price"] + offer_v2.calculated[f"cloud_price_{product2}"]
+
+    offer_data["consumer_cloud_price_overwrite"] = data.get("consumer_cloud_price_overwrite")
+    if data.get("consumer_cloud_price_overwrite"):
+        offer_v2.calculated["cloud_price_consumer"] = float(data.get("consumer_cloud_price"))
+    offer_data["consumer_extra_price_per_kwh_overwrite"] = data.get("consumer_extra_price_per_kwh_overwrite")
+    if data.get("consumer_extra_price_per_kwh_overwrite"):
+        offer_v2.calculated["consumercloud_extra_price_per_kwh"] = float(data.get("consumercloud_extra_price_per_kwh"))
+
+
+    offer_v2.calculated["cloud_price_consumer_inkl_refund"] = offer_v2.calculated["cloud_price_consumer"]
+    offer_v2.calculated["cloud_price"] = offer_v2.calculated["cloud_price"] + offer_v2.calculated["cloud_price_consumer"]
+
+    offer_v2.calculated["cloud_price_incl_refund"] = offer_v2.calculated["cloud_price"]
+    offer_v2.calculated["cloud_price_extra"] = 0
+    offer_v2.calculated["kwp_extra"] = 0
+    items = get_cloud_products(data={"calculated": offer_v2.calculated, "data": offer_data})
+    offer_v2.items = []
+    for item_data in items:
+        item_object = OfferV2Item()
+        item_object = set_attr_by_dict(item_object, item_data, ["id"])
+        offer_v2.items.append(item_object)
+
+    offer_v2.data = offer_data
+    print(json.dumps(offer_data, indent=2))
+    db.session.commit()
+    return True

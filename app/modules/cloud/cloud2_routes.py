@@ -21,9 +21,9 @@ from app.modules.auth.jwt_parser import encode_jwt
 from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.modules.settings import get_settings
-from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus, Contract, CounterValue
+from app.models import Order, OrderSchema, SherpaInvoice, SherpaInvoiceItem, ContractStatus, Contract, CounterValue, OfferV2
 from .services.annual_statement import generate_annual_statement_pdf
-from .services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data, check_contract_data, generate_annual_report, generate_annual_report_pdf
+from .services.contract import normalize_contract_number, get_contract_data, get_annual_statement_data, check_contract_data, generate_annual_report, generate_annual_report_pdf, add_custom_config, store_custom_config
 
 
 blueprint = Blueprint("cloud2", __name__, template_folder='templates')
@@ -235,6 +235,42 @@ def store_counter_value(counter):
     storedCounter.value = int(counter.get("value"))
     db.session.commit()
     return storedCounter
+
+
+@blueprint.route("contract/<contract_number>/customConfig", methods=['POST'])
+@log_request
+def post_custom_config(contract_number):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+
+    if add_custom_config(contract_number=contract_number):
+        return Response(
+            json.dumps({"status": "success", "data": {}}),
+            status=200,
+            mimetype='application/json')
+    return Response(
+        json.dumps({"status": "failed"}),
+        status=200,
+        mimetype='application/json')
+
+
+@blueprint.route("contract/<contract_number>/customConfig", methods=['PUT'])
+@log_request
+def put_custom_config(contract_number):
+    auth_data = validate_jwt()
+    if auth_data is None or "user" not in auth_data or auth_data["user"] is None:
+        return "forbidden,", 401
+    data = request.json
+    if store_custom_config(data):
+        return Response(
+            json.dumps({"status": "success", "data": {}}),
+            status=200,
+            mimetype='application/json')
+    return Response(
+        json.dumps({"status": "failed"}),
+        status=200,
+        mimetype='application/json')
 
 
 @blueprint.route("contract/<contract_number>/check/<year>", methods=['GET'])
@@ -453,7 +489,7 @@ def get_contract_annual_statement():
     config = get_settings(section="external/bitrix24")
     auth_info = get_auth_info()
     if auth_info["user"] is None:
-        return "Forbidden"
+        return "Forbidden,"
     token = encode_jwt(auth_info, expire_minutes=600)
     return render_template("cloud2/contract/annual_statement.html", token=token)
 

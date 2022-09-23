@@ -156,7 +156,7 @@ def assign_subdeal_item(deal_id, list_index, item_index):
 def fakturia_index():
     auth_info = get_auth_info()
     if auth_info["user"] is None:
-        return "Forbidden"
+        return "Forbidden,"
     options = request.form.get("PLACEMENT_OPTIONS")
     if options is None:
         return "Keine Placement Optionen gesetzt"

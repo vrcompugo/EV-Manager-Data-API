@@ -139,9 +139,10 @@ def test_special():
 
 
 @manager.command
-def tool_fakturia_sepa_fix():
-    from app.modules.fakturia.tools import fix_sepa_files
-    fix_sepa_files()
+def set_missing_values_for_deal():
+    from app.modules.external.bitrix24.deal import get_deal, set_missing_values
+    deal = get_deal(91571)
+    set_missing_values(deal)
 
 
 @manager.option("-i", "--id", dest='deal_id', default=None)
