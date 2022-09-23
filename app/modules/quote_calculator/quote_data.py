@@ -313,7 +313,7 @@ def calculate_products(data):
             quantity = 0
             if "technik_service_packet" in data["data"]["extra_options"]:
                 quantity = 1
-            if storage_product["NAME"].find("Home 4") > 0:
+            if storage_product["NAME"].find("Home 4") >= 0:
                 technik_and_service_produkt = add_direct_product(
                     label="Service, Technik & Garantie Paket Home4",
                     category="Extra Pakete",
