@@ -15,7 +15,7 @@ def add_product(data):
             size = int(data["data"]["overwrite_storage_size"])
             is_overwrite = True
     print(is_overwrite, size, "solaredge" not in data["data"]["extra_options"], data["data"]["power_usage"])
-    if size < 10 or (size == 10 and "solaredge" not in data["data"]["extra_options"] and data["data"]["power_usage"] < 10000):
+    if size <= 10 or data["data"]["power_usage"] <= 10000:
         version = "Senec Lithium Speicher"
         stack_count = math.ceil((size - 2.5) / 2.5)
         if stack_count < 1:
