@@ -316,7 +316,15 @@ def filter_export_input_cloud(data, order: Order, consumer_index=None):
             data["has_ecloud"] = True
         data["emove_tarif"] = None
         data["cloud_files"] = []
-        data["TITLE"] = f"{order.contract_number} {order.label} | Cloud {order.contact_source}"
+        data["TITLE"] = f"{order.label} | Cloud {order.contact_source}"
+        data["cloud_price_definition"] = "aktuell"
+        if order.data.get("old_price_calculation") not in [None, ""]:
+            if order.data.get("old_price_calculation") == "l2k3fblk3baxv55":
+                data["cloud_price_definition"] = "Preisdefintion vor dem 16.12.2021"
+            if order.data.get("old_price_calculation") == "VOgcqFFeQLpV9cxOA02lzXdAYX":
+                data["cloud_price_definition"] = "Preisdefintion vor dem 01.10.2022"
+        if order.contract_number not in [None, ""]:
+            data["TITLE"] = f"{order.contract_number} {order.label} | Cloud {order.contact_source}"
         for field in ["company", "firstname", "lastname", "street", "street_nb", "city", "zip"]:
             if field in order.data["address"]:
                 data[field.upper()] = order.data["address"][field]

@@ -308,6 +308,12 @@ def get_settings(section=None, domain_raw=None):
                     "": None,
                     "3772": "ja",
                     "3774": "nein"
+                },
+                "cloud_price_definition": {
+                    "": None,
+                    "7355": "Preisdefintion vor dem 16.12.2021",
+                    "7357": "Preisdefintion vor dem 01.10.2022",
+                    "7359": "aktuell"
                 }
             },
             "product": {
@@ -537,7 +543,8 @@ def get_settings(section=None, domain_raw=None):
                     "planned_teamlead": "UF_CRM_1573567239",
                     "has_overlandconnection": "UF_CRM_1611740621",
                     "wishdate": "UF_CRM_1629723583",
-                    "old_provider_account_number": "UF_CRM_1663666539683"
+                    "old_provider_account_number": "UF_CRM_1663666539683",
+                    "cloud_price_definition": "UF_CRM_1664437829"
                 }
             },
             "quote": {
