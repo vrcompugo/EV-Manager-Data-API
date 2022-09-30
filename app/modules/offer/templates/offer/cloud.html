@@ -69,7 +69,7 @@
     {% elif offer.reseller.document_style == "eeg" %}
       {% set heading = "EEG.Cloud Konfiguration" %}
     {% else %}
-      {% set heading = "Cloud ZERO 4.0 Konfiguration" %}
+      {% set heading = "CLOUD360 Konfiguration" %}
     {% endif %}
     {% include "offer/head.html" %}
     <br>
@@ -135,48 +135,46 @@
       </b>
       <br>
     {% endif %}
-    <small>
-      Sollten Sie Förderungen in Anspruch nehmen, die die Anlagenleistung weiter als 70% reduzieren,
-      {% if offer.reseller.document_style != "bsh" -%}
-        z.B. NRW Progres,
-      {% endif %}
-      so erhöht sich die monatliche Grundgebühr der Cloud um 10,- Euro !<br>
+    Sollten Sie Förderungen in Anspruch nehmen, die die Anlagenleistung weiter als 70% reduzieren,
+    {% if offer.reseller.document_style != "bsh" -%}
+      z.B. NRW Progres,
+    {% endif %}
+    so erhöht sich die monatliche Grundgebühr der Cloud um 10,- Euro !<br>
+    <br>
+    Besteht eine „alte“ PV Anlage, so muss diese auf eine sogenannte Volleinspeisung umgestellt sein oder werden. Da
+    sonst die technische Umsetzung der Cloud nicht möglich ist. Die Umstellung auf Volleinspeisung
+    muss der Kunde bei seinem Netzbetreiber schriftlich beantragen.<br>
+    <br>
+    Die oben beschrieben Werte beziehen Sich immer auf ein vollständiges Kalenderjahr (12 Monate).<br>
+    Beginnt die Cloud nicht zum 1.1. eines Jahres, so werden die Werte anteilsmässig berechnet.<br>
+    <b>Beispiel:</b> 4000 kWh Jahresverbrauch - der Vertrag beginnt zu. 1.7 eines Jahres so kann 2000 kWh bis zum 31.12 (Abrechnungsdatum) genutzt werden.<br>
+    {% if offer.reseller.document_style != "bsh" %}
       <br>
-      Besteht eine „alte“ PV Anlage, so muss diese auf eine sogenannte Volleinspeisung umgestellt sein oder werden. Da
-      sonst die technische Umsetzung der Cloud nicht möglich ist. Die Umstellung auf Volleinspeisung
-      muss der Kunde bei seinem Netzbetreiber schriftlich beantragen.<br>
       <br>
-      Die oben beschrieben Werte beziehen Sich immer auf ein vollständiges Kalenderjahr (12 Monate).<br>
-      Beginnt die Cloud nicht zum 1.1. eines Jahres, so werden die Werte anteilsmässig berechnet.<br>
-      <b>Beispiel:</b> 4000 kWh Jahresverbrauch - der Vertrag beginnt zu. 1.7 eines Jahres so kann 2000 kWh bis zum 31.12 (Abrechnungsdatum) genutzt werden.<br>
-      {% if offer.reseller.document_style != "bsh" %}
-        <br>
-        <br>
-        Bei ausgewähltem Cloud.ZERO Paket - gilt der Minus Betrag solange die Cloud besteht, maximal jedoch bis Ende der aktuellen EEG Vergütung (bis zu 20 Jahre)
-      {% endif %}
-    </small>
+      Bei ausgewähltem Cloud.ZERO Paket - gilt der Minus Betrag solange die Cloud besteht, maximal jedoch bis Ende der aktuellen EEG Vergütung (bis zu 20 Jahre)
+    {% endif %}
 
     {% if offer.reseller.document_style != "bsh" -%}
       <div style="page-break-after: always;"></div>
     {% endif %}
 
     <h2>Verbindliche Bestellung</h2>
-    <p>Diese Ausarbeitung ist geistiges Eigentum des Unternehmens. Die Unterlagen d&uuml;rfen gem&auml;&szlig; &sect;&sect; 1,2 und 11 des UrhG und &sect; 823 BGB ohne Genehmigung des Unternehmens weder zur Ausschreibung benutzt, noch Dritten zur Einsicht &uuml;berlassen oder in sonstiger Weise inhaltlich mitgeteilt werden. Es gelten unsere allgemeinen Gesch&auml;ftsbedingungen. Gerichtsstand ist Korbach.</p>
+    <p>Diese Ausarbeitung ist geistiges Eigentum des Unternehmens. Die Unterlagen d&uuml;rfen gem&auml;&szlig; &sect;&sect; 1,2 und 11 des UrhG und &sect; 823 BGB ohne Genehmigung des Unternehmens weder zur Ausschreibung benutzt, noch Dritten zur Einsicht &uuml;berlassen oder in sonstiger Weise inhaltlich mitgeteilt werden.</p>
     <p>
       {% if offer.reseller.document_style in ["bsh", "eeg"] %}
         <b>Das Angebot ist gültig bis 30.09.2022.</b>
       {% endif %}
-      Ein verbindlicher Vertrag kommt erst zu Stande, nachdem das unterschriebene
-      {% if offer.reseller.document_style in ["bsh", "eeg"] -%}
-        Leistungsverzeichnis/
-      {%- endif -%}Angebot von der energie360 GmbH &amp; Co. KG per Auftragsbest&auml;tigung angenommen wurde. Etwaige Nebenabreden (schriftlich und/oder m&uuml;ndlich) sind unwirksam, sofern sie nicht ausdr&uuml;cklich schriftlich durch den Gesch&auml;ftsf&uuml;hrer best&auml;tigt worden sind.
+      Etwaige Nebenabreden (schriftlich und/oder m&uuml;ndlich) sind unwirksam, sofern sie nicht ausdr&uuml;cklich schriftlich durch den Gesch&auml;ftsf&uuml;hrer best&auml;tigt worden sind.
     </p>
     <p>Als Zahlungsbedingungen werden vereinbart:</p>
     <p>monatliche Zahlungsweise ab Eintritt in die Cloud</p>
     <br>
     {% if offer.reseller.document_style != "bsh" -%}
       <p>Hiermit bestelle ich | wir die angebotene Cloud. Ich bin damit unabhängig vom traditionellen Energieversorger. Die EEG Einspeisevergütung trete ich hiermit ab und „befülle“ damit meine Cloud. Somit kann ich den angegebenen Gesamtverbrauch (a) (Direkt verbrauchter Strom aus PV Anlage und oder Stromspeicher, sowie aus dem Netz/Cloud genutzter Strom) ohne Einschränkung zu jeder Tages & Nachtzeit nutzen.</p>
-      <br>
+      <p>
+        <b>Kenntnisnahme und Zustimmung</b><br>
+        Die nachfolgenden, beigefügten Allgemeinen Geschäftsbedingungen (AGB) sind wesentlicher Bestandteil dieses Vertrags. Hiermit erkläre ich mich einverstanden und habe diese gelesen, verstanden und akzeptiert.
+      </p>
       <p>Der Auftraggeber best&auml;tigt mit seiner Unterschrift ein Exemplar des Vertrages erhalten zu haben.</p>
       <p>&nbsp;</p>
       <br>
