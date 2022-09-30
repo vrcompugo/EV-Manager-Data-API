@@ -312,7 +312,7 @@ def filter_export_input_cloud(data, order: Order, consumer_index=None):
     data["cloud_price_definition"] = "aktuell"
     if order.data.get("old_price_calculation") in ["l2k3fblk3baxv55"]:
         data["cloud_price_definition"] = "Preisdefintion vor dem 16.12.2021"
-    elif order.data.get("old_price_calculation") in ["VOgcqFFeQLpV9cxOA02lzXdAYX"] or datetime.now() >= datetime(2022,10,4,0,0,0):
+    elif order.data.get("old_price_calculation") in ["VOgcqFFeQLpV9cxOA02lzXdAYX"] or datetime.now() < datetime(2022,10,4,0,0,0):
         data["cloud_price_definition"] = "Preisdefintion vor dem 01.10.2022"
     if consumer_index is None:
         if "consumers" in order.data and len(order.data["consumers"]) > 0:
