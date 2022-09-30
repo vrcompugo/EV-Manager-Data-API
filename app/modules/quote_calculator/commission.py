@@ -31,6 +31,13 @@ def calculate_commission_data(quote_data, data, quote_key=""):
                 quote_data["subtotal_net"] = quote_data["subtotal_net"] + product["total_price"]
             else:
                 print(product["NAME"])
+    if 489 in data["assigned_user"]["UF_DEPARTMENT"]:
+        quote_data["subtotal_net"] = 0
+        for product in quote_data["products"]:
+            if product["PRICE"] is not None:
+                product["PRICE"] = float(product["PRICE"]) * 1.035
+                product["total_price"] = float(product["PRICE"]) * float(product["quantity"])
+                quote_data["subtotal_net"] = quote_data["subtotal_net"] + product["total_price"]
 
     quote_data["calculated"]["unchanged_total_net"] = quote_data["subtotal_net"]
 
