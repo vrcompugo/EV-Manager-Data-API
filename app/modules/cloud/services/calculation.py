@@ -19,6 +19,7 @@ def make_float(value):
 
 
 def calculate_cloud(data):
+    changedate_oct_2022 = datetime(2022,10,4,0,0,0)
     bsh_changedate = datetime(2021,12,16,0,0,0)
     kez_changedate = datetime(2021,12,1,0,0,0)
     kez_changedate2 = datetime(2022,2,28,23,10,0)
@@ -57,10 +58,31 @@ def calculate_cloud(data):
                     "reference_number": pre_dez_2021.number,
                     "comment": "eCloud wird mit aktuellem Minderverbau berechnet"
                 })
+            pre_oct_2022 = OfferV2.query\
+                .filter(OfferV2.customer_id == offer_v2.customer_id)\
+                .filter(OfferV2.datetime < changedate_oct_2022)\
+                .order_by(OfferV2.datetime.desc())\
+                .first()
+            if pre_oct_2022 is not None:
+                pricing_options.append({
+                    "label": "Preisdefintion vor dem 01.10.2022",
+                    "value": "VOgcqFFeQLpV9cxOA02lzXdAYX",
+                    "reference_number": pre_oct_2022.number,
+                    "comment": ""
+                })
 
     settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
     settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
     settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
+    cloud_price_extra_kwp_discount_small = 8.33
+    cloud_price_extra_kwp_discount_big = 6.666666667
+    cloud_price_extra_kwp_extra_cost_2years = 8.49
+    cloud_price_extra_kwp_extra_cost_12years = 10.97
+    lightcloud_price_factor_2year = 0.6485
+    lightcloud_price_factor_2year_bsh = 0.4755
+    settings["data"]["cloud_settings"]["conventional_power_cost_per_kwh"] = 38
+    if "name" in user and user["name"].lower() == "bsh":
+        settings["data"]["cloud_settings"]["conventional_power_cost_per_kwh"] = 31
     if pre_dez_2021 is not None and pre_dez_2021.data is not None:
         if make_float(pre_dez_2021.data.get("pv_kwp")) <= make_float(data.get("pv_kwp")) and \
           make_float(pre_dez_2021.data.get("power_usage")) >= make_float(data.get("power_usage")) and \
@@ -113,6 +135,17 @@ def calculate_cloud(data):
                 { "from": 300001, "to": 749999, "value": 2999.99 },
                 { "from": 750000, "to": 9999999, "value": 3490.99 }
             ]
+    if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX"] and datetime.now() > changedate_oct_2022:
+        settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.459
+        settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.459
+        settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.209
+        settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] = 2.2445
+        settings["data"]["cloud_settings"]["conventional_power_cost_per_kwh"] = 45.9
+        lightcloud_price_factor_2year = 0.6485
+        lightcloud_price_factor_2year_bsh = 1.2970
+        cloud_price_extra_kwp_discount_small = 8 * 0.85
+        cloud_price_extra_kwp_discount_big = 6.1 * 0.85
+
 
     result = {
         "pricing_options": pricing_options,
@@ -162,11 +195,8 @@ def calculate_cloud(data):
     if data is not None and "conventional_power_cost_per_kwh" in data and data["conventional_power_cost_per_kwh"] is not None and data["conventional_power_cost_per_kwh"] != "":
         data["conventional_power_cost_per_kwh"] = float(data["conventional_power_cost_per_kwh"])
     else:
-        data["conventional_power_cost_per_kwh"] = 38
-        if "name" in user and user["name"].lower() == "bsh":
-            data["conventional_power_cost_per_kwh"] = 31
-
-    result["conventional_power_cost_per_kwh"] = data["conventional_power_cost_per_kwh"]
+        data["conventional_power_cost_per_kwh"] = settings["data"]["cloud_settings"]["conventional_power_cost_per_kwh"]
+    result["conventional_power_cost_per_kwh"] = settings["data"]["cloud_settings"]["conventional_power_cost_per_kwh"]
 
     if data.get("has_heating_quote", False) is True and data.get("heating_quote_usage_old") not in [None, ""]:
         result["conventional_price_heating_usage"] = float(data.get("heating_quote_usage_old", ""))
@@ -360,9 +390,9 @@ def calculate_cloud(data):
             if 14000 < data["power_usage"] <= 20000:
                 result["cloud_price_light"] = 99
             if "name" not in user or user["name"].lower() not in ["aev", "eeg"]:
-                result["cloud_price_light"] = data["power_usage"] * 0.4755 / 10 / 12
+                result["cloud_price_light"] = data["power_usage"] * lightcloud_price_factor_2year_bsh / 10 / 12
                 if "name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
-                    result["cloud_price_light"] = data["power_usage"] * 0.6485 / 10 / 12
+                    result["cloud_price_light"] = data["power_usage"] * lightcloud_price_factor_2year / 10 / 12
         result["conventional_price_light"] = (data["power_usage"] * result["lightcloud_extra_price_per_kwh"]) / 12
 
         result["conventional_price_light"] = (data["power_usage"] * data["conventional_power_cost_per_kwh"] / 100) / 12
@@ -513,29 +543,18 @@ def calculate_cloud(data):
             + result["min_kwp_consumer"])
         extra_kwh_ratio = 1 - (data["pv_kwp"] - result["min_kwp_emove"]) / max_kwp
         if result["kwp_extra"] >= 0:
-            if user_id_for_prices != 1:
-                result["cloud_price_extra"] = -1 * result["kwp_extra"] * 8.33
-                if result["kwp_extra"] > 10:
-                    small_extra = result["kwp_extra"] - 10
-                    result["cloud_price_extra"] = -(small_extra * 8.33 + (result["kwp_extra"] - small_extra) * 6.666666667)
-            else:
-                if result["kwp_extra"] > 10:
-                    small_extra = result["kwp_extra"] - 10
-                    result["cloud_price_extra"] = -(10 * 1000 * 0.1 + small_extra * 1000 * 0.08) / 12
-                else:
-                    result["cloud_price_extra"] = -(result["kwp_extra"] * 1000 * 0.1) / 12
-                if -4 < (result["cloud_price"] + result["cloud_price_extra"]) < 0:
-                    result["cloud_price_extra"] = -result["cloud_price"]
-                if -4 < result["cloud_price_extra"] < 0:
-                    result["cloud_price_extra"] = 0
+            result["cloud_price_extra"] = -1 * result["kwp_extra"] * cloud_price_extra_kwp_discount_small
+            if result["kwp_extra"] > 10:
+                small_extra = result["kwp_extra"] - 10
+                result["cloud_price_extra"] = -(small_extra * cloud_price_extra_kwp_discount_small + (result["kwp_extra"] - small_extra) * cloud_price_extra_kwp_discount_big)
             result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
         if result["kwp_extra"] < 0:
-            result["cloud_price_extra"] = -1 * result["kwp_extra"] * 10.97
+            result["cloud_price_extra"] = -1 * result["kwp_extra"] * cloud_price_extra_kwp_extra_cost_12years
             if "price_guarantee" in data and data["price_guarantee"] == "2_years":
-                result["cloud_price_extra"] = -1 * result["kwp_extra"] * 8.49
+                result["cloud_price_extra"] = -1 * result["kwp_extra"] * cloud_price_extra_kwp_extra_cost_2years
             result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
@@ -679,8 +698,8 @@ def get_cloud_products(data=None, offer=None):
         if offer is not None and offer.reseller is not None and offer.reseller.document_style == "bsh":
             cloud_label = "cCloud-Zero"
         else:
-            cloud_label = "Cloud ZERO 4.0"
-        cloud_description = f"<div style='float:right'><img style='width: 120px' src='{config_general['base_url']}static/zero-logo.jpg' /></div>Mit der {cloud_label} – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
+            cloud_label = "CLOUD360"
+        cloud_description = f"Mit der {cloud_label} – NULL Risiko<br>Genial einfach – einfach genial<br>Die sicherste Cloud Deutschlands.<br>Strom verbrauchen, wann immer Sie ihn brauchen."
         cloud_tarif = cloud_label
         if "document_style" in data["data"]:
             if data["data"]["document_style"] == "bsh":
@@ -718,8 +737,8 @@ def get_cloud_products(data=None, offer=None):
             + f"Vertragslaufzeit: {guarantee_runtime}<br>\n" \
             + f"garantierte Zero-Laufzeit für (a): {guarantee_runtime}<br>\n" \
             + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {light_cloud_usage} kWh<br>\n" \
-            + "<small>PV, Speicher & Netzbezug</small><br>\n" \
-            + f"<small>Bei Mehrverbrauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(lightcloud_extra_price_per_kwh * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"
+            + "PV, Speicher & Netzbezug<br>\n" \
+            + f"Mehrverbrauch unterliegt keinem Preisschutz: derzeit {numberformat(lightcloud_extra_price_per_kwh * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh"
     offer_data["items"].append(monthly_price_product_base(
         description=pv_production,
         single_price=0))
@@ -727,13 +746,13 @@ def get_cloud_products(data=None, offer=None):
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>Wärmecloud</b><br>"
                          + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['heater_usage']} kWh<br>\n"
-                         + f"<small>Bei Mehrverbrauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['heatcloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
+                         + f"Mehrverbrauch unterliegt keinem Preisschutz: derzeit {numberformat(data['calculated']['heatcloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_heatcloud"])))
     if data["calculated"]["cloud_price_ecloud"] > 0:
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>eCloud</b><br>"
                          + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {data['calculated']['ecloud_usage']} kWh Gas<br>\n"
-                         + f"<small>Bei Mehrverbrauch ist der Preis abhängig von der aktuellen Gaspreisentwicklung derzeit {numberformat(data['calculated']['ecloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
+                         + f"Mehrverbrauch unterliegt keinem Preisschutz: derzeit {numberformat(data['calculated']['ecloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh"),
             single_price=(0 if wish_price else data["calculated"]["cloud_price_ecloud"])))
     if data["calculated"]["cloud_price_consumer"] > 0:
         for (index, consumer) in enumerate(data["data"]["consumers"]):
@@ -741,7 +760,7 @@ def get_cloud_products(data=None, offer=None):
                 description=(f"<b>Consumer {index + 1}</b><br>"
                             + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {consumer['usage']} kWh<br>\n"
                             + f"Adresse: {consumer['address'].get('street')} {consumer['address'].get('street_nb')}, {consumer['address'].get('zip')} {consumer['address'].get('city')}<br>\n"
-                            + f"<small>Bei Mehrverbrauch ist der Preis abhängig von der aktuellen Strompreisentwicklung derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh</small>"),
+                            + f"Mehrverbrauch unterliegt keinem Preisschutz: derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh"),
                 single_price=(0 if wish_price else consumer["price"])))
     if data["calculated"]["cloud_price_emove"] > 0:
         emove_description = ("<b>eMove</b><br>"
@@ -769,7 +788,7 @@ def get_cloud_products(data=None, offer=None):
         offer_data["items"].append(monthly_price_product_base(
             description=("<b>Cloud Refresh</b><br>"
                          + f"Durch die Cloud Refresh abgedeckter Anteil am Jahresverbrauch (a): {int(data['calculated']['refresh_usage'])} kWh<br>\n"
-                         + f"<small>Bei Ausfall der Altanlage...</small>"),
+                         + f"Bei Ausfall der Altanlage..."),
             single_price=0))
     if data["calculated"]["cloud_price_extra"] > 0:
         offer_data["items"].append(monthly_price_product_base(
