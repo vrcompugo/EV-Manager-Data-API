@@ -5,12 +5,17 @@ from dateutil.parser import parse
 
 from app import db
 from app.models import QuoteHistory
+from app.modules.offer.models.offer_v2 import OfferV2
 from app.modules.settings import get_settings, set_settings
 from app.utils.error_handler import error_handler
 from app.modules.external.bitrix24.deal import get_deal, get_deals, update_deal
 from app.modules.external.bitrix24.lead import get_lead, add_lead
 from app.modules.external.bitrix24.task import add_task
-from app.modules.quote_calculator.routes import quote_calculator_set_defaults, quote_calculator_add_history, quote_calculator_heating_pdf_action, quote_calculator_datasheets_pdf_action, quote_calculator_quote_summary_pdf_action, quote_calculator_contract_summary_pdf_action, quote_calculator_summary_pdf_action, quote_calculator_heatpump_autogenerate_pdf_action
+from app.modules.quote_calculator.routes import quote_calculator_set_defaults, \
+    quote_calculator_add_history, quote_calculator_heating_pdf_action, \
+    quote_calculator_datasheets_pdf_action, quote_calculator_quote_summary_pdf_action, \
+    quote_calculator_contract_summary_pdf_action, quote_calculator_summary_pdf_action, \
+    quote_calculator_heatpump_autogenerate_pdf_action, quote_calculator_cloud_pdfs_action
 from app.modules.quote_calculator.quote_data import calculate_heating_usage
 
 
@@ -153,4 +158,35 @@ def cron_bsh_quote_numbers():
     set_settings("bsh_quote_numbers", config)
 
 
+def cron_follow_cloud_quote():
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 220,
+        "FILTER[STAGE_ID]": "C220:UC_38IJOQ"
+    }, force_reload=True)
+    for deal in deals:
+        recreate_quote(deal["id"])
 
+
+def recreate_quote(deal_id):
+    deal = get_deal(deal_id)
+    if deal.get("unique_identifier") in [None, ""]:
+        lead = add_lead({
+            "contact_id": deal.get("contact_id"),
+            "status_id": "UC_5NR721"
+        })
+        update_deal(deal.get("id"), {
+            "unique_identifier": lead.get("id")
+        })
+    else:
+        lead = get_lead(deal.get("unique_identifier"))
+    offer_v2 = OfferV2.query.filter(OfferV2.number == deal.get("cloud_number")).first()
+    data = json.loads(json.dumps(offer_v2.data))
+    data["has_pv_quote"] = True
+    data["document_style"] = ""
+    quote_calculator_add_history(lead["id"], data)
+    quote_calculator_cloud_pdfs_action(lead["id"])
+    history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
+    update_deal(deal.get("id"), {
+        "cloud_follow_quote_link": history.data["calculated"]["pdf_link"]
+    })

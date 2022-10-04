@@ -726,6 +726,13 @@ def generate_feasibility_study_pdf(offer: OfferV2, return_string=False):
 
 
 def roof_direction_values(direction, settings):
+    print(json.dumps(settings, indent=2))
+    settings["west"] = settings["west_east"]
+    settings["east"] = settings["west_east"]
+    settings["south_west"] = settings["south_west_east"]
+    settings["south_east"] = settings["south_west_east"]
+    settings["north_west"] = settings["north_west_east"]
+    settings["north_east"] = settings["north_west_east"]
     orientation_label = "West/Ost"
     if direction == "north":
         orientation_label = "Nord"

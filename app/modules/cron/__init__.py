@@ -213,6 +213,13 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "inactive" or section == "cron_follow_cloud_quote":
+        from app.modules.quote_calculator.cron import cron_follow_cloud_quote
+        try:
+            cron_follow_cloud_quote()
+        except Exception as e:
+            print(traceback.format_exc())
+
     if section == "productive" or section == "bsh_quote_numbers":
         from app.modules.quote_calculator.cron import cron_bsh_quote_numbers
         try:

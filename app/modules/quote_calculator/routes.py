@@ -11,8 +11,8 @@ from app.config import email_config
 from app.decorators import api_response, log_request
 from app.modules.auth import get_auth_info
 from app.modules.auth.jwt_parser import decode_jwt, encode_jwt, encode_shared_jwt
-from app.modules.external.bitrix24.lead import get_lead, update_lead
-from app.modules.external.bitrix24.deal import get_deal
+from app.modules.external.bitrix24.lead import get_lead, update_lead, add_lead
+from app.modules.external.bitrix24.deal import get_deal, update_deal
 from app.modules.external.bitrix24.quote import get_quote, add_quote, update_quote_products
 from app.modules.external.bitrix24.drive import get_file, add_file, get_folder_id, get_public_link, create_folder_path
 from app.modules.external.bitrix24.products import reload_products
@@ -427,10 +427,6 @@ def quote_calculator_extra_data_update(lead_id):
 @blueprint.route("/<lead_id>/cloud_pdfs", methods=['PUT'])
 @log_request
 def quote_calculator_cloud_pdfs(lead_id):
-    from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
-    from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf, generate_feasibility_study_short_pdf
-    from app.modules.importer.sources.bitrix24._association import find_association
-
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
         return Response(
@@ -443,6 +439,14 @@ def quote_calculator_cloud_pdfs(lead_id):
             '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
             status=404,
             mimetype='application/json')
+    return quote_calculator_cloud_pdfs_action(lead_id)
+
+
+def quote_calculator_cloud_pdfs_action(lead_id):
+    from app.modules.offer.services.pdf_generation.cloud_offer import generate_cloud_pdf
+    from app.modules.offer.services.pdf_generation.feasibility_study import generate_feasibility_study_pdf, generate_feasibility_study_short_pdf
+    from app.modules.importer.sources.bitrix24._association import find_association
+
     lead = get_lead(lead_id)
     lead_link = find_association("Lead", remote_id=lead_id)
     reseller_link = None
@@ -1206,7 +1210,17 @@ def quote_calculator_index():
     options = json.loads(options)
     if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
         deal = get_deal(options["ID"])
-        options["ID"] = deal["unique_identifier"]
+        if deal.get("unique_identifier") in [None, ""] and str(deal.get("category_id")) == "220":
+            lead = add_lead({
+                "contact_id": deal.get("contact_id"),
+                "status_id": "UC_5NR721"
+            })
+            update_deal(deal.get("id"), {
+                "unique_identifier": lead.get("id")
+            })
+            options["ID"] = lead.get("id")
+        else:
+            options["ID"] = deal["unique_identifier"]
     if "ID" not in options:
         return "Keine ID gewählt"
     token = encode_jwt(auth_info, expire_minutes=600)

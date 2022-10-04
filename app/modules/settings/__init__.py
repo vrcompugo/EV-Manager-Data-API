@@ -544,7 +544,8 @@ def get_settings(section=None, domain_raw=None):
                     "has_overlandconnection": "UF_CRM_1611740621",
                     "wishdate": "UF_CRM_1629723583",
                     "old_provider_account_number": "UF_CRM_1663666539683",
-                    "cloud_price_definition": "UF_CRM_1664437829"
+                    "cloud_price_definition": "UF_CRM_1664437829",
+                    "cloud_follow_quote_link": "UF_CRM_1662986397"
                 }
             },
             "quote": {

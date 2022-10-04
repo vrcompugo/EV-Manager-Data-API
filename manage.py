@@ -141,7 +141,8 @@ def test_special():
 @manager.command
 def get_test_deal():
     from app.modules.external.bitrix24.deal import get_deal, set_missing_values
-    print(json.dumps(get_deal(93463), indent=2))
+    from app.modules.external.bitrix24.lead import get_lead, set_missing_values
+    print(json.dumps(get_lead(63909), indent=2))
 
 
 @manager.option("-i", "--id", dest='deal_id', default=None)
