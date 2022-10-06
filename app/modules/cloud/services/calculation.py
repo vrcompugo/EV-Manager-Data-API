@@ -558,9 +558,9 @@ def calculate_cloud(data):
             if result["kwp_extra"] > 10:
                 small_extra = result["kwp_extra"] - 10
                 result["cloud_price_extra"] = -(small_extra * cloud_price_extra_kwp_discount_big + 10 * cloud_price_extra_kwp_discount_small)
-            if -2 < result["cloud_price_extra"] < 0:
+            if -5 < result["cloud_price_extra"] < 0:
                 result["cloud_price_extra"] = 0
-            if -2 < result["cloud_price"] + result["cloud_price_extra"] < 0:
+            if -5 < result["cloud_price"] + result["cloud_price_extra"] < 0:
                 result["cloud_price_extra"] = -result["cloud_price"]
             result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
