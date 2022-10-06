@@ -181,14 +181,15 @@ def recreate_quote(deal_id, create_new_quote=True):
     else:
         lead = get_lead(deal.get("unique_identifier"))
     offer_v2 = OfferV2.query.filter(OfferV2.number == deal.get("cloud_number")).first()
-    data = json.loads(json.dumps(offer_v2.data))
-    data["has_pv_quote"] = True
-    data["document_style"] = ""
-    quote_calculator_add_history(lead["id"], data)
-    if create_new_quote:
-        quote_calculator_cloud_pdfs_action(lead["id"])
-        history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
-        update_deal(deal.get("id"), {
-            "cloud_follow_quote_link": history.data["calculated"]["pdf_link"]
+    if offer_v2 is not None:
+        data = json.loads(json.dumps(offer_v2.data))
+        data["has_pv_quote"] = True
+        data["document_style"] = ""
+        quote_calculator_add_history(lead["id"], data)
+        if create_new_quote:
+            quote_calculator_cloud_pdfs_action(lead["id"])
+            history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
+            update_deal(deal.get("id"), {
+                "cloud_follow_quote_link": history.data["calculated"]["pdf_link"]
         })
     return lead
