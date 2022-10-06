@@ -529,7 +529,6 @@ def calculate_cloud(data):
                          + result["min_kwp_consumer"]
                          + result["min_kwp_emove"])
     cloud_total = result["cloud_price_light"] + result["cloud_price_heatcloud"] + result["cloud_price_ecloud"] + result["cloud_price_consumer"] + result["cloud_price_emove"]
-    print(cloud_total)
     if cloud_total > cloud_price_extra_kwp_discount_small * 10:
         cloud_total_big = cloud_total - cloud_price_extra_kwp_discount_small * 10
         result["min_zero_kwp"] = result["min_kwp"] + 10 + cloud_total_big / cloud_price_extra_kwp_discount_big
@@ -559,6 +558,10 @@ def calculate_cloud(data):
             if result["kwp_extra"] > 10:
                 small_extra = result["kwp_extra"] - 10
                 result["cloud_price_extra"] = -(small_extra * cloud_price_extra_kwp_discount_big + 10 * cloud_price_extra_kwp_discount_small)
+            if -2 < result["cloud_price_extra"] < 0:
+                result["cloud_price_extra"] = 0
+            if -2 < result["cloud_price"] + result["cloud_price_extra"] < 0:
+                result["cloud_price_extra"] = -result["cloud_price"]
             result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_ecloud"] = (result["min_kwp_ecloud"] / max_kwp) * result["cloud_price_extra"]
