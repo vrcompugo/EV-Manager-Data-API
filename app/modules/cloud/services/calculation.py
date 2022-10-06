@@ -239,7 +239,7 @@ def calculate_cloud(data):
         direction_factor_production = 1
         if "roof_direction" in data:
             direction_factor_kwp, direction_factor_production = factors_by_direction(data["roof_direction"])
-            if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            if "price_guarantee" in data and data["price_guarantee"] in ["2_years", "1_year"]:
                 if data["roof_direction"] == "north":
                     direction_factor_kwp = 1.35
                     direction_factor_production = 0.65
@@ -293,7 +293,7 @@ def calculate_cloud(data):
                     power_to_kwp_factor = 3.415
                 if 750000 <= data["power_usage"]:
                     power_to_kwp_factor = 4.681
-            if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            if "price_guarantee" in data and data["price_guarantee"] in ["2_years", "1_year"]:
                 if 0 < data["power_usage"] <= 7000:
                     power_to_kwp_factor = 1.678
                 if 7000 < data["power_usage"] <= 25000:
@@ -319,7 +319,7 @@ def calculate_cloud(data):
                 power_to_kwp_factor = 2.55
             if 750000 <= data["power_usage"]:
                 power_to_kwp_factor = 3.37
-            if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            if "price_guarantee" in data and data["price_guarantee"] in ["2_years", "1_year"]:
                 if 0 < data["power_usage"] <= 7000:
                     power_to_kwp_factor = 1.4
                 if 7000 < data["power_usage"] <= 25000:
@@ -339,18 +339,18 @@ def calculate_cloud(data):
         result["min_kwp_light"] = data["power_usage"] * power_to_kwp_factor * direction_factor_kwp / 1000
         if "name" not in user or user["name"].lower() not in ["aev", "eeg", "bsh"]:
             if "extra_options" in data:
-                if "price_guarantee" in data and data["price_guarantee"] != "2_years":
+                if "price_guarantee" in data and data["price_guarantee"] not in ["2_years", "1_year"]:
                     if "solaredge" not in data["extra_options"]:
                         data["extra_options"].append("solaredge")
                 if "solaredge" not in data["extra_options"]:
                     result["min_kwp_light"] = result["min_kwp_light"] + 0.44
         result["storage_size"] = round((data["power_usage"] / 500)) * 500 / 1000
         if "name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
-            if "price_guarantee" in data and data["price_guarantee"] != "2_years":
+            if "price_guarantee" in data and data["price_guarantee"] not in ["2_years", "1_year"]:
                 result["storage_size"] = math.ceil((data["power_usage"] / 500)) * 500 / 1000
         if result["storage_size"] < 2.5:
             result["storage_size"] = 2.5
-        if "price_guarantee" in data and data["price_guarantee"] != "2_years":
+        if "price_guarantee" in data and data["price_guarantee"] not in ["2_years", "1_year"]:
             if result["storage_size"] < 5:
                 result["storage_size"] = 5
         if data.get("has_old_pv") not in [None, ""] and data.get("has_old_pv") is True:
@@ -387,7 +387,7 @@ def calculate_cloud(data):
             lambda item: item['from'] <= data["power_usage"] and data["power_usage"] <= item['to'],
             settings["data"]["cloud_settings"]["cloud_user_prices"][str(user_id_for_prices)]
         ))[0]["value"]
-        if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+        if "price_guarantee" in data and data["price_guarantee"] in ["2_years", "1_year"]:
             if 0 < data["power_usage"] <= 5000:
                 result["cloud_price_light"] = 29
             if 5000 < data["power_usage"] <= 7000:
@@ -568,7 +568,7 @@ def calculate_cloud(data):
             result["cloud_price_extra_consumer"] = (result["min_kwp_consumer"] / max_kwp) * result["cloud_price_extra"]
         if result["kwp_extra"] < 0:
             result["cloud_price_extra"] = -1 * result["kwp_extra"] * cloud_price_extra_kwp_extra_cost_12years
-            if "price_guarantee" in data and data["price_guarantee"] == "2_years":
+            if "price_guarantee" in data and data["price_guarantee"] in ["2_years", "1_year"]:
                 result["cloud_price_extra"] = -1 * result["kwp_extra"] * cloud_price_extra_kwp_extra_cost_2years
             result["cloud_price_extra_light"] = (result["min_kwp_light"] / max_kwp) * result["cloud_price_extra"]
             result["cloud_price_extra_heatcloud"] = (result["min_kwp_heatcloud"] / max_kwp) * result["cloud_price_extra"]
@@ -637,7 +637,7 @@ def calculate_cloud(data):
     result["cloud_price_incl_refund"] = result["cloud_price"] + result["cloud_price_extra"]
 
     if "cloud_price_wish" in data and data["cloud_price_wish"] != "" and data["cloud_price_wish"] != "0" and data["cloud_price_wish"] != 0:
-        if result["cloud_price_incl_refund"] > float(data["cloud_price_wish"]) > 0 and "price_guarantee" in data and data["price_guarantee"] == "2_years":
+        if result["cloud_price_incl_refund"] > float(data["cloud_price_wish"]) > 0 and "price_guarantee" in data and data["price_guarantee"] in ["2_years", "1_year"]:
             price_diff = result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])
             result["user_one_time_cost"] = result["user_one_time_cost"] + (result["cloud_price_incl_refund"] - float(data["cloud_price_wish"])) * 24
     return result
@@ -694,6 +694,8 @@ def get_cloud_products(data=None, offer=None):
         wish_price = True
     offer_data["items"] = []
     guarantee_runtime = ""
+    if data["data"]["price_guarantee"] == "1_year":
+        guarantee_runtime = "1 Jahr"
     if data["data"]["price_guarantee"] == "2_years":
         guarantee_runtime = "2 Jahre"
     if data["data"]["price_guarantee"] == "10_years":

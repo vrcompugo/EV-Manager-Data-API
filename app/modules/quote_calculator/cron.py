@@ -185,6 +185,7 @@ def recreate_quote(deal_id, create_new_quote=True):
         data = json.loads(json.dumps(offer_v2.data))
         data["has_pv_quote"] = True
         data["document_style"] = ""
+        data["price_guarantee"] = "1_year"
         quote_calculator_add_history(lead["id"], data)
         if create_new_quote:
             quote_calculator_cloud_pdfs_action(lead["id"])
