@@ -1200,6 +1200,7 @@ def get_insign_session(data):
 
 @blueprint.route("", methods=['GET', 'POST'])
 def quote_calculator_index():
+    from app.modules.quote_calculator.cron import recreate_quote
     config = get_settings(section="external/bitrix24")
     auth_info = get_auth_info()
     if auth_info["user"] is None:
@@ -1210,14 +1211,8 @@ def quote_calculator_index():
     options = json.loads(options)
     if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
         deal = get_deal(options["ID"])
-        if deal.get("unique_identifier") in [None, ""] and str(deal.get("category_id")) == "220":
-            lead = add_lead({
-                "contact_id": deal.get("contact_id"),
-                "status_id": "UC_5NR721"
-            })
-            update_deal(deal.get("id"), {
-                "unique_identifier": lead.get("id")
-            })
+        if deal.get("unique_identifier") in [None, ""] and str(deal.get("category_id")) in ["220", "15"]:
+            lead = recreate_quote(deal["id"], create_new_quote=False)
             options["ID"] = lead.get("id")
         else:
             options["ID"] = deal["unique_identifier"]

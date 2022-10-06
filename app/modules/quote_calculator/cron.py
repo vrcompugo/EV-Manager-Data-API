@@ -168,7 +168,7 @@ def cron_follow_cloud_quote():
         recreate_quote(deal["id"])
 
 
-def recreate_quote(deal_id):
+def recreate_quote(deal_id, create_new_quote=True):
     deal = get_deal(deal_id)
     if deal.get("unique_identifier") in [None, ""]:
         lead = add_lead({
@@ -185,8 +185,10 @@ def recreate_quote(deal_id):
     data["has_pv_quote"] = True
     data["document_style"] = ""
     quote_calculator_add_history(lead["id"], data)
-    quote_calculator_cloud_pdfs_action(lead["id"])
-    history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
-    update_deal(deal.get("id"), {
-        "cloud_follow_quote_link": history.data["calculated"]["pdf_link"]
-    })
+    if create_new_quote:
+        quote_calculator_cloud_pdfs_action(lead["id"])
+        history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
+        update_deal(deal.get("id"), {
+            "cloud_follow_quote_link": history.data["calculated"]["pdf_link"]
+        })
+    return lead
