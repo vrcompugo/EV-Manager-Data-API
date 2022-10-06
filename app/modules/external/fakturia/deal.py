@@ -666,7 +666,7 @@ def _is_consumer_deal(deal):
 
 
 def get_export_data(deal, contact):
-    if deal["category_id"] == "15":
+    if deal["category_id"] in ["15", "176"]:
         return get_export_data_cloud(deal, contact)
     if deal["category_id"] == "68":
         return get_export_data_service(deal, contact)
