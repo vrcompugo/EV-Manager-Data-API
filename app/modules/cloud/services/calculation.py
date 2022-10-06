@@ -145,6 +145,17 @@ def calculate_cloud(data):
         lightcloud_price_factor_2year_bsh = 1.2970
         cloud_price_extra_kwp_discount_small = 8 * 0.85
         cloud_price_extra_kwp_discount_big = 6.1 * 0.85
+        settings["data"]["cloud_settings"]["cloud_user_prices"]["1"] = [
+            { "from": 0, "to": 7000, "value": 57.99 * 1.43110881 },
+            { "from": 7001, "to": 14500, "value": 67.99 * 1.43110881 },
+            { "from": 14501, "to": 25000, "value": 137.99 * 1.43110881 },
+            { "from": 25001, "to": 40000, "value": 239.99 * 1.43110881 },
+            { "from": 40001, "to": 52000, "value": 269.99 * 1.43110881 },
+            { "from": 52001, "to": 99000, "value": 379.99 * 1.43110881 },
+            { "from": 99001, "to": 300000, "value": 598.99 * 1.43110881 },
+            { "from": 300001, "to": 749999, "value": 2999.99 * 1.43110881 },
+            { "from": 750000, "to": 9999999, "value": 3490.99 * 1.43110881 }
+        ]
 
 
     result = {
