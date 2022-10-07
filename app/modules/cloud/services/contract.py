@@ -7,6 +7,7 @@ import json
 import calendar
 import math
 from dateutil.parser import parse
+from calendar import monthrange
 
 from app import db
 from app.modules.cloud.models.counter_value import CounterValue
@@ -801,14 +802,14 @@ def get_annual_statement_data(data, year, manuell_data):
                 statement_config[product]["delivery_begin"] = str(product_delivery_begin)
                 statement_config[product]["delivery_end"] = str(delivery_end)
                 if normalize_date(statement_config[product]["delivery_begin"]) < normalize_date(statement_config["delivery_begin"]):
-                    diff_days = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config["delivery_begin"])).days + 1
+                    diff_year = calculate_year_diff(statement_config["delivery_begin"], statement_config[product]["delivery_end"], manuell_data.get("corrected_datediff"))
                 else:
-                    diff_days = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days + 1
-                statement_config[product]["allowed_usage"] = statement_config[product]["usage"] * (diff_days / 365)
+                    diff_year = calculate_year_diff(statement_config[product]["delivery_begin"], statement_config[product]["delivery_end"], manuell_data.get("corrected_datediff"))
+                statement_config[product]["allowed_usage"] = statement_config[product]["usage"] * diff_year
 
                 if product == "lightcloud" and config.get("emove") is not None:
                     statement_config[product]["label"] = statement_config[product]["label"] + " inkl. eMove"
-                    statement_config[product]["allowed_usage_emove"] = float(statement_config["emove"]["usage"]) * (diff_days / 365)
+                    statement_config[product]["allowed_usage_emove"] = float(statement_config["emove"]["usage"]) * diff_year
                     statement_config[product]["allowed_usage"] = statement_config[product]["allowed_usage"] + statement_config[product]["allowed_usage_emove"]
                 statement_config[product]["actual_usage"] = 0
                 statement_config[product]["actual_usage_net"] = 0
@@ -964,7 +965,7 @@ def get_annual_statement_data(data, year, manuell_data):
 
                 if product == "heatcloud" and statement_config.get("measuring_concept") in ["parallel_concept"]:
                     statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"]
-                percent_year = (normalize_date(statement_config[product]["delivery_end"]) - normalize_date(statement_config[product]["delivery_begin"])).days / 365
+                percent_year = calculate_year_diff(statement_config[product]["delivery_begin"], statement_config[product]["delivery_end"], manuell_data.get("corrected_datediff"))
                 statement_config[product]["total_cloud_price"] = statement_config[product]["cloud_price"] * 12 * percent_year
                 statement_config[product]["total_cloud_price_incl_refund"] = statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
                 statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
@@ -1657,3 +1658,33 @@ def store_custom_config(data):
     print(json.dumps(offer_data, indent=2))
     db.session.commit()
     return True
+
+
+def test_calculate_year_diff():
+    print(calculate_year_diff(datetime.datetime(2021, 12, 1), datetime.datetime(2021, 12, 31)))
+    print(calculate_year_diff(datetime.datetime(2021, 12, 10), datetime.datetime(2021, 12, 31)))
+    print(calculate_year_diff(datetime.datetime(2021, 11, 1), datetime.datetime(2021, 12, 31)))
+    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 12, 31)))
+    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 12, 10)))
+    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 11, 10)))
+    print("----------------")
+    print(calculate_year_diff(datetime.datetime(2021, 12, 1), datetime.datetime(2021, 12, 31), "permonth"))
+    print(calculate_year_diff(datetime.datetime(2021, 12, 10), datetime.datetime(2021, 12, 31), "permonth"))
+    print(calculate_year_diff(datetime.datetime(2021, 11, 1), datetime.datetime(2021, 12, 31), "permonth"))
+    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 12, 31), "permonth"))
+    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 12, 10), "permonth"))
+    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 11, 10), "permonth"))
+
+
+def calculate_year_diff(start_date, end_date, corrected=False):
+    start_date = normalize_date(start_date)
+    end_date = normalize_date(end_date)
+    if corrected in [True, 1, "true"]:
+        months = (end_date.year - start_date.year) * 12 + end_date.month - start_date.month
+        end_month = monthrange(end_date.year, end_date.month)
+        start_month = monthrange(start_date.year, start_date.month)
+        if end_date.year == start_date.year and end_date.month == start_date.month:
+            return (months + (end_date.day - start_date.day + 1) / end_month[1]) / 12
+        else:
+            return (months - 1 + (start_month[1] - start_date.day - 1) / start_month[1] + end_date.day / end_month[1]) / 12
+    return (end_date - start_date).days / 365
