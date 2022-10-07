@@ -1211,7 +1211,7 @@ def quote_calculator_index():
     options = json.loads(options)
     if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
         deal = get_deal(options["ID"])
-        if deal.get("unique_identifier") in [None, ""] and str(deal.get("category_id")) in ["220", "15"]:
+        if deal.get("unique_identifier") in [None, ""] and str(deal.get("category_id")) in ["220", "15", "176"]:
             lead = recreate_quote(deal["id"], create_new_quote=False)
             options["ID"] = lead.get("id")
         else:
