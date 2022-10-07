@@ -1660,22 +1660,6 @@ def store_custom_config(data):
     return True
 
 
-def test_calculate_year_diff():
-    print(calculate_year_diff(datetime.datetime(2021, 12, 1), datetime.datetime(2021, 12, 31)))
-    print(calculate_year_diff(datetime.datetime(2021, 12, 10), datetime.datetime(2021, 12, 31)))
-    print(calculate_year_diff(datetime.datetime(2021, 11, 1), datetime.datetime(2021, 12, 31)))
-    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 12, 31)))
-    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 12, 10)))
-    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 11, 10)))
-    print("----------------")
-    print(calculate_year_diff(datetime.datetime(2021, 12, 1), datetime.datetime(2021, 12, 31), "permonth"))
-    print(calculate_year_diff(datetime.datetime(2021, 12, 10), datetime.datetime(2021, 12, 31), "permonth"))
-    print(calculate_year_diff(datetime.datetime(2021, 11, 1), datetime.datetime(2021, 12, 31), "permonth"))
-    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 12, 31), "permonth"))
-    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 12, 10), "permonth"))
-    print(calculate_year_diff(datetime.datetime(2021, 11, 10), datetime.datetime(2021, 11, 10), "permonth"))
-
-
 def calculate_year_diff(start_date, end_date, corrected=False):
     start_date = normalize_date(start_date)
     end_date = normalize_date(end_date)
