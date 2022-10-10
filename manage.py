@@ -140,8 +140,8 @@ def test_special():
 
 @manager.command
 def get_test_datediff():
-    from app.modules.cloud.services.contract import test_calculate_year_diff
-    test_calculate_year_diff()
+    from app.modules.external.bitrix24.deal import get_deal, set_missing_values
+    set_missing_values(get_deal(95027))
 
 
 @manager.command

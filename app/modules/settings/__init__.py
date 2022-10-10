@@ -120,12 +120,22 @@ def get_settings(section=None, domain_raw=None):
                     "3928": "Heizung Sonstiges",
                 },
                 "storage_size": {
+                    "1638": "keine Auswahl",
                     "154": "Senec 2,5 Li",
-                    "156": "Senec 5.0 Li",
+                    "156": "Senec 5,0 Li",
                     "158": "Senec 7,5 Li",
-                    "160": "Senec 10.0 Li",
-                    "164": "Senec 20.0 Li",
-                    "1638": "keine Auswahl"
+                    "160": "Senec 10,0 Li",
+                    "164": "Senec 20,0 Li",
+                    "7377": "Senec 4,2 kWh LI",
+                    "7379": "Senec 8,4 kWh LI",
+                    "7381": "Senec 12,6 kWh LI",
+                    "7383": "Senec 16,8 kWh LI",
+                    "7385": "Senec 21 kWh LI",
+                    "7387": "Senec 25,2 kWh LI",
+                    "7389": "Senec 29,4 kWh LI",
+                    "7391": "Senec 33,6 kWh LI",
+                    "7393": "Senec 37,8 kWh LI",
+                    "7395": "Senec 42 kWh LI"
                 },
                 "inverter_type": {
                     "166": "WR im SENEC",
@@ -226,7 +236,9 @@ def get_settings(section=None, domain_raw=None):
                     "268": "Senec Duo Hybrid",
                     "3624": "Blei",
                     "272": "kein Speicher",
-                    "7323": "muss projektiert werden"
+                    "7323": "muss projektiert werden",
+                    "7369": "Senec Home 4 AC",
+                    "7371": "Senec Home 4 Hybrid"
                 },
                 "has_emove_package": {
                     "": "nicht ausgewählt",
