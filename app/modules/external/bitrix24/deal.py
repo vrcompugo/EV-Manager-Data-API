@@ -238,8 +238,8 @@ def set_missing_values(deal):
 
             update_data["storage_model"] = ["muss projektiert werden"]
             update_data["storage_size"] = storage_size
-            home4_ac = next((item for item in history.data["products"] if item["NAME"].find("Home 4 AC") == 0), None)
-            home4_hybrid = next((item for item in history.data["products"] if item["NAME"].find("Home 4 Hybrid") == 0), None)
+            home4_ac = next((item for item in history.data["products"] if item["NAME"].find("Home 4 AC") >= 0), None)
+            home4_hybrid = next((item for item in history.data["products"] if item["NAME"].find("Home 4 Hybrid") >= 0), None)
             print(home4_ac)
             if home4_ac or home4_hybrid:
                 if home4_ac:
