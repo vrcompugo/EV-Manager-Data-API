@@ -992,7 +992,7 @@ def get_annual_statement_data(data, year, manuell_data):
 
             statement_config["consumers"] = []
             for customer_product in customer_products:
-                if statement_config.get(product) is None:
+                if statement_config.get(customer_product) is None:
                     continue
                 statement_config["consumers"].append(statement_config[customer_product])
             for product in ["heatcloud", "lightcloud", "ecloud"] + customer_products:
