@@ -135,7 +135,7 @@ def calculate_cloud(data):
                 { "from": 300001, "to": 749999, "value": 2999.99 },
                 { "from": 750000, "to": 9999999, "value": 3490.99 }
             ]
-    if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX"] and datetime.now() > changedate_oct_2022:
+    if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX", "l2k3fblk3baxv55"] and datetime.now() > changedate_oct_2022:
         settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.459
         settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.459
         settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.209
