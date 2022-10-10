@@ -161,6 +161,9 @@
     <h2>Verbindliche Bestellung</h2>
     <p>Diese Ausarbeitung ist geistiges Eigentum des Unternehmens. Die Unterlagen d&uuml;rfen gem&auml;&szlig; &sect;&sect; 1,2 und 11 des UrhG und &sect; 823 BGB ohne Genehmigung des Unternehmens weder zur Ausschreibung benutzt, noch Dritten zur Einsicht &uuml;berlassen oder in sonstiger Weise inhaltlich mitgeteilt werden.</p>
     <p>
+      {% if offer.reseller.document_style in ["bsh", "eeg"] %}
+        Das Angebot ist ab Erstellung 2 Wochen g&uuml;ltig. Ein verbindlicher Vertrag kommt erst zu Stande, nachdem das unterschriebene Leistungsverzeichnis/Angebot von der energie360 GmbH &amp; Co. KG per Auftragsbest&auml;tigung angenommen wurde.
+      {% endif %}
       Etwaige Nebenabreden (schriftlich und/oder m&uuml;ndlich) sind unwirksam, sofern sie nicht ausdr&uuml;cklich schriftlich durch den Gesch&auml;ftsf&uuml;hrer best&auml;tigt worden sind.
     </p>
     <p>Als Zahlungsbedingungen werden vereinbart:</p>
