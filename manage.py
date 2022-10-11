@@ -141,7 +141,7 @@ def test_special():
 @manager.command
 def get_test_datediff():
     from app.modules.external.bitrix24.deal import get_deal, set_missing_values
-    set_missing_values(get_deal(95027))
+    set_missing_values(get_deal(95463))
 
 
 @manager.command
