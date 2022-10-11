@@ -223,7 +223,7 @@ def set_missing_values(deal):
             if history.data["calculated"]["min_kwp_consumer"] > 0:
                 cloud_type.append("Consumer")
 
-            if history.data["data"].get("additional_cloud_contract") in ["true", True, 1]:
+            if history.data["data"].get("additional_cloud_contract") in ["true", True, 1] or history.data["data"].get("cloud_quote_type") in ["combination_quote"]:
                 if history.data["calculated"]["min_kwp_light"] > 0:
                     update_data["expansion_type"] = "ja, mit zusätzlichen Speicher"
                 else:
@@ -238,6 +238,7 @@ def set_missing_values(deal):
 
             update_data["storage_model"] = ["muss projektiert werden"]
             update_data["storage_size"] = storage_size
+            print(update_data["storage_size"])
             home4_ac = next((item for item in history.data["products"] if item["NAME"].find("Home 4 AC") >= 0), None)
             home4_hybrid = next((item for item in history.data["products"] if item["NAME"].find("Home 4 Hybrid") >= 0), None)
             if home4_ac or home4_hybrid:
@@ -247,7 +248,6 @@ def set_missing_values(deal):
                 if home4_hybrid:
                     update_data["storage_model"] = ["Senec Home 4 Hybrid"]
                     update_data["storage_size"] = [home4_ac["NAME"].replace(".", ",").replace("Home 4 Hybrid ", "") + " LI"]
-                print(update_data["storage_size"])
             update_data["cloud_type"] = cloud_type
             update_data["inverter_type"] = ["Fremdwechselrichter (Fronius bevorzugt) oder 10 Jahre Garantie WR"]
             update_data["extra_packages"] = []
