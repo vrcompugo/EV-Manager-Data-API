@@ -232,9 +232,6 @@ def set_missing_values(deal):
             stack_count = math.ceil((history.data["calculated"]["storage_size"] - 2.5) / 2.5)
             stack_count = stack_count * 2.5 + 2.5
             storage_size = [f"Senec {stack_count} Li"]
-            if stack_count in [2.5, 7.5]:
-                stack_count = str(stack_count).replace('.', ',')
-                storage_size = [f"Senec {stack_count} Li"]
 
             update_data["storage_model"] = ["muss projektiert werden"]
             update_data["storage_size"] = storage_size
