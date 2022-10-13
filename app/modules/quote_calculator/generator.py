@@ -488,7 +488,8 @@ def generate_contract_summary_pdf(lead_id, data):
         add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
     if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
         add_pdf_by_drive_id(merger, 2528314, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2528314/?&ncc=1&filename=contractingvertrag_januar_2022.pdf
-    add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
+    else:
+        add_pdf_by_drive_id(merger, 443350, cached=True)  # Contractigvertrag
     add_pdf_by_drive_id(merger, 523230, cached=True)  # Abtretungsformular
 
     merger.write(output_file)
