@@ -79,7 +79,9 @@
           <th class="table--th" width="1%">Pos.</th>
           <th class="table--th" width="1%">Gewählt</th>
           <th class="table--th">Bezeichnung</th>
-          <th class="table--th right">Opt. mtl. Preis</th>
+          {% if offer.reseller.document_style == "bsh" %}
+            <th class="table--th right">Opt. mtl. Preis</th>
+          {% endif %}
           <th class="table--th right">mtl. Beitrag</th>
         </tr>
       </thead>
@@ -102,11 +104,13 @@
               <b style="display: block;">{{ item.label }}</b>
               {{ item.description | safe }}
             </td>
-            <td class="border-right right">
-              {%- if item.quantity == 0 -%}
-                {{ item.single_price | currencyformat }}
-              {%- endif -%}
-            </td>
+            {% if offer.reseller.document_style == "bsh" %}
+              <td class="border-right right">
+                {%- if item.quantity == 0 -%}
+                  {{ item.single_price | currencyformat }}
+                {%- endif -%}
+              </td>
+            {% endif %}
             <td class="right">
               {%- if item.total_price != 0 -%}
                 {{ item.total_price | currencyformat }}
@@ -117,11 +121,11 @@
           {% if index.update({"index": index.index + 1 }) %} {% endif %}
         {% endfor %}
         <tr class="foot-line">
-          <td class="border-right right" colspan="4">Monatlicher Beitrag für (a) - ZERO:</td>
+          <td class="border-right right" colspan="{%- if offer.reseller.document_style == 'bsh' -%}4{%- else -%}3{%- endif -%}">Monatlicher Beitrag für (a) - ZERO:</td>
           <td class="right">{{ total.total | currencyformat }}</td>
         </tr>
         <tr>
-          <td class="border-right right" colspan="4">Monatliche Gesamtkosten inkl. MwSt. derzeit {{ offer.tax_rate }}%:</td>
+          <td class="border-right right" colspan="{%- if offer.reseller.document_style == 'bsh' -%}4{%- else -%}3{%- endif -%}">Monatliche Gesamtkosten inkl. MwSt. derzeit {{ offer.tax_rate }}%:</td>
           <td class="right">{{ total.total | currencyformat }}</td>
         </tr>
       </tbody>

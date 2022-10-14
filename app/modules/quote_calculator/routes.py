@@ -306,7 +306,7 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
         update_data["contact_id"] = contact_id
     update_lead(lead_id, update_data)
 
-    if "has_pv_quote" in data["data"] and data["data"]["has_pv_quote"]:
+    if "has_pv_quote" in data["data"] and data["data"]["has_pv_quote"] and data.get("total") not in [None, "", 0]:
         quote = add_quote({
             "title": f"PV {lead['contact']['first_name']} {lead['contact']['last_name']}, {lead['contact']['city']}",
             "currency_id": "EUR",
@@ -463,7 +463,7 @@ def quote_calculator_cloud_pdfs_action(lead_id):
         data["address"] = lead["contact"]
     data["total_net"] = history.data["total_net"]
     data["tax_rate"] = history.data["tax_rate"]
-    items = get_cloud_products(data={"calculated": history.data["calculated"], "data": history.data["data"]})
+    items = get_cloud_products(data={"calculated": calculated, "data": data})
     offer_v2_data = {
         "reseller_id": None,
         "offer_group": "cloud-offer",
@@ -502,16 +502,34 @@ def quote_calculator_cloud_pdfs_action(lead_id):
     history_data["calculated"]["cloud_number"] = item.number
     history_data["cloud_number"] = item.number
     item = OfferV2.query.get(item.id)
-    if item.pdf is None:
-        generate_cloud_pdf(item)
-    history_data["calculated"]["pdf_link"] = item.pdf.longterm_public_link
-    history_data["pdf_link"] = history_data["calculated"]["pdf_link"]
-    history_data["pdf_cloud_config_file_id"] = item.pdf.bitrix_file_id
-    if item.feasibility_study_pdf is None:
-        generate_feasibility_study_pdf(item)
-    history_data["calculated"]["pdf_wi_link"] = item.feasibility_study_pdf.longterm_public_link
-    history_data["pdf_wi_link"] = history_data["calculated"]["pdf_wi_link"]
-    history_data["pdf_wi_file_id"] = item.feasibility_study_pdf.bitrix_file_id
+    if history_data["data"].get("cloud_quote_type") not in ["no-cloud"]:
+        if item.pdf is None:
+            generate_cloud_pdf(item)
+        history_data["calculated"]["pdf_link"] = item.pdf.longterm_public_link
+        history_data["pdf_link"] = history_data["calculated"]["pdf_link"]
+        history_data["pdf_cloud_config_file_id"] = item.pdf.bitrix_file_id
+    if history_data["data"].get("cloud_quote_type") not in ["followup_quote", "interim_quote"]:
+        if item.feasibility_study_pdf is None:
+            generate_feasibility_study_pdf(item)
+        history_data["calculated"]["pdf_wi_link"] = item.feasibility_study_pdf.longterm_public_link
+        history_data["pdf_wi_link"] = history_data["calculated"]["pdf_wi_link"]
+        history_data["pdf_wi_file_id"] = item.feasibility_study_pdf.bitrix_file_id
+    else:
+        contract_number = None
+        deal = None
+        if history_data.get("data").get("deal_id") is not None:
+            deal = get_deal(history_data.get("data").get("deal_id"))
+            contract_number = deal.get("contract_number")
+        insign_token = encode_jwt({
+            "deal_id": history_data.get("data").get("deal_id"),
+            "contract_number": contract_number,
+            "cloud_number": history_data.get("cloud_number")
+        }, expire_minutes=21*24*60)
+        if deal is not None:
+            update_deal(deal.get("id"), {
+                "cloud_follow_quote_link": history_data["calculated"]["pdf_link"],
+                "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
+            })
     history.data = history_data
     db.session.commit()
     return {"status": "success", "data": history.data}
@@ -1209,6 +1227,7 @@ def quote_calculator_index():
     if options is None:
         return "Keine Placement Optionen gesetzt"
     options = json.loads(options)
+    deal_id = None
     if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
         deal = get_deal(options["ID"])
         if deal.get("unique_identifier") in [None, ""] and str(deal.get("category_id")) in ["220", "15", "176"]:
@@ -1216,10 +1235,11 @@ def quote_calculator_index():
             options["ID"] = lead.get("id")
         else:
             options["ID"] = deal["unique_identifier"]
+        deal_id = deal.get("id")
     if "ID" not in options:
         return "Keine ID gewählt"
     token = encode_jwt(auth_info, expire_minutes=600)
-    return render_template("quote_calculator/quote_calculator.html", token=token, lead_id=options["ID"])
+    return render_template("quote_calculator/quote_calculator.html", token=token, lead_id=options["ID"], deal_id=deal_id)
 
 
 @blueprint.route("/install", methods=['GET', 'POST'])

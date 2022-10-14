@@ -146,9 +146,15 @@ def calculate_quote(lead_id, data=None, create_quote=False):
                     data["price_guarantee"] = "2_years"
             calculated = get_cloud_calculation(data)
             return_data["calculated"] = calculated
-            return_data = calculate_products(return_data)
-            if "commission_value" in return_data["calculated"]:
-                return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["calculated"]["commission_value"]
+            if data.get("cloud_quote_type") not in ["followup_quote", "interim_quote"]:
+                return_data = calculate_products(return_data)
+                if "commission_value" in return_data["calculated"]:
+                    return_data["commission_total_value"] = return_data["commission_total_value"] + return_data["calculated"]["commission_value"]
+            else:
+                return_data["total_net"] = 0
+                return_data["total_tax"] = 0
+                return_data["total"] = 0
+                return_data["tax_rate"] = config["taxrate"]
         if "has_roof_reconstruction_quote" in data and data["has_roof_reconstruction_quote"]:
             return_data["roof_reconstruction_quote"]["calculated"] = get_roof_reconstruction_calculation(return_data)
             return_data = get_roof_reconstruction_products(return_data)
@@ -201,7 +207,7 @@ def calculate_products(data):
     try:
         add_product_pv_module(data)
         storage_product = add_product_storage(data)
-        if data["data"].get("additional_cloud_contract") in [None, "", "0", 0]:
+        if data["data"].get("cloud_quote_type") not in ["combination_quote"]:
             add_direct_product(
                 label="Cloud Fähigkeit",
                 category="Stromspeicher",
@@ -240,7 +246,7 @@ def calculate_products(data):
             quantity=1,
             products=data["products"]
         )
-        if data["data"].get("additional_cloud_contract") in [None, "", "0", 0]:
+        if data["data"].get("cloud_quote_type") not in ["combination_quote"]:
             add_direct_product(
                 label="Portal Card mit Loadingfunktion",
                 category="Optionen PV Anlage",
@@ -309,7 +315,7 @@ def calculate_products(data):
                     products=data["products"]
                 )
         technik_and_service_produkt = None
-        if data["data"].get("additional_cloud_contract") in [None, "", "0", 0] and ("technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]):
+        if data["data"].get("cloud_quote_type") not in ["combination_quote"] and ("technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]):
             quantity = 0
             if "technik_service_packet" in data["data"]["extra_options"]:
                 quantity = 1
@@ -477,16 +483,16 @@ def calculate_products(data):
                 quantity=quantity,
                 products=data["products"]
             )
-        if data["data"].get("additional_cloud_contract") in [None, "", "0", 0]:
+        if data["data"].get("cloud_quote_type") in ["combination_quote"]:
             add_direct_product(
-                label="Unser Komplettschutz",
+                label="Unser Komplettschutz EXTRA",
                 category="Optionen PV Anlage",
                 quantity=1,
                 products=data["products"]
             )
         else:
             add_direct_product(
-                label="Unser Komplettschutz EXTRA",
+                label="Unser Komplettschutz",
                 category="Optionen PV Anlage",
                 quantity=1,
                 products=data["products"]

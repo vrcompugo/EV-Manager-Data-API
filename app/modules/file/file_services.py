@@ -2,6 +2,7 @@ import datetime
 import uuid
 import jwt
 import time
+import base64
 
 from sqlalchemy import or_
 

@@ -557,7 +557,10 @@ def get_settings(section=None, domain_raw=None):
                     "wishdate": "UF_CRM_1629723583",
                     "old_provider_account_number": "UF_CRM_1663666539683",
                     "cloud_price_definition": "UF_CRM_1664437829",
-                    "cloud_follow_quote_link": "UF_CRM_1662986397"
+                    "cloud_follow_quote_link": "UF_CRM_1662986397",
+                    "cloud_follow_quote_insign_link": "UF_CRM_1662993772",
+                    "order_sign_date": "UF_CRM_61606B5866031",
+                    "collection_url": "UF_CRM_6091A2714B029"
                 }
             },
             "quote": {

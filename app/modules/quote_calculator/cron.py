@@ -4,10 +4,11 @@ import json
 from dateutil.parser import parse
 
 from app import db
+from app.utils.error_handler import error_handler
 from app.models import QuoteHistory
 from app.modules.offer.models.offer_v2 import OfferV2
 from app.modules.settings import get_settings, set_settings
-from app.utils.error_handler import error_handler
+from app.modules.auth.jwt_parser import encode_jwt
 from app.modules.external.bitrix24.deal import get_deal, get_deals, update_deal
 from app.modules.external.bitrix24.lead import get_lead, add_lead
 from app.modules.external.bitrix24.task import add_task
@@ -55,7 +56,7 @@ def cron_heatpump_auto_quote_generator():
                 })
             quote_data =  {
                 "add_bluegen_storage": False,
-                "additional_cloud_contract": None,
+                "cloud_quote_type": None,
                 "address": {},
                 "assigned_user": {},
                 "bankname": None,
@@ -129,7 +130,6 @@ def cron_bsh_quote_numbers():
     config = get_settings("bsh_quote_numbers")
     now = datetime.datetime.now()
     last_excecute = datetime.datetime(now.year, now.month, 1)
-    print(last_excecute)
     if config.get("last_excecute") is None:
         config["last_excecute"] = datetime.datetime(2022, 4, 1)
     else:
@@ -159,12 +159,29 @@ def cron_bsh_quote_numbers():
 
 
 def cron_follow_cloud_quote():
+    now = datetime.datetime.now()
+    if now.weekday() >= 5: # run only monday-friday
+        return
+    config = get_settings("last_follow_cloud_generate")
+    if config.get("last_execute") is None:
+        config["last_execute"] = datetime.datetime(2022, 10, 1)
+    else:
+        config["last_execute"] = parse(config["last_execute"])
+    if config["last_execute"].day == now.day: # run only daily
+        return
+    config["last_execute"] = str(now)
+    set_settings("last_follow_cloud_generate", config)
+
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 220,
-        "FILTER[STAGE_ID]": "C220:UC_38IJOQ"
+        "FILTER[STAGE_ID]": "C220:UC_38IJOQ",
+        "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)
-    for deal in deals:
+    for index, deal in enumerate(deals):
+        if index >= 10: # do only 10 per batch
+            break
+        print("follow quote:", deal["id"])
         recreate_quote(deal["id"])
 
 
@@ -186,11 +203,33 @@ def recreate_quote(deal_id, create_new_quote=True):
         data["has_pv_quote"] = True
         data["document_style"] = ""
         data["price_guarantee"] = "1_year"
+        is_ecloud_customer = data["ecloud_usage"] > 0
+        data["ecloud_usage"] = 0
         quote_calculator_add_history(lead["id"], data)
         if create_new_quote:
             quote_calculator_cloud_pdfs_action(lead["id"])
             history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
+            insign_token = encode_jwt({
+                "deal_id": deal.get("id"),
+                "contract_number": deal.get("contract_number"),
+                "cloud_number": history.data.get("cloud_number")
+            }, days=21*24*60)
             update_deal(deal.get("id"), {
-                "cloud_follow_quote_link": history.data["calculated"]["pdf_link"]
-        })
+                "cloud_follow_quote_link": history.calculated["pdf_link"],
+                "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
+            })
+            if False:
+                if history.calculated["pdf_link"] not in [None, "", 0]:
+                    if is_ecloud_customer:
+                        update_deal(deal.get("id"), {
+                            "stage_id": "C220:UC_8OMM5X"
+                        })
+                    else:
+                        update_deal(deal.get("id"), {
+                            "stage_id": "C220:PREPARATION"
+                        })
+                else:
+                    update_deal(deal.get("id"), {
+                        "stage_id": "C220:UC_29ZOP7"
+                    })
     return lead
