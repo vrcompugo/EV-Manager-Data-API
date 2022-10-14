@@ -175,10 +175,15 @@ def calculate_cloud(data):
             { "from": 750000, "to": 9999999, "value": 3490.99 * 1.43110881 }
         ]
 
-    power_usage = int(data["power_usage"])
-    heater_usage = int(data["heater_usage"])
+    power_usage = 0
+    heater_usage = 0
+    if data.get("power_usage") not in [None, "", 0]:
+        power_usage = int(data["power_usage"])
+    if data.get("heater_usage") not in [None, "", 0]:
+        heater_usage = int(data["heater_usage"])
     if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX", "l2k3fblk3baxv55", "CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"] and datetime.now() > changedate_oct2_2022:
-        power_usage = int(data["power_usage"]) + int(data["heater_usage"])
+        if data.get("heater_usage") not in [None, "", 0]:
+            power_usage = int(data["power_usage"]) + int(data["heater_usage"])
         heater_usage = 0
 
     result = {
