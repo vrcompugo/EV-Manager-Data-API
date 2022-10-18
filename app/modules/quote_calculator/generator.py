@@ -219,7 +219,7 @@ def generate_heating_pdf(lead_id, data, return_string=False, order_confirmation=
             else:
                 appendix_product = get_product("Nachtext Angebot 8 Tage Heizung", "Texte")
             if appendix_product is not None:
-                delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=26)
+                delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=48)
                 data["appendix"] = appendix_product["DESCRIPTION"].replace("[[delivery_week_year]]", delivery_date.strftime("%U/%Y"))
                 data["appendix_type"] = appendix_product["DESCRIPTION_TYPE"]
         header_content = render_template(
