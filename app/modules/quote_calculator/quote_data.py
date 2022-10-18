@@ -123,7 +123,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         if data.get("has_roof_reconstruction_quote") is True:
             delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=24)
         elif data.get("has_heating_quote") is True:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=26)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=48)
         else:
             delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=24)
         return_data["construction_week"] = int(delivery_date.strftime("%U"))
