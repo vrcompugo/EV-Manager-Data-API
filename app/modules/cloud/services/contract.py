@@ -1673,7 +1673,7 @@ def calculate_year_diff(start_date, end_date, corrected=False):
             print("some-month", start_date, end_date, corrected, percent)
             return percent
         else:
-            percent = (months - 1 + (start_month[1] - start_date.day - 1) / start_month[1] + end_date.day / end_month[1]) / 12
+            percent = (months - 1 + (start_month[1] - (start_date.day - 1)) / start_month[1] + end_date.day / end_month[1]) / 12
             print("different-months1", start_date, end_date, corrected, percent)
             print("different-months2", months, start_month[1], start_date.day, end_month[1], end_date.day)
             return percent
