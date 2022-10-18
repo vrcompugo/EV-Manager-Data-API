@@ -921,7 +921,7 @@ def get_annual_statement_data(data, year, manuell_data):
                             if counters is not None and len(counters) > 0 and counters2 is not None and len(counters2) > 0:
                                 statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
                                 statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters) + sum(item['usage'] for item in counters2)
-                                if product in ["ecloud", "consumer0", "consumer1", "consumer2", "consumer3", "consumer4", "consumer5"]:
+                                if product in ["ecloud"] + customer_products:
                                     statement_config[product]["actual_usage"] = statement_config[product]["actual_usage_net"]
                                 statement["counters"] = statement["counters"] + counters
                                 if manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
@@ -1005,7 +1005,7 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement["errors"].append(f"{statement_config[product]['label']} hat keinen Verbrauch")
                 if statement_config[product]["actual_usage"] < statement_config[product]["actual_usage_net"]:
                     statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist größer als der Gesamtverbrauch")
-                if statement_config[product]["actual_usage"] > 0 and statement_config[product]["actual_usage_net"]/statement_config[product]["actual_usage"] > 0.8 :
+                if statement_config[product]["actual_usage"] > 0 and statement_config[product]["actual_usage_net"]/statement_config[product]["actual_usage"] > 0.8 and product not in customer_products:
                     statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist mehr als 80% vom Gesamtverbrauch")
                 if product == "lightcloud" and statement_config[product]["actual_usage_net"] <= 0:
                     statement["warnings"].append(f"{statement_config[product]['label']} Netzbezug ist nicht vorhanden")
