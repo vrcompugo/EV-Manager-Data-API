@@ -1669,7 +1669,14 @@ def calculate_year_diff(start_date, end_date, corrected=False):
         end_month = monthrange(end_date.year, end_date.month)
         start_month = monthrange(start_date.year, start_date.month)
         if end_date.year == start_date.year and end_date.month == start_date.month:
-            return (months + (end_date.day - start_date.day + 1) / end_month[1]) / 12
+            percent = (months + (end_date.day - start_date.day + 1) / end_month[1]) / 12
+            print("some-month", start_date, end_date, corrected, percent)
+            return percent
         else:
-            return (months - 1 + (start_month[1] - start_date.day - 1) / start_month[1] + end_date.day / end_month[1]) / 12
-    return (end_date - start_date).days / 365
+            percent = (months - 1 + (start_month[1] - start_date.day - 1) / start_month[1] + end_date.day / end_month[1]) / 12
+            print("different-months1", start_date, end_date, corrected, percent)
+            print("different-months2", months, start_month[1], start_date.day, end_month[1], end_date.day)
+            return percent
+    percent = (end_date - start_date).days / 365
+    print("days", start_date, end_date, corrected, percent)
+    return percent
