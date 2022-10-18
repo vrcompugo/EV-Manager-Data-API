@@ -921,6 +921,8 @@ def get_annual_statement_data(data, year, manuell_data):
                             if counters is not None and len(counters) > 0 and counters2 is not None and len(counters2) > 0:
                                 statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
                                 statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters) + sum(item['usage'] for item in counters2)
+                                if product in ["ecloud", "consumer0", "consumer1", "consumer2", "consumer3", "consumer4", "consumer5"]:
+                                    statement_config[product]["actual_usage"] = statement_config[product]["actual_usage_net"]
                                 statement["counters"] = statement["counters"] + counters
                                 if manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
                                     statement["counters"] = statement["counters"] + counters2
@@ -1670,13 +1672,13 @@ def calculate_year_diff(start_date, end_date, corrected=False):
         start_month = monthrange(start_date.year, start_date.month)
         if end_date.year == start_date.year and end_date.month == start_date.month:
             percent = (months + (end_date.day - start_date.day + 1) / end_month[1]) / 12
-            print("some-month", start_date, end_date, corrected, percent)
+            # print("some-month", start_date, end_date, corrected, percent)
             return percent
         else:
             percent = (months - 1 + (start_month[1] - (start_date.day - 1)) / start_month[1] + end_date.day / end_month[1]) / 12
-            print("different-months1", start_date, end_date, corrected, percent)
-            print("different-months2", months, start_month[1], start_date.day, end_month[1], end_date.day)
+            # print("different-months1", start_date, end_date, corrected, percent)
+            # print("different-months2", months, start_month[1], start_date.day, end_month[1], end_date.day)
             return percent
     percent = (end_date - start_date).days / 365
-    print("days", start_date, end_date, corrected, percent)
+    # print("days", start_date, end_date, corrected, percent)
     return percent
