@@ -508,13 +508,17 @@ def quote_calculator_cloud_pdfs_action(lead_id):
         history_data["calculated"]["pdf_link"] = item.pdf.longterm_public_link
         history_data["pdf_link"] = history_data["calculated"]["pdf_link"]
         history_data["pdf_cloud_config_file_id"] = item.pdf.bitrix_file_id
+    deal = None
+    deal_id = history_data["data"].get("deal_id")
+    if deal_id is not None:
+        deal = get_deal(deal_id)
     if history_data["data"].get("cloud_quote_type") not in ["followup_quote", "interim_quote"]:
         if item.feasibility_study_pdf is None:
             generate_feasibility_study_pdf(item)
         history_data["calculated"]["pdf_wi_link"] = item.feasibility_study_pdf.longterm_public_link
         history_data["pdf_wi_link"] = history_data["calculated"]["pdf_wi_link"]
         history_data["pdf_wi_file_id"] = item.feasibility_study_pdf.bitrix_file_id
-    else:
+    if history_data["data"].get("cloud_quote_type") in ["followup_quote", "interim_quote"] or (deal is not None and deal.get("category_id") in ["15", "176"]):
         contract_number = None
         deal = None
         if history_data.get("data").get("deal_id") is not None:
