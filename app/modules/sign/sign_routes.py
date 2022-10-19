@@ -110,15 +110,13 @@ def redirect_to_insign(token):
         return render_template("sign/error.html", error="Link nicht mehr gültig")
     deal = get_deal(token_data["deal_id"])
     if deal is None:
-        return render_template("sign/error.html", error="Kein kompatibles Angebot gefunden")
+        return render_template("sign/error.html", error="Kein kompatibles Angebot gefunden. 1")
 
     lead_id = int(deal.get("unique_identifier"))
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     if history is None or history.data.get("cloud_number") != token_data["cloud_number"]:
-        return render_template("sign/error.html", error="Kein kompatibles Angebot gefunden")
+        return render_template("sign/error.html", error="Kein kompatibles Angebot gefunden. 2")
     data = json.loads(json.dumps(history.data))
-    if data.get("data").get("cloud_quote_type") not in ["followup_quote", "interim_quote"]:
-        return render_template("sign/error.html", error="Kein kompatibles Angebot gefunden")
     data["contract_number"] = deal.get("contract_number")
     data["deal_id"] = deal.get("id")
     sessionId = get_insign_session_follow_interim_quote(data)
