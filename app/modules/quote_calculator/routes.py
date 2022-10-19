@@ -531,7 +531,7 @@ def quote_calculator_cloud_pdfs_action(lead_id):
         }, expire_minutes=21*24*60)
         if deal is not None:
             update_deal(deal.get("id"), {
-                "cloud_follow_quote_link": history_data["calculated"]["pdf_link"],
+                "cloud_follow_quote_link": history_data["pdf_link"],
                 "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
             })
     history.data = history_data
