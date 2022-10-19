@@ -204,6 +204,8 @@ def recreate_quote(deal_id, create_new_quote=True):
         data["document_style"] = ""
         data["cloud_quote_type"] = "followup_quote"
         data["price_guarantee"] = "1_year"
+        data["old_price_calculation"] = ""
+        data["assigned_by_id"] = 670
         is_ecloud_customer = data.get("ecloud_usage") not in [None, "", 0, "0"]
         data["ecloud_usage"] = 0
         quote_calculator_add_history(lead["id"], data)
@@ -221,7 +223,7 @@ def recreate_quote(deal_id, create_new_quote=True):
                 "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
             })
             if False:
-                if history.calculated["pdf_link"] not in [None, "", 0]:
+                if history.data["pdf_link"] not in [None, "", 0]:
                     if is_ecloud_customer:
                         update_deal(deal.get("id"), {
                             "stage_id": "C220:UC_8OMM5X"

@@ -32,7 +32,7 @@ def calculate_cloud(data):
         user = get_logged_in_user()
     except Exception as e:
         pass
-    print(user["id"])
+    print("user_id: ", user["id"])
     user_id_for_prices = user["id"]
     if user_id_for_prices not in [113, 120, 121, 123]:
         user_id_for_prices = 1
@@ -43,6 +43,7 @@ def calculate_cloud(data):
         if 330 in data["assigned_user"]["UF_DEPARTMENT"] or "330" in data["assigned_user"]["UF_DEPARTMENT"]:
             user = {"id": 120, "name": "bsh"}
             user_id_for_prices = 120
+    print("user_id2: ", user["id"])
     pricing_options = []
     pre_dez_2021 = None
     if data.get("cloud_number") not in [None, ""]:
