@@ -43,7 +43,8 @@ def calculate_cloud(data):
         if 330 in data["assigned_user"]["UF_DEPARTMENT"] or "330" in data["assigned_user"]["UF_DEPARTMENT"]:
             user = {"id": 120, "name": "bsh"}
             user_id_for_prices = 120
-    print("user_id2: ", user["id"])
+    if str(user["id"]) == "1" and "name" not in user:
+        user["name"] = "energie360"
     pricing_options = []
     pre_dez_2021 = None
     if data.get("cloud_number") not in [None, ""]:
@@ -114,7 +115,7 @@ def calculate_cloud(data):
             pricing_option = next((i for i in pricing_options if str(i["value"]) == "l2k3fblk3baxv55"), None)
             pricing_option["comment"] = "eCloud wird mit Minderverbau nach Preisdefinition vor dem 16.12.2021 berechnet"
     if data.get("old_price_calculation", "") not in ["l2k3fblk3baxv55"]:
-        if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or (("name" in user or user["name"].lower() not in ["bsh"]) and datetime.now() > kez_changedate):
+        if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or (("name" and user or user["name"].lower() not in ["bsh"]) and datetime.now() > kez_changedate):
             settings["data"]["cloud_settings"]["extra_kwh_cost"] = "33.79"
             settings["data"]["cloud_settings"]["power_to_kwp_factor"] = 2.296
             settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
@@ -143,7 +144,7 @@ def calculate_cloud(data):
             settings["data"]["cloud_settings"]["extra_kwh_cost"] = "38.79"
             settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3879
 
-        if "name" in user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
+        if "name" and user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
             settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"] = 0.37
             settings["data"]["cloud_settings"]["cloud_user_prices"]["1"] = [
                 { "from": 0, "to": 7000, "value": 57.99 },
@@ -306,7 +307,7 @@ def calculate_cloud(data):
     if "power_usage" in data and power_usage != "" and power_usage != "0" and power_usage != 0:
         power_usage = int(power_usage)
         power_to_kwp_factor = settings["data"]["cloud_settings"]["power_to_kwp_factor"]
-        if data.get("old_price_calculation", "") != "l2k3fblk3baxv55" and (("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" in user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate)):
+        if data.get("old_price_calculation", "") != "l2k3fblk3baxv55" and (("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or ("name" and user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate)):
             if 0 < power_usage <= 7000:
                 power_to_kwp_factor = 2.06
             if 7000 < power_usage <= 25000:
@@ -319,7 +320,7 @@ def calculate_cloud(data):
                 power_to_kwp_factor = 3.315
             if 750000 <= power_usage:
                 power_to_kwp_factor = 4.381
-            if "name" in user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
+            if "name" and user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
                 if 0 < power_usage <= 7000:
                     power_to_kwp_factor = 2.16
                 if 7000 < power_usage <= 25000:
@@ -400,7 +401,7 @@ def calculate_cloud(data):
                 if "solaredge" not in data["extra_options"]:
                     result["min_kwp_light"] = result["min_kwp_light"] + 0.44
         result["storage_size"] = round((power_usage / 500)) * 500 / 1000
-        if "name" in user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
+        if "name" and user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
             if "price_guarantee" in data and data["price_guarantee"] not in ["2_years", "1_year"]:
                 result["storage_size"] = math.ceil((power_usage / 500)) * 500 / 1000
         if result["storage_size"] < 2.5:
