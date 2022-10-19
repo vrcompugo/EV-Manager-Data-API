@@ -95,6 +95,7 @@ def calculate_cloud(data):
     cloud_price_extra_kwp_extra_cost_12years = 10.97
     lightcloud_price_factor_2year = 0.6485
     lightcloud_price_factor_2year_bsh = 0.4755
+    print(lightcloud_price_factor_2year)
     cloud_product_price_modifier = 1
     cloud_product_price_min_increase = 0
     if data.get("cloud_quote_type") in ["followup_quote", "interim_quote"]:
@@ -176,6 +177,7 @@ def calculate_cloud(data):
             { "from": 300001, "to": 749999, "value": 2999.99 * 1.43110881 },
             { "from": 750000, "to": 9999999, "value": 3490.99 * 1.43110881 }
         ]
+    print("3", lightcloud_price_factor_2year, lightcloud_price_factor_2year_bsh)
 
     power_usage = 0
     heater_usage = 0
@@ -454,9 +456,9 @@ def calculate_cloud(data):
             if 14000 < power_usage <= 20000:
                 result["cloud_price_light"] = 99
             if "name" not in user or user["name"].lower() not in ["aev", "eeg"]:
-                result["cloud_price_light"] = power_usage * lightcloud_price_factor_2year_bsh / 10 / 12
-                if "name" in user and user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
-                    result["cloud_price_light"] = power_usage * lightcloud_price_factor_2year / 10 / 12
+                result["cloud_price_light"] = power_usage * lightcloud_price_factor_2year / 10 / 12
+                if "name" in user and user["name"].lower() in ["bsh"]:
+                    result["cloud_price_light"] = power_usage * lightcloud_price_factor_2year_bsh / 10 / 12
         if result["cloud_price_light"] * (cloud_product_price_modifier - 1) > cloud_product_price_min_increase:
             result["cloud_price_light"] = result["cloud_price_light"] * cloud_product_price_modifier
         else:
