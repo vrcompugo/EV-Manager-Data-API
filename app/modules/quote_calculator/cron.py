@@ -203,7 +203,7 @@ def recreate_quote(deal_id, create_new_quote=True):
         data["has_pv_quote"] = True
         data["document_style"] = ""
         data["price_guarantee"] = "1_year"
-        is_ecloud_customer = data["ecloud_usage"] > 0
+        is_ecloud_customer = data.get("ecloud_usage") not in [None, "", 0, "0"]
         data["ecloud_usage"] = 0
         quote_calculator_add_history(lead["id"], data)
         if create_new_quote:
