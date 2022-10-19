@@ -202,6 +202,7 @@ def recreate_quote(deal_id, create_new_quote=True):
         data = json.loads(json.dumps(offer_v2.data))
         data["has_pv_quote"] = True
         data["document_style"] = ""
+        data["cloud_quote_type"] = "followup_quote"
         data["price_guarantee"] = "1_year"
         is_ecloud_customer = data.get("ecloud_usage") not in [None, "", 0, "0"]
         data["ecloud_usage"] = 0
