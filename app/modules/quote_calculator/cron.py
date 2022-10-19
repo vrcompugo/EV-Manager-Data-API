@@ -182,7 +182,7 @@ def cron_follow_cloud_quote():
         if index >= 10: # do only 10 per batch
             break
         print("follow quote:", deal["id"])
-        recreate_quote(deal["id"])
+        recreate_quote(deal["id"], True)
 
 
 def recreate_quote(deal_id, create_new_quote=True):
@@ -209,6 +209,7 @@ def recreate_quote(deal_id, create_new_quote=True):
         quote_calculator_add_history(lead["id"], data)
         if create_new_quote:
             quote_calculator_cloud_pdfs_action(lead["id"])
+            quote_calculator_quote_summary_pdf_action(lead["id"])
             history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
             insign_token = encode_jwt({
                 "deal_id": deal.get("id"),
