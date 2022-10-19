@@ -198,42 +198,46 @@ def recreate_quote(deal_id, create_new_quote=True):
     else:
         lead = get_lead(deal.get("unique_identifier"))
     offer_v2 = OfferV2.query.filter(OfferV2.number == deal.get("cloud_number")).first()
-    if offer_v2 is not None:
-        data = json.loads(json.dumps(offer_v2.data))
-        data["has_pv_quote"] = True
-        data["document_style"] = ""
-        data["cloud_quote_type"] = "followup_quote"
-        data["price_guarantee"] = "1_year"
-        data["old_price_calculation"] = ""
-        data["assigned_by_id"] = 670
-        is_ecloud_customer = data.get("ecloud_usage") not in [None, "", 0, "0"]
-        data["ecloud_usage"] = 0
-        quote_calculator_add_history(lead["id"], data)
-        if create_new_quote:
-            quote_calculator_cloud_pdfs_action(lead["id"])
-            quote_calculator_quote_summary_pdf_action(lead["id"])
-            history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
-            insign_token = encode_jwt({
-                "deal_id": deal.get("id"),
-                "contract_number": deal.get("contract_number"),
-                "cloud_number": history.data.get("cloud_number")
-            }, expire_minutes=21*24*60)
-            update_deal(deal.get("id"), {
-                "cloud_follow_quote_link": history.data["pdf_link"],
-                "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
-            })
-            if False:
-                if history.data["pdf_link"] not in [None, "", 0]:
-                    if is_ecloud_customer:
-                        update_deal(deal.get("id"), {
-                            "stage_id": "C220:UC_8OMM5X"
-                        })
-                    else:
-                        update_deal(deal.get("id"), {
-                            "stage_id": "C220:PREPARATION"
-                        })
+    if offer_v2 is None:
+        update_deal(deal.get("id"), {
+            "stage_id": "C220:UC_0T1K3F"
+        })
+        return lead
+    data = json.loads(json.dumps(offer_v2.data))
+    data["has_pv_quote"] = True
+    data["document_style"] = ""
+    data["cloud_quote_type"] = "followup_quote"
+    data["price_guarantee"] = "1_year"
+    data["old_price_calculation"] = ""
+    data["assigned_by_id"] = 670
+    is_ecloud_customer = data.get("ecloud_usage") not in [None, "", 0, "0"]
+    data["ecloud_usage"] = 0
+    quote_calculator_add_history(lead["id"], data)
+    if create_new_quote:
+        quote_calculator_cloud_pdfs_action(lead["id"])
+        quote_calculator_quote_summary_pdf_action(lead["id"])
+        history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
+        insign_token = encode_jwt({
+            "deal_id": deal.get("id"),
+            "contract_number": deal.get("contract_number"),
+            "cloud_number": history.data.get("cloud_number")
+        }, expire_minutes=21*24*60)
+        update_deal(deal.get("id"), {
+            "cloud_follow_quote_link": history.data["pdf_link"],
+            "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
+        })
+        if False:
+            if history.data["pdf_link"] not in [None, "", 0]:
+                if is_ecloud_customer:
+                    update_deal(deal.get("id"), {
+                        "stage_id": "C220:UC_8OMM5X"
+                    })
                 else:
                     update_deal(deal.get("id"), {
-                        "stage_id": "C220:UC_29ZOP7"
+                        "stage_id": "C220:PREPARATION"
                     })
+            else:
+                update_deal(deal.get("id"), {
+                    "stage_id": "C220:UC_29ZOP7"
+                })
     return lead
