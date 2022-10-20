@@ -66,7 +66,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
             "financing_rate": 3.75,
             "module_type": default_module_type,
             "investment_type": "financing",
-            "price_guarantee": "12_years",
+            "price_guarantee": "2_years",
             "roof_direction": "west_east",
             "module_type": default_module_type,
             "roofs": [{
