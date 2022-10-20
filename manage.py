@@ -139,9 +139,9 @@ def test_special():
 
 
 @manager.command
-def get_test_datediff():
-    from app.modules.external.bitrix24.deal import get_deal, set_missing_values
-    set_missing_values(get_deal(95463))
+def get_test_recreate_quote():
+    from app.modules.quote_calculator.cron import recreate_quote
+    recreate_quote(96881, create_new_quote=True)
 
 
 @manager.command

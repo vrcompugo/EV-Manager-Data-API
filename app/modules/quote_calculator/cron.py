@@ -212,6 +212,15 @@ def recreate_quote(deal_id, create_new_quote=True):
     data["assigned_by_id"] = 670
     is_ecloud_customer = data.get("ecloud_usage") not in [None, "", 0, "0"]
     data["ecloud_usage"] = 0
+    if data.get("heater_usage") not in [None, "", 0]:
+        reserve_light = offer_v2.calculated["storage_size"] * 1000 - int(data.get("power_usage"))
+        if reserve_light > 0:
+            if int(data["heater_usage"]) > reserve_light:
+                data["power_usage"] = int(data.get("power_usage")) + reserve_light
+                data["power_extra_usage"] = int(data["heater_usage"]) - reserve_light
+            else:
+                data["power_usage"] = int(data.get("power_usage")) + int(data["heater_usage"])
+            data["heater_usage"] = 0
     quote_calculator_add_history(lead["id"], data)
     if create_new_quote:
         quote_calculator_cloud_pdfs_action(lead["id"])
