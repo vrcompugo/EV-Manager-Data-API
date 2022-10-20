@@ -200,7 +200,7 @@ def recreate_quote(deal_id, create_new_quote=True):
     offer_v2 = OfferV2.query.filter(OfferV2.number == deal.get("cloud_number")).first()
     if offer_v2 is None:
         update_deal(deal.get("id"), {
-            "stage_id": "C220:UC_0T1K3F"
+            "stage_id": "C220:UC_29ZOP7"
         })
         return lead
     data = json.loads(json.dumps(offer_v2.data))
