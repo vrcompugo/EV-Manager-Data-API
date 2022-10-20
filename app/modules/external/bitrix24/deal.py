@@ -345,6 +345,8 @@ def set_missing_values(deal):
             and history.data["data"].get("investment_type_heating") == "financing" \
             and history.data["data"].get("financing_bank_heating") == "energie360":
             update_data["energie360_financing"] = "Ja"
+        if len(update_data["extra_packages2"]) == 0:
+            update_data["extra_packages2"] = ["keine Auswahl"]
         update_deal(deal["id"], update_data)
 
 
