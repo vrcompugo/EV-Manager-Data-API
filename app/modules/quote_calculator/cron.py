@@ -179,13 +179,16 @@ def cron_follow_cloud_quote():
         "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)
     for index, deal in enumerate(deals):
-        if index >= 10: # do only 10 per batch
+        if index >= 20: # do only 10 per batch
             break
         print("follow quote:", deal["id"])
-        recreate_quote(deal["id"], True)
+        if index >= 10: # do only 10 per batch
+            recreate_quote(deal["id"], create_new_quote=True, move_phase=False)
+        else:
+            recreate_quote(deal["id"], create_new_quote=True, move_phase=True)
 
 
-def recreate_quote(deal_id, create_new_quote=True):
+def recreate_quote(deal_id, create_new_quote=True, move_phase=False):
     deal = get_deal(deal_id)
     if deal.get("unique_identifier") in [None, ""]:
         lead = add_lead({
@@ -236,14 +239,15 @@ def recreate_quote(deal_id, create_new_quote=True):
             "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
         })
         if history.data["pdf_link"] not in [None, "", 0]:
-            if is_ecloud_customer:
-                update_deal(deal.get("id"), {
-                    "stage_id": "C220:UC_8OMM5X"
-                })
-            else:
-                update_deal(deal.get("id"), {
-                    "stage_id": "C220:PREPARATION"
-                })
+            if move_phase:
+                if is_ecloud_customer:
+                    update_deal(deal.get("id"), {
+                        "stage_id": "C220:UC_8OMM5X"
+                    })
+                else:
+                    update_deal(deal.get("id"), {
+                        "stage_id": "C220:PREPARATION"
+                    })
         else:
             update_deal(deal.get("id"), {
                 "stage_id": "C220:UC_29ZOP7"
