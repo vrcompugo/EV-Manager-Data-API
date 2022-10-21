@@ -235,18 +235,17 @@ def recreate_quote(deal_id, create_new_quote=True):
             "cloud_follow_quote_link": history.data["pdf_link"],
             "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
         })
-        if False:
-            if history.data["pdf_link"] not in [None, "", 0]:
-                if is_ecloud_customer:
-                    update_deal(deal.get("id"), {
-                        "stage_id": "C220:UC_8OMM5X"
-                    })
-                else:
-                    update_deal(deal.get("id"), {
-                        "stage_id": "C220:PREPARATION"
-                    })
+        if history.data["pdf_link"] not in [None, "", 0]:
+            if is_ecloud_customer:
+                update_deal(deal.get("id"), {
+                    "stage_id": "C220:UC_8OMM5X"
+                })
             else:
                 update_deal(deal.get("id"), {
-                    "stage_id": "C220:UC_29ZOP7"
+                    "stage_id": "C220:PREPARATION"
                 })
+        else:
+            update_deal(deal.get("id"), {
+                "stage_id": "C220:UC_29ZOP7"
+            })
     return lead
