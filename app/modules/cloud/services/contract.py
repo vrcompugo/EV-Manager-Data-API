@@ -1598,6 +1598,7 @@ def store_custom_config(data):
     if offer_v2 is None:
         return False
     offer_data = json.loads(json.dumps(offer_v2.data))
+    offer_data["cloud_quote_type"] = "custom_config"
     for product in ["lightcloud", "heatcloud", "ecloud"]:
         if product == "lightcloud":
             usage_key = "power_usage"
