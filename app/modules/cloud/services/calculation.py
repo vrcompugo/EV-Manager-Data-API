@@ -186,7 +186,9 @@ def calculate_cloud(data):
         power_usage = int(data["power_usage"])
     if data.get("heater_usage") not in [None, "", 0]:
         heater_usage = int(data["heater_usage"])
-    if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX", "l2k3fblk3baxv55", "CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"] and datetime.now() > changedate_oct2_2022 and data.get("cloud_quote_type") not in ["combination_quote", "interim_quote"]:
+    if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX", "l2k3fblk3baxv55", "CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"] \
+        and datetime.now() > changedate_oct2_2022 \
+        and data.get("cloud_quote_type") not in ["combination_quote", "interim_quote", "custom_config"]:
         if data.get("heater_usage") not in [None, "", 0]:
             power_usage = int(data["power_usage"]) + int(data["heater_usage"])
         heater_usage = 0

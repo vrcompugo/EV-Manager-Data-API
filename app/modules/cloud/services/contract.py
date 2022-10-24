@@ -1532,6 +1532,7 @@ def add_custom_config(contract_number):
     offer_v2.number = f"Custom-{offer_v2.id}"
     offer_v2.data = {
         'old_cloud_number': data.get("main_deal").get("cloud_number"),
+        "cloud_quote_type": "custom_config",
         "bic": "",
         "iban": "",
         "bankname": "",
