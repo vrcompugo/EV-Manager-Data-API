@@ -5,7 +5,16 @@ from .utils import get_data_value
 
 
 def part02_rechnungsanschrift(wb, excel_layout, deal, contact):
-    wb["Neukunden"]["S" + str(wb.current_row)] = deal.get("contract_number")
+    contract_number = deal.get("contract_number")
+    if deal.get("is_cloud_consumer"):
+        contract_number = contract_number + "c1"
+        if deal.get("title").find(deal.get("contract_number") + "c2") >= 0:
+            contract_number = deal.get("contract_number") + "c2"
+    if deal.get("is_cloud_heatcloud"):
+        contract_number = contract_number + "w1"
+    if deal.get("is_cloud_ecloud"):
+        contract_number = contract_number + "ec"
+    wb["Neukunden"]["S" + str(wb.current_row)] = contract_number
     wb["Neukunden"]["U" + str(wb.current_row)] = contact.get("company")
     wb["Neukunden"]["X" + str(wb.current_row)] = "Frau" if contact.get("salutation") == "ms" else "Herr"
     wb["Neukunden"]["Y" + str(wb.current_row)] = ""  # title
