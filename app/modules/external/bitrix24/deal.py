@@ -243,7 +243,7 @@ def set_missing_values(deal):
                     update_data["storage_size"] = [home4_ac["NAME"].replace(".", ",").replace("Home 4 AC ", "") + " LI"]
                 if home4_hybrid is not None:
                     update_data["storage_model"] = ["Senec Home 4 Hybrid"]
-                    update_data["storage_size"] = [home4_ac["NAME"].replace(".", ",").replace("Home 4 Hybrid ", "") + " LI"]
+                    update_data["storage_size"] = [home4_hybrid["NAME"].replace(".", ",").replace("Home 4 Hybrid ", "") + " LI"]
             update_data["cloud_type"] = cloud_type
             update_data["inverter_type"] = ["Fremdwechselrichter (Fronius bevorzugt) oder 10 Jahre Garantie WR"]
             update_data["extra_packages"] = []
