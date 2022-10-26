@@ -235,14 +235,13 @@ def set_missing_values(deal):
 
             update_data["storage_model"] = ["muss projektiert werden"]
             update_data["storage_size"] = storage_size
-            print(update_data["storage_size"])
             home4_ac = next((item for item in history.data["products"] if item["NAME"].find("Home 4 AC") >= 0), None)
             home4_hybrid = next((item for item in history.data["products"] if item["NAME"].find("Home 4 Hybrid") >= 0), None)
-            if home4_ac or home4_hybrid:
-                if home4_ac:
+            if home4_ac is not None or home4_hybrid is not None:
+                if home4_ac is not None:
                     update_data["storage_model"] = ["Senec Home 4 AC"]
                     update_data["storage_size"] = [home4_ac["NAME"].replace(".", ",").replace("Home 4 AC ", "") + " LI"]
-                if home4_hybrid:
+                if home4_hybrid is not None:
                     update_data["storage_model"] = ["Senec Home 4 Hybrid"]
                     update_data["storage_size"] = [home4_ac["NAME"].replace(".", ",").replace("Home 4 Hybrid ", "") + " LI"]
             update_data["cloud_type"] = cloud_type
