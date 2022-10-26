@@ -194,13 +194,15 @@ def calculate_products(data):
     if data["data"].get("roofs") not in [None, ""]:
         for roof in data["data"]["roofs"]:
             if roof.get("pv_kwp_used", 0) not in [None, 0] and roof.get("pv_kwp_used", 0) > 0:
-                print(roof.get("roof_topping"))
                 if roof.get("roof_topping") in ["Schieferdeckung"]:
                     kwp_special_roof = kwp_special_roof + roof.get("pv_kwp_used", 0)
                     kwp_normal_roof = kwp_normal_roof - roof.get("pv_kwp_used", 0)
                 if roof.get("roof_topping") in ["Trapezblech"]:
                     kwp_cheap_roof = kwp_cheap_roof + roof.get("pv_kwp_used", 0)
                     kwp_normal_roof = kwp_normal_roof - roof.get("pv_kwp_used", 0)
+
+        kwp_special_roof = round(kwp_special_roof, 2)
+        kwp_normal_roof = round(kwp_normal_roof, 2)
 
     if kwp == 0:
         return data
