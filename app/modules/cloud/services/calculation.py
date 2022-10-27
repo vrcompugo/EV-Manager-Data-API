@@ -571,7 +571,7 @@ def calculate_cloud(data):
             else:
                 result["cloud_price_emove"] = result["cloud_price_emove"] + cloud_product_price_min_increase
 
-    if data.get("cloud_quote_type") in ["followup_quote", "interim_quote"] and data.get("power_extra_usage") not in [None, "", 0] and int(data.get("power_extra_usage")) > 0:
+    if data.get("power_extra_usage") not in [None, "", 0] and int(data.get("power_extra_usage")) > 0:
         result["power_extra_usage"] = int(data.get("power_extra_usage"))
         result["cloud_price_light_extra"] = result["power_extra_usage"] * result["lightcloud_extra_price_per_kwh"] / 12
         print("sad", data.get("cloud_quote_type"), data.get("power_extra_usage"), result["cloud_price_light_extra"], result["lightcloud_extra_price_per_kwh"])

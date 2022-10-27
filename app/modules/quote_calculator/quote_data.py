@@ -26,23 +26,34 @@ from .commission import calculate_commission_data
 
 def calculate_quote(lead_id, data=None, create_quote=False):
     module_type_options = []
+    module_type_options_archive = []
     config = get_settings(section="external/bitrix24")
     categories = config["product"]["categories"]
     products = get_product_list()
     default_module_type = None
     for product in products:
-        if str(product["SECTION_ID"]) == str(categories["PV Module"]):
+        if str(product["SECTION_ID"]) in [str(categories["PV Module"]), str(categories["PV Module (Archiv)"])]:
             if default_module_type is None and product["NAME"].find("SENEC.SOLAR 380 Watt") > 0:
                 default_module_type = int(product["ID"])
             if 'kwp' in product:
-                module_type_options.append(
-                    {
-                        'value': int(product["ID"]),
-                        'label': product["NAME"],
-                        'kWp': product['kwp'],
-                        'qm': product['qm']
-                    }
-                )
+                if str(product["SECTION_ID"]) in [str(categories["PV Module"])]:
+                    module_type_options.append(
+                        {
+                            'value': int(product["ID"]),
+                            'label': product["NAME"],
+                            'kWp': product['kwp'],
+                            'qm': product['qm']
+                        }
+                    )
+                if str(product["SECTION_ID"]) in [str(categories["PV Module (Archiv)"])]:
+                    module_type_options_archive.append(
+                        {
+                            'value': int(product["ID"]),
+                            'label': product["NAME"],
+                            'kWp': product['kwp'],
+                            'qm': product['qm']
+                        }
+                    )
     lead_data = get_lead(lead_id)
     if lead_data["source_id"] == "23":
         deal_datas = get_deals({
@@ -84,7 +95,8 @@ def calculate_quote(lead_id, data=None, create_quote=False):
             "min_storage_size": 0
         },
         "select_options": {
-            "module_type_options": module_type_options
+            "module_type_options": module_type_options,
+            "module_type_options_archive": module_type_options_archive
         },
         "pdf_link": "",
         "pdf_quote_link": "",

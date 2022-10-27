@@ -37,7 +37,7 @@ def reload_products(filters=None, force=False):
             for item in data["result"]:
                 if item["NAME"] == "Abfallentsorgung":
                     print(str(item["SECTION_ID"]))
-                if str(item["SECTION_ID"]) == str(categories["PV Module"]):
+                if str(item["SECTION_ID"]) in [str(categories["PV Module"]), str(categories["PV Module (Archiv)"])]:
                     kwp = re.search(r"(.*) ([0-9]+) Watt(.*)\(([0-9,]+)qm\)$", item["NAME"])
                     if kwp is not None and kwp.group(2) != "":
                         item["kwp"] = int(kwp.group(2)) / 1000

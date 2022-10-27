@@ -349,6 +349,7 @@ def get_settings(section=None, domain_raw=None):
                     "Optionen PV Anlage": 262,
                     "Extra Pakete": 292,
                     "PV Module": 260,
+                    "PV Module (Archiv)": 497,
                     "Stromspeicher": 264,
                     "Brauchwasserwärmepumpe": 150,
                     "Wärmepumpe": 282,
