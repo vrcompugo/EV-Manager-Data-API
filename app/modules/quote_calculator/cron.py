@@ -202,10 +202,11 @@ def recreate_quote(deal_id, create_new_quote=True, move_phase=False):
         lead = get_lead(deal.get("unique_identifier"))
     offer_v2 = OfferV2.query.filter(OfferV2.number == deal.get("cloud_number")).first()
     if offer_v2 is None:
-        update_deal(deal.get("id"), {
-            "stage_id": "C220:UC_29ZOP7"
-        })
-        return lead
+        if str(deal.get("category_id")) == "220":
+            update_deal(deal.get("id"), {
+                "stage_id": "C220:UC_29ZOP7"
+            })
+            return lead
     data = json.loads(json.dumps(offer_v2.data))
     data["has_pv_quote"] = True
     data["document_style"] = ""
