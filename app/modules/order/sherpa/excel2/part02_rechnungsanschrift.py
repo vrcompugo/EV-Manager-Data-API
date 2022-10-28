@@ -16,6 +16,8 @@ def part02_rechnungsanschrift(wb, excel_layout, deal, contact):
             contract_number = contract_number + "w1"
         if deal.get("is_cloud_ecloud") in [True, "true", 1, "1"]:
             contract_number = contract_number + "ec"
+    else:
+        contract_number = deal.get("contract_number")
     wb["Neukunden"]["S" + str(wb.current_row)] = contract_number
     wb["Neukunden"]["U" + str(wb.current_row)] = contact.get("company")
     wb["Neukunden"]["X" + str(wb.current_row)] = "Frau" if contact.get("salutation") == "ms" else "Herr"
