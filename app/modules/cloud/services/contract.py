@@ -811,6 +811,8 @@ def get_annual_statement_data(data, year, manuell_data):
                 product_delivery_begin = f"{year}-01-01"
                 if parse(statement_config[product].get("delivery_begin")).year == year:
                     product_delivery_begin = parse(statement_config[product].get("delivery_begin"))
+                if normalize_date(delivery_begin) > normalize_date(product_delivery_begin):
+                    product_delivery_begin = delivery_begin
                 statement_config[product]["delivery_begin"] = str(product_delivery_begin)
                 statement_config[product]["delivery_end"] = str(delivery_end)
                 if normalize_date(statement_config[product]["delivery_begin"]) < normalize_date(statement_config["delivery_begin"]):
