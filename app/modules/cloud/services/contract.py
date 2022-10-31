@@ -890,7 +890,7 @@ def get_annual_statement_data(data, year, manuell_data):
                     for value in statement["available_values"]:
                         if value["number"] == statement_config[product].get("power_meter_number") or value["number"] in statement_config[product].get("additional_power_meter_numbers", []):
                             values.append(value)
-                    if product == "lightcloud" and "heatcloud" in statement_config and statement_config["lightcloud"]["delivery_begin"] != statement_config["heatcloud"]["delivery_begin"] and statement_config.get("measuring_concept") not in ["parallel_concept"]:
+                    if product == "lightcloud" and "heatcloud" in statement_config and normalize_date(statement_config["lightcloud"]["delivery_begin"]) != normalize_date(statement_config["heatcloud"]["delivery_begin"]) and statement_config.get("measuring_concept") not in ["parallel_concept"]:
                         counters = normalize_counter_values(
                             statement_config["lightcloud"]["delivery_begin"],
                             statement_config["heatcloud"]["delivery_begin"],
@@ -917,14 +917,14 @@ def get_annual_statement_data(data, year, manuell_data):
                                 statement_config[product]["delivery_begin"],
                                 statement["construction_date"],
                                 [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                                values,
+                                values.copy(),
                                 manuell_data
                             )
                             counters2 = normalize_counter_values(
                                 statement["construction_date"],
                                 statement_config[product]["delivery_end"],
                                 [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                                values,
+                                values.copy(),
                                 manuell_data
                             )
                             if counters is not None and counters2 is None:
@@ -947,7 +947,7 @@ def get_annual_statement_data(data, year, manuell_data):
                                     statement_config[product]["delivery_begin"],
                                     statement_config[product]["delivery_end"],
                                     [statement_config[product].get("power_meter_number")] + statement_config[product].get("additional_power_meter_numbers", []),
-                                    values,
+                                    values.copy(),
                                     manuell_data
                                 )
 
