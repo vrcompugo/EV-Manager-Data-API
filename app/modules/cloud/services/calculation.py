@@ -96,7 +96,6 @@ def calculate_cloud(data):
     cloud_price_extra_kwp_extra_cost_12years = 10.97
     lightcloud_price_factor_2year = 0.6485
     lightcloud_price_factor_2year_bsh = 0.4755
-    print(lightcloud_price_factor_2year)
     cloud_product_price_modifier = 1
     cloud_product_price_min_increase = 0
     if data.get("cloud_quote_type") in ["followup_quote", "interim_quote"]:
@@ -188,7 +187,7 @@ def calculate_cloud(data):
         heater_usage = int(data["heater_usage"])
     if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX", "l2k3fblk3baxv55", "CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"] \
         and datetime.now() > changedate_oct2_2022 \
-        and data.get("cloud_quote_type") not in ["combination_quote", "interim_quote", "custom_config"]:
+        and data.get("cloud_quote_type") not in ["combination_quote", "interim_quote", "custom_config", "legacy_cloud"]:
         if data.get("heater_usage") not in [None, "", 0]:
             power_usage = int(data["power_usage"]) + int(data["heater_usage"])
         heater_usage = 0
@@ -1002,6 +1001,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2, return_data = False):
     offer_data["data"] = data
     offer_data["data"]["cloud_quote_type"] = 'legacy_cloud'
     offer_data["calculated"] = calculate_cloud(data=offer_data["data"])
+    print("legacy", offer_data["calculated"])
     offer_data["items"] = get_cloud_products(data={
         "data": data,
         "calculated": offer_data["calculated"]
