@@ -912,7 +912,7 @@ def get_annual_statement_data(data, year, manuell_data):
                             statement["counters"] = statement["counters"] + counters
                             statement["counters"] = statement["counters"] + counters2
                     else:
-                        if statement["construction_date"] not in [None, ""] and normalize_date(statement["construction_date"]) > normalize_date(statement_config[product]["delivery_begin"]):
+                        if product in ["lightcloud", "heatcloud"] and statement["construction_date"] not in [None, ""] and normalize_date(statement["construction_date"]) > normalize_date(statement_config[product]["delivery_begin"]):
                             counters = normalize_counter_values(
                                 statement_config[product]["delivery_begin"],
                                 statement["construction_date"],
@@ -950,7 +950,6 @@ def get_annual_statement_data(data, year, manuell_data):
                                     values.copy(),
                                     manuell_data
                                 )
-
                                 if product == "lightcloud" or (product == "heatcloud" and (manuell_data.get("parallel_concept_counter") in ["smartme"] or statement_config.get("measuring_concept") not in ["parallel_concept"])):
                                     if manuell_data.get("estimate_netusage") in [1, True, "1", "true"]:
                                         statement["estimate_netusage"] = True
@@ -1342,8 +1341,6 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
                 "origin": end_value_later[0].origin
             })
         values = sorted(values, key=lambda d: d['date'])
-        if '6310269' == number:
-            print("asd", start_date, end_date, values)
         start_value = None
         start_value2 = None
         end_value = None
