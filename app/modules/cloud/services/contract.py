@@ -830,7 +830,6 @@ def get_annual_statement_data(data, year, manuell_data):
                     values = []
                     for number in numbers:
                         counter_numbers.append(number)
-                        values = []
                         beginning_of_year = get_device_by_datetime(number, statement_config[product]["delivery_begin"])
                         end_of_year = get_device_by_datetime(number, statement_config[product]["delivery_end"])
                         if beginning_of_year is not None and end_of_year is not None:
@@ -848,7 +847,6 @@ def get_annual_statement_data(data, year, manuell_data):
                                     "value": abs(end_of_year.get("CounterReading", 0)),
                                     "origin": "smartme"
                                 })
-
                             statement["available_values"] = statement["available_values"] + values
 
                     if statement["construction_date"] not in [None, ""] and normalize_date(statement["construction_date"]) > normalize_date(statement_config[product]["delivery_begin"]) and normalize_date(statement["construction_date"]).year == year:
@@ -856,14 +854,14 @@ def get_annual_statement_data(data, year, manuell_data):
                             statement_config[product]["delivery_begin"],
                             statement["construction_date"],
                             numbers,
-                            values,
+                            values.copy(),
                             manuell_data
                         )
                         counters2 = normalize_counter_values(
                             statement["construction_date"],
                             statement_config[product]["delivery_end"],
                             numbers,
-                            values,
+                            values.copy(),
                             manuell_data
                         )
                         if counters is not None and counters2 is not None:
@@ -875,7 +873,7 @@ def get_annual_statement_data(data, year, manuell_data):
                             statement_config[product]["delivery_begin"],
                             statement_config[product]["delivery_end"],
                             numbers,
-                            values,
+                            values.copy(),
                             manuell_data
                         )
                     if counters is not None and len(counters) > 0:
