@@ -1001,7 +1001,7 @@ def cloud_offer_items_by_pv_offer(offer: OfferV2, return_data = False):
             data["zero_option"] = True
     offer_data["data"] = data
     offer_data["data"]["cloud_quote_type"] = 'legacy_cloud'
-    offer_data["calculated"] = calculate_cloud(data=data)
+    offer_data["calculated"] = calculate_cloud(data=offer_data["data"])
     offer_data["items"] = get_cloud_products(data={
         "data": data,
         "calculated": offer_data["calculated"]
