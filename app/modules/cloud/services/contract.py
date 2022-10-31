@@ -711,7 +711,9 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
 def get_annual_statement_data(data, year, manuell_data):
     year = int(year)
     if manuell_data is None:
-        manuell_data = {}
+        manuell_data = {
+            "corrected_datediff": True
+        }
     statement = {
         "year": year,
         "contact": get_contact(data.get("contact_id")),
