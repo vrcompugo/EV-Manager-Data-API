@@ -929,16 +929,22 @@ def get_annual_statement_data(data, year, manuell_data):
                                 values.copy(),
                                 manuell_data
                             )
+                            if counters is None and counters2 is not None:
+                                statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters2)
+                                if product in ["ecloud"] + customer_products:
+                                    statement_config[product]["actual_usage"] = statement_config[product]["actual_usage_net"]
+                                if counters2 is not None and manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
+                                    statement["counters"] = statement["counters"] + counters2
                             if counters is not None and counters2 is None:
                                 statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
                                 statement["counters"] = statement["counters"] + counters
                             if counters is not None and len(counters) > 0 and counters2 is not None and len(counters2) > 0:
                                 statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
                                 statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage_net"] + sum(item['usage'] for item in counters) + sum(item['usage'] for item in counters2)
+                                statement["counters"] = statement["counters"] + counters
                                 if product in ["ecloud"] + customer_products:
                                     statement_config[product]["actual_usage"] = statement_config[product]["actual_usage_net"]
-                                statement["counters"] = statement["counters"] + counters
-                                if manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
+                                if counters2 is not None and manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
                                     statement["counters"] = statement["counters"] + counters2
 
                         else:
