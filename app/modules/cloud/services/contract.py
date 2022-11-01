@@ -794,6 +794,8 @@ def get_annual_statement_data(data, year, manuell_data):
         delivery_begin = str(year) + "-01-01"
         if parse(config.get("delivery_begin")).year == year:
             delivery_begin = str(config.get("delivery_begin"))
+        if parse(config.get("delivery_begin")).year > year:
+            continue
         if parse(delivery_begin).year <= year and parse(delivery_end).year >= year:
             for product in ["heatcloud", "lightcloud", "ecloud"] + customer_products:
                 if statement_config.get(product) is None:
