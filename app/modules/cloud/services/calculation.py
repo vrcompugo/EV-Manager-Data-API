@@ -858,11 +858,13 @@ def get_cloud_products(data=None, offer=None):
             single_price=(0 if wish_price else data["calculated"]["cloud_price_ecloud"])))
     if data["calculated"]["cloud_price_consumer"] > 0:
         for (index, consumer) in enumerate(data["data"]["consumers"]):
+            description = (f"<b>Consumer {index + 1}</b><br>"
+                            + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {consumer['usage']} kWh<br>\n")
+            if consumer.get('address') is not None:
+                description = description + f"Adresse: {consumer['address'].get('street')} {consumer['address'].get('street_nb')}, {consumer['address'].get('zip')} {consumer['address'].get('city')}<br>\n"
+            description = description + f"Mehrverbrauch unterliegt keinem Preisschutz: derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh"
             offer_data["items"].append(monthly_price_product_base(
-                description=(f"<b>Consumer {index + 1}</b><br>"
-                            + f"Durch die Cloud abgedeckter Jahresverbrauch (a): {consumer['usage']} kWh<br>\n"
-                            + f"Adresse: {consumer['address'].get('street')} {consumer['address'].get('street_nb')}, {consumer['address'].get('zip')} {consumer['address'].get('city')}<br>\n"
-                            + f"Mehrverbrauch unterliegt keinem Preisschutz: derzeit {numberformat(data['calculated']['consumercloud_extra_price_per_kwh'] * 100, digits=2)}&nbsp;cent&nbsp;/&nbsp;kWh"),
+                description=description,
                 single_price=(0 if wish_price else consumer["price"])))
     if data["calculated"]["cloud_price_emove"] > 0:
         emove_description = ("<b>eMove</b><br>"
