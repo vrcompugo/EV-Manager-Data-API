@@ -3,7 +3,6 @@
 cd /usr/src/app
 
 echo "80.190.117.229 api.fakturia.de" >> /etc/hosts
-echo "83.138.81.169 api-v1.photovoltaik-angebotsvergleich.de" >> /etc/hosts
 
 echo $ENVIRONMENT
 if [ $ENVIRONMENT = "dev" ]
