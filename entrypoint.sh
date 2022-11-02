@@ -2,8 +2,6 @@
 
 cd /usr/src/app
 
-echo "80.190.117.229 api.fakturia.de" >> /etc/hosts
-
 echo $ENVIRONMENT
 if [ $ENVIRONMENT = "dev" ]
 then
