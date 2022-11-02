@@ -130,12 +130,12 @@ def get_settings(section=None, domain_raw=None):
                     "7379": "SENEC 8,4 kWh LI",
                     "7381": "SENEC 12,6 kWh LI",
                     "7383": "SENEC 16,8 kWh LI",
-                    "7385": "SENEC 21 kWh LI",
+                    "7385": "SENEC 21,0 kWh LI",
                     "7387": "SENEC 25,2 kWh LI",
                     "7389": "SENEC 29,4 kWh LI",
                     "7391": "SENEC 33,6 kWh LI",
                     "7393": "SENEC 37,8 kWh LI",
-                    "7395": "SENEC 42 kWh LI"
+                    "7395": "SENEC 42,0 kWh LI"
                 },
                 "inverter_type": {
                     "166": "WR im SENEC",
