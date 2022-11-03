@@ -302,6 +302,17 @@ def get_cloud_contract_data_by_deal(deal):
                         maindeal = None
                         break
                     maindeal = subdeal
+            if maindeal is None:
+                deals = get_deals_normalized({
+                    "category_id": 176,
+                    "cloud_contract_number": f'{cloud_contract_number}'
+                })
+                for subdeal in deals:
+                    if _is_lightcloud_deal(subdeal):
+                        if maindeal is not None:
+                            maindeal = None
+                            break
+                        maindeal = subdeal
             if maindeal is not None:
                 update_deal(maindeal.get("id"), {
                     "is_cloud_master_deal": 1
