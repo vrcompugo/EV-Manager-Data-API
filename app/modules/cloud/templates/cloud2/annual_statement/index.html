@@ -207,7 +207,7 @@
       </tr>
       {% for counter in statement.counters %}
         <tr>
-          <td>{{ counter.number }} {% if counter.type == "smartme" or counter.type == "smartme/energie360" or counter.type == "energie360/smartme" %}**{% else %}*{% endif %}</td>
+          <td>{{ counter.number }} {% if counter.type in ["smartme", "smartme/energie360", "energie360/smartme", "Senec"] %}**{% else %}*{% endif %}</td>
           <td>{{ counter.type }}</td>
           <td></td>
           <td style="text-align: right;">{{ counter.start_date | dateformat }}</td>
