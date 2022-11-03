@@ -224,6 +224,9 @@ def load_contract_data(contract_number):
                 if deals[0]["stage_id"] == "C126:UC_FVSJ2M":
                     annual_statement["status"].append("special_custumer")
                     annual_statement["deal"]["status"] = "Spezialkunde"
+                if deals[0]["stage_id"] == "C126:UC_CQNYI7":
+                    annual_statement["status"].append("orgamaxx_customer")
+                    annual_statement["deal"]["status"] = "Orgamaxx Kunde"
                 if deals[0]["stage_id"] == "C126:UC_FT4TL0":
                     annual_statement["status"].append("bsh_data")
                     annual_statement["deal"]["status"] = "Senec Werte-Abfrage BSH"
