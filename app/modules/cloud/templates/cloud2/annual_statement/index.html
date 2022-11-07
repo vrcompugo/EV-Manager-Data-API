@@ -31,7 +31,7 @@
         <th>Abnahme</th>
       </tr>
       {% for config in statement.configs %}
-        {% for product in ["lightcloud", "heatcloud", "ecloud"] %}
+        {% for product in ["lightcloud", "heatcloud", "ecloud"] + config["customer_products"] %}
           {% if config[product] %}
             {% if config[product].actual_usage_net == 0 %}
               <tr>
