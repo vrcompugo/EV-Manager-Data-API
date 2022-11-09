@@ -748,6 +748,7 @@ def get_annual_statement_data(data, year, manuell_data):
         for item in sherpa_items:
             existing_counter = next((i for i in sherpa_counters if i["number"] == item.zahlernummer and i["start_date"] == str(item.datum_stand_alt) and i["end_date"] == str(item.datum_stand_neu)), None)
             if existing_counter is not None:
+                print("scher", existing_counter["sherpa_invoice_id"], item.sherpa_invoice_id)
                 if existing_counter["sherpa_invoice_id"] == item.sherpa_invoice_id:
                     existing_counter["start_value"] = existing_counter["start_value"] + item.stand_alt
                     existing_counter["end_value"] = existing_counter["end_value"] + item.stand_neu
