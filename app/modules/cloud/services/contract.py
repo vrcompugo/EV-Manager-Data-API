@@ -754,6 +754,7 @@ def get_annual_statement_data(data, year, manuell_data):
                     existing_counter["end_value"] = existing_counter["end_value"] + item.stand_neu
                     existing_counter["usage"] = existing_counter["usage"] + item.verbrauch
                 else:
+                    existing_counter["sherpa_invoice_id"] = item.sherpa_invoice_id
                     existing_counter["start_value"] = item.stand_alt
                     existing_counter["end_value"] = item.stand_neu
                     existing_counter["usage"] = item.verbrauch
