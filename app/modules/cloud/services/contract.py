@@ -743,13 +743,13 @@ def get_annual_statement_data(data, year, manuell_data):
         .filter(SherpaInvoice.abrechnungszeitraum_von <= f"{year}-12-31") \
         .all()
     for sherpaInvoice in sherpaInvoices:
-        sherpa_items = SherpaInvoiceItem.query.filter(SherpaInvoiceItem.sherpa_invoice_id == sherpaInvoice.id).all()
+        sherpa_items = SherpaInvoiceItem.query.filter(SherpaInvoiceItem.sherpa_invoice_id == sherpaInvoice.id).order_by(SherpaInvoiceItem.sherpa_invoice_id.asc()).all()
         for item in sherpa_items:
             existing_counter = next((i for i in sherpa_counters if i["number"] == item.zahlernummer and i["start_date"] == str(item.datum_stand_alt) and i["end_date"] == str(item.datum_stand_neu)), None)
             if existing_counter is not None:
-                existing_counter["start_value"] = existing_counter["start_value"] + item.stand_alt
-                existing_counter["end_value"] = existing_counter["end_value"] + item.stand_neu
-                existing_counter["usage"] = existing_counter["usage"] + item.verbrauch
+                existing_counter["start_value"] = item.stand_alt
+                existing_counter["end_value"] = item.stand_neu
+                existing_counter["usage"] = item.verbrauch
             else:
                 sherpa_counters.append({
                     "number": item.zahlernummer,
