@@ -237,7 +237,7 @@ def calculate_cloud(data):
         "conventional_price_ecloud": 0,
         "conventional_price_consumer": 0
     }
-    if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0 and data.get("old_price_calculation", "") not in ["l2k3fblk3baxv55", "VOgcqFFeQLpV9cxOA02lzXdAYX"]:
+    if "ecloud_usage" in data and data["ecloud_usage"] != "" and data["ecloud_usage"] != "0" and data["ecloud_usage"] != 0 and data.get("old_price_calculation", "") not in ["l2k3fblk3baxv55"] and data.get("malo_lightcloud", "") not in ["50445549551"]:
         data["price_guarantee"] = "2_years"
     if data.get("cloud_quote_type") in ["combination_quote"]:
         data["price_guarantee"] = "2_years"
