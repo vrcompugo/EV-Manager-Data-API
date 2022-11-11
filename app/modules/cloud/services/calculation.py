@@ -139,7 +139,7 @@ def calculate_cloud(data):
             settings["data"]["cloud_settings"]["kwp_to_refund_factor"] = 8
             settings["data"]["cloud_settings"]["cashback_price_per_kwh"] = 0.08
 
-        if data.get("old_price_calculation", "") not in ["PWTCAlQ6apVi6"] and datetime.now() > kez_changedate2:
+        if data.get("old_price_calculation", "") not in ["PWTCAlQ6apVi6", "VOgcqFFeQLpV9cxOA02lzXdAYX"] and datetime.now() > kez_changedate2:
             settings["data"]["cloud_settings"]["extra_kwh_cost"] = "38.79"
             settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3879
 
