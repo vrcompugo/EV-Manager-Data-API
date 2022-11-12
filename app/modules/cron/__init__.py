@@ -55,7 +55,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "import_leads_wattfox":
+    if section == "inactive" or section == "import_leads_wattfox":
         from app.modules.external.wattfox.deal import run_cron_import
         print("cron", "import_leads_wattfox")
         try:
@@ -88,6 +88,13 @@ def cron(section=None):
         from app.modules.external.bitrix24.deal import run_cron_add_missing_values
         try:
             run_cron_add_missing_values()
+        except Exception as e:
+            error_handler()
+
+    if section == "productive" or section == "copy_cloud_deal_values":
+        from app.modules.cloud.services.deal import cron_copy_cloud_deal_values
+        try:
+            cron_copy_cloud_deal_values()
         except Exception as e:
             error_handler()
 
