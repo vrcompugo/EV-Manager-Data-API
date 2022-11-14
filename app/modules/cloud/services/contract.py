@@ -436,7 +436,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
         "errors": []
     }
     if delivery_end not in empty_values:
-        config["delivery_end"] = delivery_end
+        config["delivery_end"] = str(normalize_date(delivery_end) - datetime.timedelta(days=1))
     else:
         if data.get("cancel_date") not in empty_values:
             config["delivery_end"] = data.get("cancel_date")
