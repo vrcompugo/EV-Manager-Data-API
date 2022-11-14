@@ -474,6 +474,8 @@ def get_settings(section=None, domain_raw=None):
                     "emove_usage_outside": "UF_CRM_1620740831",
                     "is_negative_cloud": "UF_CRM_1607944340",
                     "cloud_runtime": "UF_CRM_1597758014166",
+                    "cloud_contract_end": "UF_CRM_1662987508",
+                    "alte_phase": "UF_CRM_1630596077",
                     "power_meter_number": "UF_CRM_1585821761",
                     "counter_main": "UF_CRM_1585821761",
                     "heatcloud_power_meter_number": "UF_CRM_1597757955687",

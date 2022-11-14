@@ -1,11 +1,16 @@
-from datetime import datetime
 import json
-from app import db
+import time
+from datetime import datetime
 
+from app import db
 from app.modules.external.bitrix24.deal import get_deal, get_deals, add_deal, update_deal
 from app.modules.external.bitrix24.drive import get_folder, get_folder_id
 from app.modules.external.fakturia.deal import store_json_data, load_json_data, normalize_contract_number
 from app.modules.offer.models.offer_v2 import OfferV2
+from app.modules.settings import get_settings, set_settings
+
+
+empty_values = [None, "", "0", 0, False, "false"]
 
 
 def cron_split_cloud_contract():
@@ -115,3 +120,81 @@ def cron_mein_portal_initial_documents():
                 print(auto_documents)
                 print(deal["id"])
                 update_deal(deal["id"], {"auto_document_check": datetime.now()})'''
+
+
+def cron_copy_cloud_deal_values():
+    print("copy_cloud_deal_values")
+    copy_cloud_deal_values(get_deal(414))
+    return
+    config = get_settings("cloud/copy_cloud_deal_values")
+    system_config = get_settings(section="external/bitrix24")
+    last_import_datetime = datetime.now()
+    payload = {
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": "15",
+        "FILTER[STAGE_ID]": "C15:WON",
+        f"FILTER[{system_config['deal']['fields']['is_cloud_master_deal']}]": "1",
+    }
+    if "last_import_datetime" in config:
+        payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]
+    deals = get_deals(payload, force_reload=True)
+    if deals is not None and len(deals) > 0:
+        for deal in deals:
+            copy_cloud_deal_values(deal)
+
+        config = get_settings("cloud/copy_cloud_deal_values")
+        if config is not None:
+            config["last_import_datetime"] = last_import_datetime.astimezone().isoformat()
+        set_settings("cloud/copy_cloud_deal_values", config)
+
+
+def copy_cloud_deal_values(deal):
+    print("deal", deal.get("id"))
+    system_config = get_settings(section="external/bitrix24")
+    if deal.get("is_cloud_master_deal") not in ["1", 1, True]:
+        print("not master deal")
+        return
+    follow_deals = get_deals({
+        "SELECT": "full",
+        f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": deal.get("contract_number"),
+        "FILTER[CATEGORY_ID]": 220
+    }, force_reload=True)
+    if len(follow_deals) != 1:
+        print("no or to much follow deals")
+        return
+    follow_deal = follow_deals[0]
+    if follow_deal.get("stage_id") != "C220:NEW":
+        print("not in new phase")
+        return
+    delivery_begin = None
+    if deal.get("cloud_delivery_begin_3") not in empty_values:
+        delivery_begin = deal.get("cloud_delivery_begin_3")
+    if delivery_begin is None and deal.get("cloud_delivery_begin_2") not in empty_values:
+        delivery_begin = deal.get("cloud_delivery_begin_2")
+    if delivery_begin is None and deal.get("cloud_delivery_begin_1") not in empty_values:
+        delivery_begin = deal.get("cloud_delivery_begin_1")
+    if delivery_begin is None and deal.get("cloud_delivery_begin") not in empty_values:
+        delivery_begin = deal.get("cloud_delivery_begin")
+    if delivery_begin is None:
+        print("no delivery_begin")
+        return
+    change_found = False
+    if follow_deal.get("cloud_runtime") != deal.get("cloud_runtime"):
+        change_found = True
+    if follow_deal.get("cloud_delivery_begin") != delivery_begin:
+        change_found = True
+    if change_found:
+        print("update")
+        update_deal(follow_deal.get("id"), {
+            "cloud_runtime": deal.get("cloud_runtime"),
+            "cloud_contract_end": "",
+            "cloud_delivery_begin": delivery_begin,
+            "alte_phase": "",
+            "stage_id": "C220:1"
+        })
+        time.sleep(2)
+        update_deal(follow_deal.get("id"), {
+            "stage_id": "C220:NEW"
+        })
+    else:
+        print("no change")
