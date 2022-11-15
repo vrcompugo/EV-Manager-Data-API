@@ -680,7 +680,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 "FILTER[CATEGORY_ID]": 15
             }, force_reload=True)
             for index, consumer in enumerate(config["consumers"]):
-                existing_deal = next((i for i in deals if str(i["delivery_usage"]) == str(consumer["usage"])), None)
+                existing_deal = next((i for i in deals if str(i["delivery_usage"]) == str(consumer["usage"]) and i.get("is_used") is not True), None)
                 if existing_deal is None:
                     config["errors"].append({
                         "code": "deal_not_found",
@@ -701,6 +701,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                         "id": existing_deal.get("id"),
                         "title": existing_deal.get("title")
                     }
+                    existing_deal["is_used"] = True
             config["consumer_data"] = {
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_consumer"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_consumer_incl_refund"),
