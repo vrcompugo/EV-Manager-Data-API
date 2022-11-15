@@ -62,6 +62,20 @@ def calculate_cloud(data):
                     "reference_number": pre_dez_2021.number,
                     "comment": "eCloud wird mit aktuellem Minderverbau berechnet"
                 })
+
+            if "name" not in user or user["name"].lower() != "bsh":
+                pre_march_2022 = OfferV2.query\
+                    .filter(OfferV2.customer_id == offer_v2.customer_id)\
+                    .filter(OfferV2.datetime < kez_changedate2)\
+                    .order_by(OfferV2.datetime.desc())\
+                    .first()
+                if pre_march_2022 is not None:
+                    pricing_options.append({
+                        "label": "Preisdefintion vor dem 28.02.2022",
+                        "value": "5EQnMQSgTFhK3AlS",
+                        "reference_number": pre_march_2022.number,
+                        "comment": ""
+                    })
             pre_oct_2022 = OfferV2.query\
                 .filter(OfferV2.customer_id == offer_v2.customer_id)\
                 .filter(OfferV2.datetime < changedate_oct_2022)\
@@ -98,6 +112,14 @@ def calculate_cloud(data):
     lightcloud_price_factor_2year_bsh = 0.4755
     cloud_product_price_modifier = 1
     cloud_product_price_min_increase = 0
+
+    power_usage = 0
+    heater_usage = 0
+    if data.get("power_usage") not in [None, "", 0]:
+        power_usage = int(data["power_usage"])
+    if data.get("heater_usage") not in [None, "", 0]:
+        heater_usage = int(data["heater_usage"])
+
     if data.get("cloud_quote_type") in ["followup_quote", "interim_quote"]:
         cloud_product_price_modifier = 1.157
         cloud_product_price_min_increase = 15.67
@@ -113,84 +135,77 @@ def calculate_cloud(data):
             settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.0499
             pricing_option = next((i for i in pricing_options if str(i["value"]) == "l2k3fblk3baxv55"), None)
             pricing_option["comment"] = "eCloud wird mit Minderverbau nach Preisdefinition vor dem 16.12.2021 berechnet"
-    if data.get("old_price_calculation", "") not in ["l2k3fblk3baxv55"]:
-        if ("name" in user and user["name"].lower() in ["bsh"] and datetime.now() > bsh_changedate) or (("name" and user or user["name"].lower() not in ["bsh"]) and datetime.now() > kez_changedate):
-            settings["data"]["cloud_settings"]["extra_kwh_cost"] = "33.79"
-            settings["data"]["cloud_settings"]["power_to_kwp_factor"] = 2.296
-            settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
-            settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"] = 0.33
-            settings["data"]["cloud_settings"]["heater_to_kwp_factor"] = [
-                {"from": 1, "to": 4000, "value": 2.33},
-                {"from": 4001, "to": 6500, "value": 2.444},
-                {"from": 6501, "to": 9999999, "value": 2.574}
-            ]
-            settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 750
-            settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
-            settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"] = 0.289
-            settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
-            settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"] = 0.0999
-            settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] = 1.9987
-            settings["data"]["cloud_settings"]["cloud_emove"] = {
-                "emove.drive I": {"price": 9.99, "kwp": 3.3},
-                "emove.drive II": {"price": 14.99, "kwp": 4.3},
-                "emove.drive III": {"price": 19.99, "kwp": 7},
-                "emove.drive ALL": {"price": 39.00, "kwp": 7.6}
-            }
-            settings["data"]["cloud_settings"]["kwp_to_refund_factor"] = 8
-            settings["data"]["cloud_settings"]["cashback_price_per_kwh"] = 0.08
 
-        if data.get("old_price_calculation", "") not in ["PWTCAlQ6apVi6", "VOgcqFFeQLpV9cxOA02lzXdAYX"] and datetime.now() > kez_changedate2:
+    if data.get("old_price_calculation", "") not in ["l2k3fblk3baxv55"]:
+        settings["data"]["cloud_settings"]["extra_kwh_cost"] = "33.79"
+        settings["data"]["cloud_settings"]["power_to_kwp_factor"] = 2.296
+        settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
+        settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"] = 0.33
+        settings["data"]["cloud_settings"]["heater_to_kwp_factor"] = [
+            {"from": 1, "to": 4000, "value": 2.33},
+            {"from": 4001, "to": 6500, "value": 2.444},
+            {"from": 6501, "to": 9999999, "value": 2.574}
+        ]
+        settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"] = 750
+        settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
+        settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"] = 0.289
+        settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.1189
+        settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"] = 0.0999
+        settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] = 1.9987
+        settings["data"]["cloud_settings"]["cloud_emove"] = {
+            "emove.drive I": {"price": 9.99, "kwp": 3.3},
+            "emove.drive II": {"price": 14.99, "kwp": 4.3},
+            "emove.drive III": {"price": 19.99, "kwp": 7},
+            "emove.drive ALL": {"price": 39.00, "kwp": 7.6}
+        }
+        settings["data"]["cloud_settings"]["kwp_to_refund_factor"] = 8
+        settings["data"]["cloud_settings"]["cashback_price_per_kwh"] = 0.08
+
+        if data.get("old_price_calculation", "") not in ["PWTCAlQ6apVi6", "5EQnMQSgTFhK3AlS"]:
             settings["data"]["cloud_settings"]["extra_kwh_cost"] = "38.79"
             settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3879
 
-        if "name" and user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
-            settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"] = 0.37
-            settings["data"]["cloud_settings"]["cloud_user_prices"]["1"] = [
-                { "from": 0, "to": 7000, "value": 57.99 },
-                { "from": 7001, "to": 14500, "value": 67.99 },
-                { "from": 14501, "to": 25000, "value": 137.99 },
-                { "from": 25001, "to": 40000, "value": 239.99 },
-                { "from": 40001, "to": 52000, "value": 269.99 },
-                { "from": 52001, "to": 99000, "value": 379.99 },
-                { "from": 99001, "to": 300000, "value": 598.99 },
-                { "from": 300001, "to": 749999, "value": 2999.99 },
-                { "from": 750000, "to": 9999999, "value": 3490.99 }
+            if "name" and user or user["name"].lower():
+                settings["data"]["cloud_settings"]["lightcloud_conventional_price_per_kwh"] = 0.37
+                settings["data"]["cloud_settings"]["cloud_user_prices"]["1"] = [
+                    { "from": 0, "to": 7000, "value": 57.99 },
+                    { "from": 7001, "to": 14500, "value": 67.99 },
+                    { "from": 14501, "to": 25000, "value": 137.99 },
+                    { "from": 25001, "to": 40000, "value": 239.99 },
+                    { "from": 40001, "to": 52000, "value": 269.99 },
+                    { "from": 52001, "to": 99000, "value": 379.99 },
+                    { "from": 99001, "to": 300000, "value": 598.99 },
+                    { "from": 300001, "to": 749999, "value": 2999.99 },
+                    { "from": 750000, "to": 9999999, "value": 3490.99 }
             ]
-    if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX", "l2k3fblk3baxv55"] and datetime.now() > changedate_oct_2022:
-        settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.459
-        settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.459
-        settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.209
-        settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] = 2.2445
-        settings["data"]["cloud_settings"]["conventional_power_cost_per_kwh"] = 45.9
-        lightcloud_price_factor_2year = 0.6485
-        lightcloud_price_factor_2year_bsh = 1.2970
-        cloud_price_extra_kwp_discount_small = 8 * 0.85
-        cloud_price_extra_kwp_discount_big = 6.1 * 0.85
-        settings["data"]["cloud_settings"]["cloud_user_prices"]["1"] = [
-            { "from": 0, "to": 7000, "value": 57.99 * 1.43110881 },
-            { "from": 7001, "to": 14500, "value": 67.99 * 1.43110881 },
-            { "from": 14501, "to": 25000, "value": 137.99 * 1.43110881 },
-            { "from": 25001, "to": 40000, "value": 239.99 * 1.43110881 },
-            { "from": 40001, "to": 52000, "value": 269.99 * 1.43110881 },
-            { "from": 52001, "to": 99000, "value": 379.99 * 1.43110881 },
-            { "from": 99001, "to": 300000, "value": 598.99 * 1.43110881 },
-            { "from": 300001, "to": 749999, "value": 2999.99 * 1.43110881 },
-            { "from": 750000, "to": 9999999, "value": 3490.99 * 1.43110881 }
-        ]
-    print("3", lightcloud_price_factor_2year, lightcloud_price_factor_2year_bsh)
+            if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX"]:
 
-    power_usage = 0
-    heater_usage = 0
-    if data.get("power_usage") not in [None, "", 0]:
-        power_usage = int(data["power_usage"])
-    if data.get("heater_usage") not in [None, "", 0]:
-        heater_usage = int(data["heater_usage"])
-    if data.get("old_price_calculation", "") not in ["VOgcqFFeQLpV9cxOA02lzXdAYX", "l2k3fblk3baxv55", "CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"] \
-        and datetime.now() > changedate_oct2_2022 \
-        and data.get("cloud_quote_type") not in ["combination_quote", "interim_quote", "custom_config", "legacy_cloud"]:
-        if data.get("heater_usage") not in [None, "", 0]:
-            power_usage = int(data["power_usage"]) + int(data["heater_usage"])
-        heater_usage = 0
+                settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.459
+                settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.459
+                settings["data"]["cloud_settings"]["ecloud_extra_price_per_kwh"] = 0.209
+                settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] = 2.2445
+                settings["data"]["cloud_settings"]["conventional_power_cost_per_kwh"] = 45.9
+                lightcloud_price_factor_2year = 0.6485
+                lightcloud_price_factor_2year_bsh = 1.2970
+                cloud_price_extra_kwp_discount_small = 8 * 0.85
+                cloud_price_extra_kwp_discount_big = 6.1 * 0.85
+                settings["data"]["cloud_settings"]["cloud_user_prices"]["1"] = [
+                    { "from": 0, "to": 7000, "value": 57.99 * 1.43110881 },
+                    { "from": 7001, "to": 14500, "value": 67.99 * 1.43110881 },
+                    { "from": 14501, "to": 25000, "value": 137.99 * 1.43110881 },
+                    { "from": 25001, "to": 40000, "value": 239.99 * 1.43110881 },
+                    { "from": 40001, "to": 52000, "value": 269.99 * 1.43110881 },
+                    { "from": 52001, "to": 99000, "value": 379.99 * 1.43110881 },
+                    { "from": 99001, "to": 300000, "value": 598.99 * 1.43110881 },
+                    { "from": 300001, "to": 749999, "value": 2999.99 * 1.43110881 },
+                    { "from": 750000, "to": 9999999, "value": 3490.99 * 1.43110881 }
+                ]
+
+                if data.get("old_price_calculation", "") not in ["CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"]:
+                    if data.get("cloud_quote_type") not in ["combination_quote", "interim_quote", "custom_config", "legacy_cloud"]:
+                        if data.get("heater_usage") not in [None, "", 0]:
+                            power_usage = int(data["power_usage"]) + int(data["heater_usage"])
+                        heater_usage = 0
 
     result = {
         "pricing_options": pricing_options,
