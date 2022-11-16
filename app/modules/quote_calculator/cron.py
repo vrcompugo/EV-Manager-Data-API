@@ -189,7 +189,7 @@ def cron_follow_cloud_quote():
 
 
 def recreate_quote(deal_id, create_new_quote=True, move_phase=False):
-    deal = get_deal(deal_id)
+    deal = get_deal(deal_id, force_reload=True)
     if deal.get("unique_identifier") in [None, ""]:
         lead = add_lead({
             "contact_id": deal.get("contact_id"),
@@ -207,6 +207,7 @@ def recreate_quote(deal_id, create_new_quote=True, move_phase=False):
                 "stage_id": "C220:UC_29ZOP7"
             })
             return lead
+
     data = json.loads(json.dumps(offer_v2.data))
     data["has_pv_quote"] = True
     data["document_style"] = ""
