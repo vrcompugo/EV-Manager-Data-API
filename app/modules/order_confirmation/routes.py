@@ -66,7 +66,7 @@ def order_confirmation_generate(quote_id):
             "quote": quote,
         }
         if quote.get("expected_construction_week", None) is None or quote.get("expected_construction_week", None) == "":
-            expected_construction_datetime = datetime.datetime.now() + datetime.timedelta(weeks=24)
+            expected_construction_datetime = datetime.datetime.now() + datetime.timedelta(weeks=18)
             quote["expected_construction_week"] = expected_construction_datetime.strftime("%W/%Y")
         subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {quote['unique_identifier']}/Angebote/Version {quote['history_id']}")
         pdf = generate_order_confirmation_pdf(quote_id, quote)
