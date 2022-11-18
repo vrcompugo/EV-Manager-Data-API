@@ -27,7 +27,7 @@ def convert_config_values(data_raw):
     data["company"] = None
     data["contact"] = {}
     if "contact_id" in data and data["contact_id"] is not None and data["contact_id"] is not False and data["contact_id"] != "" and int(data["contact_id"]) > 0:
-        contact_data = get_contact(data["contact_id"])
+        contact_data = get_contact(data["contact_id"], force_reload=True)
         if contact_data is not None:
             data["email"] = contact_data["email"]
             data["contact"] = {
