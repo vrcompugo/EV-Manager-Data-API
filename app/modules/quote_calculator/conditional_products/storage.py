@@ -46,11 +46,14 @@ def add_product(data):
         product["NAME"] = f"{version} {round(stack_count * 4.2, 1)} kWh"
         product["PRICE"] = float(product["PRICE"]) * math.ceil(stack_count / 6) + float(stack["PRICE"]) * stack_count
         data["products"].append(product)
+        product["storagebox_count"] = math.ceil(stack_count / 6)
+        return_product = product
         product = get_product(label="Montage Stromspeicher Home4", category="Stromspeicher")
-        product["quantity"] = 1
+        product["quantity"] = return_product["storagebox_count"]
         data["products"].append(product)
         product = get_product(label="Home 4 Kit", category="Stromspeicher")
         product["quantity"] = 1
         data["products"].append(product)
+        return return_product
 
     return product
