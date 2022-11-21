@@ -1624,7 +1624,7 @@ def add_custom_config(contract_number):
 
 
 def store_custom_config(data):
-    offer_v2 = OfferV2.query.filter(OfferV2.number == data["cloud_number"]).first()
+    offer_v2 = OfferV2.query.filter(OfferV2.number == data.get("cloud_number")).first()
     if offer_v2 is None:
         return False
     offer_data = json.loads(json.dumps(offer_v2.data))
