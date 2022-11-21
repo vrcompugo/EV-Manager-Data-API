@@ -290,13 +290,18 @@ def set_missing_values(deal):
                     update_data["bwwp"] = ["Nibe 210"]
 
             if "module_kwp" in history.data["data"]:
-                for value in [280, 320, 380, 400]:
-                    if history.data["data"]["module_kwp"]["kWp"] * 1000 == value: ### todo auf produkte matchen
-                        update_data["pv_module"] = [f"{value} Watt Amerisolar black"]
-                        if value == 280:
-                            update_data["pv_module"] = [f"{value} Watt Amerisolar"]
-                        if value == 380:
-                            update_data["pv_module"] = [f"{value} Watt Amerisolar Black"]
+                if history.data["data"]["module_kwp"]["label"] == "PV Modul SENEC.SOLAR 380 Watt BLACK":
+                    update_data["pv_module"] = "SENEC 380 Watt Modul"
+                elif history.data["data"]["module_kwp"]["label"] == "ASWS-415-MS-BW 415 Watt":
+                    update_data["pv_module"] = "415 Watt ASWS. Black"
+                else:
+                    for value in [280, 320, 380, 400]:
+                        if history.data["data"]["module_kwp"]["kWp"] * 1000 == value: ### todo auf produkte matchen
+                            update_data["pv_module"] = [f"{value} Watt Amerisolar black"]
+                            if value == 280:
+                                update_data["pv_module"] = [f"{value} Watt Amerisolar"]
+                            if value == 380:
+                                update_data["pv_module"] = [f"{value} Watt Amerisolar Black"]
 
             if history.data.get("construction_year") not in [None, "", "0", 0]:
                 update_data["construction_date"] = datetime.datetime.strptime(f'{history.data["construction_year"]}-01-01', "%Y-%m-%d")

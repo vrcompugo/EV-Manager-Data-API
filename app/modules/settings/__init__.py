@@ -147,6 +147,7 @@ def get_settings(section=None, domain_raw=None):
                     "176": "400 Watt Amerisolar black",
                     "4100": "380 Watt Amerisolar Black",
                     "2484": "320 Watt Amerisolar black",
+                    "5698": "415 Watt ASWS. Black",
                     "178": "Triple Black Module",
                     "240": "Sondermodul",
                     "1906": "keine Auswahl",
