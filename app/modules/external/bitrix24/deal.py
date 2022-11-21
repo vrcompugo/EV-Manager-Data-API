@@ -302,7 +302,7 @@ def set_missing_values(deal):
                                 update_data["pv_module"] = [f"{value} Watt Amerisolar"]
                             if value == 380:
                                 update_data["pv_module"] = [f"{value} Watt Amerisolar Black"]
-
+                print(update_data["pv_module"])
             if history.data.get("construction_year") not in [None, "", "0", 0]:
                 update_data["construction_date"] = datetime.datetime.strptime(f'{history.data["construction_year"]}-01-01', "%Y-%m-%d")
                 update_data["construction_date"] = str(update_data["construction_date"] + datetime.timedelta(weeks=int(history.data["construction_week"])))
