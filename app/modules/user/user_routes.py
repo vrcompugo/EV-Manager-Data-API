@@ -43,7 +43,8 @@ def sales_users():
         384,   # Team Schuster
         458,   # Team Oftring
         464,   # Team Rieger
-        462    # Spba-Finanz*
+        462,    # Spba-Finanz*
+        489    # Solar B
     ]
     for department_id in departments:
         response = get_users_per_department(department_id)  # Verkauf/Außendienst
