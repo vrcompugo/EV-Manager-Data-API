@@ -41,6 +41,7 @@ def convert_config_values(data_raw):
         contact_data = get_contact(data["contact_id"])
         if contact_data is not None:
             data["contact"] = {
+                "company": contact_data.get("company"),
                 "name": contact_data["first_name"],
                 "first_name": contact_data["first_name"],
                 "last_name": contact_data["last_name"],
