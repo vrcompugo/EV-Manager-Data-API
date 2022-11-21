@@ -291,9 +291,9 @@ def set_missing_values(deal):
 
             if "module_kwp" in history.data["data"]:
                 if history.data["data"]["module_kwp"]["label"] == "PV Modul SENEC.SOLAR 380 Watt BLACK":
-                    update_data["pv_module"] = "SENEC 380 Watt Modul"
+                    update_data["pv_module"] = ["SENEC 380 Watt Modul"]
                 elif history.data["data"]["module_kwp"]["label"] == "ASWS-415-MS-BW 415 Watt":
-                    update_data["pv_module"] = "415 Watt ASWS. Black"
+                    update_data["pv_module"] = ["415 Watt ASWS. Black"]
                 else:
                     for value in [280, 320, 380, 400]:
                         if history.data["data"]["module_kwp"]["kWp"] * 1000 == value: ### todo auf produkte matchen
