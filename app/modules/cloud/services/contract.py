@@ -1656,8 +1656,7 @@ def store_custom_config(data):
             offer_data[f"{product}_cloud_price_overwrite"] = data.get(product).get("cloud_price_overwrite")
             if data.get(product).get("cloud_price_overwrite"):
                 offer_v2.calculated[f"cloud_price_{product2}"] = float(data[product].get("cloud_price"))
-                offer_v2.calculated[f"cloud_price_{product2}_inkl_refund"] = float(data[product].get("cloud_price"))
-
+                offer_v2.calculated[f"cloud_price_{product2}_incl_refund"] = float(data[product].get("cloud_price"))
             offer_data[f"{product}_extra_price_per_kwh_overwrite"] = data.get(product).get("extra_price_per_kwh_overwrite")
             if data.get(product).get("extra_price_per_kwh_overwrite"):
                 offer_v2.calculated[f"{product}_extra_price_per_kwh"] = float(data[product].get("extra_price_per_kwh"))
@@ -1676,7 +1675,7 @@ def store_custom_config(data):
         offer_v2.calculated["consumercloud_extra_price_per_kwh"] = float(data.get("consumercloud_extra_price_per_kwh"))
 
 
-    offer_v2.calculated["cloud_price_consumer_inkl_refund"] = offer_v2.calculated["cloud_price_consumer"]
+    offer_v2.calculated["cloud_price_consumer_incl_refund"] = offer_v2.calculated["cloud_price_consumer"]
     offer_v2.calculated["cloud_price"] = offer_v2.calculated["cloud_price"] + offer_v2.calculated["cloud_price_consumer"]
 
     offer_v2.calculated["cloud_price_incl_refund"] = offer_v2.calculated["cloud_price"]
