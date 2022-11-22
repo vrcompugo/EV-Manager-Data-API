@@ -162,7 +162,7 @@ def load_contract_data(contract_number):
     data["construction_date"] = data["main_deal"].get("construction_date2")
     cloud_number = data["main_deal"].get("cloud_number").replace(" ", "")
     if data["main_deal"].get("cloud_delivery_begin") not in empty_values and cloud_number not in empty_values:
-        data = get_cloud_config(data, cloud_number, data["main_deal"].get("cloud_delivery_begin"), data["main_deal"].get("cloud_delivery_begin_1"))
+        data = get_cloud_config(data, cloud_number, data["main_deal"].get("cloud_delivery_begin"), data["main_deal"].get("cloud_delivery_begin_1"), first_delivery=True)
     if data["main_deal"].get("cloud_delivery_begin_1") not in empty_values and data["main_deal"].get("cloud_number_1") not in empty_values:
         data = get_cloud_config(data, data["main_deal"].get("cloud_number_1"), data["main_deal"].get("cloud_delivery_begin_1"), data["main_deal"].get("cloud_delivery_begin_2"))
     if data["main_deal"].get("cloud_delivery_begin_2") not in empty_values and data["main_deal"].get("cloud_number_2") not in empty_values:
@@ -425,7 +425,7 @@ def load_contract_data(contract_number):
     return data
 
 
-def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
+def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_delivery=False):
     settings = get_settings(section="external/bitrix24")
     config = {
         "cloud_number": cloud_number,
@@ -707,7 +707,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end):
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_consumer_incl_refund"),
                 "extra_price_per_kwh": offer_v2.calculated.get("consumercloud_extra_price_per_kwh"),
             }
-
+    if first_delivery and normalize_date(config["earliest_delivery_begin"]) < normalize_date(config["delivery_begin"]):
+        config["delivery_begin"] = config["earliest_delivery_begin"]
     data["configs"].append(config)
     return data
 
