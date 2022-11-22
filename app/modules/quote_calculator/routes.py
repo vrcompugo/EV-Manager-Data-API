@@ -530,7 +530,7 @@ def quote_calculator_cloud_pdfs_action(lead_id):
             "deal_id": history_data.get("data").get("deal_id"),
             "contract_number": contract_number,
             "cloud_number": history_data.get("cloud_number")
-        }, expire_minutes=21*24*60)
+        }, expire_minutes=90*24*60)
         if deal is not None:
             update_deal(deal.get("id"), {
                 "cloud_follow_quote_link": history_data["pdf_link"],
