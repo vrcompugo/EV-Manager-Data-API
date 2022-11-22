@@ -153,7 +153,8 @@ def get_settings(section=None, domain_raw=None):
                     "1906": "keine Auswahl",
                     "174": "400 Watt Amerisolar blau",
                     "170": "280 Watt Amerisolar",
-                    "7327": "SENEC 380 Watt Modul"
+                    "7327": "SENEC 380 Watt Modul",
+                    "7541": "ASWS-SM 390M Glas Glas 390 Watt"
                 },
                 "extra_packages": {
                     "180": "Technik & Service (Anschlussgarantie, Technikpaket, Portal)",
