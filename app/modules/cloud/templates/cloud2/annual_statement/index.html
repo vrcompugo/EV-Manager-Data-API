@@ -165,6 +165,15 @@
           <td style="text-align: right;">{% if statement.extra_credit_value > 0 %}{{ statement.extra_credit_value | currencyformat }}{% endif%}</td>
         </tr>
       {% endif %}
+      {% if statement.extra_credit_value2 != 0 %}
+        <tr>
+          <td>{{ statement.extra_credit_label2 }}</td>
+          <td></td>
+          <td></td>
+          <td style="text-align: right;">{% if statement.extra_credit_value2 < 0 %}{{ -statement.extra_credit_value2 | currencyformat }}{% endif%}</td>
+          <td style="text-align: right;">{% if statement.extra_credit_value2 > 0 %}{{ statement.extra_credit_value2 | currencyformat }}{% endif%}</td>
+        </tr>
+      {% endif %}
       <tr class="summary">
         <td colspan="3"><b>{% if statement.to_pay > 0 %}Noch zu Zahlen{% else %}Auszahlung{% endif%}</b></td>
         <td style="text-align: right;">{% if statement.to_pay > 0 %}{{ statement.to_pay | currencyformat }}{% endif%}</td>
