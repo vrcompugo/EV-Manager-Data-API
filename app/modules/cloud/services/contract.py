@@ -735,7 +735,8 @@ def get_annual_statement_data(data, year, manuell_data):
         "total_extra_price_net": 0,
         "total_cloud_price": 0,
         "total_cloud_price_incl_refund": 0,
-        "available_values": []
+        "available_values": [],
+        "extra_price_per_kwh": 0.27
     }
     counter_numbers = []
     sherpa_counters = []
@@ -824,6 +825,8 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement_config[product]["extra_price_per_kwh"] = 0.3379
                 if manuell_data.get(f"{product}_extra_price_per_kwh") not in [None, ""]:
                     statement_config[product]["extra_price_per_kwh"] = float(manuell_data.get(f"{product}_extra_price_per_kwh")) / 100
+                if statement["extra_price_per_kwh"] < statement_config[product]["extra_price_per_kwh"]:
+                    statement["extra_price_per_kwh"] = statement_config[product]["extra_price_per_kwh"]
                 product_delivery_begin = f"{year}-01-01"
                 if parse(statement_config[product].get("delivery_begin")).year == year:
                     product_delivery_begin = parse(statement_config[product].get("delivery_begin"))
