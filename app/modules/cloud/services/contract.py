@@ -504,8 +504,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_light"),
                 "cloud_price_overwrite": offer_v2.data.get("lightcloud_cloud_price_overwrite"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_light_incl_refund"),
-                "smartme_number": data["main_deal"].get("smartme_number"),
-                "power_meter_number": data["main_deal"].get("delivery_counter_number"),
+                "smartme_number": data["main_deal"].get("smartme_number").strip(),
+                "power_meter_number": data["main_deal"].get("delivery_counter_number").strip(),
                 "additional_power_meter_numbers": [],
                 "additional_smartme_numbers": [],
                 "delivery_begin": data["main_deal"].get("cloud_delivery_begin"),
@@ -527,7 +527,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 for number in numbers:
                     number = number.strip()
                     if number != "" and number not in config["lightcloud"]["additional_power_meter_numbers"]:
-                        config["lightcloud"]["additional_power_meter_numbers"].append(number)
+                        config["lightcloud"]["additional_power_meter_numbers"].append(number.strip())
             if data["main_deal"].get("old_smartme_numbers") not in empty_values:
                 if isinstance(data["main_deal"].get("old_smartme_numbers"), list):
                     numbers = data["main_deal"].get("old_smartme_numbers")
@@ -536,7 +536,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 for number in numbers:
                     number = number.strip()
                     if number != "" and number not in config["lightcloud"]["additional_smartme_numbers"]:
-                        config["lightcloud"]["additional_smartme_numbers"].append(number)
+                        config["lightcloud"]["additional_smartme_numbers"].append(number.strip())
 
         if offer_v2.calculated.get("min_kwp_emove") > 0:
             config["emove"] = {
@@ -578,8 +578,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                     "message": "Wärmecloud Auftrag nicht gefunden"
                 })
             else:
-                config["heatcloud"]["smartme_number"] = deals[0].get("smartme_number_heatcloud")
-                config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number")
+                config["heatcloud"]["smartme_number"] = deals[0].get("smartme_number_heatcloud").strip()
+                config["heatcloud"]["power_meter_number"] = deals[0].get("heatcloud_power_meter_number").strip()
                 config["heatcloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
                 if config["heatcloud"]["delivery_begin"] not in ["", None]:
                     if parse(config["earliest_delivery_begin"]) > parse(config["heatcloud"]["delivery_begin"]):
@@ -595,7 +595,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                     for number in numbers:
                         number = number.strip()
                         if number != "" and number not in config["heatcloud"]["additional_power_meter_numbers"]:
-                            config["heatcloud"]["additional_power_meter_numbers"].append(number)
+                            config["heatcloud"]["additional_power_meter_numbers"].append(number.strip())
                 if deals[0].get("old_smartme_numbers") not in empty_values:
                     if isinstance(deals[0].get("old_smartme_numbers"), list):
                         numbers = deals[0].get("old_smartme_numbers")
@@ -604,7 +604,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                     for number in numbers:
                         number = number.strip()
                         if number != "" and number not in config["heatcloud"]["additional_smartme_numbers"]:
-                            config["heatcloud"]["additional_smartme_numbers"].append(number)
+                            config["heatcloud"]["additional_smartme_numbers"].append(number.strip())
         if offer_v2.calculated.get("min_kwp_ecloud") > 0:
             config["ecloud"] = {
                 "label": "eCloud",
@@ -630,7 +630,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 })
             else:
                 config["ecloud"]["smartme_number"] = None
-                config["ecloud"]["power_meter_number"] = deals[0].get("counter_ecloud")
+                config["ecloud"]["power_meter_number"] = deals[0].get("counter_ecloud").strip()
                 config["ecloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
                 if parse(config["earliest_delivery_begin"]) > parse( config["ecloud"]["delivery_begin"]):
                     config["earliest_delivery_begin"] =  config["ecloud"]["delivery_begin"]
@@ -645,19 +645,19 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                     for number in numbers:
                         number = number.strip()
                         if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
-                            config["ecloud"]["additional_power_meter_numbers"].append(number)
+                            config["ecloud"]["additional_power_meter_numbers"].append(number.strip())
                 if data["main_deal"].get("old_power_meter_numbers_ecloud") not in empty_values:
                     numbers = data["main_deal"].get("old_power_meter_numbers_ecloud").split("\n")
                     for number in numbers:
                         number = number.strip()
                         if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
-                            config["ecloud"]["additional_power_meter_numbers"].append(number)
+                            config["ecloud"]["additional_power_meter_numbers"].append(number.strip())
                 if deals[0].get("old_power_meter_numbers_ecloud") not in empty_values:
                     numbers = deals[0].get("old_power_meter_numbers_ecloud").split("\n")
                     for number in numbers:
                         number = number.strip()
                         if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
-                            config["ecloud"]["additional_power_meter_numbers"].append(number)
+                            config["ecloud"]["additional_power_meter_numbers"].append(number.strip())
         if offer_v2.calculated.get("min_kwp_consumer") > 0:
             config["consumer_cloud_price_overwrite"] = offer_v2.data.get("consumer_cloud_price_overwrite")
             config["consumer_extra_price_per_kwh_overwrite"] = offer_v2.data.get("consumer_extra_price_per_kwh_overwrite")
@@ -687,7 +687,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                         "message": f"Consumer {index + 1} Auftrag nicht gefunden"
                     })
                 else:
-                    consumer["power_meter_number"] = existing_deal.get("delivery_counter_number")
+                    consumer["power_meter_number"] = existing_deal.get("delivery_counter_number").strip()
                     consumer["delivery_begin"] = existing_deal.get("cloud_delivery_begin")
                     if parse(config["earliest_delivery_begin"]) > parse(consumer["delivery_begin"]):
                         config["earliest_delivery_begin"] = consumer["delivery_begin"]
@@ -696,7 +696,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                         for number in numbers:
                             number = number.strip()
                             if number != "" and number not in consumer["additional_power_meter_numbers"]:
-                                consumer["additional_power_meter_numbers"].append(number)
+                                consumer["additional_power_meter_numbers"].append(number.strip())
                     consumer["deal"] = {
                         "id": existing_deal.get("id"),
                         "title": existing_deal.get("title")
