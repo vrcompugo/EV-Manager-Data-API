@@ -1375,7 +1375,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
         start_value2 = None
         end_value = None
         for value in values:
-            if value["number"] == number:
+            if value["number"].strip() == number:
                 if value["date"] < start_date:
                     start_value = value
                 if value["date"] == start_date:
