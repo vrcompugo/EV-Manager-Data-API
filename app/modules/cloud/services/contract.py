@@ -824,7 +824,10 @@ def get_annual_statement_data(data, year, manuell_data):
                 if product == "lightcloud" and statement_config[product]["extra_price_per_kwh"] < 0.3379:
                     statement_config[product]["extra_price_per_kwh"] = 0.3379
                 if manuell_data.get(f"{product}_extra_price_per_kwh") not in [None, ""]:
-                    statement_config[product]["extra_price_per_kwh"] = float(manuell_data.get(f"{product}_extra_price_per_kwh")) / 100
+                    if product.find("consumer") >= 0:
+                        statement_config[product]["extra_price_per_kwh"] = float(manuell_data.get(f"consumer_extra_price_per_kwh")) / 100
+                    else:
+                        statement_config[product]["extra_price_per_kwh"] = float(manuell_data.get(f"{product}_extra_price_per_kwh")) / 100
                 if statement["extra_price_per_kwh"] < statement_config[product]["extra_price_per_kwh"]:
                     statement["extra_price_per_kwh"] = statement_config[product]["extra_price_per_kwh"]
                 product_delivery_begin = f"{year}-01-01"
