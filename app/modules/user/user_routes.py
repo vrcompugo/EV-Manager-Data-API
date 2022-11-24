@@ -139,7 +139,7 @@ def supervisors():
         384,   # Team Schuster
         458,   # Team Oftring
         464,   # Team Rieger
-        462    # Spba-Finanz*
+        462,    # Spba-Finanz*
         489,   # Solar B
         503    # Team Ellrich
     ]
