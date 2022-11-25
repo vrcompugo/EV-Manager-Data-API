@@ -85,7 +85,7 @@ def get_device_by_datetime(smartme_number, datetime_item):
                             data["Date"] = str(requested_date)
                             return data
         if normalize_date(data.get("Date")) < datetime(2002,1,1):
-            print("problem")
+            print("problem", data.get("Date"))
             return data
     return data
 

@@ -907,7 +907,7 @@ def get_annual_statement_data(data, year, manuell_data):
                     if counters is not None and len(counters) > 0:
                         statement_config[product]["actual_usage"] = statement_config[product]["actual_usage"] + sum(item['usage'] for item in counters)
                         statement["counters"] = statement["counters"] + counters
-                if statement_config[product].get("power_meter_number") not in [None, "", "123", 0, "0"]:
+                if statement_config[product].get("power_meter_number") not in [None, "", 0, "0"]:
                     counter_numbers.append(statement_config[product].get("power_meter_number"))
                     counter_numbers = counter_numbers + statement_config[product].get("additional_power_meter_numbers", [])
                     values = []
