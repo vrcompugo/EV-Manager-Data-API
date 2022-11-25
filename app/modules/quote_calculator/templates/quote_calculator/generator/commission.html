@@ -27,32 +27,52 @@
       {% if data.calculated.commission_value and data.calculated.commission_value > 0 %}
         <tr>
           <td class="align-right align-top">{{ index.index }}</td>
-          <td class="border-right align-top description"><div>PV-Angebot - Verkaufspreis netto: {{ data.total_net | currencyformat }}</div></td>
-          <td class="border-right align-right align-top empty-on-split">{{ data.calculated.commission_value | currencyformat }}</td>
+          <td class="border-right align-top description"><div>Teil 1. PV-Angebot - Verkaufspreis netto: {{ data.total_net | currencyformat }}</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ (data.calculated.commission_value * 0.7) | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="border-right align-top description"><div>Restbetrag PV-Angebot - Verkaufspreis netto: {{ data.total_net | currencyformat }}</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ (data.calculated.commission_value * 0.3) | currencyformat }}</td>
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
       {% endif %}
       {% if data.roof_reconstruction_quote and data.roof_reconstruction_quote.calculated.commission_value and data.roof_reconstruction_quote.calculated.commission_value > 0 %}
         <tr>
           <td class="align-right align-top">{{ index.index }}</td>
-          <td class="border-right align-top description"><div>Dachsanierung - Verkaufspreis netto: {{ data.roof_reconstruction_quote.total_net | currencyformat }}</div></td>
-          <td class="border-right align-right align-top empty-on-split">{{ data.roof_reconstruction_quote.calculated.commission_value | currencyformat }}</td>
+          <td class="border-right align-top description"><div>Teil 1. Dachsanierung - Verkaufspreis netto: {{ data.roof_reconstruction_quote.total_net | currencyformat }}</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ (data.roof_reconstruction_quote.calculated.commission_value * 0.7) | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="border-right align-top description"><div>Restbetrag Dachsanierung - Verkaufspreis netto: {{ data.roof_reconstruction_quote.total_net | currencyformat }}</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ (data.roof_reconstruction_quote.calculated.commission_value * 0.3) | currencyformat }}</td>
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
       {% endif %}
       {% if data.heating_quote and data.heating_quote.calculated.commission_value and data.heating_quote.calculated.commission_value > 0 %}
         <tr>
           <td class="align-right align-top">{{ index.index }}</td>
-          <td class="border-right align-top description"><div>Heizung - Verkaufspreis netto: {{ data.heating_quote.total_net | currencyformat }}</div></td>
-          <td class="border-right align-right align-top empty-on-split">{{ data.heating_quote.calculated.commission_value | currencyformat }}</td>
+          <td class="border-right align-top description"><div>Teil 1. Heizung - Verkaufspreis netto: {{ data.heating_quote.total_net | currencyformat }}</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ (data.heating_quote.calculated.commission_value * 0.7) | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="border-right align-top description"><div>Restbetrag Heizung - Verkaufspreis netto: {{ data.heating_quote.total_net | currencyformat }}</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ (data.heating_quote.calculated.commission_value * 0.3) | currencyformat }}</td>
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
       {% endif %}
       {% if data.bluegen_quote and data.bluegen_quote.calculated.commission_value and data.bluegen_quote.calculated.commission_value > 0 %}
         <tr>
           <td class="align-right align-top">{{ index.index }}</td>
-          <td class="border-right align-top description"><div>BlueGen - Verkaufspreis netto: {{ data.bluegen_quote.total_net | currencyformat }}</div></td>
-          <td class="border-right align-right align-top empty-on-split">{{ data.bluegen_quote.calculated.commission_value | currencyformat }}</td>
+          <td class="border-right align-top description"><div>Teil 1. BlueGen - Verkaufspreis netto: {{ data.bluegen_quote.total_net | currencyformat }}</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ (data.bluegen_quote.calculated.commission_value * 0.7) | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td class="align-right align-top">{{ index.index }}</td>
+          <td class="border-right align-top description"><div>Restbetrag BlueGen - Verkaufspreis netto: {{ data.bluegen_quote.total_net | currencyformat }}</div></td>
+          <td class="border-right align-right align-top empty-on-split">{{ (data.bluegen_quote.calculated.commission_value * 0.3) | currencyformat }}</td>
         </tr>
         {% if index.update({"index": index.index + 1 }) %} {% endif %}
       {% endif %}

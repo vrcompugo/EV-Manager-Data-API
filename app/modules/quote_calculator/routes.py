@@ -302,11 +302,11 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
         "upload_link_electric": data["data"]["upload_link_electric"],
         "upload_link_heating": data["data"]["upload_link_heating"],
         "upload_link_invoices": data["data"]["upload_link_invoices"],
-        "upload_link_contract": data["data"]["upload_link_contract"]
+        "upload_link_contract": data["data"]["upload_link_contract"],
+        "is_splittable": "1"
     }
     if contact_id is not None:
         update_data["contact_id"] = contact_id
-    update_lead(lead_id, update_data)
 
     if "has_pv_quote" in data["data"] and data["data"]["has_pv_quote"] and data.get("total") not in [None, "", 0]:
         quote = add_quote({
@@ -323,6 +323,8 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
             "special_conditions": data["data"].get("special_conditions_pv_quote", None)
         })
         update_quote_products(quote["id"], data)
+        update_data["has_pv_quote"] = 1
+        update_data["pv_quote_sum"] = history.data.get("total")
     if "has_roof_reconstruction_quote" in data["data"] and data["data"]["has_roof_reconstruction_quote"]:
         quote = add_quote({
             "title": f"Dachsanierung {lead['contact']['first_name']} {lead['contact']['last_name']}, {lead['contact']['city']}",
@@ -338,6 +340,8 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
             "special_conditions": data["data"].get("special_conditions_roof_reconstruction_quote", None)
         })
         update_quote_products(quote["id"], data["roof_reconstruction_quote"])
+        update_data["has_roof_reconstruction_quote"] = 1
+        update_data["roof_reconstruction_quote_sum"] = history.data.get("roof_reconstruction_quote").get("total")
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
         quote = add_quote({
             "title": f"Heizung {lead['contact']['first_name']} {lead['contact']['last_name']}, {lead['contact']['city']}",
@@ -353,6 +357,8 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
             "special_conditions": data["data"].get("special_conditions_heating_quote", "")
         })
         update_quote_products(quote["id"], data["heating_quote"])
+        update_data["has_heating_quote"] = 1
+        update_data["heating_quote_sum"] = history.data.get("heating_quote").get("total")
     if "has_bluegen_quote" in data["data"] and data["data"]["has_bluegen_quote"]:
         quote = add_quote({
             "title": f"BlueGen {lead['contact']['first_name']} {lead['contact']['last_name']}, {lead['contact']['city']}",
@@ -368,6 +374,9 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
             "special_conditions": data["data"].get("special_conditions_bluegen_quote", "")
         })
         update_quote_products(quote["id"], data["bluegen_quote"])
+        update_data["has_bluegen_quote"] = 1
+        update_data["bluegen_quote_sum"] = history.data.get("bluegen_quote").get("total")
+    update_lead(lead_id, update_data)
     data["quote_datetime"] = data["datetime"]
 
     return {"status": "success", "data": data}
