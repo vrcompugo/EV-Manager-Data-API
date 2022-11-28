@@ -1664,7 +1664,7 @@ def store_custom_config(data):
             "usage": consumer["usage"],
             "address": {}
         })
-    print(json.dumps(data, indent=2))
+    offer_data["pv_kwp"] = data.get("pv_kwp")
     for product in ["lightcloud", "heatcloud", "ecloud"]:
         if data.get(product) is not None:
             offer_data[f"{product}_min_kwp_overwrite"] = data.get(product).get("min_kwp_overwrite")
