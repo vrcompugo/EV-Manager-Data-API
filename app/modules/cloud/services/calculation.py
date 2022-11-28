@@ -416,6 +416,8 @@ def calculate_cloud(data):
                         data["extra_options"].append("solaredge")
                 if "solaredge" not in data["extra_options"]:
                     result["min_kwp_light"] = result["min_kwp_light"] + 0.44
+        if data.get("lightcloud_min_kwp_overwrite") in [True]:
+            result["min_kwp_light"] = float(data["lightcloud_min_kwp"])
         result["storage_size"] = round((power_usage / 500)) * 500 / 1000
         if "name" and user or user["name"].lower() not in ["bsh"] and datetime.now() > kez_changedate2:
             if "price_guarantee" in data and data["price_guarantee"] not in ["2_years", "1_year"]:
@@ -498,6 +500,8 @@ def calculate_cloud(data):
             settings["data"]["cloud_settings"]["cloud_user_heater_prices"][str(user_id_for_prices)]
         ))[0]["value"]
         result["min_kwp_heatcloud"] = heater_usage * heater_to_kwp_factor * direction_factor_kwp / 1000
+        if data.get("heatcloud_min_kwp_overwrite") in [True]:
+            result["min_kwp_heatcloud"] = float(data["heatcloud_min_kwp"])
         result["conventional_price_heatcloud"] = (heater_usage * settings["data"]["cloud_settings"]["heatcloud_conventional_price_per_kwh"]) / 12
         if data is not None and "conventional_heat_cost_per_kwh" in data and data["conventional_heat_cost_per_kwh"] is not None and data["conventional_heat_cost_per_kwh"] != "":
             data["conventional_heat_cost_per_kwh"] = float(data["conventional_heat_cost_per_kwh"])
@@ -520,6 +524,8 @@ def calculate_cloud(data):
         else:
             result["cloud_price_ecloud"] = settings["data"]["cloud_settings"]["cloud_user_ecloud_prices"][str(user_id_for_prices)]
         result["min_kwp_ecloud"] = data["ecloud_usage"] / settings["data"]["cloud_settings"]["ecloud_to_kwp_factor"]
+        if data.get("ecloud_min_kwp_overwrite") in [True]:
+            result["min_kwp_ecloud"] = float(data["ecloud_min_kwp"])
         settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"]
         result["conventional_price_ecloud"] = (data["ecloud_usage"] * settings["data"]["cloud_settings"]["ecloud_conventional_price_per_kwh"]) / 12
         if data is not None and "conventional_gas_cost_per_kwh" in data and data["conventional_gas_cost_per_kwh"] is not None and data["conventional_gas_cost_per_kwh"] != "":
@@ -551,6 +557,8 @@ def calculate_cloud(data):
         if consumer_usage > 0:
             result["consumer_usage"] = consumer_usage
             result["min_kwp_consumer"] = (consumer_usage * settings["data"]["cloud_settings"]["consumer_to_kwp_factor"] * direction_factor_kwp) / 1000
+            if data.get("consumer_min_kwp_overwrite") in [True]:
+                result["min_kwp_consumer"] = float(data["consumer_min_kwp"])
             result["conventional_price_consumer"] = (
                 (
                     settings["data"]["wi_settings"]["conventional_base_cost_per_year"] * len(data["consumers"])

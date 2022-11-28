@@ -493,6 +493,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
             config["cashback_price_per_kwh"] = offer_v2.calculated.get("cashback_price_per_kwh")
         if offer_v2.calculated.get("ecloud_cashback_price_per_kwh") is not None:
             config["ecloud_cashback_price_per_kwh"] = offer_v2.calculated.get("ecloud_cashback_price_per_kwh")
+        config["pv_kwp"] = offer_v2.data.get("pv_kwp")
+        config["pv_kwp_overwrite"] = offer_v2.data.get("pv_kwp_overwrite")
         if offer_v2.calculated.get("min_kwp_light") > 0:
             config["lightcloud"] = {
                 "label": "Lichtcloud",
@@ -659,6 +661,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                         if number != "" and number not in config["ecloud"]["additional_power_meter_numbers"]:
                             config["ecloud"]["additional_power_meter_numbers"].append(number)
         if offer_v2.calculated.get("min_kwp_consumer") > 0:
+            config["consumer_min_kwp"] = offer_v2.data.get("consumer_min_kwp")
+            config["consumer_min_kwp_overwrite"] = offer_v2.data.get("consumer_min_kwp_overwrite")
             config["consumer_cloud_price_overwrite"] = offer_v2.data.get("consumer_cloud_price_overwrite")
             config["consumer_extra_price_per_kwh_overwrite"] = offer_v2.data.get("consumer_extra_price_per_kwh_overwrite")
             for index, consumer in enumerate(offer_v2.data.get("consumers")):
@@ -1660,6 +1664,16 @@ def store_custom_config(data):
             "usage": consumer["usage"],
             "address": {}
         })
+    print(json.dumps(data, indent=2))
+    for product in ["lightcloud", "heatcloud", "ecloud"]:
+        if data.get(product) is not None:
+            offer_data[f"{product}_min_kwp_overwrite"] = data.get(product).get("min_kwp_overwrite")
+            if offer_data[f"{product}_min_kwp_overwrite"] is True:
+                offer_data[f"{product}_min_kwp"] = data.get(product).get("min_kwp")
+    offer_data["consumer_min_kwp_overwrite"] = data.get("consumer_min_kwp_overwrite")
+    if offer_data["consumer_min_kwp_overwrite"] is True:
+        offer_data["consumer_min_kwp"] = data.get("consumer_min_kwp")
+    offer_data["old_price_calculation"] = "VOgcqFFeQLpV9cxOA02lzXdAYX"
     offer_v2.calculated = calculate_cloud(data=offer_data)
     offer_v2.calculated["cloud_price"] = 0
     for product in ["lightcloud", "heatcloud", "ecloud"]:
@@ -1675,12 +1689,7 @@ def store_custom_config(data):
             if data.get(product).get("extra_price_per_kwh_overwrite"):
                 offer_v2.calculated[f"{product}_extra_price_per_kwh"] = float(data[product].get("extra_price_per_kwh"))
 
-
-            offer_data[f"{product}_min_kwp_overwrite"] = data.get(product).get("min_kwp_overwrite")
-            if data.get(product).get("min_kwp_overwrite"):
-                offer_v2.calculated[f"min_kwp_{product2}"] = float(data[product].get("min_kwp"))
         offer_v2.calculated["cloud_price"] = offer_v2.calculated["cloud_price"] + offer_v2.calculated[f"cloud_price_{product2}"]
-
     offer_data["consumer_cloud_price_overwrite"] = data.get("consumer_cloud_price_overwrite")
     if data.get("consumer_cloud_price_overwrite"):
         offer_v2.calculated["cloud_price_consumer"] = float(data.get("consumer_cloud_price"))
@@ -1692,9 +1701,7 @@ def store_custom_config(data):
     offer_v2.calculated["cloud_price_consumer_incl_refund"] = offer_v2.calculated["cloud_price_consumer"]
     offer_v2.calculated["cloud_price"] = offer_v2.calculated["cloud_price"] + offer_v2.calculated["cloud_price_consumer"]
 
-    offer_v2.calculated["cloud_price_incl_refund"] = offer_v2.calculated["cloud_price"]
-    offer_v2.calculated["cloud_price_extra"] = 0
-    offer_v2.calculated["kwp_extra"] = 0
+    offer_v2.calculated["cloud_price_incl_refund"] = offer_v2.calculated["cloud_price"] + offer_v2.calculated["cloud_price_extra"]
     items = get_cloud_products(data={"calculated": offer_v2.calculated, "data": offer_data})
     offer_v2.items = []
     for item_data in items:
@@ -1703,7 +1710,6 @@ def store_custom_config(data):
         offer_v2.items.append(item_object)
 
     offer_v2.data = offer_data
-    print(json.dumps(offer_data, indent=2))
     db.session.commit()
     return True
 
