@@ -148,7 +148,7 @@ def get_test_recreate_quote():
 def get_test_missing_values_deal():
     from app.modules.external.bitrix24.deal import get_deal, set_missing_values
     from app.modules.external.bitrix24.lead import get_lead
-    print(json.dumps(set_missing_values(get_deal(106733)), indent=2))
+    print(json.dumps(set_missing_values(get_deal(111539)), indent=2))
 
 
 @manager.option("-i", "--id", dest='deal_id', default=None)
