@@ -127,8 +127,8 @@
               </td>
               <td>{{ config[product].delivery_begin | dateformat }}</td>
               <td>{{ config[product].delivery_end | dateformat }}</td>
-              <td style="text-align: right;">{% if config[product].total_extra_price > 0 %}{{ config[product].total_extra_price | currencyformat }}{% endif%}</td>
-              <td style="text-align: right;">{% if config[product].total_extra_price <= 0 %}{{ -config[product].total_extra_price | currencyformat }}{% endif%}</td>
+              <td style="text-align: right; white-space: nowrap;">{% if config[product].total_extra_price > 0 %}{{ config[product].total_extra_price | currencyformat }}{% endif%}</td>
+              <td style="text-align: right; white-space: nowrap;">{% if config[product].total_extra_price <= 0 %}{{ -config[product].total_extra_price | currencyformat }}{% endif%}</td>
             </tr>
           {% endif %}
         {% endfor %}
@@ -140,8 +140,8 @@
             </td>
             <td>{{ config.delivery_begin | dateformat }}</td>
             <td>{{ config.delivery_end | dateformat }}</td>
-            <td style="text-align: right;">{% if config.total_cloud_price_incl_refund > 0 %}{{ config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
-            <td style="text-align: right;">{% if config.total_cloud_price_incl_refund <= 0 %}{{ -config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
+            <td style="text-align: right; white-space: nowrap;">{% if config.total_cloud_price_incl_refund > 0 %}{{ config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
+            <td style="text-align: right; white-space: nowrap;">{% if config.total_cloud_price_incl_refund <= 0 %}{{ -config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
           </tr>
         {% endif %}
       {% endfor %}
@@ -161,8 +161,8 @@
           <td>{{ statement.extra_credit_label }}</td>
           <td></td>
           <td></td>
-          <td style="text-align: right;">{% if statement.extra_credit_value < 0 %}{{ -statement.extra_credit_value | currencyformat }}{% endif%}</td>
-          <td style="text-align: right;">{% if statement.extra_credit_value > 0 %}{{ statement.extra_credit_value | currencyformat }}{% endif%}</td>
+          <td style="text-align: right; white-space: nowrap;">{% if statement.extra_credit_value > 0 %}{{ statement.extra_credit_value | currencyformat }}{% endif%}</td>
+          <td style="text-align: right; white-space: nowrap;">{% if statement.extra_credit_value < 0 %}{{ -statement.extra_credit_value | currencyformat }}{% endif%}</td>
         </tr>
       {% endif %}
       {% if statement.extra_credit_value2 != 0 %}
@@ -170,14 +170,14 @@
           <td>{{ statement.extra_credit_label2 }}</td>
           <td></td>
           <td></td>
-          <td style="text-align: right;">{% if statement.extra_credit_value2 < 0 %}{{ -statement.extra_credit_value2 | currencyformat }}{% endif%}</td>
-          <td style="text-align: right;">{% if statement.extra_credit_value2 > 0 %}{{ statement.extra_credit_value2 | currencyformat }}{% endif%}</td>
+          <td style="text-align: right; white-space: nowrap;">{% if statement.extra_credit_value2 > 0 %}{{ statement.extra_credit_value2 | currencyformat }}{% endif%}</td>
+          <td style="text-align: right; white-space: nowrap;">{% if statement.extra_credit_value2 < 0 %}{{ -statement.extra_credit_value2 | currencyformat }}{% endif%}</td>
         </tr>
       {% endif %}
       <tr class="summary">
         <td colspan="3"><b>{% if statement.to_pay > 0 %}Noch zu Zahlen{% else %}Auszahlung{% endif%}</b></td>
-        <td style="text-align: right;">{% if statement.to_pay > 0 %}{{ statement.to_pay | currencyformat }}{% endif%}</td>
-        <td style="text-align: right;">{% if statement.to_pay <= 0 %}{{ -statement.to_pay | currencyformat }}{% endif%}</td>
+        <td style="text-align: right; white-space: nowrap;">{% if statement.to_pay > 0 %}{{ statement.to_pay | currencyformat }}{% endif%}</td>
+        <td style="text-align: right; white-space: nowrap;">{% if statement.to_pay <= 0 %}{{ -statement.to_pay | currencyformat }}{% endif%}</td>
       </tr>
     </table>
     <br>
