@@ -201,7 +201,7 @@ def calculate_cloud(data):
                     { "from": 750000, "to": 9999999, "value": 3490.99 * 1.43110881 }
                 ]
 
-                if data.get("old_price_calculation", "") not in ["CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"]:
+                if data.get("old_price_calculation", "") not in ["CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"] and data.get("cloud_quote_heat_seperate") not in [True, 1, "true"]:
                     if data.get("cloud_quote_type") not in ["combination_quote", "interim_quote", "custom_config", "legacy_cloud"]:
                         if data.get("heater_usage") not in [None, "", 0]:
                             power_usage = int(data["power_usage"]) + int(data["heater_usage"])
