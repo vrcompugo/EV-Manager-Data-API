@@ -398,7 +398,7 @@ def generate_datasheet_pdf(lead_id, data):
                 add_pdf_by_drive_id(merger, 1352454, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352454/?&ncc=1&filename=power-optimizer-datasheet-30.pdf
             else:
                 add_pdf_by_drive_id(merger, 1352452, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1352452/?&ncc=1&filename=power-optimizer-datasheet.pdf
-        if "tax_consult" in data["data"]["extra_options"]:
+        if False and "tax_consult" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, 436100, cached=True)
 
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:

@@ -361,7 +361,7 @@ def calculate_products(data):
                     product["quantity"] = 1
                     product["PRICE"] = -float(product["PRICE"])
                     data["products"].append(product)
-        if "tax_consult" in data["data"]["extra_options"] or "tax_consult" in data["data"]["extra_options_zero"]:
+        if False and ("tax_consult" in data["data"]["extra_options"] or "tax_consult" in data["data"]["extra_options_zero"]):
             quantity = 0
             if "tax_consult" in data["data"]["extra_options"]:
                 quantity = 1
