@@ -485,7 +485,7 @@ def generate_contract_summary_pdf(lead_id, data):
     if "data" in data and data["data"].get("is_commercial") is True:
         add_pdf_by_drive_id(merger, 1598546, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/1598546/?&ncc=1&filename=Verkaufsunterlagen+Gewerbe.pdf
     else:
-        add_pdf_by_drive_id(merger, 443352, cached=True)  # Verkaufsunterlagen
+        add_pdf_by_drive_id(merger, 443352, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/443352/?&ncc=1&filename=Verkaufsunterlagen.pdf
     if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
         add_pdf_by_drive_id(merger, 2528314, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2528314/?&ncc=1&filename=contractingvertrag_januar_2022.pdf
     else:
@@ -502,7 +502,7 @@ def generate_contract_summary_pdf(lead_id, data):
 def generate_contract_summary_part1_pdf(lead_id, data):
     if "data" in data and data["data"].get("is_commercial") is True:
         return get_file_content_cached(1598546)  # https://keso.bitrix24.de/disk/downloadFile/1598546/?&ncc=1&filename=Verkaufsunterlagen+Gewerbe.pdf
-    return get_file_content_cached(443352)  # Verkaufsunterlagen
+    return get_file_content_cached(443352)  # https://keso.bitrix24.de/disk/downloadFile/443352/?&ncc=1&filename=Verkaufsunterlagen.pdf
 
 
 def generate_contract_summary_part2_pdf(lead_id, data):
