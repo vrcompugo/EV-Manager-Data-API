@@ -757,7 +757,6 @@ def get_annual_statement_data(data, year, manuell_data):
         for item in sherpa_items:
             existing_counter = next((i for i in sherpa_counters if i["number"] == item.zahlernummer and i["start_date"] == str(item.datum_stand_alt) and i["end_date"] == str(item.datum_stand_neu)), None)
             if existing_counter is not None:
-                print("scher", existing_counter["sherpa_invoice_id"], item.sherpa_invoice_id)
                 if existing_counter["sherpa_invoice_id"] == item.sherpa_invoice_id:
                     existing_counter["start_value"] = existing_counter["start_value"] + item.stand_alt
                     existing_counter["end_value"] = existing_counter["end_value"] + item.stand_neu
@@ -1062,7 +1061,6 @@ def get_annual_statement_data(data, year, manuell_data):
         for statement_config in statement["configs"]:
             if product not in statement_config:
                 continue
-            print("asd", statement_config[product].get("actual_usage_net"))
             if statement_config[product].get("actual_usage_net") in [None, "", 0]:
                 continue
             if f"total_self_usage_{product}" not in statement:
@@ -1758,6 +1756,14 @@ def move_2022_contracts():
     }, force_reload=True)
     for deal in deals:
         contract = get_contract_data(deal.get("contract_number"), force_reload=False)
+        move_deal = True
+        if contract.get("main_deal") is None:
+            print(deal.get("contract_number"), "no main deal")
+            move_deal = False
         if contract.get("cancel_date") not in [None, ""]:
             print(deal.get("contract_number"), contract["cancel_date"])
+            if normalize_date(contract["cancel_date"]).year <= 2021:
+                move_deal = False
+        if move_deal:
+            print(deal.get("contract_number"), "move")
             # C126:UC_XM96DH
