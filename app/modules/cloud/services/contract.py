@@ -1741,3 +1741,20 @@ def string_stripper(text):
     if text is None:
         return None
     return text.strip()
+
+
+def move_2022_contracts():
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 126,
+        "FILTER[STAGE_ID]": "C126:WON"
+    }, force_reload=True)
+    deals = deals + get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 126,
+        "FILTER[STAGE_ID]": "C126:FINAL_INVOICE"
+    }, force_reload=True)
+    for deal in deals:
+        contract = get_contract_data(deal.get("contract_number"), force_reload=False)
+        if contract["cancel_date"] not in [None, ""]:
+            print(deal.get("contract_number"), contract["cancel_date"])
