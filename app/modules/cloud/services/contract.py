@@ -1758,3 +1758,4 @@ def move_2022_contracts():
         contract = get_contract_data(deal.get("contract_number"), force_reload=False)
         if contract["cancel_date"] not in [None, ""]:
             print(deal.get("contract_number"), contract["cancel_date"])
+            # C126:UC_XM96DH

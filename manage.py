@@ -90,6 +90,13 @@ def send_test_enbw_contract():
 
 
 @manager.command
+def run_move_2022_contracts():
+    from app.modules.cloud.services.contract import move_2022_contracts
+    move_2022_contracts()
+
+
+
+@manager.command
 def redo_sherpa_gas_usgae():
     from app.models import SherpaInvoiceItem
     invoice_items = SherpaInvoiceItem.query.all()
