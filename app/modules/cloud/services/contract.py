@@ -1764,10 +1764,13 @@ def move_2022_contracts():
             if normalize_date(contract["cancel_date"]).year <= 2021:
                 print(deal.get("contract_number"), contract["cancel_date"])
                 move_deal = False
+        if len(contract.get("configs")) == 0:
+            print(deal.get("contract_number"), "no configs")
+            move_deal = False
         if move_deal:
             last_config = contract.get("configs")[len(contract.get("configs")) - 1]
             if deal.get("cloud_number") != last_config["cloud_number"]:
                 print(deal.get("contract_number"), "move", last_config["cloud_number"])
             else:
-                print(deal.get("contract_number"), "move")
+                pass #print(deal.get("contract_number"), "move")
             # C126:UC_XM96DH
