@@ -160,6 +160,8 @@ def load_contract_data(contract_number):
     data["pv_system"]["zip"] = data["main_deal"].get("cloud_zip")
     data["pv_system"]["pv_kwp"] = data["main_deal"].get("pv_kwp")
     data["construction_date"] = data["main_deal"].get("construction_date2")
+    if data["main_deal"].get("cloud_number") is None:
+        data["main_deal"]["cloud_number"] = ""
     cloud_number = data["main_deal"].get("cloud_number").replace(" ", "")
     if data["main_deal"].get("cloud_delivery_begin") not in empty_values and cloud_number not in empty_values:
         data = get_cloud_config(data, cloud_number, data["main_deal"].get("cloud_delivery_begin"), data["main_deal"].get("cloud_delivery_begin_1"), first_delivery=True)
