@@ -1756,21 +1756,16 @@ def move_2022_contracts():
     }, force_reload=True)
     for deal in deals:
         contract = get_contract_data(deal.get("contract_number"), force_reload=False)
-        move_deal = True
         if contract.get("main_deal") is None:
             print(deal.get("contract_number"), "no main deal")
-            move_deal = False
-        if contract.get("cancel_date") not in [None, ""]:
-            if normalize_date(contract["cancel_date"]).year <= 2021:
-                print(deal.get("contract_number"), contract["cancel_date"])
-                move_deal = False
-        if contract.get("configs") is None or len(contract.get("configs")) == 0:
+        elif contract.get("cancel_date") not in [None, ""] and normalize_date(contract["cancel_date"]).year <= 2021:
+            print(deal.get("contract_number"), contract["cancel_date"])
+        elif contract.get("configs") is None or len(contract.get("configs")) == 0:
             print(deal.get("contract_number"), "no configs")
-            move_deal = False
-        if move_deal:
+        else:
             last_config = contract.get("configs")[len(contract.get("configs")) - 1]
             if deal.get("cloud_number") != last_config["cloud_number"]:
-                print(deal.get("contract_number"), "move", last_config["cloud_number"])
+                pass #print(deal.get("contract_number"), "move", last_config["cloud_number"])
             else:
                 pass #print(deal.get("contract_number"), "move")
             # C126:UC_XM96DH
