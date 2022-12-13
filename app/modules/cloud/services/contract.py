@@ -1765,7 +1765,11 @@ def move_2022_contracts():
         else:
             last_config = contract.get("configs")[len(contract.get("configs")) - 1]
             if deal.get("cloud_number") != last_config["cloud_number"]:
-                pass #print(deal.get("contract_number"), "move", last_config["cloud_number"])
+                update_deal({
+                    "stage_id": "C126:UC_XM96DH",
+                    "cloud_number": last_config["cloud_number"]
+                })
             else:
-                pass #print(deal.get("contract_number"), "move")
-            # C126:UC_XM96DH
+                update_deal({
+                    "stage_id": "C126:UC_XM96DH"
+                })
