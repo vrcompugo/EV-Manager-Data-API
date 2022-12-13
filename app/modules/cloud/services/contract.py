@@ -1761,8 +1761,8 @@ def move_2022_contracts():
             print(deal.get("contract_number"), "no main deal")
             move_deal = False
         if contract.get("cancel_date") not in [None, ""]:
-            print(deal.get("contract_number"), contract["cancel_date"])
             if normalize_date(contract["cancel_date"]).year <= 2021:
+                print(deal.get("contract_number"), contract["cancel_date"])
                 move_deal = False
         if move_deal:
             print(deal.get("contract_number"), "move")
