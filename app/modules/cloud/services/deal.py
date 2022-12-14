@@ -164,6 +164,7 @@ def copy_cloud_deal_values(deal):
         follow_deal["category_id"] = "220"
         follow_deal["stage_id"] = "C220:NEW"
         follow_deal = add_deal(follow_deal)
+        follow_deals = [follow_deal]
     if len(follow_deals) > 1:
         print("much follow deals")
         return
