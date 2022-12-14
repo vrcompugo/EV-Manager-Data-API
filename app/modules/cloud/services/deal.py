@@ -148,18 +148,24 @@ def cron_copy_cloud_deal_values():
 
 
 def copy_cloud_deal_values(deal):
-    print("deal", deal.get("id"))
     system_config = get_settings(section="external/bitrix24")
     if deal.get("is_cloud_master_deal") not in ["1", 1, True]:
-        print("not master deal")
         return
+    print("deal", deal.get("id"))
     follow_deals = get_deals({
         "SELECT": "full",
         f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": deal.get("contract_number"),
         "FILTER[CATEGORY_ID]": 220
     }, force_reload=True)
-    if len(follow_deals) != 1:
-        print("no or to much follow deals")
+    if len(follow_deals) < 1:
+        print("no follow deals")
+        follow_deal = json.loads(json.dumps(deal))
+        del follow_deal["id"]
+        follow_deal["category_id"] = "220"
+        follow_deal["stage_id"] = "C220:NEW"
+        follow_deal = add_deal(follow_deal)
+    if len(follow_deals) > 1:
+        print("much follow deals")
         return
     follow_deal = follow_deals[0]
     if follow_deal.get("stage_id") != "C220:NEW":
