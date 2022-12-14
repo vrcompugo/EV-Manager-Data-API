@@ -124,8 +124,6 @@ def cron_mein_portal_initial_documents():
 
 def cron_copy_cloud_deal_values():
     print("copy_cloud_deal_values")
-    copy_cloud_deal_values(get_deal(414))
-    return
     config = get_settings("cloud/copy_cloud_deal_values")
     system_config = get_settings(section="external/bitrix24")
     last_import_datetime = datetime.now()
