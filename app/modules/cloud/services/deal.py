@@ -135,6 +135,7 @@ def cron_copy_cloud_deal_values():
     }
     if "last_import_datetime" in config:
         payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]
+    print(payload)
     deals = get_deals(payload, force_reload=True)
     if deals is not None and len(deals) > 0:
         for deal in deals:
