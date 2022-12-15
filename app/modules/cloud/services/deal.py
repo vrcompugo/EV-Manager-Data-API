@@ -139,7 +139,9 @@ def cron_copy_cloud_deal_values():
     deals = get_deals(payload, force_reload=True)
     if deals is not None and len(deals) > 0:
         for deal in deals:
-            copy_cloud_deal_values(deal)
+            print("deal:", deal.get("id"))
+            # copy_cloud_deal_values(deal)
+            pass
 
         config = get_settings("cloud/copy_cloud_deal_values")
         if config is not None:
@@ -150,6 +152,8 @@ def cron_copy_cloud_deal_values():
 def copy_cloud_deal_values(deal):
     system_config = get_settings(section="external/bitrix24")
     if deal.get("is_cloud_master_deal") not in ["1", 1, True]:
+        return
+    if deal.get("stage_id") not in ["C15:WON"]:
         return
     print("deal", deal.get("id"))
     follow_deals = get_deals({
