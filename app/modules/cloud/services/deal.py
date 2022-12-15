@@ -139,7 +139,6 @@ def cron_copy_cloud_deal_values():
     deals = get_deals(payload, force_reload=True)
     if deals is not None and len(deals) > 0:
         for deal in deals:
-            print("deal:", deal.get("id"))
             copy_cloud_deal_values(deal)
 
         config = get_settings("cloud/copy_cloud_deal_values")
