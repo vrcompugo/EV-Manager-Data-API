@@ -1440,8 +1440,6 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
 
     counters = sorted(counters, key=lambda d: d["start_date"])
 
-    first_counter = counters[0]
-    last_counter = counters[len(counters) - 1]
     diff_days_value = (last_counter["end_date"] - first_counter["start_date"]).days
     if manuell_data.get("skip_counter_date_range_limiter") not in [True, 1, "1", "true"]:
         if diff_days_target < 100:
@@ -1472,7 +1470,8 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
                     last_counter["end_value"] = 0
             last_counter["usage"] = last_counter["end_value"] - last_counter["start_value"]
     else:
-        first_counter = counter
+        first_counter = counters[0]
+        last_counter = counters[len(counters) - 1]
         if first_counter["start_date"] != start_date:
             diff_start_days = (first_counter["start_date"] - start_date).days
             first_counter["start_date"] = start_date
@@ -1482,7 +1481,6 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
                 first_counter["start_value"] = 0
         first_counter["usage"] = first_counter["end_value"] - first_counter["start_value"]
 
-        last_counter = counter
         if last_counter["end_date"] != end_date:
             diff_start_days = (last_counter["end_date"] - end_date).days
             last_counter["end_date"] = end_date
