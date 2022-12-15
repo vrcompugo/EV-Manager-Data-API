@@ -140,8 +140,7 @@ def cron_copy_cloud_deal_values():
     if deals is not None and len(deals) > 0:
         for deal in deals:
             print("deal:", deal.get("id"))
-            # copy_cloud_deal_values(deal)
-            pass
+            copy_cloud_deal_values(deal)
 
         config = get_settings("cloud/copy_cloud_deal_values")
         if config is not None:
