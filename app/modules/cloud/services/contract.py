@@ -888,14 +888,16 @@ def get_annual_statement_data(data, year, manuell_data):
                             statement["construction_date"],
                             numbers,
                             values.copy(),
-                            manuell_data
+                            manuell_data,
+                            combine_counters=True
                         )
                         counters2 = normalize_counter_values(
                             statement["construction_date"],
                             statement_config[product]["delivery_end"],
                             numbers,
                             values.copy(),
-                            manuell_data
+                            manuell_data,
+                            combine_counters=True
                         )
                         if counters is not None and counters2 is not None:
                             counters = counters + counters2
@@ -1322,7 +1324,7 @@ def normalize_date(datetime):
     return parse(parse(str(datetime)).strftime("%Y-%m-%d"))
 
 
-def normalize_counter_values(start_date, end_date, numbers, values, manuell_data):
+def normalize_counter_values(start_date, end_date, numbers, values, manuell_data, combine_counters=False):
     counters = []
     start_date = normalize_date(start_date)
     end_date = normalize_date(end_date)
@@ -1385,21 +1387,21 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
         end_value = None
         for value in values:
             if string_stripper(value["number"]) == number:
-                if value["date"] < start_date:
-                    start_value = value
                 if value["date"] == start_date:
                     start_value = value
-                if value["date"] > start_date:
+                elif value["date"] < start_date:
+                    start_value = value
+                elif value["date"] > start_date:
                     if start_value is None:
                         start_value = value
                     elif (start_date - start_value["date"]).days > (value["date"] - start_date).days:
                         start_value2 = start_value
                         start_value = value
-                if value["date"] < end_date:
-                    end_value = value
                 if value["date"] == end_date:
                     end_value = value
-                if value["date"] > end_date:
+                elif value["date"] < end_date:
+                    end_value = value
+                elif value["date"] > end_date:
                     if end_value is None:
                         end_value = value
                     elif (end_value["date"] - start_date).days < diff_days_target * 0.3:
@@ -1440,7 +1442,6 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
 
     first_counter = counters[0]
     last_counter = counters[len(counters) - 1]
-
     diff_days_value = (last_counter["end_date"] - first_counter["start_date"]).days
     if manuell_data.get("skip_counter_date_range_limiter") not in [True, 1, "1", "true"]:
         if diff_days_target < 100:
@@ -1449,24 +1450,47 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
         else:
             if diff_days_target * 0.3 > diff_days_value:
                 return None
+    if combine_counters:
+        for counter in counters:
+            first_counter = counter
+            if first_counter["start_date"] != start_date:
+                diff_start_days = (first_counter["start_date"] - start_date).days
+                first_counter["start_date"] = start_date
+                first_counter["start_estimated"] = True
+                first_counter["start_value"] = first_counter["start_value"] - diff_start_days * average_value_per_day
+                if first_counter["start_value"] < 0:
+                    first_counter["start_value"] = 0
+            first_counter["usage"] = first_counter["end_value"] - first_counter["start_value"]
 
-    if first_counter["start_date"] != start_date:
-        diff_start_days = (first_counter["start_date"] - start_date).days
-        first_counter["start_date"] = start_date
-        first_counter["start_estimated"] = True
-        first_counter["start_value"] = first_counter["start_value"] - diff_start_days * average_value_per_day
-        if first_counter["start_value"] < 0:
-            first_counter["start_value"] = 0
-    first_counter["usage"] = first_counter["end_value"] - first_counter["start_value"]
+            last_counter = counter
+            if last_counter["end_date"] != end_date:
+                diff_start_days = (last_counter["end_date"] - end_date).days
+                last_counter["end_date"] = end_date
+                last_counter["end_estimated"] = True
+                last_counter["end_value"] = last_counter["end_value"] - diff_start_days * average_value_per_day
+                if last_counter["end_value"] < 0:
+                    last_counter["end_value"] = 0
+            last_counter["usage"] = last_counter["end_value"] - last_counter["start_value"]
+    else:
+        first_counter = counter
+        if first_counter["start_date"] != start_date:
+            diff_start_days = (first_counter["start_date"] - start_date).days
+            first_counter["start_date"] = start_date
+            first_counter["start_estimated"] = True
+            first_counter["start_value"] = first_counter["start_value"] - diff_start_days * average_value_per_day
+            if first_counter["start_value"] < 0:
+                first_counter["start_value"] = 0
+        first_counter["usage"] = first_counter["end_value"] - first_counter["start_value"]
 
-    if last_counter["end_date"] != end_date:
-        diff_start_days = (last_counter["end_date"] - end_date).days
-        last_counter["end_date"] = end_date
-        last_counter["end_estimated"] = True
-        last_counter["end_value"] = last_counter["end_value"] - diff_start_days * average_value_per_day
-        if last_counter["end_value"] < 0:
-            last_counter["end_value"] = 0
-    last_counter["usage"] = last_counter["end_value"] - last_counter["start_value"]
+        last_counter = counter
+        if last_counter["end_date"] != end_date:
+            diff_start_days = (last_counter["end_date"] - end_date).days
+            last_counter["end_date"] = end_date
+            last_counter["end_estimated"] = True
+            last_counter["end_value"] = last_counter["end_value"] - diff_start_days * average_value_per_day
+            if last_counter["end_value"] < 0:
+                last_counter["end_value"] = 0
+        last_counter["usage"] = last_counter["end_value"] - last_counter["start_value"]
 
     for counter in counters:
         counter["start_date"] = str(counter["start_date"])
