@@ -115,6 +115,8 @@ def quote_calculator_set_defaults(lead_id):
             data["data"]["extra_options_zero"] = []
         if "extra_options" not in data["data"]:
             data["data"]["extra_options"] = []
+        if "tab_power_usage_options" not in data["data"]:
+            data["data"]["tab_power_usage_options"] = []
         data["quote_datetime"] = data["datetime"]
         if "status_id" not in data["data"]:
             lead_data = get_lead(lead_id)
@@ -191,6 +193,63 @@ def quote_calculator_calculate(lead_id):
         status=501,
         mimetype='application/json')
 
+
+@blueprint.route("/<lead_id>/upload_file", methods=['POST'])
+@api_response
+def quote_calculator_upload_file(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+        post_data = request.form
+        lead_id = int(lead_id)
+        if lead_id <= 0:
+            return Response(
+                '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
+                status=404,
+                mimetype='application/json')
+        lead = get_lead(lead_id)
+        subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Uploads/{os.path.dirname(post_data.get('path'))}")
+        file_id = add_file(subfolder_id, data={
+            "file": request.files.get("file"),
+            "filename": os.path.basename(post_data.get('path'))
+        })
+        print(file_id)
+
+        return Response(
+            json.dumps({"status": "success", "data": { "file_id": file_id } }),
+            status=200,
+            mimetype='application/json')
+    return Response(
+        '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
+        status=501,
+        mimetype='application/json')
+
+
+@blueprint.route("/<lead_id>/view_upload_file", methods=['POST'])
+@api_response
+def quote_calculator_view_upload_file(lead_id):
+    auth_info = get_auth_info()
+    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+        post_data = request.json
+        lead_id = int(lead_id)
+        if lead_id <= 0:
+            return Response(
+                '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
+                status=404,
+                mimetype='application/json')
+        if 'file_id' in post_data:
+            public_link = get_public_link(post_data['file_id'])
+            is_sample = False
+        else:
+            public_link = '/static/tab/samples/' + post_data['path']
+            is_sample = True
+        return Response(
+            json.dumps({"status": "success", "data": {'public_url': public_link, "is_sample": is_sample}}),
+            status=200,
+            mimetype='application/json')
+    return Response(
+        '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
+        status=501,
+        mimetype='application/json')
 
 @blueprint.route("/<lead_id>/calculate_heating_usage", methods=['POST'])
 @api_response

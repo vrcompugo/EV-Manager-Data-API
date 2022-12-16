@@ -114,6 +114,64 @@
             Diese Einwilligung gilt unabhängig vom Zustandekommen des Auftrags sowie auch für zukünftige Anträge, kann aber jederzeit von mir
             widerrufen werden. Eine darüber hinaus gehende verarbeitung und Nutzung der Daten ist nicht gestattet.
         </p>
+        <div class="page">
+            <h2>Gebäudebeschreibung</h2>
+
+            <table>
+                <tr>
+                    <th>Gebäudeart</th>
+                    <th>{{ data.data.tab_building_type }}</th>
+                </tr>
+                <tr>
+                    <th>Keller mit Außenzugang</th>
+                    <th>{% if data.data.tab_has_cellar_external_entrance %}Ja{% else %}Nein{% endif %}</th>
+                </tr>
+            </table>
+
+            <h2>Elektroinstallation</h2>
+            <table>
+                <tr>
+                    <th>Zählerzusammenlegung gewünscht</th>
+                    <th>{% if data.data.tab_zahlerzusammenlegung %}Ja{% else %}Nein{% endif %}</th>
+                </tr>
+                <tr>
+                    <th>alte Hauptzählernummer</th>
+                    <th>{{ data.data.tab_main_counter_number }}</th>
+                </tr>
+                {% if data.data.tab_zahlerzusammenlegung %}
+                <tr>
+                    <th>alte Nebenzählernummer 1</th>
+                    <th>{{ data.data.tab_extra_counter_number1 }}</th>
+                </tr>
+                <tr>
+                    <th>alte Nebenzählernummer 2</th>
+                    <th>{{ data.data.tab_extra_counter_number2 }}</th>
+                </tr>
+                <tr>
+                    <th>alte Nebenzählernummer 3</th>
+                    <th>{{ data.data.tab_extra_counter_number3 }}</th>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Höhe des Raums mit Zählerschrank</th>
+                    <th>{{ data.data.tab_roomheight_power_cabinet }}cm</th>
+                </tr>
+                <tr>
+                    <th>Standort HAK</th>
+                    <th>{{ data.data.tab_hak_position }}</th>
+                </tr>
+                <tr>
+                    <th>Entfernung HAK zum Zählerschrank in Meter</th>
+                    <th>{{ data.data.tab_distance_hak }}m</th>
+                </tr>
+            </table>
+            <div style="padding: 0 1em;">
+                <b>Extra Stromverbraucher</b><br/>
+                {% for option in data.data.tab_power_usage_options %}
+                    - {{ option }}<br/>
+                {% endfor %}
+            </div>
+        </div>
 
         {% for roof in data.data.roofs %}
             <div class="page">
@@ -175,7 +233,8 @@
                             <div>
                             <b>Betonziegel<br>(Frankfurter Pfanne)</b><br>
                             Decklänge: 33,0 cm<br>
-                            Deckbreite: 30,0 cm
+                            Deckbreite: 30,0 cm<br />
+                            {{ roof.roof_topping_fixture }}
                             </div>
                         </div>
                         <div class="{% if roof.roof_topping == 'Tonziegel' %}active{% endif %}">
@@ -183,7 +242,8 @@
                             <div>
                             <b>Tonziegel<br>(Flachdachpfanne)</b><br>
                             Decklänge: {{ roof.tonziegel_decklange }} cm<br>
-                            Deckbreite: 24,3 cm
+                            Deckbreite: 24,3 cm<br />
+                            {{ roof.roof_topping_fixture }}
                             </div>
                         </div>
                         <div class="{% if roof.roof_topping == 'Biberschwanz' %}active{% endif %}">
