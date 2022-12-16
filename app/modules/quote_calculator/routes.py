@@ -376,6 +376,8 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
         update_quote_products(quote["id"], data["bluegen_quote"])
         update_data["has_bluegen_quote"] = 1
         update_data["bluegen_quote_sum"] = history.data.get("bluegen_quote").get("total")
+    update_data["has_aircondition_quote"] = 0
+    update_data["aircondition_quote_sum"] = 0
     update_lead(lead_id, update_data)
     data["quote_datetime"] = data["datetime"]
 

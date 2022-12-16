@@ -564,6 +564,8 @@ def get_settings(section=None, domain_raw=None):
                     "cloud_price_definition": "UF_CRM_1664437829",
                     "cloud_follow_quote_link": "UF_CRM_1662986397",
                     "cloud_follow_quote_insign_link": "UF_CRM_1662993772",
+                    "cloud_follow_delivery_begin1": "UF_CRM_1662990191",
+                    "cloud_follow_delivery_end1": "UF_CRM_1662990290",
                     "order_sign_date": "UF_CRM_61606B5866031",
                     "collection_url": "UF_CRM_6091A2714B029"
                 }
@@ -627,11 +629,13 @@ def get_settings(section=None, domain_raw=None):
                     "pv_quote_sum": "UF_CRM_1669299347",
                     "heating_quote_sum": "UF_CRM_1669299366",
                     "bluegen_quote_sum": "UF_CRM_1669299560",
+                    "aircondition_quote_sum": "UF_CRM_1671187455",
                     "roof_reconstruction_quote_sum": "UF_CRM_1669299415",
                     "has_pv_quote": "UF_CRM_1669299441",
                     "has_heating_quote": "UF_CRM_1669299466",
                     "has_bluegen_quote": "UF_CRM_1669299531",
                     "has_roof_reconstruction_quote": "UF_CRM_1669299494",
+                    "has_aircondition_quote": "UF_CRM_1671185185228",
                     "pv_kwp": "UF_CRM_1623246805",
                     "automatic_checked": "UF_CRM_1627383502",
                     "info_roof": "UF_CRM_1627383573",

@@ -592,8 +592,9 @@ def calculate_heating_usage(lead_id, post_data):
         if float(post_data.get("heating_quote_sqm")) <= 0 or float(post_data.get("heating_quote_people")) < 0:
             return post_data
         heating_usage = float(post_data.get("heating_quote_sqm")) * 18
-        water_heating_usage = float(post_data.get("heating_quote_people")) * 320
+        water_heating_usage = (float(post_data.get("heating_quote_people")) - 1) * 280
         post_data["heating_quote_usage"] = heating_usage + water_heating_usage
+        post_data["heating_quote_usage_wp"] = round(post_data.get("heating_quote_usage"))
 
         if post_data.get("new_heating_type") == 'hybrid_gas':
             wp_percent = 0.60
@@ -610,6 +611,7 @@ def calculate_heating_usage(lead_id, post_data):
     if post_data.get("new_heating_type") == 'heatpump':
         post_data["heating_quote_usage_gas"] = 0
         post_data["heating_quote_usage_wp"] = (float(post_data.get("heating_quote_usage_old")) * new_heating_benefit) / 3.75
+        post_data["heating_quote_usage_wp"] = post_data["heating_quote_usage_wp"] + (float(post_data.get("heating_quote_people")) - 1) * 280
         post_data["heating_quote_usage"] = post_data.get("heating_quote_usage_wp")
 
     if post_data.get("old_heating_type") == 'heatpump' and post_data.get("new_heating_type") == 'heatpump':

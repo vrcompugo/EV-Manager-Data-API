@@ -71,22 +71,50 @@
       {% endfor %}
     </tbody>
   </table>
-  <table style="width: 100%;">
-    <tbody>
-      <tr>
-        <td class="align-right" width="80%">Zwischensumme netto:</td>
-        <td class="align-right" width="30%" style="white-space: nowrap;">{{ data.subtotal_net | currencyformat }}</td>
-      </tr>
-      <tr>
-        <td class="align-right">Mehrwertsteuer {{ data.tax_rate | percentformat }}</td>
-        <td class="align-right" style="white-space: nowrap;">{{ data.total_tax | currencyformat }}</td>
-      </tr>
-      <tr class="foot-line">
-        <td class="align-right" style="font-weight: bold;" >Gesamtbetrag</td>
-        <td class="align-right" style="white-space: nowrap;font-weight: bold;">{{ data.total | currencyformat }}</td>
-      </tr>
-    </tbody>
-  </table>
+  {% if data.calculated.pv_kwp < 30 %}
+    <table style="width: 100%;">
+      <tbody>
+        <tr>
+          <td class="align-right" width="80%" style="font-weight: bold;">Zwischensumme netto:</td>
+          <td class="align-right" width="30%" style="white-space: nowrap;font-weight: bold;">{{ data.subtotal_net | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td class="align-right" style="font-size: 0.9em; color: #555;">Mehrwertsteuer {{ data.tax_rate | percentformat }}</td>
+          <td class="align-right" style="font-size: 0.9em; color: #555; white-space: nowrap;">{{ data.total_tax | currencyformat }}</td>
+        </tr>
+        <tr class="foot-line">
+          <td class="align-right" style="font-size: 0.9em; color: #555;">Gesamtbetrag</td>
+          <td class="align-right" style="font-size: 0.9em; color: #555; white-space: nowrap;">{{ data.total | currencyformat }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <b>0%-Umsatzsteuer</b><br>
+    Das Angebot wird mit einer 19%-Umsatzsteuer durch Energie360 ausgewiesen. Unter dem Vorbehalt, dass der Steuersatz des
+    Umsatzsteuergesetztes (UStG) zum 01.01.2023 durch das Jahressteuergesetz 2022, gem. Drucksache 20/4729 Deutscher Bundestag,
+    auf 0% abgesenkt wurde und die oben angebotene Anlage sowie der Kunde selbst die gesetzlich vorgegebenen Voraussetzungen
+    erfüllt (30 kWp-Grenze, Unternehmer usw.) kann der MwSt Betrag reduziert werden.<br>
+    Sollten die Bedingungen für eine 0%-Umsatzsteuer nicht erfüllt sein und/oder eine gesetzliche Umsatzsteuerabsenkung durch den
+    Gesetzgeber nicht veranlasst werden, so gilt der jeweils gültige gesetzliche Umsatzsteuersatz gem. UStG.
+    Der jeweils gültige Umsatzsteuersatz wird dem Kunden in der Rechnung ausgewiesen.<br>
+    <br>
+  {% else%}
+    <table style="width: 100%;">
+      <tbody>
+        <tr>
+          <td class="align-right" width="80%">Zwischensumme netto:</td>
+          <td class="align-right" width="30%" style="white-space: nowrap;">{{ data.subtotal_net | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td class="align-right">Mehrwertsteuer {{ data.tax_rate | percentformat }}</td>
+          <td class="align-right" style="white-space: nowrap;">{{ data.total_tax | currencyformat }}</td>
+        </tr>
+        <tr class="foot-line">
+          <td class="align-right" style="font-weight: bold;" >Gesamtbetrag</td>
+          <td class="align-right" style="white-space: nowrap;font-weight: bold;">{{ data.total | currencyformat }}</td>
+        </tr>
+      </tbody>
+    </table>
+  {% endif%}
   {% if data.calculated.pv_kwp > 99 %}
     <div class="warning">
       Achtung! Ob die Anschlussleistung reicht oder eine kostenpflichtige Trafo Station benötigt wird muss mit dem zuständigen Netzbetreiber erörtert werden. Netzverstärkungen sind nicht im Angebot enthalten

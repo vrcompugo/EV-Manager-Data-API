@@ -292,6 +292,22 @@ def get_heating_products(data):
                 products=data["heating_quote"]["products"]
             )
 
+        if data["data"]["new_heating_type"] in ["heatpump"]:
+            if "build_platform" in data["data"].get("heating_quote_extra_options", []):
+                add_direct_product(
+                    label="Fundament für eine Wärmepumpe",
+                    category=f"Online - Heizung - Extra Optionen - WP",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
+            else:
+                add_direct_product(
+                    label="Kein Fundament für eine Wärmepumpe",
+                    category=f"Online - Heizung - Extra Optionen - WP",
+                    quantity=1,
+                    products=data["heating_quote"]["products"]
+                )
+
         if "bufferstorage" in data["data"].get("heating_quote_extra_options", []) or data["heating_quote_sqm"] >= 350:
             add_direct_product(
                 label="Heizungspufferspeicher",

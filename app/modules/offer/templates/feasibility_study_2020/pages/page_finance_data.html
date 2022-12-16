@@ -176,7 +176,7 @@
                 <td>{{ data.pv_offer_total | currencyformat }}</td>
               </tr>
               <tr>
-                <td>Kreditsumme Heizung (inkl. Förderung)</td>
+                <td>Kreditsumme Heizung (inkl. Förderung**)</td>
                 <td>{{ data.heating_offer_substitute_total | currencyformat }}</td>
               </tr>
               <tr>
@@ -266,6 +266,7 @@
             ** Achtung: Es handelt sich hierbei um einen Sonderzinssatz. Die finale Kreditentscheidung obliegt unserer Partnerbank.
             Sollte Ihre Anfrage mit 4,99% nicht genehmigt werden, wird Ihre Anfrage automatisch auf den aktuell gültigen Zinssatz i.H.v. 5,79% umgestellt.
           {% endif %}
+          ** Eine volle 40% Bafa-Förderung kann nicht erreicht werden, bei einem Gebäude-Baujahr neuer als 2001<br>
         {% endif %}
         <br>
         <small>

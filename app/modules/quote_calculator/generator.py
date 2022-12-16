@@ -556,6 +556,7 @@ def generate_contract_summary_part4_pdf(lead_id, data, return_string=False):
             "Personen": data.get("data", {}).get("heating_quote_people"),
             "Warmwasser_Heizsystem": "Ja" if data.get("data", {}).get("heating_quote_warm_water_type") == "heater" else "Nein" ,
             "Heizsystem": old_heating_type.get(data.get("data", {}).get("old_heating_type")),
+            "Baujahr_Haus": int(data.get("data", {}).get("heating_quote_house_build_year")),
             "Baujahr_Heizung": heating_quote_old_heating_build.get(data.get("data", {}).get("heating_quote_old_heating_build")),
             "Mittlerer_3_Jahre": "-" if data.get("data", {}).get("heating_quote_house_build") == "new_building" else numberformat(data.get("data", {}).get("heating_quote_usage_old"), digits=0) + " kWh",
             "Zirkulationspumpe": "Ja" if data.get("data", {}).get("heating_quote_circulation_pump") is True else "Nein",

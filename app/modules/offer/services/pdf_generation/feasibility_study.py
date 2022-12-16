@@ -311,11 +311,14 @@ def calculate_feasibility_study(offer: OfferV2):
         data["heating_offer_substitute_total"] = data["heating_offer_total"]
         if offer.data.get("new_heating_type") in ["heatpump"]:
             if offer.data.get("old_heating_type") in ["oil", "gas"]:
-                data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.65 + data["heating_offer_total_nonsubstitional"]
-                print("65")
+                data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.6 + data["heating_offer_total_nonsubstitional"]
+                print("60")
             if offer.data.get("old_heating_type") in ["new", "heatpump"]:
                 data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.70 + data["heating_offer_total_nonsubstitional"]
                 print("70")
+        if int(offer.data.get("heating_quote_house_build_year", 0)) >= 2001:
+            data["heating_offer_substitute_total"] = data["heating_offer_total_substitional"] * 0.75 + data["heating_offer_total_nonsubstitional"]
+            print("75")
 
     data["loan_amount"] = data["pv_offer_total"] + data["heating_offer_substitute_total"]
     data["yearly_loan_payment"] = data["loan_amount"] / 20
