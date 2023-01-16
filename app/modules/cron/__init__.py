@@ -55,7 +55,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "inactive" or section == "import_leads_wattfox":
+    if section == "productive" or section == "import_leads_wattfox":
         from app.modules.external.wattfox.deal import run_cron_import
         print("cron", "import_leads_wattfox")
         try:
