@@ -1032,7 +1032,7 @@ def get_insign_callback(token):
     if len(collection_files) > 0:
         jwt = encode_shared_jwt(data={
             "files": collection_files
-        }, expire_minutes=343200)
+        }, expire_minutes=365*24*60)
         lead_data = {
             "collection_url": f"https://kunden.energie360.de/files/collection?token={jwt['token']}",
             "zoom_appointment": str(datetime.datetime.now()),
