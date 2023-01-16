@@ -543,6 +543,12 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                         config["lightcloud"]["additional_smartme_numbers"].append(number)
 
         if offer_v2.calculated.get("min_kwp_emove") > 0:
+            emove_usage_inhouse = data["main_deal"].get("emove_usage_inhouse")
+            emove_usage_outside = data["main_deal"].get("emove_usage_outside")
+            if emove_usage_inhouse is not None:
+                emove_usage_inhouse = float(emove_usage_inhouse)
+            if emove_usage_outside is not None:
+                emove_usage_outside = float(emove_usage_outside)
             config["emove"] = {
                 "label": "eMove",
                 "tarif": offer_v2.data.get("emove_tarif"),
@@ -550,8 +556,8 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 "cloud_price": offer_v2.calculated.get(f"cloud_price_emove"),
                 "cloud_price_incl_refund": offer_v2.calculated.get("cloud_price_emove_incl_refund"),
                 "extra_price_per_kwh": offer_v2.calculated.get("lightcloud_extra_price_per_kwh"),
-                "usage": float(data["main_deal"].get("emove_usage_inhouse")),
-                "usage_outside": float(data["main_deal"].get("emove_usage_outside")),
+                "usage": emove_usage_inhouse,
+                "usage_outside": emove_usage_outside,
                 "delivery_begin": data["main_deal"].get("cloud_delivery_begin"),
                 "deal": {
                     "id": data["main_deal"].get("id"),
