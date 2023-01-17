@@ -14,7 +14,7 @@ from app.modules.cloud.models.counter_value import CounterValue
 from app.utils.model_func import to_dict
 from app.utils.set_attr_by_dict import set_attr_by_dict
 from app.modules.settings import get_settings
-from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal
+from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal, delete_deal
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.fakturia.deal import get_payments, get_payments2, get_contract
 from app.modules.external.fakturia.activity import generate_invoice
@@ -1801,3 +1801,36 @@ def move_2022_contracts():
                 update_deal(deal.get("id"), {
                     "stage_id": "C126:UC_XM96DH"
                 })
+
+
+def remove_double_follow_contracts():
+    deleted_ids = []
+    deleted_contracts = []
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 220,
+        "FILTER[STAGE_ID]": "C220:NEW"
+    }, force_reload=True)
+    for deal in deals:
+        print(".", end = '')
+        if deal.get("id") in deleted_ids:
+            continue
+        if deal.get("cloud_contract_number") in deleted_contracts:
+            continue
+        for deal2 in deals:
+            if deal.get("cloud_contract_number") != deal2.get("cloud_contract_number"):
+                continue
+            if deal.get("id") == deal2.get("id"):
+                continue
+            print("")
+            print("double", deal.get("cloud_contract_number"))
+            deleted_contracts.append(deal.get("cloud_contract_number"))
+            deleted_ids.append(deal.get("id"))
+            deleted_ids.append(deal2.get("id"))
+            print(normalize_date(deal.get("date_create")), normalize_date(deal2.get("date_create")))
+            if normalize_date(deal.get("date_create")) < normalize_date(deal2.get("date_create")):
+                print("delete", deal2.get("id"))
+                delete_deal(deal2.get("id"))
+            else:
+                print("delete", deal.get("id"))
+                delete_deal(deal.get("id"))

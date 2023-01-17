@@ -90,9 +90,9 @@ def send_test_enbw_contract():
 
 
 @manager.command
-def run_move_2022_contracts():
-    from app.modules.cloud.services.contract import move_2022_contracts
-    move_2022_contracts()
+def run_remove_double_follow_contracts():
+    from app.modules.cloud.services.contract import remove_double_follow_contracts
+    remove_double_follow_contracts()
 
 
 

@@ -164,6 +164,12 @@ def update_deal(id, data, domain=None):
         return False
 
 
+def delete_deal(id):
+    update_data = {"id": id}
+    response = post("crm.deal.delete", update_data)
+    print(response)
+
+
 def run_cron_add_missing_values():
     print("add_missing_deal_values")
     config = get_settings("external/bitrix/add_deals_missing_values")
