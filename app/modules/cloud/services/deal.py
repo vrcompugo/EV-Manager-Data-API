@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 from app import db
-from app.modules.external.bitrix24.deal import get_deal, get_deals, add_deal, update_deal
+from app.modules.external.bitrix24.deal import get_deal, get_deals, add_deal, update_deal, delete_deal
 from app.modules.external.bitrix24.drive import get_folder, get_folder_id
 from app.modules.external.fakturia.deal import store_json_data, load_json_data, normalize_contract_number
 from app.modules.offer.models.offer_v2 import OfferV2
@@ -130,8 +130,7 @@ def cron_copy_cloud_deal_values():
     payload = {
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "15",
-        "FILTER[STAGE_ID]": "C15:WON",
-        f"FILTER[{system_config['deal']['fields']['is_cloud_master_deal']}]": "1",
+        "FILTER[STAGE_ID]": "C15:WON"
     }
     if "last_import_datetime" in config:
         payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]
@@ -149,8 +148,6 @@ def cron_copy_cloud_deal_values():
 
 def copy_cloud_deal_values(deal):
     system_config = get_settings(section="external/bitrix24")
-    if deal.get("is_cloud_master_deal") not in ["1", 1, True]:
-        return
     if deal.get("stage_id") not in ["C15:WON"]:
         return
     print("deal", deal.get("id"))
@@ -159,6 +156,10 @@ def copy_cloud_deal_values(deal):
         f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": deal.get("contract_number"),
         "FILTER[CATEGORY_ID]": 220
     }, force_reload=True)
+    if deal.get("is_cloud_master_deal") not in ["1", 1, True]:
+        if len(follow_deals) >= 1:
+            delete_deal(follow_deals[0].get("id"))
+        return
     if len(follow_deals) < 1:
         print("no follow deals")
         follow_deal = json.loads(json.dumps(deal))
