@@ -107,7 +107,7 @@ def run_cron_import():
             "start": int(datetime(2020, 11, 1, 0, 0, 0).timestamp()),
             "stop": int(last_import_datetime.timestamp())
         })
-
+    print("wattfox leads", leads)
     if leads is not None:
         for lead in leads["data"]:
             log = find_log("Lead", identifier=lead["wf_leadid"])

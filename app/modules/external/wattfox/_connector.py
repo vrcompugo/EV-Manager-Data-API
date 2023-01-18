@@ -38,5 +38,5 @@ def get(url, parameters=None):
         try:
             return response.json()
         except Exception as e:
-            print(response.text)
+            print("wattfox error", response.text)
     return None
