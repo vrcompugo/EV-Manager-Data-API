@@ -1526,6 +1526,10 @@ def cron_transfer_fakturia_annual_invoice():
             print("fakturia")
             print(json.dumps(contract, indent=2))
             min_delivery_begin = None
+            max_year = 2021
+            for annual_statement in contract.get("annual_statements"):
+                if max_year < annual_statement.get("year") and annual_statement.get("data") is not None:
+                    max_year = annual_statement.get("year")
             for config in contract["configs"]:
                 print(config["delivery_begin"])
                 if config["delivery_begin"] not in [None, ""] and (min_delivery_begin is None or min_delivery_begin > parse(config["delivery_begin"])):
@@ -1537,11 +1541,11 @@ def cron_transfer_fakturia_annual_invoice():
                 "quantity": 1,
                 "individualPrice": float(deal.get("opportunity")) / 1.19,
                 "description": f"Jahresabrechnung 2022 zum Vertrag {deal.get('contract_number')}",
-                "performanceDateStart": "2022-01-01",
-                "performanceDateEnd": "2022-12-31",
+                "performanceDateStart": f"{max_year}-01-01",
+                "performanceDateEnd": f"{max_year}-12-31",
                 "type": "DEFAULT_PERFORMANCE"
             }
-            if min_delivery_begin.year == 2021:
+            if min_delivery_begin.year == max_year:
                 payment_data["performanceDateStart"] = min_delivery_begin.strftime("%Y-%m-%d")
             if float(deal.get("opportunity")) < 0:
                 payment_data["individualPrice"] = payment_data["individualPrice"] * -1
