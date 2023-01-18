@@ -10,9 +10,9 @@ def authenticate():
         print("no config for wattfox")
         return None
     response = requests.post(config["url"] + "/login",
-                             data={
-                                 "user": config["username"],
-                                 "pass": config["password"]}
+                             json={
+                                "user": config["username"],
+                                "pass": config["password"]}
                              )
     print("wattfox auth", response.status_code, response.text)
     if response.status_code == 200:
