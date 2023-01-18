@@ -36,6 +36,7 @@ def get(url, parameters=None):
             params=parameters
         )
         try:
+            print("wattfox success", response.status_code, response.text)
             return response.json()
         except Exception as e:
             print("wattfox error", response.text)
