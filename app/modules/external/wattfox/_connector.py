@@ -14,14 +14,15 @@ def authenticate():
                                  "user": config["username"],
                                  "pass": config["password"]}
                              )
+    print("wattfox auth", response.status_code, response.text)
     if response.status_code == 200:
         data = response.json()
         if "auth_token" in data:
             return data["auth_token"]
         else:
-            print(data)
+            print("wattfox data", data)
     else:
-        print(response.text)
+        print("wattfox error1", response.text)
     return None
 
 
