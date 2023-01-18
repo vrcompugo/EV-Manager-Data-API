@@ -91,6 +91,7 @@ def get_settings(section=None, domain_raw=None):
                 },
                 "cloud_type": {
                     "234": "Zero",
+                    "7583": "cloud360",
                     "2438": "eCloud",
                     "2440": "Wärmecloud",
                     "262": "Spezial",

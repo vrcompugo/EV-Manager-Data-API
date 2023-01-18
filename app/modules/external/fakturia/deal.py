@@ -601,7 +601,7 @@ def assign_subdeal_to_item(deal_id, list_index, item_index, subdeal_id):
             "is_cloud_consumer": "0",
             "is_cloud_ecloud": "0",
             "is_cloud_heatcloud": "0",
-            "cloud_type": ["Zero"]
+            "cloud_type": ["cloud360"]
         })
     if data["item_lists"][list_index]["items"][item_index]["type"] == "consumer":
         update_deal(subdeal.get("id"), {
@@ -654,7 +654,7 @@ def _is_lightcloud_deal(deal):
     return str(deal.get("is_cloud_consumer")) in ["None", "0"] and \
         str(deal.get("is_cloud_ecloud")) in ["None", "0"] and \
         str(deal.get("is_cloud_heatcloud")) in ["None", "0"] and \
-        len(deal.get("cloud_type", [])) > 0 and deal.get("cloud_type", [])[0] == "Zero"
+        len(deal.get("cloud_type", [])) > 0 and deal.get("cloud_type", [])[0] in ["Zero", "cloud360"]
 
 
 def _is_heatcloud_deal(deal):
