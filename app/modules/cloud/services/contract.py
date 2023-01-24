@@ -1403,6 +1403,8 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
                     elif (start_date - start_value["date"]).days > (value["date"] - start_date).days:
                         start_value2 = start_value
                         start_value = value
+                if value["date"] == start_value["date"]:
+                    continue
                 if value["date"] == end_date:
                     end_value = value
                 elif value["date"] < end_date:
