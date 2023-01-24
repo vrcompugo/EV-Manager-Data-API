@@ -36,3 +36,5 @@ from app.modules.external.bitrix24.models.bitrix24_request_cache import Bitrix24
 from app.modules.stats.models.request_log import RequestLog
 from app.modules.invoice.models.invoice_bundle import InvoiceBundle
 from app.modules.invoice.models.invoice_bundle_item import InvoiceBundleItem
+from app.modules.external.enbw.models.enbw_contract import ENBWContract
+from app.modules.external.enbw.models.enbw_contract_history import ENBWContractHistory
