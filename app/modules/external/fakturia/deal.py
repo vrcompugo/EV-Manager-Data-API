@@ -7,7 +7,7 @@ from schwifty import IBAN
 
 from app import db
 from app.exceptions import ApiException
-from app.models import OfferV2
+from app.models import OfferV2, ENBWContract
 from app.modules.external.bitrix24.deal import get_deal, get_deals, get_deals_normalized, update_deal, set_default_data
 from app.modules.external.bitrix24.contact import get_contact, update_contact
 from app.modules.settings import get_settings
@@ -263,6 +263,9 @@ def initilize_service_contract_data(deal):
 
 def get_cloud_contract_data_by_deal(deal):
     cloud_contract_number = normalize_contract_number(deal.get("cloud_contract_number"))
+    contract = ENBWContract.query.options(db.subqueryload("histories")).filter(ENBWContract.deal_id == deal.get("id")).first()
+    if contract is not None:
+        deal["enbw_data"] = contract.to_dict()
     deal = set_default_data(deal)
     if deal is None:
         return {"status": "failed", "data": {"error": "Cloud Nummer konnten nicht gefunden werden"}, "message": ""}

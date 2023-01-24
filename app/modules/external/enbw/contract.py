@@ -1,25 +1,99 @@
 import json
-from dateutil.parser import parse
+import datetime
 
+from app.exceptions import ApiException
+from app.modules.external.bitrix24.deal import get_deal
 from app.modules.external.bitrix24.contact import get_contact
-from app.modules.cloud.services.contract import get_contract_data
+from app.modules.cloud.services.contract import get_contract_data, normalize_date
 from app.modules.settings import get_settings
 
+from ._connector import post
+from .models.enbw_contract import ENBWContract
+from .models.enbw_contract_history import ENBWContractHistory
 
-def send_contract(contract_number):
-    contract_number = "C2205307037"
+
+def send_contract(contract: ENBWContract):
 
     config = get_settings(section="external/enbw")
-    contract = get_contract_data(contract_number)
-    contact = get_contact(contract.get("contact_id"))
+    deal = get_deal(contract.deal_id)
+    contact = get_contact(deal.get("contact_id"))
+    requested_usage = int(deal.get("delivery_usage")) * 0.5
+    address_data = {
+        "area_code": deal.get("delivery_zip"),
+        "city": deal.get("delivery_city"),
+        "email": contact.get("email")[0].get("VALUE"),
+        "phone_number": contact.get("phone")[0].get("VALUE"),
+        "street_name": deal.get("delivery_street"),
+        "street_number": deal.get("delivery_street_nb"),
+        "zipcode": deal.get("delivery_zip")
+    }
+    tarif_request = {
+        "tariff_type": 1,
+        "customer_type": 0,
+        "client_type": 0,
+        "counter_type": 0,
+        "query_date": normalize_date(datetime.datetime.now()).strftime("%d.%m.%Y"),
+        "brand": "0",
+        "tariff_variant": 0,
+        "consumption": requested_usage,
+        "zip": address_data["zipcode"],
+        "city": address_data["city"],
+        "street": f'{address_data["street_name"]} {address_data["street_number"]}'
+        }
+    tarif_data = post("/tariffs", tarif_request, contract=contract)
+    if "data" not in tarif_data or "tariffs" not in tarif_data["data"] or len(tarif_data["data"]["tariffs"]) == 0:
+        raise ApiException("no valid tarif", "Kein ENBW Tariff für die Kundendaten gefunden")
+    cheapest_tarif = None
+    for tarif in tarif_data["data"]["tariffs"]:
+        if cheapest_tarif is None or tarif["yearly_price"] < cheapest_tarif["yearly_price"]:
+            cheapest_tarif = tarif
+    if cheapest_tarif is None:
+        raise ApiException("no valid tarif", "Kein ENBW Tariff für die Kundendaten gefunden")
     enbw_data = {
+        "extern_id": config.get("extern_id"),
         "partner_id": config.get("partner_id"),
+        "AddressData": address_data,
+        "Client": {
+            "account_holder": "energie360 GmbH & Co. KG",
+            "account_iban": "DE84460628175191056500",
+            "authorize_debit": 1,
+            "bonus_cent": 0,
+            "bonus_cent_runtime": 0,
+            "bonus_percent": 0,
+            "bonus_value": 0,
+            "bonus_value_2": 0,
+            "client_type": 0,
+            "corDiff": 0,
+            "counter_number": deal.get("delivery_counter_number"),
+            "counter_type": "0",
+            "previous_client_number": "",
+            "previous_supplier": None,
+            "previous_volume": requested_usage,
+            "rate_ap": cheapest_tarif["rawSourceTariff"]["preise"][0]["arbeitspreis"]["brutto"],
+            "rate_gp": cheapest_tarif["rawSourceTariff"]["preise"][0]["grundpreisJahr"]["brutto"],
+            "self_terminated": "0",
+            "sign_date": normalize_date(datetime.datetime.now()).strftime("%Y-%m-%d"),
+            "agree_permission_date": normalize_date(datetime.datetime.now()).strftime("%Y-%m-%d"),
+            "start_delivery": normalize_date(datetime.datetime.now()).strftime("%Y-%m-%d"),
+            "start_delivery_next_possible": "1",
+            "start_delivery_type": 1,
+            "status": 0,
+            "tariff_brand": cheapest_tarif["brand"],
+            "tariff_city": address_data["city"],
+            "tariff_energy_type": 1,
+            "tariff_id": cheapest_tarif["base_tariff"]["tariff_id"],
+            "campaign_identifier": cheapest_tarif["campaign"],
+            "tariff_street": address_data["street_name"],
+            "tariff_street_number": address_data["street_number"],
+            "tariff_zip": address_data["zipcode"],
+            "vp_client_extern_id": contract.sub_contract_number
+        },
         "CorrespondenseAdressData": {
             "area_code": "34497",
             "city": "Korbach",
             "email": "versorger@energie360.de",
             "phone_number": "0 56 31 50 17 17",
-            "street_name": "Marienburger Straße",
+            "street_name": "Marienburger Stra\u00dfe",
             "street_number": "6",
             "zipcode": "34497"
         },
@@ -29,82 +103,18 @@ def send_contract(contract_number):
             "suffix": "Herr"
         },
         "PrivateData": {
-            "first_name": contact.get("firstname"),
-            "last_name": contact.get("lastname"),
-            "suffix": "Frau" if contact.get("salutation") in ["ms"] else "Herr"
-        },
-        "permissions": {
-            "datetime": "08052018000000",
-            "admissionText": "",
-            "admissionTextVersion": "YELLO_BELEHRUNG_002",
-            "admissionChannels": ["E-Mail","SMS"],
-            "admissionPurposes": ["Strom"],
-            "consentText": "Ja",
-            "consentTextVersion": "YELLO_ENERGIE_S_003",
-            "consentConfirmed": True,
-            "consentChannels": ["Telefon","E-Mail","SMS"],
-            "consentPurposes": [
-                "Strom",
-                "Gas",
-                "EnergienaheDienstleistungen",
-                "Photovoltaik"
-            ]
+            "first_name": deal.get("delivery_first_name"),
+            "last_name": deal.get("delivery_last_name"),
+            "suffix": "Herr"
         }
     }
-    for cloud_config in contract.get("configs"):
-        customer_products = []
-        for index, consumer in enumerate(cloud_config["consumers"]):
-            customer_products.append(f"consumer{index}")
-            cloud_config[f"consumer{index}"] = consumer
-        products = ["lightcloud", "heatcloud"] + customer_products
-        for product in products:
-            if product not in enbw_data and product in cloud_config and cloud_config.get(product).get("delivery_begin") not in [None, "", 0, "0"]:
-                contract_data = {
-                    "extern_id": f"{contract_number}-{product}",
-                    "AddressData": {
-                        "area_code": contract.get("main_deal").get("delivery_zip"),
-                        "city": contract.get("main_deal").get("delivery_city"),
-                        "email": contact.get("email")[0].get("VALUE"),
-                        "phone_number": contact.get("phone")[0].get("VALUE"),
-                        "street_name": contract.get("main_deal").get("delivery_street"),
-                        "street_number": contract.get("main_deal").get("delivery_street_nb"),
-                        "zipcode": contract.get("main_deal").get("delivery_zip")
-                    },
-                    "Client": {
-                        "account_holder": config.get("account_holder"),
-                        "account_iban":  config.get("account_iban"),
-                        "authorize_debit": 1,
-                        "bonus_cent": 0,
-                        "bonus_cent_runtime": 0,
-                        "bonus_percent": 0,
-                        "bonus_value": 0,
-                        "bonus_value_2": 0,
-                        "client_type": 0,
-                        "corDiff": 0,
-                        "counter_number": cloud_config.get(product).get("power_meter_number"),
-                        "counter_type": "0",
-                        "previous_client_number": "",
-                        "previous_supplier": contract.get("main_deal").get("energie_delivery_provider"),
-                        "previous_volume": str(cloud_config.get(product).get("usage")),
-                        "rate_ap": .0,
-                        "rate_gp": .0,
-                        "self_terminated": "0",
-                        "sign_date": contract.get("main_deal").get("order_sign_date"),
-                        "start_delivery": cloud_config.get(product).get("delivery_begin"),
-                        "start_delivery_next_possible": "1",
-                        "start_delivery_type": 1,
-                        "status": 0,
-                        "tariff_brand": "enbw",
-                        "tariff_city": contact.get("delivery_city"),
-                        "tariff_energy_type": 1,
-                        "tariff_id": "S_WV_HS_ET_P_AKTIVIMMO_01",
-                        "campaign_identifier": "WWUDIREKTVERTRIEBNVKEINBONUS",
-                        "tariff_street": contact.get("delivery_street"),
-                        "tariff_street_number": contact.get("delivery_street_nb"),
-                        "tariff_zip": contact.get("delivery_zip"),
-                        "vp_client_extern_id": f"{contract_number}-{product}"
-                    },
-                }
-                for key in enbw_data.keys():
-                    contract_data[key] = enbw_data.get(key)
-                print(json.dumps(contract_data, indent=2))
+
+    contract_data = post("/clients", enbw_data, contract=contract)
+    if contract_data is None:
+        raise ApiException("transfer failed", "Übertragung an ENBW fehlgeschlagen")
+    if "joulesId" not in contract_data or contract_data["joulesId"] is None:
+        if  "message" in contract_data:
+            raise ApiException("transfer failed", contract_data["message"])
+        raise ApiException("transfer failed", "Übertragung an ENBW fehlgeschlagen")
+    print(json.dumps(contract_data, indent=2))
+    return contract_data
