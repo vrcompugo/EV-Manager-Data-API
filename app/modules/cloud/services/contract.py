@@ -1541,7 +1541,7 @@ def cron_transfer_fakturia_annual_invoice():
                 "itemNumber": "Jahresabrechnung",
                 "quantity": 1,
                 "individualPrice": float(deal.get("opportunity")) / 1.19,
-                "description": f"Jahresabrechnung 2022 zum Vertrag {deal.get('contract_number')}",
+                "description": f"Jahresabrechnung {max_year} zum Vertrag {deal.get('contract_number')}",
                 "performanceDateStart": f"{max_year}-01-01",
                 "performanceDateEnd": f"{max_year}-12-31",
                 "type": "DEFAULT_PERFORMANCE"
