@@ -1189,7 +1189,7 @@ def get_insign_data(lead_id):
     auth_info = get_auth_info()
     if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
         lead_id = int(lead_id)
-        history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+        history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).filter(QuoteHistory.is_complete.is_(True)).order_by(QuoteHistory.datetime.desc()).first()
         data = json.loads(json.dumps(history.data))
         sessionId = get_insign_session(data)
         try:
