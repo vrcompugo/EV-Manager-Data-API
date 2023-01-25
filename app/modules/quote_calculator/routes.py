@@ -1378,9 +1378,9 @@ def get_insign_session(data):
     if "calculated" in data:
         token_data["pv_kwp"] = data["calculated"].get("pv_kwp")
     token = encode_jwt(token_data, 172800)
+    print(json.dumps(documents, indent=2))
     return get_session_id(
         {
-            "displayname": data["number"],
             "displayname": data["number"],
             "foruser": data["assigned_by_id"] + " " + data["assigned_user"]["EMAIL"],
             "callbackURL": "https://www.energie360.de/insign-callback/",
