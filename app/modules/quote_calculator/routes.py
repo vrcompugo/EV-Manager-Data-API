@@ -253,7 +253,7 @@ def quote_calculator_calculate(lead_id):
         else:
             history_dirty = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(not_(QuoteHistory.is_complete)).order_by(QuoteHistory.datetime.desc()).first()
         if history_dirty is None:
-            if form_dirty is False:
+            if form_dirty is False and history_quote is not None:
                 return Response(
                     json.dumps({"status": "success", "data": history_quote.data}),
                     status=200,
