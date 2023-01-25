@@ -13,3 +13,4 @@ class QuoteHistory(db.Model):
     datetime = db.Column(db.DateTime)
     label = db.Column(db.String(120))
     data = db.Column(JSONB)
+    is_complete = db.Column(db.Boolean)

@@ -10,7 +10,7 @@ from PyPDF2 import PdfFileMerger, PdfFileWriter, PdfFileReader
 
 from app.modules.settings import get_settings
 from app.modules.external.bitrix24.user import get_user
-from app.modules.external.bitrix24.drive import get_file_content, get_file_content_cached
+from app.modules.external.bitrix24.drive import get_file_content, get_file_content_cached, get_public_link
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.products import get_list as get_product_list, get_product
 from app.modules.external.bitrix24._field_values import convert_field_euro_from_remote
@@ -626,6 +626,13 @@ def generate_contract_summary_part4_1_pdf(lead_id, data, return_string=False):
         print(json.dumps(data["contact"], indent=2))
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
+        for key in data["data"].keys():
+            if key[:8] == "tab_img_" and data["data"][key] > 0:
+                data[key + "_link"] = get_public_link(data["data"][key], expire_minutes=365*24*60)
+        for index, roof in enumerate(data["data"]["roofs"]):
+            for i in range(1,5):
+                data["data"]["roofs"][index][f"tab_img_dachflache{i}_link"] = data.get(f"tab_img_dachflache{index + 1}_{i}_link")
+                data["data"]["roofs"][index][f"tab_comment_dachflache{i}"] = data["data"].get(f"tab_comment_dachflache{index + 1}_{i}")
         content = render_template(
             "quote_calculator/generator/tab/index.html",
             base_url=config_general["base_url"],

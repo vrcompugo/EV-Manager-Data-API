@@ -543,6 +543,7 @@ def calculate_products(data):
     data["subtotal_net"] = 0
     for product in data["products"]:
         if product["PRICE"] is not None:
+            product["PRICE"] = float(product["PRICE"]) * 0.9
             product["total_price"] = float(product["PRICE"]) * float(product["quantity"])
             data["subtotal_net"] = data["subtotal_net"] + product["total_price"]
         else:

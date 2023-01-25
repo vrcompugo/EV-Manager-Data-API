@@ -24,14 +24,6 @@
           page-break-before: always;
           padding: 4em 0;
       }
-      .radio-elements > * {
-        text-align: center;
-        margin: 0 0.6em 1em;
-        opacity: 0.3;
-      }
-      .radio-elements > .active {
-        opacity: 1;
-      }
       .radio-elements .image {
         height: 4em;
         display: flex;
@@ -47,6 +39,19 @@
       }
       .radio-elements .image.radio-image2 {
         height: 17vw;
+      }
+      .imagegrid {
+        width: 100%;
+        display: block;
+        flex-wrap: wrap;
+        flex-direction: row;
+      }
+      .imagegrid > * {
+        flex: 0 1 31%;
+        margin-right: 1em;
+      }
+      .imagegrid img {
+        width: 100%;
       }
   </style>
 </head>
@@ -131,26 +136,67 @@
             <h2>Elektroinstallation</h2>
             <table>
                 <tr>
-                    <th>Zählerzusammenlegung gewünscht</th>
-                    <th>{% if data.data.tab_zahlerzusammenlegung %}Ja{% else %}Nein{% endif %}</th>
+                    <th>Besteht eine Oberleitung:</th>
+                    <th>{{ data.data.oberleitung_vorhanden | boolformat }}</th>
                 </tr>
                 <tr>
-                    <th>alte Hauptzählernummer</th>
-                    <th>{{ data.data.tab_main_counter_number }}</th>
+                    <th>Als Kabelkanal aussen am Haus soll folgende Farbe verwendet werden:</th>
+                    <th> {{ data.data.kabelkanal_color }}</th>
                 </tr>
-                {% if data.data.tab_zahlerzusammenlegung %}
-                <tr>
-                    <th>alte Nebenzählernummer 1</th>
-                    <th>{{ data.data.tab_extra_counter_number1 }}</th>
-                </tr>
-                <tr>
-                    <th>alte Nebenzählernummer 2</th>
-                    <th>{{ data.data.tab_extra_counter_number2 }}</th>
-                </tr>
-                <tr>
-                    <th>alte Nebenzählernummer 3</th>
-                    <th>{{ data.data.tab_extra_counter_number3 }}</th>
-                </tr>
+                {% if data.data.is_new_building %}
+                    <tr>
+                        <th>Hauptzählernummer (Malo ID)</th>
+                        <th>{{ data.data.power_meter_number }} ({{ data.data.malo_id }})</th>
+                    </tr>
+                    {% if data.data.heater_usage > 0 %}
+                        <tr>
+                            <th>Wärmecloud Zählernummer</th>
+                            <th>{{ data.data.heatcloud_power_meter_number }}</th>
+                        </tr>
+                    {% endif %}
+                    {% if len(data.data.consumers) > 0 %}
+                        {% for consumer in data.data.consumers %}
+                            <tr>
+                                <th>Consumer Zählernummer (Malo ID)</th>
+                                <th>{{ consumer.power_meter_number }} ({{ consumer.malo_id }})</th>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    <tr>
+                        <th>Zählerzusammenlegung gewünscht</th>
+                        <th>{% if data.data.tab_zahlerzusammenlegung %}Ja{% else %}Nein{% endif %}</th>
+                    </tr>
+                    {% if data.data.tab_zahlerzusammenlegung %}
+                        <tr>
+                            <th>alte Nebenzählernummer 1</th>
+                            <th>{{ data.data.tab_extra_counter_number1 }}</th>
+                        </tr>
+                        <tr>
+                            <th>alte Nebenzählernummer 2</th>
+                            <th>{{ data.data.tab_extra_counter_number2 }}</th>
+                        </tr>
+                        <tr>
+                            <th>alte Nebenzählernummer 3</th>
+                            <th>{{ data.data.tab_extra_counter_number3 }}</th>
+                        </tr>
+                    {% endif %}
+                    {% if data.data.power_meter_number_extra1 or data.data.power_meter_number_extra2 %}
+                        <tr>
+                            <th colspan="2"><b>Extra Zähler</b></th>
+                        </tr>
+                        {% if data.data.power_meter_number_extra1 %}
+                            <tr>
+                                <th>{{ data.data.power_meter_number_extra1_label }}</th>
+                                <th>{{ data.data.power_meter_number_extra1 }}</th>
+                            </tr>
+                        {% endif %}
+                        {% if data.data.power_meter_number_extra2 %}
+                            <tr>
+                                <th>{{ data.data.power_meter_number_extra2_label }}</th>
+                                <th>{{ data.data.power_meter_number_extra2 }}</th>
+                            </tr>
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
                 <tr>
                     <th>Höhe des Raums mit Zählerschrank</th>
@@ -171,243 +217,311 @@
                     - {{ option }}<br/>
                 {% endfor %}
             </div>
+            <div style="padding: 0 1em;">
+                <b>kWh Gesamtleistung (Großverbraucher)</b><br/>
+                {{ data.data.tab_power_usage_total_power }}
+            </div>
+            {% if "wallbox" in data.data.extra_options %}
+                <div style="padding: 0 1em;">
+                    <b>Wallbox Montageort</b><br/>
+                    {{ data.data.wallbox_mountpoint }}
+                </div>
+            {% endif %}
+
+            <h2>Bilder Elektro</h2>
+            <div class="layout horizontal imagegrid">
+                {% if data.tab_img_zahlerschrank_offen_link %}
+                    <div>
+                        <div>Zählerschrank offen</div>
+                        <img src="{{ data.tab_img_zahlerschrank_offen_link }}" />
+                        <div><a href="{{ data.tab_img_zahlerschrank_offen_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_zahlerschrank_offen }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_zahlerschrank_geschlossen_link %}
+                    <div>
+                        <div>Zählerschrank Umgebung</div>
+                        <img src="{{ data.tab_img_zahlerschrank_geschlossen_link }}" />
+                        <div><a href="{{ data.tab_img_zahlerschrank_geschlossen_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_zahlerschrank_geschlossen }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_zahlerschrank_typshild_link %}
+                    <div>
+                        <div>Typenschild Zählerschrank</div>
+                        <img src="{{ data.tab_img_zahlerschrank_typshild_link }}" />
+                        <div><a href="{{ data.tab_img_zahlerschrank_typshild_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_zahlerschrank_typshild }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_hak_innen_link %}
+                    <div>
+                        <div>Hausanschluss (HAK) innen</div>
+                        <img src="{{ data.tab_img_hak_innen_link }}" />
+                        <div><a href="{{ data.tab_img_hak_innen_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_hak_innen }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_hak_aussen_link %}
+                    <div>
+                        <div>Hausanschluss (HAK) außen</div>
+                        <img src="{{ data.tab_img_hak_aussen_link }}" />
+                        <div><a href="{{ data.tab_img_hak_aussen_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_hak_aussen }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_zahlerschrank_zahlernummer_link %}
+                    <div>
+                        <div>Hauptzähler mit lesbarer Zählernummer</div>
+                        <img src="{{ data.tab_img_zahlerschrank_zahlernummer_link }}" />
+                        <div><a href="{{ data.tab_img_zahlerschrank_zahlernummer_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_zahlerschrank_zahlernummer }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_zahlerschrank_warmezahlernummer_link %}
+                    <div>
+                        <div>Wärmezähler mit lesbarer Zählernummer</div>
+                        <img src="{{ data.tab_img_zahlerschrank_warmezahlernummer_link }}" />
+                        <div><a href="{{ data.tab_img_zahlerschrank_warmezahlernummer_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_zahlerschrank_warmezahlernummer }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_zahlerschrank_zahlernummer1_link %}
+                    <div>
+                        <div>Extra Zähler 1 mit lesbarer Zählernummer</div>
+                        <img src="{{ data.tab_img_zahlerschrank_zahlernummer1_link }}" />
+                        <div><a href="{{ data.tab_img_zahlerschrank_zahlernummer1_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_zahlerschrank_zahlernummer1 }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_zahlerschrank_zahlernummer2_link %}
+                    <div>
+                        <div>Extra Zähler 2 mit lesbarer Zählernummer</div>
+                        <img src="{{ data.tab_img_zahlerschrank_zahlernummer2_link }}" />
+                        <div><a href="{{ data.tab_img_zahlerschrank_zahlernummer2_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_zahlerschrank_zahlernummer2 }}</div>
+                    </div>
+                {% endif %}
+            </div>
+            <b>Raum für mögliche Aufstellorte (Speicher, Wechselrichter, neuer Zählerschrank)</b>
+            <div class="layout horizontal imagegrid">
+                {% if data.tab_img_aufstellort1_link %}
+                    <div>
+                        <div>Aufstellort 1</div>
+                        <img src="{{ data.tab_img_aufstellort1_link }}" />
+                        <div><a href="{{ data.tab_img_aufstellort1_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_aufstellort1 }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_aufstellort2_link %}
+                    <div>
+                        <div>Aufstellort 2</div>
+                        <img src="{{ data.tab_img_aufstellort2_link }}" />
+                        <div><a href="{{ data.tab_img_aufstellort2_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_aufstellort2 }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_panorama_link %}
+                    <div>
+                        <div>Panoramaaufnahme</div>
+                        <img src="{{ data.tab_img_panorama_link }}" />
+                        <div><a href="{{ data.tab_img_panorama_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_panorama }}</div>
+                    </div>
+                {% endif %}
+            </div>
+            <b>Kabelweg / Erdweg von Garage, Scheune usw.</b>
+            <div class="layout horizontal imagegrid">
+                {% if data.tab_img_kabelweg1_link %}
+                    <div>
+                        <div>Kabelweg 1</div>
+                        <img src="{{ data.tab_img_kabelweg1_link }}" />
+                        <div><a href="{{ data.tab_img_kabelweg1_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_kabelweg1 }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_kabelweg2_link %}
+                    <div>
+                        <div>Kabelweg 2</div>
+                        <img src="{{ data.tab_img_kabelweg2_link }}" />
+                        <div><a href="{{ data.tab_img_kabelweg2_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_kabelweg2 }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_kabelweg3_link %}
+                    <div>
+                        <div>Kabelweg 3</div>
+                        <img src="{{ data.tab_img_kabelweg3_link }}" />
+                        <div><a href="{{ data.tab_img_kabelweg3_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_kabelweg3 }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_kabelweg4_link %}
+                    <div>
+                        <div>Kabelweg 4</div>
+                        <img src="{{ data.tab_img_kabelweg4_link }}" />
+                        <div><a href="{{ data.tab_img_kabelweg4_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_kabelweg4 }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_kabelweg5_link %}
+                    <div>
+                        <div>Kabelweg 5</div>
+                        <img src="{{ data.tab_img_kabelweg5_link }}" />
+                        <div><a href="{{ data.tab_img_kabelweg5_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_kabelweg5 }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_kabelweg6_link %}
+                    <div>
+                        <div>Kabelweg 6</div>
+                        <img src="{{ data.tab_img_kabelweg6_link }}" />
+                        <div><a href="{{ data.tab_img_kabelweg6_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_kabelweg6 }}</div>
+                    </div>
+                {% endif %}
+            </div>
+            {% if "wallbox" in data.data.extra_options %}
+                <b>Kabelwege / Platz für Wallbox</b>
+                <div class="layout horizontal imagegrid">
+                    {% if data.tab_img_kabelweg_wallbox_1_link %}
+                        <div>
+                            <div>Kabelweg Wallbox 1</div>
+                            <img src="{{ data.tab_img_kabelweg_wallbox_1_link }}" />
+                            <div><a href="{{ data.tab_img_kabelweg_wallbox_1_link }}" target="_blank">Link</a></div>
+                            <div>{{ data.data.tab_comment_kabelweg_wallbox_1 }}</div>
+                        </div>
+                    {% endif %}
+                    {% if data.tab_img_kabelweg_wallbox_2_link %}
+                        <div>
+                            <div>Kabelweg Wallbox 2</div>
+                            <img src="{{ data.tab_img_kabelweg_wallbox_2_link }}" />
+                            <div><a href="{{ data.tab_img_kabelweg_wallbox_2_link }}" target="_blank">Link</a></div>
+                            <div>{{ data.data.tab_comment_kabelweg_wallbox_2 }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <b>Sonstige Bilder (andere Besonderheiten)</b>
+            <div class="layout horizontal imagegrid">
+                {% if data.tab_img_vorhandene_wallbox_link %}
+                    <div>
+                        <div>Bereits vorhandene Wallbox</div>
+                        <img src="{{ data.tab_img_vorhandene_wallbox_link }}" />
+                        <div><a href="{{ data.tab_img_vorhandene_wallbox_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_vorhandene_wallbox }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_große_verbraucher_link %}
+                    <div>
+                        <div>Große Verbraucher</div>
+                        <img src="{{ data.tab_img_große_verbraucher_link }}" />
+                        <div><a href="{{ data.tab_img_große_verbraucher_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_große_verbraucher }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_bereits_bestehende_pv_link %}
+                    <div>
+                        <div>Bereits bestehende PV - Anlage ( mit Typenschild)</div>
+                        <img src="{{ data.tab_img_bereits_bestehende_pv_link }}" />
+                        <div><a href="{{ data.tab_img_bereits_bestehende_pv_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_bereits_bestehende_pv }}</div>
+                    </div>
+                {% endif %}
+                {% if data.tab_img_grundriss_link %}
+                    <div>
+                        <div>Falls vorhanden Grundriss (Bei Neubau immer!)</div>
+                        <img src="{{ data.tab_img_grundriss_link }}" />
+                        <div><a href="{{ data.tab_img_grundriss_link }}" target="_blank">Link</a></div>
+                        <div>{{ data.data.tab_comment_grundriss }}</div>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
         {% for roof in data.data.roofs %}
             <div class="page">
-                Name der zu bebauenden Fläche: {{ roof.label }}
-                <h2>1. Gebäudebeschreibung</h2>
+                <h2>1. Dachbeschreibung</h2>
                 <div class="layout horizontal radio-elements">
-                    <div class="{% if roof.roof_type == 'Sattel' %}active{% endif %}">
-                        <div class="image"><img src="{{ data.base_url }}static/tab/sattel.jpeg" /></div>
-                        Sattel
+                    <div style="margin-right: 1em;">
+                        Name der zu bebauenden Fläche:<br>
+                        {{ roof.label }}
                     </div>
-                    <div class="{% if roof.roof_type == 'Pult' %}active{% endif %}">
-                        <div class="image"><img src="{{ data.base_url }}static/tab/pult.jpeg" /></div>
-                        Pult
+                    <div style="margin-right: 1em;">
+                        Traufhöhe:<br>
+                        {{ roof.traufhohe }}
                     </div>
-                    <div class="{% if roof.roof_type == 'Walm' %}active{% endif %}">
-                        <div class="image"><img src="{{ data.base_url }}static/tab/walm.jpeg" /></div>
-                        Walm
+                    <div style="margin-right: 1em;">
+                        Dachtyp:
+                        <div class="image"><img src="{{ data.base_url }}static/tab/{{ roof.roof_type | lower }}.jpeg" /></div>
+                        {{ roof.roof_type }}
                     </div>
-                    <div class="{% if roof.roof_type == 'Schopfwalm' %}active{% endif %}">
-                        <div class="image"><img src="{{ data.base_url }}static/tab/schopfwalm.jpeg" /></div>
-                        Schopfwalm
-                    </div>
-                    <div class="{% if roof.roof_type == 'Zelt' %}active{% endif %}">
-                        <div class="image"><img src="{{ data.base_url }}static/tab/zelt.jpeg" /></div>
-                        Zelt
-                    </div>
-                    <div class="{% if roof.roof_type == 'Mansard' %}active{% endif %}">
-                        <div class="image"><img src="{{ data.base_url }}static/tab/mansard.jpeg" /></div>
-                        Mansard
-                    </div>
-                    <div class="{% if roof.roof_type == 'Halle' %}active{% endif %}">
-                        <div class="image"><img src="{{ data.base_url }}static/tab/halle.jpeg" /></div>
-                        Halle
-                    </div>
-                    <div class="{% if roof.roof_type == 'Garage' %}active{% endif %}">
-                        <div class="image"><img src="{{ data.base_url }}static/tab/garage.jpeg" /></div>
-                        Garage
-                    </div>
-                    <div class="{% if roof.roof_type == 'Flachdach' %}active{% endif %}">
-                        <div class="image">&nbsp;</div>
-                        Flachdach
-                    </div>
-                </div>
-                Blitzschutz vorhanden: {{ roof.lightning_protection | boolformat }}<br>
-                {% if roof.lightning_protection %}
-                    Blitzschutz soll demontiert werden zusätzlicher Kostenaufwand: 290€: {{ roof.lightning_protection_removal | boolformat }}<br>
-                    Blitzschutz soll integriert werden zusätzlicher Kostenaufwand: 1.200€: {{ roof.lightning_protection_installation | boolformat }}<br>
-                    {% if not roof.lightning_protection_removal and not roof.lightning_protection_installation %}
-                        <div>
-                            Blitzschutz wird bauseits in die Pv Anlage integriert.
-                        </div>
-                    {% endif %}
-                {% endif %}
-                <h2>2. Dacheindeckung</h2>
-                <div class="layout horizontal radio-elements" style="flex-wrap: wrap;">
-                    {% if roof_type not in ["Flachdach"] %}
-                        <div class="{% if roof.roof_topping == 'Betonziegel' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/betonziegel.jpeg" /></div>
-                            <div>
-                            <b>Betonziegel<br>(Frankfurter Pfanne)</b><br>
-                            Decklänge: 33,0 cm<br>
-                            Deckbreite: 30,0 cm<br />
+                    <div style="margin-right: 1em;">
+                        Dacheindeckung:
+                        <div class="image"><img src="{{ data.base_url }}static/tab/{{ roof.roof_topping | lower }}.jpeg" /></div>
+                        <b>{{ roof.roof_topping }}</b><br>
+                        {% if roof.roof_topping in ['Tonziegel', 'Betonziegel', 'Biberschwanz'] %}
+                            Decklänge: {{ roof.decklange }} cm<br>
+                            Deckbreite: {{ roof.deckbreite }} cm<br />
+                        {% endif %}
+                        {% if roof.roof_topping in ['Tonziegel', 'Betonziegel'] %}
                             {{ roof.roof_topping_fixture }}
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Tonziegel' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/tonziegel.jpeg" /></div>
-                            <div>
-                            <b>Tonziegel<br>(Flachdachpfanne)</b><br>
-                            Decklänge: {{ roof.tonziegel_decklange }} cm<br>
-                            Deckbreite: 24,3 cm<br />
-                            {{ roof.roof_topping_fixture }}
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Biberschwanz' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/biberschwanz.jpeg" /></div>
-                            <div>
-                            <b>Biberschwanz</b><br>
-                            Decklänge: 16,0 cm <br>
-                            Deckbreite: 18,0 cm
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Schieferdeckung' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/schieferdeckung.jpeg" /></div>
-                            <div>
-                            <b>Schieferdeckung</b>
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Bitumenschindeln' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/bitumenschindeln.jpeg" /></div>
-                            <div>
-                            <b>Bitumenschindeln</b>
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Wellblech' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/wellblech.jpeg" style="padding: 2.2em 0;" /></div>
-                            <div>
-                            <b>Wellblech</b>
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Trapezblech' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/trapezblech.jpeg" style="padding: 2.2em 0;" /></div>
-                            <div>
-                            <b>Trapezblech</b><br>
-                            Materialstärke: {{ roof.trapezblech_thickness }} mm<br>
-                            <small>mindestens 0,75 mm</small>
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Sandwichelement' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/sandwichelement.jpeg" style="padding: 2.2em 0;" /></div>
-                            <div>
-                            <b>Sandwichelement</b><br />
-                            Materialstärke: {{ roof.sandwichelement_thickness }}
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Falzblech' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/falzblech.jpeg" style="padding: 2.2em 0;" /></div>
-                            <div>
-                                <b>Falzblech</b>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="{% if roof.roof_topping == 'Bitumendach' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/bitumendach.jpeg" /></div>
-                            <div>
-                            <b>Bitumendach</b>
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Foliendach' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/foliendach.jpeg" /></div>
-                            <div>
-                            <b>Foliendach</b>
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Kiesschüttung' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/kiesschuttung.jpeg" /></div>
-                            <div>
-                            <b>Kiesschüttung</b>
-                            </div>
-                        </div>
-                        <div class="{% if roof.roof_topping == 'Begrüntes Dach' %}active{% endif %}">
-                            <div class="image radio-image3"><img src="{{ data.base_url }}static/tab/begruntes_dach.jpeg" /></div>
-                            <div>
-                            <b>Begrüntes Dach</b>
-                            </div>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
                     <div>
-                        <div class="image radio-image3">&nbsp;</div>
-                        <div>
-                            <b>Sonstige</b>
-                        </div>
+                        Dämmung:
+                        <div class="image"><img src="{{ data.base_url }}static/tab/{{ roof.insulation_type | replace('ä', 'a') | lower }}.jpeg" /></div>
+                        <b>{{ roof.insulation_type }}</b><br>
+                        {% if roof.insulation_type in ['Aufdachdämmung'] %}
+                            <div>Dämmstärke: {{ roof.insulation_thickness }} cm</div>
+                            <div>Dämmmaterial: {{ roof.insulation_material }}</div>
+                        {% endif %}
                     </div>
                 </div>
 
-                <h2>3. Daten Belegungsfläche</h2>
-                {% if roof_type not in ["Flachdach"] %}
-                    <div class="layout horizontal">
-                        <div style="margin-right: 2em">
-                            <img src="{{ data.base_url }}static/tab/flache_sattel.jpeg" style="width: 35vw;" />
-                        </div>
-                        <div class="layout horizontal">
-                            <div style="margin-right: 2em">
-                                Gebäudelänge: {{ roof.gebaudelange }} m<br>
-                                Firstlänge: {{ roof.firstlange }} m<br>
-                                Ortganglänge: {{ roof.ortganglange }} m<br>
-                                Fläche: {{ roof.sqm }} m²
-                            </div>
-                            <div>
-                                Traufhöhe: {{ roof.traufhohe }} m<br>
-                                Dachneigung: {{ roof.dachneigung }}°<br>
-                                Anzahl Ziegel (vertikal): {{ roof.anzahl_ziegel }}
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="layout horizontal">
-                        <div style="margin-right: 2em">
-                            <img src="{{ data.base_url }}static/tab/flache_flachdach.jpeg" style="width: 40vw;" />
-                        </div>
+                <h2>Dachbilder</h2>
+                <div class="layout horizontal imagegrid">
+                    {% if roof.tab_img_dachflache1_link %}
                         <div>
-                            <div class="layout horizontal">
-                                <div style="margin-right: 1em">
-                                    Dachlänge: {{ roof.dachlange }} m
-                                    Dachbreite: {{ roof.dachbreite }} m<br>
-                                    Fläche: {{ roof.sqm }} m²
-                                </div>
-                                <div>
-                                    Dachöhe: {{ roof.dachhohe }}
-                                    Dachneigung: {{ roof.dachneigung }} °
-                                </div>
-                            </div>
-                            <br />
-                            <div class="layout horizontal">
-                                <div style="margin-right: 2em">
-                                    <b>Attika (falls vorhanden)</b><br />
-                                    <img src="{{ data.base_url }}static/tab/attika.jpeg" />
-                                </div>
-                                <div>
-                                    <br />
-                                    Höhe (h): {{ roof.hohe }} m
-                                    Breite (b): {{ roof.breite }} m
-                                </div>
-                            </div>
+                            Dach von Vorne
+                            <img src="{{ roof.tab_img_dachflache1_link }}" />
+                            <div><a href="{{ roof.tab_img_dachflache1_link }}" target="_blank">Link</a></div>
+                            <div>{{ roof.tab_comment_dachflache1 }}</div>
                         </div>
-                    </div>
-                {% endif %}
-                <h2 style="page-break-before: always; margin-top: 4em">4. Dämmung</h2>
-                <div class="layout horizontal radio-elements">
-                    <div class="{% if roof.insulation_type == 'Aufdachdämmung' %}active{% endif %}">
-                        <div class="image radio-image2"><img src="{{ data.base_url }}static/tab/aufdachdammung.jpeg" /></div>
-                        Aufdachdämmung
-                    </div>
-                    <div class="{% if roof.insulation_type == 'Zwischensparrendämmung' %}active{% endif %}">
-                        <div class="image radio-image2"><img src="{{ data.base_url }}static/tab/zwichensparrendammung.jpeg" /></div>
-                        Zwischensparrendämmung
-                    </div>
-                    <div class="{% if roof.insulation_type == 'Keine Dämmung' %}active{% endif %}" style="display: flex; justify-content: center; align-items: flex-end;">
-                        <b>Keine Dämmung</b>
-                    </div>
+                    {% endif %}
+                    {% if roof.tab_img_dachflache2_link %}
+                        <div>
+                            Dach von der Seite
+                            <img src="{{ roof.tab_img_dachflache2_link }}" />
+                            <div><a href="{{ roof.tab_img_dachflache2_link }}" target="_blank">Link</a></div>
+                            <div>{{ roof.tab_comment_dachflache2 }}</div>
+                        </div>
+                    {% endif %}
+                    {% if roof.tab_img_dachflache3_link %}
+                        <div>
+                            Dach von Hinten
+                            <img src="{{ roof.tab_img_dachflache3_link }}" />
+                            <div><a href="{{ roof.tab_img_dachflache3_link }}" target="_blank">Link</a></div>
+                            <div>{{ roof.tab_comment_dachflache3 }}</div>
+                        </div>
+                    {% endif %}
+                    {% if roof.tab_img_dachflache4_link %}
+                        <div>
+                            Sparrenansicht und Dicke
+                            <img src="{{ roof.tab_img_dachflache4_link }}" />
+                            <div><a href="{{ roof.tab_img_dachflache4_link }}" target="_blank">Link</a></div>
+                            <div>{{ roof.tab_comment_dachflache4 }}</div>
+                        </div>
+                    {% endif %}
+                    {% if data.tab_img_solaredge_link %}
+                        <div>
+                            SolarEdge 3D Ansicht
+                            <img src="{{ data.tab_img_solaredge_link }}" />
+                            <div><a href="{{ data.tab_img_solaredge_link }}" target="_blank">Link</a></div>
+                            <div>{{ data.data.tab_comment_solaredge }}</div>
+                        </div>
+                    {% endif %}
                 </div>
-                {% if roof.insulation_type == 'Aufdachdämmung' %}
-                    <div>Dämmstärke: {{ roof.insulation_thickness }} cm</div>
-                    <div>Dämmmaterial: {{ roof.insulation_material }}</div>
-                {% endif %}
-                <h2>5. Ergänzende Informationen</h2>
-                <b>Besteht eine Oberleitung:<b></b> {{ roof.oberleitung_vorhanden | boolformat }}<br>
-                <br>
-                <b>Als Kabelkanal aussen am Haus soll folgende Farbe verwendet werden:</b> {{ roof.kabelkanal_color }}<br>
-                <br>
-                <b>Die hier beschriebenen Dachfläche kann komplett zur Belegung genutzt werden:</b> {{ roof.full_use | boolformat }}<br>
-                {% if not roof.full_use %}
-                    <b>Eingeschränkte Belegung:</b> {{ roof.specific_use }}<br>
-                {% endif %}
-                <br>
-                <b>Bemerkungen:</b> {{ roof.comment }}
             </div>
         {% endfor %}
         <br>

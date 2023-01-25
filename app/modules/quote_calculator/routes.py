@@ -5,6 +5,7 @@ import os
 import datetime
 from flask import Blueprint, request, render_template, redirect, make_response, Response
 from flask_emails import Message
+from sqlalchemy import not_
 
 from app import db
 from app.config import email_config
@@ -31,6 +32,26 @@ from .models.quote_history import QuoteHistory
 blueprint = Blueprint("quote_calculator", __name__, template_folder='templates')
 
 
+UNCALCULATED_FIELDS = [
+    # customer data
+    "birthday", "iban", "bic", "bankname", "extra_notes",
+    # elektro tab
+    "tab_building_type", "oberleitung_vorhanden", "kabelkanal_color", "tab_has_cellar_external_entrance",
+    "is_new_building", "power_meter_number", "main_malo_id", "heatcloud_power_meter_number",
+    "power_meter_number_extra1_label", "power_meter_number_extra1",
+    "power_meter_number_extra2_label", "power_meter_number_extra2",
+    "tab_zahlerzusammenlegung", "tab_extra_counter_number1", "tab_extra_counter_number2", "tab_extra_counter_number3",
+    "tab_hak_position", "tab_distance_hak", "tab_roomheight_power_cabinet",
+    "tab_power_usage_options", "wallbox_mountpoint"
+]
+UNCALCULATED_FIELDS_CONSUMER = [
+    "power_meter_number", "malo_id", "address"
+]
+UNCALCULATED_FIELDS_ROOF = [
+    "label", "roof_type", "insulation_type", "insulation_thickness", "insulation_material"
+]
+
+
 @blueprint.route("/reload_products", methods=['GET', 'POST'])
 @log_request
 def route_reload_products():
@@ -43,7 +64,7 @@ def route_reload_products():
 def edit_history(history_id):
     auth_info = get_auth_info()
     if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
-        history = QuoteHistory.query.filter(QuoteHistory.id == int(history_id)).first()
+        history = QuoteHistory.query.filter(QuoteHistory.id == int(history_id)).filter(QuoteHistory.is_complete.is_(True)).first()
         if history is not None:
             data = request.json
             history.label = data.get("label")
@@ -104,9 +125,25 @@ def quote_calculator_set_defaults(lead_id):
             '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
             status=404,
             mimetype='application/json')
+
     history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    if history is not None and history.is_complete is not True:
+        history_quote = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(QuoteHistory.is_complete).order_by(QuoteHistory.datetime.desc()).first()
+        if history_quote is not None:
+            history.data["pdf_link"] = history_quote.data.get("pdf_link")
+            history.data["pdf_wi_link"] = history_quote.data.get("pdf_wi_link")
+            history.data["cloud_number"] = history_quote.data.get("cloud_number")
+            history.data["pdf_summary_link"] = history_quote.data.get("pdf_summary_link")
+            history.data["pdf_commission_link"] = history_quote.data.get("pdf_commission_link")
+            history.data["pdf_datasheets_link"] = history_quote.data.get("pdf_datasheets_link")
+            history.data["pdf_quote_summary_link"] = history_quote.data.get("pdf_quote_summary_link")
+            history.data["pdf_contract_summary_link"] = history_quote.data.get("pdf_contract_summary_link")
+            history.data["pdf_contract_summary_part1_file_id"] = history_quote.data.get("pdf_contract_summary_part1_file_id")
+            history.data["pdf_contract_summary_part4_file_link"] = history_quote.data.get("pdf_contract_summary_part4_file_link")
+            history.data["pdf_contract_summary_part4_1_file_link"] = history_quote.data.get("pdf_contract_summary_part4_1_file_link")
     if history is not None:
         data = history.data
+        data["history_id"] = history.id
         if "financing_rate" not in data["data"]:
             data["data"]["financing_rate"] = 3.79
         if "financing_rate_heating" not in data["data"]:
@@ -157,7 +194,7 @@ def quote_calculator_set_defaults(lead_id):
             update_data[f"upload_link_{folder['key']}"] = data["data"][f"upload_link_{folder['key']}"]
     if len(update_data.keys()) > 0:
         update_lead(lead_id, update_data)
-    histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).all()
+    histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(QuoteHistory.is_complete.is_(True)).order_by(QuoteHistory.datetime.desc()).all()
     data["histories"] = []
     for history in histories:
         data["histories"].append({
@@ -185,7 +222,68 @@ def quote_calculator_calculate(lead_id):
                 '{"status": "error", "error_code": "not_deal_given", "message": "deal id missing in data object"}',
                 status=404,
                 mimetype='application/json')
+        form_dirty = False
+        history_quote = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(QuoteHistory.is_complete).order_by(QuoteHistory.datetime.desc()).first()
+        if history_quote is not None:
+            history_data = json.loads(json.dumps(history_quote.data))
+            for key in post_data.keys():
+                if is_uncalculated_field(key):
+                    history_data["data"][key] = post_data[key]
+                else:
+                    if key in ["consumers", "roofs"]:
+                        if len(post_data[key]) != len(history_quote.data["data"][key]):
+                            form_dirty = True
+                        else:
+                            for index in range(len(post_data[key])):
+                                for key2 in post_data[key][index].keys():
+                                    if key2 not in UNCALCULATED_FIELDS_CONSUMER and key2 not in UNCALCULATED_FIELDS_ROOF:
+                                        if is_value_changed(post_data[key][index][key2], history_quote.data["data"][key][index].get(key2)):
+                                            form_dirty = True
+                    else:
+                        print(key, is_value_changed(post_data[key], history_quote.data["data"].get(key)), post_data[key], history_quote.data["data"].get(key))
+                        if is_value_changed(post_data[key], history_quote.data["data"].get(key)):
+                            form_dirty = True
+            history_quote.data = history_data
+            db.session.commit()
+            history_dirty = QuoteHistory.query\
+                .filter(QuoteHistory.lead_id == lead_id)\
+                .filter(not_(QuoteHistory.is_complete))\
+                .filter(QuoteHistory.datetime >= history_quote.datetime)\
+                .order_by(QuoteHistory.datetime.desc()).first()
+        else:
+            history_dirty = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(not_(QuoteHistory.is_complete)).order_by(QuoteHistory.datetime.desc()).first()
+        if history_dirty is None:
+            if form_dirty is False:
+                return Response(
+                    json.dumps({"status": "success", "data": history_quote.data}),
+                    status=200,
+                    mimetype='application/json')
+            history_dirty = QuoteHistory(
+                lead_id=lead_id,
+                datetime=datetime.datetime.now(),
+                label="",
+                data=None,
+                is_complete=False
+            )
+            db.session.add(history_dirty)
+            db.session.flush()
         data = calculate_quote(lead_id, post_data)
+        data["history_id"] = history_dirty.id
+        if history_quote is not None:
+            data["pdf_link"] = history_quote.data.get("pdf_link")
+            data["pdf_wi_link"] = history_quote.data.get("pdf_wi_link")
+            data["cloud_number"] = history_quote.data.get("cloud_number")
+            data["pdf_summary_link"] = history_quote.data.get("pdf_summary_link")
+            data["pdf_commission_link"] = history_quote.data.get("pdf_commission_link")
+            data["pdf_datasheets_link"] = history_quote.data.get("pdf_datasheets_link")
+            data["pdf_quote_summary_link"] = history_quote.data.get("pdf_quote_summary_link")
+            data["pdf_contract_summary_link"] = history_quote.data.get("pdf_contract_summary_link")
+            data["pdf_contract_summary_part1_file_id"] = history_quote.data.get("pdf_contract_summary_part1_file_id")
+            data["pdf_contract_summary_part4_file_link"] = history_quote.data.get("pdf_contract_summary_part4_file_link")
+            data["pdf_contract_summary_part4_1_file_link"] = history_quote.data.get("pdf_contract_summary_part4_1_file_link")
+        history_dirty.data=data
+        db.session.commit()
+
         return Response(
             json.dumps({"status": "success", "data": data}),
             status=200,
@@ -242,7 +340,7 @@ def quote_calculator_view_upload_file(lead_id):
             public_link = get_public_link(post_data['file_id'])
             is_sample = False
         else:
-            public_link = '/static/tab/samples/' + post_data['path']
+            public_link = '/static/tab/samples/' + post_data['samplepath']
             is_sample = True
         return Response(
             json.dumps({"status": "success", "data": {'public_url': public_link, "is_sample": is_sample}}),
@@ -343,7 +441,8 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
         lead_id=lead_id,
         datetime=datetime.datetime.now(),
         label="",
-        data=data
+        data=data,
+        is_complete=True
     )
     db.session.add(history)
     db.session.flush()
@@ -1329,3 +1428,31 @@ def install_quote_calculator():
 @blueprint.route("/uninstall", methods=['POST'])
 def uninstall_quote_calculator():
     return render_template("quote_calculator/uninstall.html", domain=request.host)
+
+
+def is_value_changed(new_value, old_value):
+    if new_value is None and old_value is None:
+        return False
+    if old_value is None:
+        return True
+    if isinstance(new_value, list):
+        if len(new_value) != len(old_value):
+            return True
+        for index in range(len(new_value)):
+            if is_value_changed(new_value[index], old_value[index]):
+                return True
+    if isinstance(new_value, dict):
+        for key in new_value.keys():
+            if key not in old_value or is_value_changed(new_value[key], old_value.get(key)):
+                return True
+    return new_value != old_value
+
+
+def is_uncalculated_field(fieldname):
+    if fieldname is None:
+        return True
+    if fieldname[:8] == "tab_img_":
+        return True
+    if fieldname in UNCALCULATED_FIELDS:
+        return True
+    return False

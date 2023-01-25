@@ -100,6 +100,18 @@ def calculate_cloud(data):
                     "reference_number": pre_oct2_2022.number,
                     "comment": ""
                 })
+            pre_feb_2023 = OfferV2.query\
+                .filter(OfferV2.customer_id == offer_v2.customer_id)\
+                .filter(OfferV2.datetime < changedate_oct2_2022)\
+                .order_by(OfferV2.datetime.desc())\
+                .first()
+            if pre_feb_2023 is not None:
+                pricing_options.append({
+                    "label": "Preisdefintion vor dem 25.02.2023",
+                    "value": "oTv8BT9RzG3ms7QJcq7Y",
+                    "reference_number": pre_feb_2023.number,
+                    "comment": ""
+                })
 
     settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.3379
     settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.2979
@@ -201,11 +213,22 @@ def calculate_cloud(data):
                     { "from": 750000, "to": 9999999, "value": 3490.99 * 1.43110881 }
                 ]
 
-                if data.get("old_price_calculation", "") not in ["CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"] and data.get("cloud_quote_heat_seperate") not in [True, 1, "true"]:
-                    if data.get("cloud_quote_type") not in ["combination_quote", "interim_quote", "custom_config", "legacy_cloud"]:
-                        if data.get("heater_usage") not in [None, "", 0]:
-                            power_usage = int(data["power_usage"]) + int(data["heater_usage"])
-                        heater_usage = 0
+                if data.get("old_price_calculation", "") not in ["CXRsAMcrJw7V9wTA4L5ELE8xJx9NVNo9"]:
+                    if data.get("cloud_quote_heat_seperate") not in [True, 1, "true"]:
+                        if data.get("cloud_quote_type") not in ["combination_quote", "interim_quote", "custom_config", "legacy_cloud"]:
+                            if data.get("heater_usage") not in [None, "", 0]:
+                                power_usage = int(data["power_usage"]) + int(data["heater_usage"])
+                            heater_usage = 0
+                    if data.get("old_price_calculation", "") not in ["oTv8BT9RzG3ms7QJcq7Y"]:
+                        settings["data"]["cloud_settings"]["lightcloud_extra_price_per_kwh"] = 0.389
+                        settings["data"]["cloud_settings"]["heatcloud_extra_price_per_kwh"] = 0.389
+                        if data.get("cloud_quote_type") not in ["followup_quote", "interim_quote"]:
+                            lightcloud_price_factor_2year = 0.1895
+                            cloud_price_extra_kwp_discount_small = 7.45 * 0.82
+                            cloud_price_extra_kwp_discount_big = 5.67 * 0.82
+                            cloud_price_extra_kwp_extra_cost_2years = 8.79
+                            cloud_price_extra_kwp_extra_cost_12years = 11.49
+
 
     result = {
         "pricing_options": pricing_options,
@@ -301,11 +324,11 @@ def calculate_cloud(data):
                     direction_factor_production = 0.65
 
         if "roofs" in data and data["roofs"] is not None:
-            total_roof_space = 0
+            total_modules = 0
             for roof in data["roofs"]:
-                if "sqm" in roof and roof["sqm"] is not None and roof["sqm"] != "":
-                    total_roof_space = total_roof_space + float(roof["sqm"])
-            if total_roof_space == 0:
+                if "pv_count_modules" in roof and roof["pv_count_modules"] is not None and roof["pv_count_modules"] != "":
+                    total_modules = total_modules + float(roof["pv_count_modules"])
+            if total_modules == 0:
                 direction_factor_kwp, direction_factor_production = factors_by_direction("west_east")
                 if len(data["roofs"]) > 0 and "direction" in data["roofs"][0]:
                     direction_factor_kwp, direction_factor_production = factors_by_direction(data["roofs"][0]["direction"])
@@ -313,10 +336,10 @@ def calculate_cloud(data):
                 direction_factor_kwp = 0
                 direction_factor_production = 0
                 for roof in data["roofs"]:
-                    if "sqm" in roof and roof["sqm"] is not None and roof["sqm"] != "":
+                    if "pv_count_modules" in roof and roof["pv_count_modules"] is not None and roof["pv_count_modules"] != "":
                         x, y = factors_by_direction(roof["direction"])
-                        direction_factor_kwp = direction_factor_kwp + (float(roof["sqm"]) / total_roof_space) * x
-                        direction_factor_production = direction_factor_kwp + (float(roof["sqm"]) / total_roof_space) * y
+                        direction_factor_kwp = direction_factor_kwp + (float(roof["pv_count_modules"]) / total_modules) * x
+                        direction_factor_production = direction_factor_kwp + (float(roof["pv_count_modules"]) / total_modules) * y
     else:
         direction_factor_kwp = 1 / pv_efficiancy_faktor
         direction_factor_production = pv_efficiancy_faktor
