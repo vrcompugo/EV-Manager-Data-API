@@ -89,7 +89,7 @@ def send_contract(contract: ENBWContract):
             "tariff_zip": address_data["zipcode"],
             "vp_client_extern_id": contract.sub_contract_number
         },
-        "CorrespondenseAdressData": {
+        "CorrespondenseAddressData": {
             "area_code": "34497",
             "city": "Korbach",
             "email": "versorger@energie360.de",
