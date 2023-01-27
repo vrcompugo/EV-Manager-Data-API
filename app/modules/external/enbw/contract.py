@@ -67,7 +67,7 @@ def send_contract(contract: ENBWContract):
             "counter_number": deal.get("delivery_counter_number"),
             "counter_type": "0",
             "previous_client_number": "",
-            "previous_supplier": None,
+            "previous_supplier": deal.get("energie_delivery_code"),
             "previous_volume": requested_usage,
             "rate_ap": cheapest_tarif["rawSourceTariff"]["preise"][0]["arbeitspreis"]["brutto"],
             "rate_gp": cheapest_tarif["rawSourceTariff"]["preise"][0]["grundpreisJahr"]["brutto"],
