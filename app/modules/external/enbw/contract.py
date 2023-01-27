@@ -19,10 +19,11 @@ def send_contract(contract: ENBWContract):
     contact = get_contact(deal.get("contact_id"))
     requested_usage = int(deal.get("delivery_usage")) * 0.5
     address_data = {
-        "area_code": deal.get("delivery_zip"),
+        "area_code": "05631",
         "city": deal.get("delivery_city"),
-        "email": contact.get("email")[0].get("VALUE"),
-        "phone_number": contact.get("phone")[0].get("VALUE"),
+        "email": "",
+        # "phone_number": contact.get("phone")[0].get("VALUE"),
+        "phone_number": "501717",
         "street_name": deal.get("delivery_street"),
         "street_number": deal.get("delivery_street_nb"),
         "zipcode": deal.get("delivery_zip")
@@ -39,7 +40,7 @@ def send_contract(contract: ENBWContract):
         "zip": address_data["zipcode"],
         "city": address_data["city"],
         "street": f'{address_data["street_name"]} {address_data["street_number"]}'
-        }
+    }
     tarif_data = post("/tariffs", tarif_request, contract=contract)
     if "data" not in tarif_data or "tariffs" not in tarif_data["data"] or len(tarif_data["data"]["tariffs"]) == 0:
         raise ApiException("no valid tarif", "Kein ENBW Tariff für die Kundendaten gefunden")
@@ -100,7 +101,7 @@ def send_contract(contract: ENBWContract):
         },
         "CorrespondensePrivateData": {
             "first_name": "Andre",
-            "last_name": "Schon",
+            "last_name": "Schön",
             "suffix": "Herr"
         },
         "PrivateData": {
