@@ -393,19 +393,19 @@ def get_payments(contract_number):
     contract_number = int(contract_number.replace("C", ""))
     invoices = get(f"/Invoices", parameters={
         "contractNumber": contract_number,
-        "extendedData": True
+        "extendedData": False
     })
     invoice_correntions = get(f"/InvoiceCorrections", parameters={
         "contractNumber": contract_number,
-        "extendedData": True
+        "extendedData": False
     })
     credit_notes = get(f"/CreditNotes", parameters={
         "contractNumber": contract_number,
-        "extendedData": True
+        "extendedData": False
     })
     credit_note_correntions = get(f"/CreditNoteCorrections", parameters={
         "contractNumber": contract_number,
-        "extendedData": True
+        "extendedData": False
     })
     data = []
     for item in invoices:
@@ -423,17 +423,31 @@ def get_payments(contract_number):
 
 
 def enhance_payment(item, item_type):
+    if item_type == "invoice":
+        item = get(f"/Invoices/{item.get('number')}")
+    if item_type == "invoice_corrention":
+        item = get(f"/InvoiceCorrections/{item.get('number')}")
+    if item_type == "credit_note":
+        item = get(f"/CreditNotes/{item.get('number')}")
+    if item_type == "credit_note_corrention":
+        item = get(f"/CreditNoteCorrections/{item.get('number')}")
+
     item["date"] = parse(item["date"])
     item["type"] = item_type
     item["service_year"] = {}
     item["service_year_net"] = {}
+    item["amountGross_normalized_prepay"] = 0
     if item.get("payItems") is not None:
         for pay_item in item["payItems"]:
+            if pay_item.get("itemNumber") != "Jahresabrechnung":
+                item["amountGross_normalized_prepay"] = item["amountGross_normalized_prepay"] + pay_item["amountNetSum"] * (1 + pay_item["taxRatePercent"] / 100)
             item["service_year_net"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"]
             item["service_year"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"] * (1 + (pay_item["taxRatePercent"] / 100))
-    item["amountGross_normalized"] = item["amountGross"]
-    if item_type in ["credit_note"]:
-        item["amountGross_normalized"] = item["amountGross"] * -1
+
+    item["amountGross_normalized"] = item["amountGross"] * -1
+    if item_type in ["credit_note", "invoice_corrention"]:
+        item["amountGross_normalized"] = item["amountGross_normalized"] * -1
+        item["amountGross_normalized_prepay"] = item["amountGross_normalized_prepay"] * -1
     return item
 
 

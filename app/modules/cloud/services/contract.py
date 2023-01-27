@@ -1085,8 +1085,8 @@ def get_annual_statement_data(data, year, manuell_data):
         statement["payments"] = []
         statement["pre_payments_total"] = 0
         for payment in data.get("invoices_credit_notes"):
-            if payment["date"][:4] == str(year):
-                statement["pre_payments_total"] = statement["pre_payments_total"] + payment["amountGross_normalized"]
+            if payment["date"][:4] == str(year) and payment["amountGross_normalized_prepay"] > 0:
+                statement["pre_payments_total"] = statement["pre_payments_total"] + payment["amountGross_normalized_prepay"]
                 statement["payments"].append(payment)
     statement["extra_credit_value"] = 0
     statement["extra_credit_label"] = ""
