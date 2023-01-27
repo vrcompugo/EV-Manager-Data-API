@@ -65,6 +65,7 @@ def send_contract(contract: ENBWContract):
             "client_type": 0,
             "corDiff": 0,
             "counter_number": deal.get("delivery_counter_number"),
+            "malo": deal.get("malo_lightcloud"),
             "counter_type": "0",
             "previous_client_number": "",
             "previous_supplier": deal.get("energie_delivery_code"),
