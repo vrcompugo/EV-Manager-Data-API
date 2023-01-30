@@ -137,7 +137,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         elif data.get("has_heating_quote") is True:
             delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=40)
         else:
-            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=18)
+            delivery_date = datetime.datetime.now() + datetime.timedelta(weeks=10)
         return_data["construction_week"] = int(delivery_date.strftime("%U"))
         return_data["construction_year"] = int(delivery_date.strftime("%Y"))
     if lead_data["assigned_by_id"] is not None and lead_data["assigned_by_id"] != "":
