@@ -373,6 +373,18 @@ def test(test_name=None):
     return 1
 
 
+@manager.command
+def run_sherpa_import():
+    from app.modules.external.sherpa.contract import import_raw
+    import_raw()
+
+
+@manager.command
+def run_sherpa_import2():
+    from app.modules.external.sherpa.contract import import_contracts_for_anual_report
+    import_contracts_for_anual_report()
+
+
 if __name__ == '__main__':
     sa.orm.configure_mappers()
     manager.run()
