@@ -130,18 +130,21 @@ def quote_calculator_set_defaults(lead_id):
     if history is not None and history.is_complete is not True:
         history_quote = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(QuoteHistory.is_complete).order_by(QuoteHistory.datetime.desc()).first()
         if history_quote is not None:
-            history.data["pdf_link"] = history_quote.data.get("pdf_link")
-            history.data["pdf_wi_link"] = history_quote.data.get("pdf_wi_link")
-            history.data["cloud_number"] = history_quote.data.get("cloud_number")
-            history.data["pdf_summary_link"] = history_quote.data.get("pdf_summary_link")
-            history.data["pdf_commission_link"] = history_quote.data.get("pdf_commission_link")
-            history.data["pdf_datasheets_link"] = history_quote.data.get("pdf_datasheets_link")
-            history.data["pdf_quote_summary_link"] = history_quote.data.get("pdf_quote_summary_link")
-            history.data["pdf_contract_summary_link"] = history_quote.data.get("pdf_contract_summary_link")
-            history.data["pdf_contract_summary_part1_file_id"] = history_quote.data.get("pdf_contract_summary_part1_file_id")
-            history.data["pdf_contract_summary_part4_file_link"] = history_quote.data.get("pdf_contract_summary_part4_file_link")
-            history.data["pdf_contract_summary_part4_1_file_link"] = history_quote.data.get("pdf_contract_summary_part4_1_file_link")
-    if history is not None:
+            if history.data is not None:
+                history.data["pdf_link"] = history_quote.data.get("pdf_link")
+                history.data["pdf_wi_link"] = history_quote.data.get("pdf_wi_link")
+                history.data["cloud_number"] = history_quote.data.get("cloud_number")
+                history.data["pdf_summary_link"] = history_quote.data.get("pdf_summary_link")
+                history.data["pdf_commission_link"] = history_quote.data.get("pdf_commission_link")
+                history.data["pdf_datasheets_link"] = history_quote.data.get("pdf_datasheets_link")
+                history.data["pdf_quote_summary_link"] = history_quote.data.get("pdf_quote_summary_link")
+                history.data["pdf_contract_summary_link"] = history_quote.data.get("pdf_contract_summary_link")
+                history.data["pdf_contract_summary_part1_file_id"] = history_quote.data.get("pdf_contract_summary_part1_file_id")
+                history.data["pdf_contract_summary_part4_file_link"] = history_quote.data.get("pdf_contract_summary_part4_file_link")
+                history.data["pdf_contract_summary_part4_1_file_link"] = history_quote.data.get("pdf_contract_summary_part4_1_file_link")
+            else:
+                history.data = history_quote.data
+    if history is not None and history.data is not None:
         data = history.data
         data["history_id"] = history.id
         if "financing_rate" not in data["data"]:
