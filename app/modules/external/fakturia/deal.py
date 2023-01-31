@@ -445,7 +445,7 @@ def enhance_payment(item, item_type):
             item["service_year"][pay_item["performanceDateStart"][:4]] = pay_item["amountNetSum"] * (1 + (pay_item["taxRatePercent"] / 100))
 
     item["amountGross_normalized"] = item["amountGross"]
-    if item_type in ["credit_note", "invoice_corrention"]:
+    if item_type in ["credit_note"]:
         item["amountGross_normalized"] = item["amountGross_normalized"] * -1
         item["amountGross_normalized_prepay"] = item["amountGross_normalized_prepay"] * -1
     return item
