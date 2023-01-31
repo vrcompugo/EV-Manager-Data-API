@@ -6,6 +6,7 @@ import re
 import json
 import calendar
 import math
+import copy
 from dateutil.parser import parse
 from calendar import monthrange
 
@@ -1401,7 +1402,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
                     if start_value is None:
                         start_value = value
                     elif (start_date - start_value["date"]).days > (value["date"] - start_date).days:
-                        start_value2 = start_value
+                        start_value2 = copy.deepcopy(start_value)
                         start_value = value
                 if value["date"] == start_value["date"]:
                     continue
@@ -1417,6 +1418,9 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
                     elif (end_date - end_value["date"]).days > (value["date"] - end_date).days:
                         end_value = value
         if start_value == end_value:
+            start_value = start_value2
+        if end_value is None:
+            end_value = start_value
             start_value = start_value2
         if end_value is None or start_value is None:
             continue
