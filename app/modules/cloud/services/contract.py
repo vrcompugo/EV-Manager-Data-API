@@ -858,6 +858,7 @@ def get_annual_statement_data(data, year, manuell_data):
                 statement_config[product]["allowed_usage"] = statement_config[product]["usage"] * diff_year
 
                 if product == "lightcloud" and config.get("emove") is not None:
+                    statement_config[product]["cloud_price_incl_refund"] = statement_config[product]["cloud_price_incl_refund"] + statement_config["emove"]["cloud_price_incl_refund"]
                     statement_config[product]["label"] = statement_config[product]["label"] + " inkl. eMove"
                     statement_config[product]["allowed_usage_emove"] = float(statement_config["emove"]["usage"]) * diff_year
                     statement_config[product]["allowed_usage"] = statement_config[product]["allowed_usage"] + statement_config[product]["allowed_usage_emove"]
