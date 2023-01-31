@@ -102,13 +102,13 @@
     </table>
     <br>
     <h2>Aufstellung Vorauszahlungen/Kosten</h2>
+    <h3>Kosten</h3>
     <table>
       <tr class="heading">
         <th>Art</th>
         <th>von</th>
         <th>bis</th>
-        <th>Soll</th>
-        <th>Haben</th>
+        <th>Betrag</th>
       </tr>
       {% set total_extra_usage = 0 %}
       {% for config in statement.configs %}
@@ -127,12 +127,10 @@
               </td>
               <td>{{ config[product].delivery_begin | dateformat }}</td>
               <td>{{ config[product].delivery_end | dateformat }}</td>
-              <td style="text-align: right; white-space: nowrap;">{% if config[product].total_extra_price > 0 %}{{ config[product].total_extra_price | currencyformat }}{% endif%}</td>
-              <td style="text-align: right; white-space: nowrap;">{% if config[product].total_extra_price <= 0 %}{{ -config[product].total_extra_price | currencyformat }}{% endif%}</td>
+              <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price | currencyformat }}</td>
             </tr>
           {% endif %}
         {% endfor %}
-
         {% if statement.is_fakturia %}
           <tr>
             <td>
@@ -140,51 +138,61 @@
             </td>
             <td>{{ config.delivery_begin | dateformat }}</td>
             <td>{{ config.delivery_end | dateformat }}</td>
-            <td style="text-align: right; white-space: nowrap;">{% if config.total_cloud_price_incl_refund > 0 %}{{ config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
-            <td style="text-align: right; white-space: nowrap;">{% if config.total_cloud_price_incl_refund <= 0 %}{{ -config.total_cloud_price_incl_refund | currencyformat }}{% endif%}</td>
+            <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
+          </tr>
+        {% endif %}
+        {% if statement.extra_credit_value != 0 %}
+          <tr>
+            <td>{{ statement.extra_credit_label }}</td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value | currencyformat }}</td>
+          </tr>
+        {% endif %}
+        {% if statement.extra_credit_value2 != 0 %}
+          <tr>
+            <td>{{ statement.extra_credit_label2 }}</td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value2 | currencyformat }}</td>
           </tr>
         {% endif %}
       {% endfor %}
+      <tr class="summary">
+        <td colspan="3"><b>Summe</b></td>
+        <td style="text-align: right; white-space: nowrap;">{{ statement.cost_total | currencyformat }}</td>
+      </tr>
+    </table>
+    <h3>Zahlungen</h3>
+    <table>
+      <tr class="heading">
+        <th>von</th>
+        <th>Art</th>
+        <th>Betrag</th>
+      </tr>
       {% if statement.payments %}
         {% for payment in statement.payments %}
           <tr>
-            <td>{{ payment.number }}</td>
             <td>{{ payment.date | dateformat }}</td>
-            <td></td>
-            <td style="text-align: right;">{% if payment.amountGross < 0 %}{{ -payment.amountGross | currencyformat }}{% endif%}</td>
-            <td style="text-align: right;">{% if payment.amountGross > 0 %}{{ payment.amountGross | currencyformat }}{% endif%}</td>
+            <td>{{ payment.number }}</td>
+            <td style="text-align: right;">{{ payment.amountGross_normalized_prepay | currencyformat }}</td>
           </tr>
         {% endfor %}
       {% endif %}
-      {% if statement.extra_credit_value != 0 %}
-        <tr>
-          <td>{{ statement.extra_credit_label }}</td>
-          <td></td>
-          <td></td>
-          <td style="text-align: right; white-space: nowrap;">{% if statement.extra_credit_value > 0 %}{{ statement.extra_credit_value | currencyformat }}{% endif%}</td>
-          <td style="text-align: right; white-space: nowrap;">{% if statement.extra_credit_value < 0 %}{{ -statement.extra_credit_value | currencyformat }}{% endif%}</td>
-        </tr>
-      {% endif %}
-      {% if statement.extra_credit_value2 != 0 %}
-        <tr>
-          <td>{{ statement.extra_credit_label2 }}</td>
-          <td></td>
-          <td></td>
-          <td style="text-align: right; white-space: nowrap;">{% if statement.extra_credit_value2 > 0 %}{{ statement.extra_credit_value2 | currencyformat }}{% endif%}</td>
-          <td style="text-align: right; white-space: nowrap;">{% if statement.extra_credit_value2 < 0 %}{{ -statement.extra_credit_value2 | currencyformat }}{% endif%}</td>
-        </tr>
-      {% endif %}
       <tr class="summary">
-        <td colspan="3"><b>{% if statement.to_pay > 0 %}Noch zu Zahlen{% else %}Auszahlung{% endif%}</b></td>
-        <td style="text-align: right; white-space: nowrap;">{% if statement.to_pay > 0 %}{{ statement.to_pay | currencyformat }}{% endif%}</td>
-        <td style="text-align: right; white-space: nowrap;">{% if statement.to_pay <= 0 %}{{ -statement.to_pay | currencyformat }}{% endif%}</td>
+        <td colspan="2"><b>Summe</b></td>
+        <td style="text-align: right; white-space: nowrap;">{{ statement.pre_payments_total | currencyformat }}</td>
       </tr>
     </table>
     <br>
     <br>
     {% if statement.to_pay > 0 %}
+      <div style="font-size: 1.2em">Nachzahlung: {{ statement.to_pay | currencyformat }}</div>
+      <br>
       Die zu dieser Verbrauchsübersicht zugehörige Rechnung erhalten Sie separat.
     {% else %}
+      <div style="font-size: 1.2em">Auszahlung: {{ -statement.to_pay | currencyformat }}</div>
+      <br>
       Die zu dieser Verbrauchsübersicht zugehörige Gutschrift erhalten Sie separat.
     {% endif %}
     Die bisherige Cloudgebühr wird wie vereinbart weiterhin abgebucht.
