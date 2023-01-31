@@ -255,6 +255,7 @@ def quote_calculator_calculate(lead_id):
                 .order_by(QuoteHistory.datetime.desc()).first()
         else:
             history_dirty = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(not_(QuoteHistory.is_complete)).order_by(QuoteHistory.datetime.desc()).first()
+        data = calculate_quote(lead_id, post_data)
         if history_dirty is None:
             if form_dirty is False and history_quote is not None:
                 return Response(
@@ -270,7 +271,6 @@ def quote_calculator_calculate(lead_id):
             )
             db.session.add(history_dirty)
             db.session.flush()
-        data = calculate_quote(lead_id, post_data)
         data["history_id"] = history_dirty.id
         if history_quote is not None:
             data["pdf_link"] = history_quote.data.get("pdf_link")
