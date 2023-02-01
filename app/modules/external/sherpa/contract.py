@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from sqlalchemy import or_
 
 from app import db
@@ -68,12 +69,14 @@ def import_contracts_for_anual_report():
             f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
             "FILTER[CATEGORY_ID]": 126
         }, force_reload=True)
+        time.sleep(2)
         if len(deals) == 0:
             deals2 = get_deals({
                 "SELECT": "full",
                 f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
                 "FILTER[CATEGORY_ID]": 15
             }, force_reload=True)
+            time.sleep(2)
             post_data = {
                 "category_id": 126,
                 "stage_id": "C126:UC_XM96DH",
