@@ -131,16 +131,14 @@
             </tr>
           {% endif %}
         {% endfor %}
-        {% if statement.is_fakturia %}
-          <tr>
-            <td>
-              Cloud Jahresgebühr
-            </td>
-            <td>{{ config.delivery_begin | dateformat }}</td>
-            <td>{{ config.delivery_end | dateformat }}</td>
-            <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
-          </tr>
-        {% endif %}
+        <tr>
+          <td>
+            Cloud Jahresgebühr
+          </td>
+          <td>{{ config.delivery_begin | dateformat }}</td>
+          <td>{{ config.delivery_end | dateformat }}</td>
+          <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
+        </tr>
         {% if statement.extra_credit_value != 0 %}
           <tr>
             <td>{{ statement.extra_credit_label }}</td>
@@ -178,6 +176,12 @@
             <td style="text-align: right;">{{ payment.amountGross_normalized_prepay | currencyformat }}</td>
           </tr>
         {% endfor %}
+      {% else %}
+        <tr>
+          <td>31.12.{{ year }}</td>
+          <td>Vorauszahlungen {{ year }}</td>
+          <td style="text-align: right;">{{ statement.pre_payments_total  | currencyformat }}</td>
+        </tr>
       {% endif %}
       <tr class="summary">
         <td colspan="2"><b>Summe</b></td>
