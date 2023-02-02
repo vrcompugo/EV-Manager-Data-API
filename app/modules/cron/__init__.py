@@ -84,6 +84,13 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
+    if section == "productive" or section == "extern_lead_convert":
+        from app.modules.external.bitrix24.lead import run_extern_lead_convert
+        try:
+            run_extern_lead_convert()
+        except Exception as e:
+            error_handler()
+
     if section == "productive" or section == "add_missing_deal_values":
         from app.modules.external.bitrix24.deal import run_cron_add_missing_values
         try:

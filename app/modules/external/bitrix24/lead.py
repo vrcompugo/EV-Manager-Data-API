@@ -273,6 +273,37 @@ def run_bennemann_lead_convert():
         set_settings("external/bitrix24/bennemann_lead_convert", config)
 
 
+def run_extern_lead_convert():
+    config = get_settings("external/bitrix24/extern_lead_convert")
+    print("extern_lead_convert")
+    if config is None:
+        print("no config for extern_lead_convert import")
+        return None
+    now = datetime.now()
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
+        "FILTER[CATEGORY_ID]": "239"
+    }, force_reload=True)
+    if deals is not None:
+        for deal in deals:
+            if deal.get("unique_identifier") in [None, "", "None", "0"]:
+                contact = get_contact(deal.get("contact_id"))
+                if contact is None or contact.get("email") in [None, ""] or len(contact.get("email")) == 0:
+                    continue
+                lead_data = deal
+                lead_data["status_id"] = "16"
+                lead = add_lead(deal)
+                if lead is not None and "id" in lead:
+                    update_deal(deal.get("id"), {
+                        "unique_identifier": lead.get("id")
+                    })
+        config = get_settings("external/bitrix24/extern_lead_convert")
+        if config is not None:
+            config["last_import"] = now.astimezone().isoformat()
+        set_settings("external/bitrix24/extern_lead_convert", config)
+
+
 def run_cron_auto_assign_leads():
     from app.modules.user import auto_assign_lead_to_user
     leads = get_leads({
