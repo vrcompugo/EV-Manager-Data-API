@@ -100,6 +100,7 @@ def calculate_commission_data(quote_data, data, quote_key=""):
 
     quote_data["calculated"]["effective_internal_discount_rate"] = (1 - quote_data["calculated"]["commission_total_net"] / quote_data["calculated"]["unchanged_total_net"]) * 100
     quote_data["calculated"]["commission_rate"] = get_commission_rate(quote_data=quote_data, data=data, quote_key=quote_key)
+    print(quote_data["calculated"]["commission_rate"])
 
     quote_data["calculated"]["unchanged_commission_value"] = quote_data["calculated"]["unchanged_total_net"] * (quote_data["calculated"]["commission_rate"] / 100)
     quote_data["calculated"]["after_increase_commission_value"] = quote_data["calculated"]["unchanged_commission_value"] + (quote_data["calculated"]["after_increase_total_net"] - quote_data["calculated"]["unchanged_total_net"]) / 2
@@ -165,7 +166,7 @@ def get_commission_rate(quote_data, data, quote_key):
         if 0 < effective_discount_rate_rounded <= 5:
             return 4
     if effective_discount_rate_rounded <= 0:
-        return 4.25
+        return 5
     if 0 < effective_discount_rate_rounded <= 5:
-        return 3.75
+        return 4
     return 2
