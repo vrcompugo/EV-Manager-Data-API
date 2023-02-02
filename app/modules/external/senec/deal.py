@@ -120,7 +120,7 @@ def run_cron_import():
             if existing_contact is None:
                 data["lead"]["status_id"] = "NEW"
                 contact = add_contact(data["contact"])
-                if not isinstance(data["contact"], dict):
+                if not isinstance(contact, dict):
                     print(data["contact"])
                     print(contact)
                 data["lead"]["contact_id"] = contact["id"]
