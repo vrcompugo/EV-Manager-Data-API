@@ -131,14 +131,6 @@
             </tr>
           {% endif %}
         {% endfor %}
-        <tr>
-          <td>
-            Cloud Jahresgebühr
-          </td>
-          <td>{{ config.delivery_begin | dateformat }}</td>
-          <td>{{ config.delivery_end | dateformat }}</td>
-          <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
-        </tr>
         {% if statement.extra_credit_value != 0 %}
           <tr>
             <td>{{ statement.extra_credit_label }}</td>
@@ -158,34 +150,46 @@
       {% endfor %}
       <tr class="summary">
         <td colspan="3"><b>Summe</b></td>
-        <td style="text-align: right; white-space: nowrap;">{{ statement.cost_total | currencyformat }}</td>
+        <td style="text-align: right; white-space: nowrap;">{{ (statement.cost_total - statement.total_cloud_price_incl_refund) | currencyformat }}</td>
       </tr>
     </table>
-    <h3>Zahlungen</h3>
+    <h3>Forderungen aus 2022</h3>
     <table>
       <tr class="heading">
-        <th>von</th>
-        <th>Art</th>
+        <th>(resultiert aus monatlichen Cloudbeiträgen)</th>
+        <th>Betrag pro Monat</th>
+        <th>Anzahl Monate</th>
         <th>Betrag</th>
       </tr>
-      {% if statement.payments %}
-        {% for payment in statement.payments %}
-          <tr>
-            <td>{{ payment.date | dateformat }}</td>
-            <td>{{ payment.number }}</td>
-            <td style="text-align: right;">{{ payment.amountGross_normalized_prepay | currencyformat }}</td>
-          </tr>
-        {% endfor %}
-      {% else %}
+      {% for config in statement.configs %}
         <tr>
-          <td>31.12.{{ year }}</td>
-          <td>Vorauszahlungen {{ year }}</td>
-          <td style="text-align: right;">{{ statement.pre_payments_total  | currencyformat }}</td>
+          <td>
+            {% if config.cloud_price_incl_refund >= 0 %}
+              Forderung
+            {% else %}
+              Gutschrift
+            {% endif %}
+          </td>
+          <td>{{ config.cloud_price_incl_refund | currencyformat }}</td>
+          <td>{{ (12 * config.percent_year) | numberformat }}</td>
+          <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
         </tr>
-      {% endif %}
+      {% endfor %}
       <tr class="summary">
-        <td colspan="2"><b>Summe</b></td>
-        <td style="text-align: right; white-space: nowrap;">{{ statement.pre_payments_total | currencyformat }}</td>
+        <td colspan="3"><b>Summe</b></td>
+        <td style="text-align: right; white-space: nowrap;">{{ statement.total_cloud_price_incl_refund | currencyformat }}</td>
+      </tr>
+    </table>
+    <br>
+    <h3>Geleistete Zahlungen/Gutschriften</h3>
+    <table>
+      <tr class="heading">
+        <th>{{ year }}</th>
+        <th>Betrag</th>
+      </tr>
+      <tr>
+        <td>{{ statement.delivery_begin | dateformat }} - {{ statement.delivery_end | dateformat }}</td>
+        <td style="text-align: right;">{{ statement.pre_payments_total  | currencyformat }}</td>
       </tr>
     </table>
     <br>

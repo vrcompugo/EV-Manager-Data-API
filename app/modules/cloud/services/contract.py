@@ -823,6 +823,10 @@ def get_annual_statement_data(data, year, manuell_data):
             delivery_begin = str(config.get("delivery_begin"))
         if parse(config.get("delivery_begin")).year > year:
             continue
+        if statement.get("delivery_begin") is None:
+            statement["delivery_begin"] = delivery_begin
+        if statement.get("delivery_end") is None or normalize_date(statement.get("delivery_end")) < normalize_date(delivery_end):
+            statement["delivery_end"] = delivery_end
         if parse(delivery_begin).year <= year and parse(delivery_end).year >= year:
             for product in ["heatcloud", "lightcloud", "ecloud"] + customer_products:
                 if statement_config.get(product) is None:
@@ -1027,6 +1031,7 @@ def get_annual_statement_data(data, year, manuell_data):
                 percent_year = calculate_year_diff(statement_config[product]["delivery_begin"], statement_config[product]["delivery_end"], manuell_data.get("corrected_datediff"))
                 statement_config[product]["total_cloud_price"] = statement_config[product]["cloud_price"] * 12 * percent_year
                 statement_config[product]["total_cloud_price_incl_refund"] = statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
+                statement_config["percent_year"] = percent_year
                 statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
                 statement_config["total_cloud_price_incl_refund"] = statement_config["total_cloud_price_incl_refund"] + statement_config[product]["total_cloud_price_incl_refund"]
                 statement_config[product]["total_extra_usage"] = statement_config[product]["actual_usage"] - statement_config[product]["allowed_usage"]
@@ -1681,9 +1686,11 @@ def add_custom_config(contract_number):
 
 
 def store_custom_config(data):
+    print(json.dumps(data, indent=2))
     if data.get("cloud_number") is None:
         return False
     offer_v2 = OfferV2.query.filter(OfferV2.number == data.get("cloud_number")).first()
+    print(offer_v2)
     if offer_v2 is None:
         return False
     offer_data = json.loads(json.dumps(offer_v2.data))
@@ -1742,7 +1749,6 @@ def store_custom_config(data):
 
     offer_v2.calculated["cloud_price_consumer_incl_refund"] = offer_v2.calculated["cloud_price_consumer"]
     offer_v2.calculated["cloud_price"] = offer_v2.calculated["cloud_price"] + offer_v2.calculated["cloud_price_consumer"]
-
     offer_v2.calculated["cloud_price_incl_refund"] = offer_v2.calculated["cloud_price"] + offer_v2.calculated["cloud_price_extra"]
     items = get_cloud_products(data={"calculated": offer_v2.calculated, "data": offer_data})
     offer_v2.items = []
