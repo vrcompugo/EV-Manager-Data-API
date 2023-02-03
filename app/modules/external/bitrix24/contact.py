@@ -120,7 +120,7 @@ def add_contact(data, domain=None):
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
     response = post("crm.contact.add", update_data, domain=domain)
     if "result" in response and response["result"]:
-        return get_contact(int(response["result"]))
+        return get_contact(int(response["result"]), force_reload=True)
     else:
         return False
 

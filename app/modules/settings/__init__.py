@@ -329,6 +329,11 @@ def get_settings(section=None, domain_raw=None):
                     "7355": "Preisdefintion vor dem 16.12.2021",
                     "7357": "Preisdefintion vor dem 01.10.2022",
                     "7359": "aktuell"
+                },
+                "invoice_document_prefix": {
+                    "": None,
+                    "8243": "RG-",
+                    "8245": "GU-"
                 }
             },
             "product": {
@@ -569,6 +574,19 @@ def get_settings(section=None, domain_raw=None):
                     "cloud_follow_delivery_end1": "UF_CRM_1662990290",
                     "order_sign_date": "UF_CRM_61606B5866031",
                     "collection_url": "UF_CRM_6091A2714B029"
+                }
+            },
+            "invoice": {
+                "fields": {
+                    "invoice_datetime": "begindate",
+                    "invoice_number_index": "accountnumber",
+                    "invoice_document_prefix": "ufcrmsmartinvoice1675090456470",
+                    "first_name": "ufcrmsmartinvoice1670430989003",
+                    "last_name": "ufcrmsmartinvoice1670430999601",
+                    "street": "ufcrmsmartinvoice1670431008014",
+                    "zip_city": "ufcrmsmartinvoice1670431016845",
+                    "user_number": "ufcrmsmartinvoice1670431027186",
+                    "email": "ufcrmsmartinvoice1671028062238"
                 }
             },
             "quote": {
