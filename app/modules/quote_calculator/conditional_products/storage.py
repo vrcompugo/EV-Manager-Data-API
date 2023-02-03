@@ -12,7 +12,7 @@ def add_product(data):
     if data["data"].get("power_usage") not in [None, "", 0, "0"]:
         size = size + math.ceil(float(data["data"].get("power_usage")) / 2500) * 2.5
     if data["data"].get("heater_usage") not in [None, "", 0, "0"]:
-        size = size + math.ceil(data["data"].get("heater_usage") / 6100) * 2.5
+        size = size + math.ceil(float(data["data"].get("heater_usage")) / 6100) * 2.5
     is_overwrite = False
     if "overwrite_storage_size" in data["data"] and data["data"]["overwrite_storage_size"] != "":
         if int(data["data"]["overwrite_storage_size"]) > size:
@@ -39,7 +39,7 @@ def add_product(data):
             if data["data"].get("power_usage") not in [None, "", 0, "0"]:
                 size = size + math.ceil(float(data["data"].get("power_usage")) / 4200) * 4.2
             if data["data"].get("power_usage") not in [None, "", 0, "0"]:
-                size = size + math.ceil(data["calculated"]["heater_usage"] / 9000) * 4.2
+                size = size + math.ceil(float(data["data"].get("heater_usage")) / 9000) * 4.2
         if "solaredge" not in data["data"]["extra_options"]:
             version = "SENEC Home 4 Hybrid"
             product = get_product(label="SENEC Home 4 Hybrid (Gehäuse)", category="Stromspeicher")
