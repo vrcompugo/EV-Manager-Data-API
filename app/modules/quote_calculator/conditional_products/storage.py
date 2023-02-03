@@ -8,13 +8,17 @@ def add_product(data):
         raise Exception("storage produkt could not be calculated")
     if data["calculated"]["storage_size"] == 0:
         return None
-    size = math.ceil(data["calculated"]["power_usage"] / 2500) * 2.5
+    size = 0
+    if data["data"].get("power_usage") not in [None, "", 0, "0"]:
+        size = size + math.ceil(float(data["data"].get("power_usage")) / 2500) * 2.5
+    if data["data"].get("heater_usage") not in [None, "", 0, "0"]:
+        size = size + math.ceil(data["data"].get("heater_usage") / 6100) * 2.5
     is_overwrite = False
     if "overwrite_storage_size" in data["data"] and data["data"]["overwrite_storage_size"] != "":
         if int(data["data"]["overwrite_storage_size"]) > size:
             size = int(data["data"]["overwrite_storage_size"])
             is_overwrite = True
-    if size <= 10 and data["calculated"]["power_usage"] <= 10000:
+    if size <= 10:
         version = "Senec Lithium Speicher"
         stack_count = math.ceil((size - 2.5) / 2.5)
         if stack_count < 1:
@@ -31,7 +35,11 @@ def add_product(data):
         data["products"].append(product)
     else:
         if not is_overwrite:
-            size = math.ceil(data["calculated"]["power_usage"] / 4200) * 4.2
+            size = 0
+            if data["data"].get("power_usage") not in [None, "", 0, "0"]:
+                size = size + math.ceil(float(data["data"].get("power_usage")) / 4200) * 4.2
+            if data["data"].get("power_usage") not in [None, "", 0, "0"]:
+                size = size + math.ceil(data["calculated"]["heater_usage"] / 9000) * 4.2
         if "solaredge" not in data["data"]["extra_options"]:
             version = "SENEC Home 4 Hybrid"
             product = get_product(label="SENEC Home 4 Hybrid (Gehäuse)", category="Stromspeicher")
