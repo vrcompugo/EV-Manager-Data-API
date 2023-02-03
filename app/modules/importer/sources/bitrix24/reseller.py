@@ -57,8 +57,8 @@ def filter_import_data(item_data):
         "group_id": group_id,
         "bitrix_department": ", ".join(bitrix_department),
         "email": item_data["EMAIL"],
-        "name": str(item_data["NAME"]) + " " + str(item_data["LAST_NAME"]),
-        "phone": item_data["WORK_PHONE"],
+        "name": str(item_data.get("NAME")) + " " + str(item_data.get("LAST_NAME")),
+        "phone": item_data.get("WORK_PHONE"),
         "active": item_data["ACTIVE"]
     }
     return data
