@@ -53,7 +53,7 @@ def filter_import_data(item_data):
         "bitrix_department": ", ".join(bitrix_department),
         "email": item_data["EMAIL"],
         "username": item_data["EMAIL"],
-        "name": str(item_data["NAME"]) + " " + str(item_data["LAST_NAME"]),
+        "name": str(item_data.get("NAME")) + " " + str(item_data.get("LAST_NAME")),
         "active": item_data["ACTIVE"]
     }
     if role_id is not None:
