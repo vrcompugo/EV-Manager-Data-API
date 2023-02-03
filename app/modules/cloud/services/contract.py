@@ -987,7 +987,8 @@ def get_annual_statement_data(data, year, manuell_data):
                                     statement_config[product]["actual_usage"] = statement_config[product]["actual_usage_net"]
                                 if counters2 is not None and manuell_data.get("hide_netusage") not in [1, True, "1", "true"]:
                                     statement["counters"] = statement["counters"] + counters2
-
+                                if product == "heatcloud" and statement_config.get("measuring_concept") in ["parallel_concept"] and manuell_data.get("parallel_concept_counter") not in ["smartme"]:
+                                    statement_config[product]["actual_usage"] = statement_config[product]["actual_usage_net"]
                         else:
                             if product == "heatcloud" and statement_config.get("measuring_concept") in ["parallel_concept"] and manuell_data.get("parallel_concept_counter") in ["smartme"]:
                                 pass
