@@ -249,7 +249,7 @@ def quote_calculator_calculate(lead_id):
                     history_data["data"][key] = post_data[key]
                 else:
                     if key in ["consumers", "roofs"]:
-                        if len(post_data[key]) != len(history_quote.data["data"][key]):
+                        if post_data.get(key) is None or history_quote.data["data"].get(key) or len(post_data[key]) != len(history_quote.data["data"][key]):
                             form_dirty = True
                         else:
                             for index in range(len(post_data[key])):
