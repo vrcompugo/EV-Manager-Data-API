@@ -147,6 +147,21 @@ def quote_calculator_set_defaults(lead_id):
     if history is not None and history.data is not None:
         data = history.data
         data["history_id"] = history.id
+        if "roofs" not in data["data"]:
+            roof = {
+                "direction": "west_east",
+                "is_valid": True,
+                "is_valid_body": True,
+                "is_valid_header": True,
+                "label": "Rekonstruiert",
+                "pv_count_modules": 1,
+                "pv_kwp_used": 1
+            }
+            if "roof_direction" in data["data"]:
+                roof["direction"] = data["data"]["roof_direction"]
+            if "pv_kwp" in data["data"]:
+                roof["pv_kwp_used"] = data["data"]["pv_kwp"]
+            data["data"]["roofs"] = [roof]
         if "financing_rate" not in data["data"]:
             data["data"]["financing_rate"] = 3.79
         if "financing_rate_heating" not in data["data"]:
