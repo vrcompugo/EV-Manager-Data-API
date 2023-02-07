@@ -64,7 +64,7 @@ def import_contracts_for_anual_report():
         .filter(or_(Contract.end.is_(None), Contract.end >= f'{year}-01-01'))
     for contract in contracts:
         if contract.main_contract_number is None:
-            continue
+            contract.main_contract_number = contract.contract_number
         deals = get_deals({
             "SELECT": "full",
             f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
