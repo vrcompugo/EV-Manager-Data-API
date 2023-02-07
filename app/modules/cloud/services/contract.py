@@ -1536,7 +1536,7 @@ def cron_transfer_fakturia_annual_invoice():
                 "stage_id": "C126:EXECUTING"
             })
             continue
-        if contract.get("fakturia") is not None and contract.get("fakturia").get("contractStatus") in ["ACTIVE"]:
+        if contract.get("fakturia") is not None and contract.get("fakturia").get("contractStatus") in ["ACTIVE", "ENDED"]:
             print("fakturia")
             print(json.dumps(contract, indent=2))
             min_delivery_begin = None
