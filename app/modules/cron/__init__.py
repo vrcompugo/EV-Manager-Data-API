@@ -71,12 +71,6 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-        from app.modules.external.smartme2.powermeter_measurement import run_cron_import
-        try:
-            run_cron_import()
-        except Exception as e:
-            error_handler()
-
     if section == "productive" or section == "bennemann_lead_convert":
         from app.modules.external.bitrix24.lead import run_bennemann_lead_convert
         try:

@@ -5,9 +5,11 @@ from requests.auth import HTTPBasicAuth
 from app.modules.settings import get_settings
 
 
-def get(url, parameters=None):
+def get(url, parameters=None, account=None):
 
-    config = get_settings("external/smartme")
+    if account is None:
+        account = ""
+    config = get_settings(f"external/smartme{account}")
 
     response = requests.get(
         config["url"] + url,

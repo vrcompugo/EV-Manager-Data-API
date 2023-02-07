@@ -374,9 +374,9 @@ def test(test_name=None):
 
 
 @manager.command
-def run_sherpa_import():
-    from app.modules.external.sherpa.contract import import_raw
-    import_raw()
+def run_smartmetest():
+    from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime
+    print(get_device_by_datetime("191760", "2023-01-01"))
 
 
 @manager.command

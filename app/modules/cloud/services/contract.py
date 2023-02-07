@@ -19,8 +19,7 @@ from app.modules.external.bitrix24.deal import get_deals, get_deal, update_deal,
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.fakturia.deal import get_payments, get_payments2, get_contract
 from app.modules.external.fakturia.activity import generate_invoice
-from app.modules.external.smartme2.powermeter_measurement import get_device_by_datetime
-from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime as get_device_by_datetime2
+from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
 from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem, Survey, OfferV2Item
 from .annual_statement import generate_annual_statement_pdf
