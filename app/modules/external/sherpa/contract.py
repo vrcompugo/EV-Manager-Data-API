@@ -59,6 +59,7 @@ def import_contracts_for_anual_report():
     year = 2022
     system_config = get_settings(section="external/bitrix24")
     contracts = Contract.query \
+        .filter(or_(Contract.deal_id.is_(None), Contract.deal_id == 0))\
         .filter(Contract.begin < f'{year + 1}-01-01')\
         .filter(or_(Contract.end.is_(None), Contract.end >= f'{year}-01-01'))
     for contract in contracts:
@@ -69,14 +70,12 @@ def import_contracts_for_anual_report():
             f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
             "FILTER[CATEGORY_ID]": 126
         }, force_reload=True)
-        time.sleep(2)
         if len(deals) == 0:
             deals2 = get_deals({
                 "SELECT": "full",
                 f"FILTER[{system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
                 "FILTER[CATEGORY_ID]": 15
             }, force_reload=True)
-            time.sleep(2)
             post_data = {
                 "category_id": 126,
                 "stage_id": "C126:UC_XM96DH",
@@ -90,3 +89,5 @@ def import_contracts_for_anual_report():
             add_deal(post_data)
         else:
             print("exist", contract.main_contract_number)
+            contract.deal_id = deals[0].get("id")
+            db.session.commit()

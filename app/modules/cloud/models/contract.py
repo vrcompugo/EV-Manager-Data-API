@@ -9,6 +9,7 @@ class Contract(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contract_number = db.Column(db.String(50))
     main_contract_number = db.Column(db.String(50))
+    deal_id = db.Column(db.Integer)
     begin = db.Column(db.DateTime)
     end = db.Column(db.DateTime)
     first_name = db.Column(db.String(50))
