@@ -50,7 +50,9 @@ def filter_import_data(item_data):
         return None
     data = {
         "roles": [],
+        "bitrix_user_id": item_data["ID"],
         "bitrix_department": ", ".join(bitrix_department),
+        "bitrix_department_ids": item_data["UF_DEPARTMENT"],
         "email": item_data["EMAIL"],
         "username": item_data["EMAIL"],
         "name": str(item_data.get("NAME")) + " " + str(item_data.get("LAST_NAME")),

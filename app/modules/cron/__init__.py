@@ -99,7 +99,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive":
+    if section == "productive" or section == "bitrix_user_import":
         from app.modules.importer.sources.bitrix24.reseller import run_import
         try:
             run_import()
