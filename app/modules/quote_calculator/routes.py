@@ -6,6 +6,7 @@ import datetime
 from flask import Blueprint, request, render_template, redirect, make_response, Response
 from flask_emails import Message
 from sqlalchemy import not_
+from dateutil.parser import parse
 
 from app import db
 from app.config import email_config
@@ -42,7 +43,7 @@ UNCALCULATED_FIELDS = [
     "power_meter_number_extra2_label", "power_meter_number_extra2",
     "tab_zahlerzusammenlegung", "tab_extra_counter_number1", "tab_extra_counter_number2", "tab_extra_counter_number3",
     "tab_hak_position", "tab_distance_hak", "tab_roomheight_power_cabinet",
-    "tab_power_usage_options", "wallbox_mountpoint"
+    "tab_power_usage_options", "wallbox_mountpoint", "tab_power_usage_total_power",
 ]
 UNCALCULATED_FIELDS_CONSUMER = [
     "power_meter_number", "malo_id", "address"
@@ -241,12 +242,17 @@ def quote_calculator_calculate(lead_id):
                 status=404,
                 mimetype='application/json')
         form_dirty = False
+        form_updated = False
         history_quote = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(QuoteHistory.is_complete).order_by(QuoteHistory.datetime.desc()).first()
         if history_quote is not None:
             history_data = json.loads(json.dumps(history_quote.data))
             for key in post_data.keys():
                 if is_uncalculated_field(key):
-                    history_data["data"][key] = post_data[key]
+                    if str(history_data["data"][key]) != str(post_data[key]):
+                        if not is_temp_field(key):
+                            form_updated = True
+                            print("update detected", key)
+                        history_data["data"][key] = post_data[key]
                 else:
                     if key in ["consumers", "roofs"]:
                         if post_data.get(key) is None or history_quote.data["data"].get(key) is None or len(post_data[key]) != len(history_quote.data["data"][key]):
@@ -255,11 +261,17 @@ def quote_calculator_calculate(lead_id):
                             for index in range(len(post_data[key])):
                                 for key2 in post_data[key][index].keys():
                                     if key2 not in UNCALCULATED_FIELDS_CONSUMER and key2 not in UNCALCULATED_FIELDS_ROOF:
-                                        if is_value_changed(post_data[key][index][key2], history_quote.data["data"][key][index].get(key2)):
-                                            form_dirty = True
+                                        if is_uncalculated_field(key2):
+                                            if not is_temp_field(key2):
+                                                form_updated = True
+                                                print("update detected", key, index, key2)
+                                        else:
+                                            if is_value_changed(post_data[key][index][key2], history_quote.data["data"][key][index].get(key2)):
+                                                print("dirty detected", key, index, key2)
+                                                form_dirty = True
                     else:
-                        print(key, is_value_changed(post_data[key], history_quote.data["data"].get(key)), post_data[key], history_quote.data["data"].get(key))
                         if is_value_changed(post_data[key], history_quote.data["data"].get(key)):
+                            print("dirty detected", key)
                             form_dirty = True
             history_quote.data = history_data
             db.session.commit()
@@ -270,9 +282,19 @@ def quote_calculator_calculate(lead_id):
                 .order_by(QuoteHistory.datetime.desc()).first()
         else:
             history_dirty = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(not_(QuoteHistory.is_complete)).order_by(QuoteHistory.datetime.desc()).first()
-        data = calculate_quote(lead_id, post_data)
+
         if history_dirty is None:
             if form_dirty is False and history_quote is not None:
+                if form_updated or \
+                    history_quote.data.get("pdf_contract_summary_link_datetime") is None or \
+                    parse(history_quote.data.get("pdf_contract_summary_link_datetime")) < datetime.datetime.now() - datetime.timedelta(days=1):
+                    history_data = json.loads(json.dumps(history_quote.data))
+                    history_data["pdf_contract_summary_link"] = None
+                    history_data["pdf_contract_summary_part1_file_id"] = None
+                    history_data["pdf_contract_summary_part4_file_link"] = None
+                    history_data["pdf_contract_summary_part4_1_file_link"] = None
+                    history_quote.data = history_data
+                    db.session.commit()
                 return Response(
                     json.dumps({"status": "success", "data": history_quote.data}),
                     status=200,
@@ -286,19 +308,8 @@ def quote_calculator_calculate(lead_id):
             )
             db.session.add(history_dirty)
             db.session.flush()
+        data = calculate_quote(lead_id, post_data)
         data["history_id"] = history_dirty.id
-        if history_quote is not None:
-            data["pdf_link"] = history_quote.data.get("pdf_link")
-            data["pdf_wi_link"] = history_quote.data.get("pdf_wi_link")
-            data["cloud_number"] = history_quote.data.get("cloud_number")
-            data["pdf_summary_link"] = history_quote.data.get("pdf_summary_link")
-            data["pdf_commission_link"] = history_quote.data.get("pdf_commission_link")
-            data["pdf_datasheets_link"] = history_quote.data.get("pdf_datasheets_link")
-            data["pdf_quote_summary_link"] = history_quote.data.get("pdf_quote_summary_link")
-            data["pdf_contract_summary_link"] = history_quote.data.get("pdf_contract_summary_link")
-            data["pdf_contract_summary_part1_file_id"] = history_quote.data.get("pdf_contract_summary_part1_file_id")
-            data["pdf_contract_summary_part4_file_link"] = history_quote.data.get("pdf_contract_summary_part4_file_link")
-            data["pdf_contract_summary_part4_1_file_link"] = history_quote.data.get("pdf_contract_summary_part4_1_file_link")
         history_dirty.data=data
         db.session.commit()
 
@@ -1003,6 +1014,7 @@ def quote_calculator_contract_summary_pdf_action(lead_id):
         data["pdf_contract_summary_part4_file_link"] = get_public_link(data["pdf_contract_summary_part4_file_id"])
     genrate_pdf(data, generate_contract_summary_pdf, lead_id, "pdf_contract_summary_file_id", "Vertragsunterlagen.pdf", subfolder_id)
     data["pdf_contract_summary_link"] = get_public_link(data["pdf_contract_summary_file_id"])
+    data["pdf_contract_summary_link_datetime"] = str(datetime.datetime.now())
 
     history.data = data
     db.session.commit()
@@ -1471,6 +1483,16 @@ def is_uncalculated_field(fieldname):
         return True
     if fieldname[:8] == "tab_img_":
         return True
+    if fieldname[:9] == "is_valid_":
+        return True
     if fieldname in UNCALCULATED_FIELDS:
+        return True
+    return False
+
+
+def is_temp_field(fieldname):
+    if fieldname[:8] == "tab_img_" and (fieldname[-5:] == "_link" or fieldname[-11:] == "_link_small"):
+        return True
+    if fieldname[:9] == "is_valid_":
         return True
     return False
