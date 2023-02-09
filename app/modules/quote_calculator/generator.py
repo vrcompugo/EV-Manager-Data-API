@@ -648,7 +648,8 @@ def generate_contract_summary_part4_1_pdf(lead_id, data, return_string=False):
         pdf = gotenberg_pdf(
             content,
             margins=["0", "0", "0", "0"],
-            landscape=False)
+            landscape=False,
+            wait_delay="2")
         return pdf
     return None
 
