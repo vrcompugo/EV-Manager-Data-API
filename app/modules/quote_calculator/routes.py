@@ -248,11 +248,11 @@ def quote_calculator_calculate(lead_id):
             history_data = json.loads(json.dumps(history_quote.data))
             for key in post_data.keys():
                 if is_uncalculated_field(key):
-                    if str(history_data["data"][key]) != str(post_data[key]):
+                    if str(history_data["data"].get(key)) != str(post_data.get(key)):
                         if not is_temp_field(key):
                             form_updated = True
                             print("update detected", key)
-                        history_data["data"][key] = post_data[key]
+                        history_data["data"][key] = post_data.get(key)
                 else:
                     if key in ["consumers", "roofs"]:
                         if post_data.get(key) is None or history_quote.data["data"].get(key) is None or len(post_data[key]) != len(history_quote.data["data"][key]):
