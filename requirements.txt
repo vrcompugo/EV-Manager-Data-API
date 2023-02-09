@@ -55,3 +55,5 @@ verify-email
 azure-servicebus
 python-magic
 schwifty
+pillow
+pillow-heif

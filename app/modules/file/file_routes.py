@@ -6,6 +6,10 @@ import base64
 import requests
 import magic
 from luqum.parser import parser
+import io
+from PIL import Image
+from pillow_heif import register_heif_opener
+
 
 from app.decorators import token_required, api_response
 from app.exceptions import ApiException
@@ -33,6 +37,8 @@ file_upload.add_argument('filename',
                          type=str,
                          required=False,
                          help='')
+
+register_heif_opener()
 
 
 @api.route('/')
@@ -93,7 +99,32 @@ class ViewFile(Resource):
         try:
             data = decode_jwt(token)
             file = get_file(data["file_id"])
+
             content = get_file_content(data["file_id"])
+            if data.get("resize") is not None:
+                try:
+                    extention = None
+                    if mime.from_buffer(content) in ["image/jpeg"]:
+                        extention = "jpeg"
+                    if mime.from_buffer(content) in ["image/png"]:
+                        extention = "png"
+                    if mime.from_buffer(content) in ["image/webp"]:
+                        extention = "jpeg"
+                    if mime.from_buffer(content) in ["image/heic"]:
+                        extention = "jpeg"
+
+                    if extention is None:
+                        print("extention not found", mime.from_buffer(content))
+                        return "error"
+                    size = data.get("resize").split("x")
+                    image = Image.open(io.BytesIO(content))
+                    image.thumbnail((int(size[0]), int(size[1])))
+                    content = io.BytesIO()
+                    image.save(content, "jpeg")
+                    content = content.getvalue()
+                except Exception as e:
+                    print(e)
+                    return "error"
             response = make_response(content)
             response.headers['Content-Type'] = mime.from_buffer(content)
             response.headers['Content-Disposition'] = \

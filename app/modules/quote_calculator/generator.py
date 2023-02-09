@@ -629,9 +629,12 @@ def generate_contract_summary_part4_1_pdf(lead_id, data, return_string=False):
         for key in data["data"].keys():
             if key[:8] == "tab_img_" and data["data"][key] > 0:
                 data[key + "_link"] = get_public_link(data["data"][key], expire_minutes=365*24*60)
+                print(key, data["data"][key])
+                data[key + "_link_small"] = get_public_link(data["data"][key], expire_minutes=365*24*60, extra_data={"resize": "1000x1000"})
         for index, roof in enumerate(data["data"]["roofs"]):
             for i in range(1,5):
                 data["data"]["roofs"][index][f"tab_img_dachflache{i}_link"] = data.get(f"tab_img_dachflache{index + 1}_{i}_link")
+                data["data"]["roofs"][index][f"tab_img_dachflache{i}_link_small"] = data.get(f"tab_img_dachflache{index + 1}_{i}_link_small")
                 data["data"]["roofs"][index][f"tab_comment_dachflache{i}"] = data["data"].get(f"tab_comment_dachflache{index + 1}_{i}")
         content = render_template(
             "quote_calculator/generator/tab/index.html",

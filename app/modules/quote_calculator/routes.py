@@ -1057,11 +1057,11 @@ def quote_calculator_contract_summary_pdf3(lead_id):
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
 
-    pdf = generate_contract_summary_part4_1_pdf(lead_id, data)
+    pdf = generate_contract_summary_part4_1_pdf(lead_id, data, return_string=True)
 
     return Response(pdf,
-        status=200,
-        mimetype='application/pdf')
+        status=200)
+        #mimetype='application/pdf')
 
 
 def genrate_pdf(data, generate_function, lead_id, pdf_id_key, label, subfolder_id, order_confirmation=False):

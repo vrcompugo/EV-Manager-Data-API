@@ -20,10 +20,10 @@ from .deal import get_deal, get_deals, update_deal
 FOLDER_CACHE = {}
 
 
-def get_file(id):
+def get_file(id, force_reload=False):
     data = post("disk.file.get", {
         "id": id
-    })
+    }, force_reload=force_reload)
     if "result" in data:
         return data["result"]
     else:
@@ -32,7 +32,7 @@ def get_file(id):
 
 
 def get_file_content(id):
-    file_data = get_file(id)
+    file_data = get_file(id, force_reload=True)
     if file_data is None:
         print("error: cant get file for content")
     result = requests.get(file_data["DOWNLOAD_URL"])
@@ -220,9 +220,12 @@ def add_file(folder_id, data):
     return None
 
 
-def get_public_link(id, expire_minutes=86400):
+def get_public_link(id, expire_minutes=86400, extra_data=None):
     config = get_settings(section="general")
-    token_data = encode_jwt({"file_id": id}, expire_minutes)
+    if extra_data is None:
+        extra_data = {}
+    extra_data["file_id"] = id
+    token_data = encode_jwt(extra_data, expire_minutes)
     return f"{config['base_url']}files/view/{token_data['token']}"
 
 
