@@ -385,6 +385,12 @@ def run_sherpa_import2():
     import_contracts_for_anual_report()
 
 
+@manager.command
+def run_get_task_test():
+    from app.modules.external.bitrix24.task import get_task
+    print(json.dumps(get_task(428023), indent=2))
+
+
 if __name__ == '__main__':
     sa.orm.configure_mappers()
     manager.run()
