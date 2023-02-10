@@ -233,7 +233,7 @@ def recreate_quote(deal_id, create_new_quote=True, move_phase=False):
             "deal_id": deal.get("id"),
             "contract_number": deal.get("contract_number"),
             "cloud_number": history.data.get("cloud_number")
-        }, expire_minutes=120*24*60)
+        }, expire_minutes=220*24*60)
         update_deal(deal.get("id"), {
             "cloud_follow_quote_link": history.data["pdf_link"],
             "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
