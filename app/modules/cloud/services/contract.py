@@ -1317,14 +1317,17 @@ def generate_annual_report_pdf(contract_number, year):
     status.pdf_file_id = statement["drive_id"]
     status.pdf_file_link = statement["pdf_link"]
     status.to_pay = statement["to_pay"]
+    print("contract_number", contract_number)
     if contract_number != "":
         deals = get_deals({
             "SELECT": "full",
             f"FILTER[{config['deal']['fields']['cloud_contract_number']}]": contract_number,
             "FILTER[CATEGORY_ID]": 126,
         })
+        print("deals", deals)
         if deals is not None and len(deals) > 0:
             deal_id = deals[0].get("id")
+            print("deal", deal_id)
             update_deal(deal_id, {
                 # "stage_id": "C126:UC_WT48N4",
                 "annual_statement_link": statement["pdf_link"],
