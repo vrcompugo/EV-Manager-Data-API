@@ -1325,6 +1325,11 @@ def generate_annual_report_pdf(contract_number, year):
         })
         if deals is not None and len(deals) > 0:
             deal_id = deals[0].get("id")
+            print(deal_id, {
+                # "stage_id": "C126:UC_WT48N4",
+                "annual_statement_link": statement["pdf_link"],
+                "opportunity": statement["to_pay"]
+            })
             update_deal(deal_id, {
                 # "stage_id": "C126:UC_WT48N4",
                 "annual_statement_link": statement["pdf_link"],
