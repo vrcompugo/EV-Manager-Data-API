@@ -1328,12 +1328,12 @@ def generate_annual_report_pdf(contract_number, year):
             print(deal_id, {
                 # "stage_id": "C126:UC_WT48N4",
                 "annual_statement_link": statement["pdf_link"],
-                "opportunity": statement["to_pay"]
+                "opportunity": round(statement["to_pay"], 2)
             })
             update_deal(deal_id, {
                 # "stage_id": "C126:UC_WT48N4",
                 "annual_statement_link": statement["pdf_link"],
-                "opportunity": statement["to_pay"]
+                "opportunity": round(statement["to_pay"], 2)
             })
     db.session.commit()
     return data
