@@ -473,12 +473,12 @@ def calculate_cloud(data):
                 result["storage_size"] = 30
             result["min_storage_size"] = result["storage_size"]
             if "min_storage_size_overwrite" in data and data["min_storage_size_overwrite"] != "":
-                if int(data["min_storage_size_overwrite"]) > result["storage_size"]:
+                if float(data["min_storage_size_overwrite"]) > result["storage_size"]:
                     result["storage_size"] = data["min_storage_size_overwrite"]
         if result["min_storage_size"] < 5:
             result["min_storage_size"] = 5
         if "overwrite_storage_size" in data and data["overwrite_storage_size"] != "":
-            if int(data["overwrite_storage_size"]) > result["storage_size"]:
+            if float(data["overwrite_storage_size"]) > result["storage_size"]:
                 result["storage_size"] = int(data["overwrite_storage_size"])
         if result["storage_size"] > 70:
             result["storage_size"] = 70
