@@ -195,6 +195,7 @@ def cron_follow_cloud_quote_test():
         "FILTER[STAGE_ID]": "C220:UC_38IJOQ",
         "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)
+    print("number", len(deals))
     for index, deal in enumerate(deals):
         print("follow quote:", deal["id"])
         recreate_quote(deal["id"], create_new_quote=True, move_phase=False)
