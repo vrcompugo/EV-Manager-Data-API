@@ -391,6 +391,12 @@ def run_get_task_test():
     print(json.dumps(get_task(428023), indent=2))
 
 
+@manager.command
+def run_cron_follow_cloud_quote_test():
+    from app.modules.quote_calculator.cron import cron_follow_cloud_quote_test
+    cron_follow_cloud_quote_test()
+
+
 if __name__ == '__main__':
     sa.orm.configure_mappers()
     manager.run()

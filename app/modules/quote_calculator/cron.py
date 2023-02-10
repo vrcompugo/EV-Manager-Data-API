@@ -179,11 +179,25 @@ def cron_follow_cloud_quote():
         "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)
     for index, deal in enumerate(deals):
+        if index >= 20:
+            return
         print("follow quote:", deal["id"])
         if index >= 10: # do only 10 per batch
             recreate_quote(deal["id"], create_new_quote=True, move_phase=False)
         else:
-            recreate_quote(deal["id"], create_new_quote=True, move_phase=False)
+            recreate_quote(deal["id"], create_new_quote=True, move_phase=True)
+
+
+def cron_follow_cloud_quote_test():
+    deals = get_deals({
+        "SELECT": "full",
+        "FILTER[CATEGORY_ID]": 220,
+        "FILTER[STAGE_ID]": "C220:UC_38IJOQ",
+        "ORDER[UF_CRM_1662987508]": "ASC"
+    }, force_reload=True)
+    for index, deal in enumerate(deals):
+        print("follow quote:", deal["id"])
+        recreate_quote(deal["id"], create_new_quote=True, move_phase=False)
 
 
 def recreate_quote(deal_id, create_new_quote=True, move_phase=False):
@@ -229,11 +243,13 @@ def recreate_quote(deal_id, create_new_quote=True, move_phase=False):
         quote_calculator_cloud_pdfs_action(lead["id"])
         quote_calculator_quote_summary_pdf_action(lead["id"])
         history = QuoteHistory.query.filter(QuoteHistory.lead_id == lead["id"]).order_by(QuoteHistory.datetime.desc()).first()
+        print("hist", history.datetime)
         insign_token = encode_jwt({
             "deal_id": deal.get("id"),
             "contract_number": deal.get("contract_number"),
             "cloud_number": history.data.get("cloud_number")
         }, expire_minutes=220*24*60)
+        print("hist2", history.data["pdf_link"])
         update_deal(deal.get("id"), {
             "cloud_follow_quote_link": history.data["pdf_link"],
             "cloud_follow_quote_insign_link": f"https://api.korbacher-energiezentrum.de/sign/{insign_token['token']}"
