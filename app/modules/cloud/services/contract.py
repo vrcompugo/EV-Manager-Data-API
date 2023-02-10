@@ -1305,6 +1305,7 @@ def generate_annual_report_pdf(contract_number, year):
         "filename": f"Cloud Abrechnung {year}.pdf"
     })
     statement["pdf_link"] = get_public_link(statement["drive_id"], expire_minutes=525600)
+    print("asd", statement["drive_id"])
 
     status = ContractStatus.query\
         .filter(ContractStatus.contract_number == contract_number)\
@@ -1330,7 +1331,7 @@ def generate_annual_report_pdf(contract_number, year):
                 "annual_statement_link": statement["pdf_link"],
                 "opportunity": statement["to_pay"]
             })
-            print("deal", json.dumps(get_deal(deal_id), indent=2))
+            print("asd", statement["pdf_link"])
     db.session.commit()
     return data
 
