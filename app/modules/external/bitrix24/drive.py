@@ -31,9 +31,15 @@ def get_file(id, force_reload=False):
     return None
 
 
-def get_file_content(id):
-    file_data = get_file(id, force_reload=True)
-    if file_data is None:
+def get_file_content(id=None, url=None):
+    file_data = {}
+    if id is not None:
+        file_data = get_file(id, force_reload=True)
+        if file_data is None:
+            print("error: cant get file for content")
+    if url is not None:
+        file_data["DOWNLOAD_URL"] = url
+    if file_data.get("DOWNLOAD_URL") is None:
         print("error: cant get file for content")
     result = requests.get(file_data["DOWNLOAD_URL"])
     if result.content[:1] == b'{' or result.content[:1] == b'[':

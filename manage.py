@@ -388,7 +388,16 @@ def run_sherpa_import2():
 @manager.command
 def run_get_task_test():
     from app.modules.external.bitrix24.task import get_task
-    print(json.dumps(get_task(428023), indent=2))
+    data = {
+        "comment_files": []
+    }
+    task_data = get_task(428051)
+    if task_data.get("comments") is not None:
+        for comment in task_data.get("comments"):
+            if comment.get("ATTACHED_OBJECTS") not in [None, "", 0]:
+                for key in comment.get("ATTACHED_OBJECTS").keys():
+                    data["comment_files"].append(comment.get("ATTACHED_OBJECTS")[key])
+    print(json.dumps(data, indent=2))
 
 
 @manager.command

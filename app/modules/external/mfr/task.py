@@ -40,6 +40,7 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
         main_mfr_id = company_data.get("mfr_id")
         service_objects.append({"Id": company_data.get("mfr_service_object_id")})
     task_link = f'<a href="https://keso.bitrix24.de/company/personal/user/15/tasks/task/view/{task_data["id"]}/" target="_blank">Bitrix-Aufgabenlink</a>'
+    data["comment_files"] = []
     comment_list = ""
     if task_data.get("comments") is not None:
         for comment in task_data.get("comments"):
@@ -59,6 +60,9 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
                 continue
             post_date = dateutil.parser.parse(comment['POST_DATE'])
             comment_list = comment_list + f"{post_date.strftime('%d.%m.%Y %H:%M:%S')} von {comment['AUTHOR_NAME']}<br>\n{comment['POST_MESSAGE']}<br>\n{'-' * 20}<br>\n"
+            if comment.get("ATTACHED_OBJECTS") not in [None, "", 0]:
+                for key in comment.get("ATTACHED_OBJECTS").keys():
+                    data["comment_files"].append(comment.get("ATTACHED_OBJECTS")[key])
     data = {
         "CreateFromServiceRequestTemplateId": get_template_id_by_deal(deal_data),
         "Name": f"{contact_data.get('first_name')} {contact_data.get('last_name')}",
@@ -315,9 +319,13 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         return
     post_data = get_export_data(task_data, contact_data, deal_data, company_data)
     documents = None
+    comment_files = None
     if "documents" in post_data:
         documents = post_data["documents"]
         del post_data["documents"]
+    if "comment_files" in post_data:
+        comment_files = post_data["comment_files"]
+        del post_data["comment_files"]
     if task_data.get("mfr_id", None) in ["", None, 0]:
         print(json.dumps(post_data, indent=2))
         response = post("/ServiceRequests", post_data=post_data)
@@ -344,6 +352,20 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
             existing_document = next((item for item in response.get("Documents", []) if item["FileName"] == str(document["NAME"])), None)
             if existing_document is None:
                 file_content = get_file_content(document["ID"])
+                mime_type = magic.from_buffer(file_content, mime=True)
+                upload_response = post("/Document/UploadAndCreate", files=[
+                    ("FilePath", (document["NAME"], file_content, mime_type))
+                ], type="mfr")
+                if 'DocumentDto' in upload_response and "Id" in upload_response.get('DocumentDto'):
+                    response_document_attach = put(f"/ServiceRequest/{task_data.get('mfr_id')}/Document/{upload_response.get('DocumentDto').get('Id')}", type="mfr")
+    if comment_files is not None and task_data.get('mfr_id') not in [None, ""]:
+        response = get(f"/ServiceRequests({task_data.get('mfr_id')}L)?$expand=ServiceObjects,Documents,Customer,Reports,Items,Appointments/Contacts,Steps,Comments,StockMovements", parameters={
+            "id": task_data.get('mfr_id')
+        })
+        for document in comment_files:
+            existing_document = next((item for item in response.get("Documents", []) if item["FileName"] == str(document["NAME"])), None)
+            if existing_document is None:
+                file_content = get_file_content(url=document["DOWNLOAD_URL"])
                 mime_type = magic.from_buffer(file_content, mime=True)
                 upload_response = post("/Document/UploadAndCreate", files=[
                     ("FilePath", (document["NAME"], file_content, mime_type))
