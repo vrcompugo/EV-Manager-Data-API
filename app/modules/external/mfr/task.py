@@ -40,7 +40,7 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
         main_mfr_id = company_data.get("mfr_id")
         service_objects.append({"Id": company_data.get("mfr_service_object_id")})
     task_link = f'<a href="https://keso.bitrix24.de/company/personal/user/15/tasks/task/view/{task_data["id"]}/" target="_blank">Bitrix-Aufgabenlink</a>'
-    data["comment_files"] = []
+    task_data["comment_files"] = []
     comment_list = ""
     if task_data.get("comments") is not None:
         for comment in task_data.get("comments"):
@@ -62,7 +62,7 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
             comment_list = comment_list + f"{post_date.strftime('%d.%m.%Y %H:%M:%S')} von {comment['AUTHOR_NAME']}<br>\n{comment['POST_MESSAGE']}<br>\n{'-' * 20}<br>\n"
             if comment.get("ATTACHED_OBJECTS") not in [None, "", 0]:
                 for key in comment.get("ATTACHED_OBJECTS").keys():
-                    data["comment_files"].append(comment.get("ATTACHED_OBJECTS")[key])
+                    task_data["comment_files"].append(comment.get("ATTACHED_OBJECTS")[key])
     data = {
         "CreateFromServiceRequestTemplateId": get_template_id_by_deal(deal_data),
         "Name": f"{contact_data.get('first_name')} {contact_data.get('last_name')}",
