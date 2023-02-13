@@ -573,7 +573,11 @@ def get_settings(section=None, domain_raw=None):
                     "cloud_follow_delivery_begin1": "UF_CRM_1662990191",
                     "cloud_follow_delivery_end1": "UF_CRM_1662990290",
                     "order_sign_date": "UF_CRM_61606B5866031",
-                    "collection_url": "UF_CRM_6091A2714B029"
+                    "collection_url": "UF_CRM_6091A2714B029",
+                    "pdf_datasheets_link": "UF_CRM_5FA43F98A1FE3",
+                    "pdf_summary_link": "UF_CRM_5FA43F98D1F32",
+                    "pdf_quote_summary_link": "UF_CRM_5FA43F990C9A4",
+                    "pdf_contract_summary_link": "UF_CRM_5FA43F993BF84"
                 }
             },
             "invoice": {
