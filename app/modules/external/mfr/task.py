@@ -367,7 +367,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
             print(document)
             existing_document = next((item for item in response.get("Documents", []) if item["FileName"] == str(document["NAME"])), None)
             if existing_document is None:
-                file_content = get_file_content(url=document["DOWNLOAD_URL"])
+                file_content = get_file_content(url=f'https://keso.bitrix24.de{document["DOWNLOAD_URL"]}')
                 mime_type = magic.from_buffer(file_content, mime=True)
                 upload_response = post("/Document/UploadAndCreate", files=[
                     ("FilePath", (document["NAME"], file_content, mime_type))
