@@ -35,7 +35,7 @@ blueprint = Blueprint("quote_calculator", __name__, template_folder='templates')
 
 UNCALCULATED_FIELDS = [
     # customer data
-    "birthday", "iban", "bic", "bankname", "extra_notes",
+    "birthday", "iban", "bic", "bankname", "extra_notes", "cloud_number",
     # elektro tab
     "tab_building_type", "oberleitung_vorhanden", "kabelkanal_color", "tab_has_cellar_external_entrance",
     "is_new_building", "power_meter_number", "main_malo_id", "heatcloud_power_meter_number",
@@ -291,7 +291,6 @@ def quote_calculator_calculate(lead_id):
                     history_data = json.loads(json.dumps(history_quote.data))
                     history_data["pdf_contract_summary_link"] = None
                     history_data["pdf_contract_summary_part1_file_id"] = None
-                    history_data["pdf_contract_summary_part4_file_link"] = None
                     history_data["pdf_contract_summary_part4_1_file_link"] = None
                     history_quote.data = history_data
                     db.session.commit()
@@ -932,6 +931,9 @@ def quote_calculator_summary_pdf_action(lead_id):
     genrate_pdf(data, generate_letter_pdf, lead_id, "pdf_letter_file_id", "Anschreiben.pdf", subfolder_id)
     genrate_pdf(data, generate_summary_pdf, lead_id, "pdf_summary_file_id", "Energiemappe.pdf", subfolder_id)
     data["pdf_summary_link"] = get_public_link(data["pdf_summary_file_id"])
+    if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
+        genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Heizungskonzept.pdf", subfolder_id)
+        data["pdf_contract_summary_part4_file_link"] = get_public_link(data["pdf_contract_summary_part4_file_id"])
 
     history.data = data
     db.session.commit()
@@ -1011,9 +1013,7 @@ def quote_calculator_contract_summary_pdf_action(lead_id):
         genrate_pdf(data, generate_contract_summary_part4_1_pdf, lead_id, "pdf_contract_summary_part4_1_file_id", "Technischer Aufnahmebogen.pdf", subfolder_id)
         data["pdf_contract_summary_part4_1_file_link"] = get_public_link(data["pdf_contract_summary_part4_1_file_id"])
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
-        genrate_pdf(data, generate_contract_summary_part4_pdf, lead_id, "pdf_contract_summary_part4_file_id", "Heizungskonzept.pdf", subfolder_id)
         genrate_pdf(data, generate_contract_summary_part5_pdf, lead_id, "pdf_contract_summary_part5_file_id", "Contracting WP.pdf", subfolder_id)
-        data["pdf_contract_summary_part4_file_link"] = get_public_link(data["pdf_contract_summary_part4_file_id"])
     genrate_pdf(data, generate_contract_summary_pdf, lead_id, "pdf_contract_summary_file_id", "Vertragsunterlagen.pdf", subfolder_id)
     data["pdf_contract_summary_link"] = get_public_link(data["pdf_contract_summary_file_id"])
     data["pdf_contract_summary_link_datetime"] = str(datetime.datetime.now())
