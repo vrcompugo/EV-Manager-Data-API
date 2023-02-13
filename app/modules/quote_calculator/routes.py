@@ -940,6 +940,17 @@ def quote_calculator_summary_pdf_action(lead_id):
     update_lead(lead_id, {
         "pdf_summary_link": data["pdf_summary_link"]
     })
+    deal = None
+    deal_id = history.data["data"].get("deal_id")
+    if deal_id is not None:
+        deal = get_deal(deal_id)
+    if deal is not None and deal.get("category_id") in ["239"]:
+        update_deal(deal.get("id"), {
+            "pdf_datasheets_link": data.get("pdf_datasheets_link"),
+            "pdf_summary_link": data.get("pdf_summary_link"),
+            "pdf_quote_summary_link": data.get("pdf_quote_summary_link"),
+            "pdf_contract_summary_link": data.get("pdf_contract_summary_link")
+        })
 
     return data
 
@@ -980,17 +991,6 @@ def quote_calculator_quote_summary_pdf_action(lead_id):
         "construction_year": data["construction_year"],
         "pdf_quote_summary_link": data["pdf_quote_summary_link"]
     })
-    deal = None
-    deal_id = history.data["data"].get("deal_id")
-    if deal_id is not None:
-        deal = get_deal(deal_id)
-    if deal is not None and deal.get("category_id") in ["239"]:
-        update_deal(deal.get("id"), {
-            "pdf_datasheets_link": data.get("pdf_datasheets_link"),
-            "pdf_summary_link": data.get("pdf_summary_link"),
-            "pdf_quote_summary_link": data.get("pdf_quote_summary_link"),
-            "pdf_contract_summary_link": data.get("pdf_contract_summary_link")
-        })
     return data
 
 
