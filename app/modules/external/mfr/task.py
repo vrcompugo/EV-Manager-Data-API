@@ -325,7 +325,6 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         del post_data["documents"]
     if "comment_files" in task_data:
         comment_files = task_data["comment_files"]
-        print("1", comment_files)
         del task_data["comment_files"]
     if task_data.get("mfr_id", None) in ["", None, 0]:
         print(json.dumps(post_data, indent=2))
@@ -364,7 +363,6 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
             "id": task_data.get('mfr_id')
         })
         for document in comment_files:
-            print(document)
             existing_document = next((item for item in response.get("Documents", []) if item["FileName"] == str(document["NAME"])), None)
             if existing_document is None:
                 file_content = get_file_content(url=f'https://keso.bitrix24.de{document["DOWNLOAD_URL"]}')
