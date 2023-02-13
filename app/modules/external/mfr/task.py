@@ -61,7 +61,9 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
             post_date = dateutil.parser.parse(comment['POST_DATE'])
             comment_list = comment_list + f"{post_date.strftime('%d.%m.%Y %H:%M:%S')} von {comment['AUTHOR_NAME']}<br>\n{comment['POST_MESSAGE']}<br>\n{'-' * 20}<br>\n"
             if comment.get("ATTACHED_OBJECTS") not in [None, "", 0]:
+                print("3", comment.get("ATTACHED_OBJECTS"))
                 for key in comment.get("ATTACHED_OBJECTS").keys():
+                    print("2", key)
                     task_data["comment_files"].append(comment.get("ATTACHED_OBJECTS")[key])
     data = {
         "CreateFromServiceRequestTemplateId": get_template_id_by_deal(deal_data),
@@ -325,6 +327,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         del post_data["documents"]
     if "comment_files" in post_data:
         comment_files = post_data["comment_files"]
+        print("1", comment_files)
         del post_data["comment_files"]
     if task_data.get("mfr_id", None) in ["", None, 0]:
         print(json.dumps(post_data, indent=2))
