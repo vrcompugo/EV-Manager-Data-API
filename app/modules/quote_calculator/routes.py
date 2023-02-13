@@ -309,6 +309,8 @@ def quote_calculator_calculate(lead_id):
             db.session.add(history_dirty)
             db.session.flush()
         data = calculate_quote(lead_id, post_data)
+        if history_quote is not None:
+            data["pdf_commission_link"] = history_quote.data.get("pdf_commission_link")
         data["history_id"] = history_dirty.id
         history_dirty.data=data
         db.session.commit()
