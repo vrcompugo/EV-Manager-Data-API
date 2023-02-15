@@ -596,7 +596,8 @@ def get_settings(section=None, domain_raw=None):
                     "pv_quote_sum_net": "",
                     "heatpump_survey_link": "",
                     "zoom_appointment": "",
-                    "zoom_link": ""
+                    "zoom_link": "",
+                    "solaredge_designer_link": "UF_CRM_1676482129"
                 }
             },
             "invoice": {
@@ -692,7 +693,8 @@ def get_settings(section=None, domain_raw=None):
                     "interested_in": "UF_CRM_1652363669",
                     "comment": "UF_CRM_1652706710",
                     "contracting_heatpump_link": "UF_CRM_1652867586",
-                    "heatpump_concept_link": "UF_CRM_1654263535401"
+                    "heatpump_concept_link": "UF_CRM_1654263535401",
+                    "solaredge_designer_link": "UF_CRM_1676482069"
                 }
             },
             "company": {

@@ -222,6 +222,7 @@ def set_missing_values(deal):
             "storage_model": ["kein Speicher"]
         }
         if history.data["data"].get("has_pv_quote") is True:
+            update_data["solaredge_designer_link"] = history.data["data"].get("solaredge_designer_link")
             cloud_type = ["cloud360"]
             if history.data["calculated"]["min_kwp_ecloud"] > 0:
                 cloud_type.append("eCloud")
