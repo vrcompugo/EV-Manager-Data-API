@@ -77,13 +77,15 @@ def get_deals_normalized(filters):
 
 
 def get_deal(id, force_reload=False):
+    if id in [None, "", 0, "0", "None"]:
+        return None
     data = post("crm.deal.get", {
         "ID": id
     }, force_reload=force_reload)
     if "result" in data:
         return convert_config_values(data["result"])
     else:
-        print("error deal get:", data)
+        print("error deal get:", data, id)
     return None
 
 

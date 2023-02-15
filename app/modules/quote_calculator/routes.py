@@ -580,7 +580,7 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
     update_data["aircondition_quote_sum"] = 0
     update_lead(lead_id, update_data)
     deal_id = history_data["data"].get("deal_id")
-    if deal_id is not None:
+    if deal_id not in [None, 0, ""]:
         deal = get_deal(deal_id)
         if deal is not None:
             update_deal(deal.get("id"), {
@@ -740,7 +740,7 @@ def quote_calculator_cloud_pdfs_action(lead_id):
         history_data["pdf_cloud_config_file_id"] = item.pdf.bitrix_file_id
     deal = None
     deal_id = history_data["data"].get("deal_id")
-    if deal_id is not None:
+    if deal_id not in [None, 0, ""]:
         deal = get_deal(deal_id)
     if history_data["data"].get("cloud_quote_type") not in ["followup_quote", "interim_quote"]:
         if item.feasibility_study_pdf is None:
@@ -751,7 +751,7 @@ def quote_calculator_cloud_pdfs_action(lead_id):
     if history_data["data"].get("cloud_quote_type") in ["followup_quote", "interim_quote"] or (deal is not None and deal.get("category_id") in ["15", "176"]):
         contract_number = None
         deal = None
-        if history_data.get("data").get("deal_id") is not None:
+        if history_data.get("data").get("deal_id") not in [None, 0, ""]:
             deal = get_deal(history_data.get("data").get("deal_id"))
             contract_number = deal.get("contract_number")
         insign_token = encode_jwt({
@@ -969,7 +969,7 @@ def quote_calculator_summary_pdf_action(lead_id):
     })
     deal = None
     deal_id = history.data["data"].get("deal_id")
-    if deal_id is not None:
+    if deal_id not in [None, 0, ""]:
         deal = get_deal(deal_id)
     if deal is not None and deal.get("category_id") in ["239"]:
         update_deal(deal.get("id"), {
@@ -1239,7 +1239,7 @@ def get_insign_callback(token):
             lead_data["order_confirmation_date"] = str(datetime.datetime.now())
         lead_data["order_sign_date"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-01:00")
         update_lead(token_data["unique_identifier"], lead_data)
-        if token_data.get("deal_id") not in [None, 0, "", "0"]:
+        if token_data.get("deal_id") not in [None, 0, "", "0", "None"]:
             update_deal(token_data.get("deal_id"), lead_data)
 
     log = InsignLog.query.filter(InsignLog.session_id == session_id).first()
