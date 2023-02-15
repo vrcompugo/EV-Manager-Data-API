@@ -35,7 +35,7 @@ blueprint = Blueprint("quote_calculator", __name__, template_folder='templates')
 
 UNCALCULATED_FIELDS = [
     # customer data
-    "birthday", "iban", "bic", "bankname", "extra_notes", "cloud_number",
+    "birthday", "iban", "bic", "bankname", "extra_notes", "cloud_number", "solaredge_designer_link",
     # elektro tab
     "tab_building_type", "oberleitung_vorhanden", "kabelkanal_color", "tab_has_cellar_external_entrance",
     "is_new_building", "power_meter_number", "main_malo_id", "heatcloud_power_meter_number",
@@ -584,19 +584,6 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
         deal = get_deal(deal_id)
         if deal is not None:
             update_deal(deal.get("id"), {
-                "is_splittable": update_data["is_splittable"],
-                "has_pv_quote": update_data["has_pv_quote"],
-                "pv_quote_sum": update_data["pv_quote_sum"],
-                "has_roof_reconstruction_quote": update_data["has_roof_reconstruction_quote"],
-                "roof_reconstruction_quote_sum": update_data["roof_reconstruction_quote_sum"],
-                "has_heating_quote": update_data["has_heating_quote"],
-                "heating_quote_sum": update_data["heating_quote_sum"],
-                "has_bluegen_quote": update_data["has_bluegen_quote"],
-                "bluegen_quote_sum": update_data["bluegen_quote_sum"],
-                "has_aircondition_quote": update_data["has_aircondition_quote"],
-                "aircondition_quote_sum": update_data["aircondition_quote_sum"]
-            })
-            print(deal.get("id"),{
                 "is_splittable": update_data["is_splittable"],
                 "has_pv_quote": update_data["has_pv_quote"],
                 "pv_quote_sum": update_data["pv_quote_sum"],
@@ -1252,6 +1239,9 @@ def get_insign_callback(token):
             lead_data["order_confirmation_date"] = str(datetime.datetime.now())
         lead_data["order_sign_date"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-01:00")
         update_lead(token_data["unique_identifier"], lead_data)
+        if token_data.get("deal_id") not in [None, 0, "", "0"]:
+            update_deal(token_data.get("deal_id"), lead_data)
+
     log = InsignLog.query.filter(InsignLog.session_id == session_id).first()
     if log is not None:
         data = json.loads(json.dumps(log.data))
@@ -1447,6 +1437,7 @@ def get_insign_session(data):
             del document["preFilledFields"]
     token_data = {
             "unique_identifier": data["id"],
+            "deal_id": data.get("data", {}).get("deal_id"),
             "number": data["number"],
             "pv_quote_sum_net": data.get("total_net"),
             "heating_quote_sum_net": data["heating_quote"].get("total_net"),
