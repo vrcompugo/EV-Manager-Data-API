@@ -569,6 +569,23 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
     update_data["has_aircondition_quote"] = 0
     update_data["aircondition_quote_sum"] = 0
     update_lead(lead_id, update_data)
+    deal_id = history_data["data"].get("deal_id")
+    if deal_id is not None:
+        deal = get_deal(deal_id)
+        if deal is not None:
+            update_deal(deal.get("id"), {
+                "is_splittable": update_data["is_splittable"],
+                "has_pv_quote": update_data["has_pv_quote"],
+                "pv_quote_sum": update_data["pv_quote_sum"],
+                "has_roof_reconstruction_quote": update_data["has_roof_reconstruction_quote"],
+                "roof_reconstruction_quote_sum": update_data["roof_reconstruction_quote_sum"],
+                "has_heating_quote": update_data["has_heating_quote"],
+                "heating_quote_sum": update_data["heating_quote_sum"],
+                "has_bluegen_quote": update_data["has_bluegen_quote"],
+                "bluegen_quote_sum": update_data["bluegen_quote_sum"],
+                "has_aircondition_quote": update_data["has_aircondition_quote"],
+                "aircondition_quote_sum": update_data["aircondition_quote_sum"]
+            })
     data["quote_datetime"] = data["datetime"]
 
     return {"status": "success", "data": data}
