@@ -493,7 +493,17 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
         "upload_link_heating": data["data"]["upload_link_heating"],
         "upload_link_invoices": data["data"]["upload_link_invoices"],
         "upload_link_contract": data["data"]["upload_link_contract"],
-        "is_splittable": "1"
+        "is_splittable": "1",
+        "has_pv_quote": 0,
+        "pv_quote_sum": 0,
+        "has_roof_reconstruction_quote": 0,
+        "roof_reconstruction_quote_sum": 0,
+        "has_heating_quote": 0,
+        "heating_quote_sum": 0,
+        "has_bluegen_quote": 0,
+        "bluegen_quote_sum": 0,
+        "has_aircondition_quote": 0,
+        "aircondition_quote_sum": 0
     }
     if contact_id is not None:
         update_data["contact_id"] = contact_id
@@ -574,6 +584,19 @@ def quote_calculator_add_history(lead_id, post_data, auth_info=None):
         deal = get_deal(deal_id)
         if deal is not None:
             update_deal(deal.get("id"), {
+                "is_splittable": update_data["is_splittable"],
+                "has_pv_quote": update_data["has_pv_quote"],
+                "pv_quote_sum": update_data["pv_quote_sum"],
+                "has_roof_reconstruction_quote": update_data["has_roof_reconstruction_quote"],
+                "roof_reconstruction_quote_sum": update_data["roof_reconstruction_quote_sum"],
+                "has_heating_quote": update_data["has_heating_quote"],
+                "heating_quote_sum": update_data["heating_quote_sum"],
+                "has_bluegen_quote": update_data["has_bluegen_quote"],
+                "bluegen_quote_sum": update_data["bluegen_quote_sum"],
+                "has_aircondition_quote": update_data["has_aircondition_quote"],
+                "aircondition_quote_sum": update_data["aircondition_quote_sum"]
+            })
+            print(deal.get("id"),{
                 "is_splittable": update_data["is_splittable"],
                 "has_pv_quote": update_data["has_pv_quote"],
                 "pv_quote_sum": update_data["pv_quote_sum"],
