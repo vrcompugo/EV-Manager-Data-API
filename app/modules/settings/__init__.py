@@ -577,7 +577,18 @@ def get_settings(section=None, domain_raw=None):
                     "pdf_datasheets_link": "UF_CRM_5FA43F98A1FE3",
                     "pdf_summary_link": "UF_CRM_5FA43F98D1F32",
                     "pdf_quote_summary_link": "UF_CRM_5FA43F990C9A4",
-                    "pdf_contract_summary_link": "UF_CRM_5FA43F993BF84"
+                    "pdf_contract_summary_link": "UF_CRM_5FA43F993BF84",
+                    "is_splittable": "UF_CRM_6396E25F4E04D",
+                    "pv_quote_sum": "UF_CRM_6396E25F82921",
+                    "heating_quote_sum": "UF_CRM_6396E25FA7B50",
+                    "bluegen_quote_sum": "UF_CRM_6396E2609CE2C",
+                    "aircondition_quote_sum": "UF_CRM_1671187529",
+                    "roof_reconstruction_quote_sum": "UF_CRM_6396E25FCDBA0",
+                    "has_pv_quote": "UF_CRM_6396E2600083A",
+                    "has_heating_quote": "UF_CRM_6396E2602CE2B",
+                    "has_bluegen_quote": "UF_CRM_6396E26072742",
+                    "has_roof_reconstruction_quote": "UF_CRM_6396E26051AF1",
+                    "has_aircondition_quote": "UF_CRM_1671187503"
                 }
             },
             "invoice": {
