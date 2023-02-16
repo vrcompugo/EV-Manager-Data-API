@@ -201,7 +201,7 @@ def run_cron_add_missing_values():
 
 def set_missing_values(deal):
     if "unique_identifier" in deal:
-        history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal["unique_identifier"]).order_by(QuoteHistory.datetime.desc()).first()
+        history = QuoteHistory.query.filter(QuoteHistory.lead_id == deal["unique_identifier"]).filter(QuoteHistory.is_complete.is_(True)).order_by(QuoteHistory.datetime.desc()).first()
         if history is None:
             return
         update_data = {
@@ -225,6 +225,7 @@ def set_missing_values(deal):
         }
         if history.data["data"].get("has_pv_quote") is True:
             update_data["solaredge_designer_link"] = history.data["data"].get("solaredge_designer_link")
+            print("asd", history.data["data"].get("solaredge_designer_link"))
             cloud_type = ["cloud360"]
             if history.data["calculated"]["min_kwp_ecloud"] > 0:
                 cloud_type.append("eCloud")
