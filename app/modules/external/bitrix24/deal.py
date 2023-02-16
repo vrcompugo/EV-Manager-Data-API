@@ -225,7 +225,6 @@ def set_missing_values(deal):
         }
         if history.data["data"].get("has_pv_quote") is True:
             update_data["solaredge_designer_link"] = history.data["data"].get("solaredge_designer_link")
-            print("asd", history.data["data"].get("solaredge_designer_link"))
             cloud_type = ["cloud360"]
             if history.data["calculated"]["min_kwp_ecloud"] > 0:
                 cloud_type.append("eCloud")
@@ -365,6 +364,7 @@ def set_missing_values(deal):
             update_data["energie360_financing"] = "Ja"
         if len(update_data["extra_packages2"]) == 0:
             update_data["extra_packages2"] = ["keine Auswahl"]
+        print(deal["id"], json.dumps(update_data, indent=2))
         update_deal(deal["id"], update_data)
 
 
