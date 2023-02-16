@@ -589,6 +589,7 @@ def get_settings(section=None, domain_raw=None):
                     "has_bluegen_quote": "UF_CRM_6396E26072742",
                     "has_roof_reconstruction_quote": "UF_CRM_6396E26051AF1",
                     "has_aircondition_quote": "UF_CRM_1671187503",
+                    "solaredge_designer_link": "UF_CRM_1676482129"
                     '''"order_confirmation_date": "",
                     "roof_reconstruction_quote_sum_net": "",
                     "bluegen_quote_sum_net": "",
@@ -597,7 +598,6 @@ def get_settings(section=None, domain_raw=None):
                     "heatpump_survey_link": "",
                     "zoom_appointment": "",
                     "zoom_link": "",'''
-                    "solaredge_designer_link": "UF_CRM_1676482129"
                 }
             },
             "invoice": {

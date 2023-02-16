@@ -158,7 +158,8 @@ def update_deal(id, data, domain=None):
     update_data = {"id": id}
     config = get_settings(section="external/bitrix24", domain_raw=domain)
     fields = config["deal"]["fields"]
-    update_data = flatten_dict(data, update_data, fields=fields, config=config)#
+    update_data = flatten_dict(data, update_data, fields=fields, config=config)
+    print(json.dumps(update_data, indent=2))
     response = post("crm.deal.update", update_data, domain=domain)
     print(response)
     if "result" in response and response["result"]:
@@ -364,7 +365,6 @@ def set_missing_values(deal):
             update_data["energie360_financing"] = "Ja"
         if len(update_data["extra_packages2"]) == 0:
             update_data["extra_packages2"] = ["keine Auswahl"]
-        print(deal["id"], json.dumps(update_data, indent=2))
         update_deal(deal["id"], update_data)
 
 
