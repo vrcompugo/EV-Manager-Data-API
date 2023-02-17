@@ -589,15 +589,15 @@ def get_settings(section=None, domain_raw=None):
                     "has_bluegen_quote": "UF_CRM_6396E26072742",
                     "has_roof_reconstruction_quote": "UF_CRM_6396E26051AF1",
                     "has_aircondition_quote": "UF_CRM_1671187503",
-                    "solaredge_designer_link": "UF_CRM_1676482129"
-                    #"order_confirmation_date": "",
-                    #"roof_reconstruction_quote_sum_net": "",
-                    #"bluegen_quote_sum_net": "",
-                    #"heating_quote_sum_net": "",
-                    #"pv_quote_sum_net": "",
-                    #"heatpump_survey_link": "",
-                    #"zoom_appointment": "",
-                    #"zoom_link": "",
+                    "solaredge_designer_link": "UF_CRM_1676482129",
+                    "order_confirmation_date": "UF_CRM_1620753288",
+                    "roof_reconstruction_quote_sum_net": "UF_CRM_1623241246",
+                    "bluegen_quote_sum_net": "UF_CRM_1623241289",
+                    "heating_quote_sum_net": "UF_CRM_5F299D9A46C15",
+                    "pv_quote_sum_net": "UF_CRM_5DF8B018B26AF",
+                    "heatpump_survey_link": "UF_CRM_1651062167",
+                    "zoom_appointment": "UF_CRM_5FA43F99B141A",
+                    "zoom_link": "UF_CRM_5FA70A10C20DC"
                 }
             },
             "invoice": {
