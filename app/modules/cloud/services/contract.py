@@ -6,6 +6,7 @@ import re
 import json
 import calendar
 import math
+import time
 import copy
 from dateutil.parser import parse
 from calendar import monthrange
@@ -1866,6 +1867,9 @@ def add_cloud_values():
         "FILTER[CATEGORY_ID]": 15
     }, force_reload=True)
     for deal in deals:
+        print(deal.get("id"))
+        if deal.get("price_per_kwh") not in [None, "", 0]:
+            continue
         last_config = deal.get("cloud_number")
         for i in range(1, 3):
             if deal.get(f"cloud_number_{i}") not in [None, "", 0]:
@@ -1888,3 +1892,4 @@ def add_cloud_values():
         }
         update_deal(deal.get("id"), update_data)
         print(json.dumps(update_data, indent=2))
+        time.sleep(2)
