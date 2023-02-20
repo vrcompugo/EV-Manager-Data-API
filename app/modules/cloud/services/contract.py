@@ -1876,8 +1876,12 @@ def add_cloud_values():
                 last_config = deal.get(f"cloud_number_{i}")
         if last_config in [None, "", 0, "X"]:
             continue
-        offer_id = "".join(last_config.split("-")[-1:])
-        offer_v2 = OfferV2.query.filter(OfferV2.id == int(offer_id)).first()
+        try:
+            offer_id = int("".join(last_config.split("-")[-1:]))
+        except Exception as e:
+            print(e)
+            continue
+        offer_v2 = OfferV2.query.filter(OfferV2.id == offer_id).first()
         if offer_v2 is None or offer_v2.calculated is None or offer_v2.data is None:
             continue
         price_per_kwh = offer_v2.calculated.get("lightcloud_extra_price_per_kwh")
