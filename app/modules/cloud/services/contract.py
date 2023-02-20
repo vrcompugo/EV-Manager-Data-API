@@ -1856,3 +1856,35 @@ def remove_double_follow_contracts():
             else:
                 print("delete", deal.get("id"))
                 delete_deal(deal.get("id"))
+
+
+def add_cloud_values():
+    system_config = get_settings(section="external/bitrix24")
+    deals = get_deals({
+        "SELECT": "full",
+        f"FILTER[{system_config['deal']['fields']['is_cloud_master_deal']}]": "1",
+        "FILTER[CATEGORY_ID]": 15
+    }, force_reload=True)
+    for deal in deals:
+        last_config = deal.get("cloud_number")
+        for i in range(1, 3):
+            if deal.get(f"cloud_number_{i}") not in [None, "", 0]:
+                last_config = deal.get(f"cloud_number_{i}")
+        if last_config in [None, "", 0]:
+            continue
+        offer_id = "".join(last_config.split("-")[-1:])
+        offer_v2 = OfferV2.query.filter(OfferV2.id == int(offer_id)).first()
+        if offer_v2 is None:
+            continue
+        price_per_kwh = offer_v2.calculated.get("lightcloud_extra_price_per_kwh")
+        if price_per_kwh not in [None, "", 0]:
+            price_per_kwh = float(price_per_kwh) * 100
+        power_extra_usage = offer_v2.data.get("power_extra_usage")
+        if power_extra_usage not in [None, "", 0]:
+            power_extra_usage = int(power_extra_usage)
+        update_data = {
+            "price_per_kwh": price_per_kwh,
+            "power_extra_usage": power_extra_usage
+        }
+        update_deal(deal.get("id"), update_data)
+        print(json.dumps(update_data, indent=2))

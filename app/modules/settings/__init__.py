@@ -597,7 +597,9 @@ def get_settings(section=None, domain_raw=None):
                     "pv_quote_sum_net": "UF_CRM_5DF8B018B26AF",
                     "heatpump_survey_link": "UF_CRM_1651062167",
                     "zoom_appointment": "UF_CRM_5FA43F99B141A",
-                    "zoom_link": "UF_CRM_5FA70A10C20DC"
+                    "zoom_link": "UF_CRM_5FA70A10C20DC",
+                    "price_per_kwh": "UF_CRM_1676891819",
+                    "power_extra_usage": "UF_CRM_1676891711"
                 }
             },
             "invoice": {
