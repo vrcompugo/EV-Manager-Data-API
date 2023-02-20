@@ -1870,7 +1870,7 @@ def add_cloud_values():
         for i in range(1, 3):
             if deal.get(f"cloud_number_{i}") not in [None, "", 0]:
                 last_config = deal.get(f"cloud_number_{i}")
-        if last_config in [None, "", 0]:
+        if last_config in [None, "", 0, "X"]:
             continue
         offer_id = "".join(last_config.split("-")[-1:])
         offer_v2 = OfferV2.query.filter(OfferV2.id == int(offer_id)).first()
