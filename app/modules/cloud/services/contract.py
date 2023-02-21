@@ -1864,7 +1864,7 @@ def add_cloud_values():
     deals = get_deals({
         "SELECT": "full",
         f"FILTER[{system_config['deal']['fields']['is_cloud_master_deal']}]": "1",
-        "FILTER[CATEGORY_ID]": 15
+        "FILTER[CATEGORY_ID]": 176
     }, force_reload=True)
     for deal in deals:
         print(deal.get("id"))
