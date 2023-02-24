@@ -58,22 +58,46 @@ def run_cron_import():
 
 
 def get_device_by_datetime(smartme_number, datetime_item):
-    account = None
+    accounts = []
     requested_date = normalize_date(datetime_item) + timedelta(days=1) - timedelta(seconds=1)
-    print(requested_date)
     device = get("/DeviceBySerial", parameters={ "serial": smartme_number})
-    if device is None or device.get("Id") in [None, "", 0]:
-        account = "2"
-        device = get("/DeviceBySerial", parameters={ "serial": smartme_number}, account=account)
-    if device is None or device.get("Id") in [None, "", 0]:
-        account = "3"
-        device = get("/DeviceBySerial", parameters={ "serial": smartme_number}, account=account)
-    if device is None or device.get("Id") in [None, "", 0]:
-        account = "4"
-        device = get("/DeviceBySerial", parameters={ "serial": smartme_number}, account=account)
-    if device is None or device.get("Id") in [None, "", 0]:
+    if device is not None and device.get("Id") not in [None, "", 0]:
+        accounts.append({
+            "device": device,
+            "account_index": ""
+        })
+    device = get("/DeviceBySerial", parameters={ "serial": smartme_number}, account="2")
+    if device is not None and device.get("Id") not in [None, "", 0]:
+        accounts.append({
+            "device": device,
+            "account_index": "2"
+        })
+    device = get("/DeviceBySerial", parameters={ "serial": smartme_number}, account="3")
+    if device is not None and device.get("Id") not in [None, "", 0]:
+        accounts.append({
+            "device": device,
+            "account_index": "3"
+        })
+    device = get("/DeviceBySerial", parameters={ "serial": smartme_number}, account="4")
+    if device is not None and device.get("Id") not in [None, "", 0]:
+        accounts.append({
+            "device": device,
+            "account_index": "4"
+        })
+    if len(accounts) == 0:
         return None
-    data = get(f"/MeterValues/{device['Id']}", parameters={ "date": str(requested_date) }, account=account)
+    data = None
+    account = None
+    smallest_diff_days = 999
+    print(accounts)
+    for item in accounts:
+        raw = get(f"/MeterValues/{item['device']['Id']}", parameters={ "date": str(requested_date) }, account=item["account_index"])
+        if raw is not None:
+            diff_days = abs((normalize_date(requested_date) - normalize_date(raw.get("Date"))).days)
+            if diff_days <= smallest_diff_days:
+                account = item
+                smallest_diff_days = diff_days
+                data = raw
     if data is not None:
         requested_date = normalize_date(datetime_item)
         responded_date = normalize_date(data.get("Date"))
@@ -81,7 +105,7 @@ def get_device_by_datetime(smartme_number, datetime_item):
             if responded_date <= requested_date:
                 for i in range(10):
                     requested_date2 = requested_date + timedelta(days=i * 10)
-                    data2 = get(f"/MeterValues/{device['Id']}", parameters={ "date": str(requested_date2) }, account=account)
+                    data2 = get(f"/MeterValues/{account['device']['Id']}", parameters={ "date": str(requested_date2) }, account=account["account_index"])
                     if data2 is not None:
                         responded_date2 = normalize_date(data2.get("Date"))
                         if responded_date2 > requested_date:
