@@ -89,7 +89,6 @@ def get_device_by_datetime(smartme_number, datetime_item):
     data = None
     account = None
     smallest_diff_days = 999
-    print(accounts)
     for item in accounts:
         raw = get(f"/MeterValues/{item['device']['Id']}", parameters={ "date": str(requested_date) }, account=item["account_index"])
         if raw is not None:
