@@ -1553,7 +1553,7 @@ def is_temp_field(fieldname):
 
 def fix_legacy_solar_edge_links():
     updated_leads = []
-    histories = QuoteHistory.query.filter(QuoteHistory.datetime > '2022-02-10').order_by(QuoteHistory.datetime.desc()).all()
+    histories = QuoteHistory.query.filter(QuoteHistory.datetime > '2023-01-10').order_by(QuoteHistory.datetime.desc()).all()
     for history in histories:
         if history.lead_id not in updated_leads:
             if history.data.get("data").get("solaredge_designer_link") not in [None, ""]:
