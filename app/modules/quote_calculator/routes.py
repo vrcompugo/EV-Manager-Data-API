@@ -1556,7 +1556,7 @@ def fix_legacy_solar_edge_links():
     histories = QuoteHistory.query.filter(QuoteHistory.datetime > '2023-01-10').order_by(QuoteHistory.datetime.desc()).all()
     for history in histories:
         if history.lead_id not in updated_leads:
-            if history.data.get("data").get("solaredge_designer_link") not in [None, ""]:
+            if history.data.get("data") not in [None] and history.data.get("data").get("solaredge_designer_link") not in [None, ""]:
                 updated_leads.append(history.lead_id)
                 update_lead(history.lead_id, {
                     "solaredge_designer_link": history.data.get("data").get("solaredge_designer_link")
