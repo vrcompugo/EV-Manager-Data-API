@@ -247,7 +247,15 @@ def quote_calculator_calculate(lead_id):
         if history_quote is not None:
             history_data = json.loads(json.dumps(history_quote.data))
             for key in post_data.keys():
-                if is_uncalculated_field(key):
+                if key == "solaredge_designer_link":
+                    if str(history_data["data"].get(key)) != str(post_data.get(key)):
+                        form_updated = True
+                        print("update detected", key)
+                        update_lead(lead_id, {
+                            "solaredge_designer_link": post_data.get(key)
+                        })
+                        history_data["data"][key] = post_data.get(key)
+                elif is_uncalculated_field(key):
                     if str(history_data["data"].get(key)) != str(post_data.get(key)):
                         if not is_temp_field(key):
                             form_updated = True
@@ -313,6 +321,7 @@ def quote_calculator_calculate(lead_id):
         data["history_id"] = history_dirty.id
         history_dirty.data=data
         db.session.commit()
+
 
         return Response(
             json.dumps({"status": "success", "data": data}),
