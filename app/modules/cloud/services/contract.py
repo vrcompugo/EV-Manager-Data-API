@@ -703,8 +703,9 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 else:
                     consumer["power_meter_number"] = string_stripper(existing_deal.get("delivery_counter_number"))
                     consumer["delivery_begin"] = existing_deal.get("cloud_delivery_begin")
-                    if parse(config["earliest_delivery_begin"]) > parse(consumer["delivery_begin"]):
-                        config["earliest_delivery_begin"] = consumer["delivery_begin"]
+                    if onsumer["delivery_begin"] not in ["", None]:
+                        if parse(config["earliest_delivery_begin"]) > parse(consumer["delivery_begin"]):
+                            config["earliest_delivery_begin"] = consumer["delivery_begin"]
                     if existing_deal.get("old_power_meter_numbers") not in empty_values:
                         numbers =  existing_deal.get("old_power_meter_numbers").split("\n")
                         for number in numbers:
