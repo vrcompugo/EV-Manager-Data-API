@@ -391,6 +391,12 @@ def run_cron_follow_cloud_quote_test():
     cron_follow_cloud_quote_test()
 
 
+@manager.command
+def run_fix_legacy_solar_edge_links():
+    from app.modules.quote_calculator.routes import fix_legacy_solar_edge_links
+    fix_legacy_solar_edge_links()
+
+
 if __name__ == '__main__':
     sa.orm.configure_mappers()
     manager.run()

@@ -1549,3 +1549,16 @@ def is_temp_field(fieldname):
     if fieldname[:9] == "is_valid_":
         return True
     return False
+
+
+def fix_legacy_solar_edge_links():
+    updated_leads = []
+    histories = QuoteHistory.query.filter(QuoteHistory.datetime > '2022-02-10').order_by(QuoteHistory.datetime.desc()).all()
+    for history in histories:
+        if history.lead_id not in updated_leads:
+            if history.data.get("data").get("solaredge_designer_link") not in [None, ""]:
+                updated_leads.append(history.lead_id)
+                update_lead(history.lead_id, {
+                    "solaredge_designer_link": history.data.get("data").get("solaredge_designer_link")
+                })
+                print(history.lead_id, history.data.get("data").get("solaredge_designer_link"))
