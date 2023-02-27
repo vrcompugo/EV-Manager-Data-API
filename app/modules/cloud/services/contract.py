@@ -643,8 +643,9 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 config["ecloud"]["smartme_number"] = None
                 config["ecloud"]["power_meter_number"] = string_stripper(deals[0].get("counter_ecloud"))
                 config["ecloud"]["delivery_begin"] = deals[0].get("cloud_delivery_begin")
-                if parse(config["earliest_delivery_begin"]) > parse( config["ecloud"]["delivery_begin"]):
-                    config["earliest_delivery_begin"] =  config["ecloud"]["delivery_begin"]
+                if config["ecloud"]["delivery_begin"] not in ["", None]:
+                    if parse(config["earliest_delivery_begin"]) > parse(config["ecloud"]["delivery_begin"]):
+                        config["earliest_delivery_begin"] =  config["ecloud"]["delivery_begin"]
                 config["ecloud"]["deal"] = {
                     "id": deals[0].get("id"),
                     "title": deals[0].get("title")
