@@ -885,6 +885,8 @@ def get_annual_statement_data(data, year, manuell_data):
                                     "number": number,
                                     "date": normalize_date(beginning_of_year.get("Date")),
                                     "value": abs(beginning_of_year.get("CounterReading", 0)),
+                                    "account": beginning_of_year.get("account"),
+                                    "device_label": beginning_of_year.get("device_label"),
                                     "origin": "smartme"
                                 })
                             if normalize_date(end_of_year.get("Date")) > datetime.datetime(2002,1,1):
@@ -892,6 +894,8 @@ def get_annual_statement_data(data, year, manuell_data):
                                     "number": number,
                                     "date": normalize_date(end_of_year.get("Date")),
                                     "value": abs(end_of_year.get("CounterReading", 0)),
+                                    "account": end_of_year.get("account"),
+                                    "device_label": end_of_year.get("device_label"),
                                     "origin": "smartme"
                                 })
                             statement["available_values"] = statement["available_values"] + values
@@ -1448,9 +1452,13 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
             "start_date": start_value["date"],
             "start_value": start_value["value"],
             "start_estimated": False,
+            "start_account": start_value.get("account"),
+            "start_device_label": start_value.get("device_label"),
             "end_date": end_value["date"],
             "end_value": end_value["value"],
             "end_estimated": False,
+            "end_account": end_value.get("account"),
+            "end_device_label": end_value.get("device_label")
         })
     if len(counters) == 0:
         return None

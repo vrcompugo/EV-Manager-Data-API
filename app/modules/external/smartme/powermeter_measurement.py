@@ -98,6 +98,8 @@ def get_device_by_datetime(smartme_number, datetime_item):
                 smallest_diff_days = diff_days
                 data = raw
     if data is not None:
+        data["account"] = account["account_index"]
+        data["device_label"] = account['device']['Name']
         requested_date = normalize_date(datetime_item)
         responded_date = normalize_date(data.get("Date"))
         if requested_date != responded_date:
