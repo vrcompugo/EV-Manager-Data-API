@@ -1188,6 +1188,11 @@ def get_insign_callback(token):
                 "filename": file["displayname"],
                 "file_content": file_content
             })'''
+            if file["displayname"] == "Technischer Aufnahmebogen" and token_data.get("upload_folder_id_tab") not in [None, "", 0]:
+                file_id = add_file(token_data["upload_folder_id_tab"], {
+                    "filename": f'{file["displayname"]} ({token_data["number"]}).pdf',
+                    "file_content": file_content
+                })
             add_file(customer_folder_id, {
                 "filename": token_data["number"] + " " + file["displayname"] + ".pdf",
                 "file_content": file_content
@@ -1454,6 +1459,7 @@ def get_insign_session(data):
             "roof_reconstruction_quote_sum_net": data["roof_reconstruction_quote"].get("total_net"),
             "pv_kwp": None,
             "documents": token_documents,
+            "upload_folder_id_tab": data["data"].get("upload_folder_id_tab"),
             "upload_folder_id_electric": data["data"]["upload_folder_id_electric"],
             "upload_folder_id_heating": data["data"]["upload_folder_id_heating"],
             "upload_folder_id_contract": data["data"]["upload_folder_id_contract"]
