@@ -285,6 +285,12 @@ def find_credit_memo_bugs():
 
 
 @manager.command
+def fix_legacy_copy_tab_pdf():
+    from app.modules.quote_calculator.routes import fix_legacy_copy_tab_pdf
+    fix_legacy_copy_tab_pdf()
+
+
+@manager.command
 def run_legacy_folder_creation():
     from app.modules.external.bitrix24.drive import run_legacy_folder_creation
     run_legacy_folder_creation()

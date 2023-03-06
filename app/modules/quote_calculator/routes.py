@@ -1189,7 +1189,7 @@ def get_insign_callback(token):
                 "file_content": file_content
             })'''
             if file["displayname"] == "Technischer Aufnahmebogen" and token_data.get("upload_folder_id_tab") not in [None, "", 0]:
-                file_id = add_file(token_data["upload_folder_id_tab"], {
+                add_file(token_data["upload_folder_id_tab"], {
                     "filename": f'{file["displayname"]} ({token_data["number"]}).pdf',
                     "file_content": file_content
                 })
@@ -1568,3 +1568,34 @@ def fix_legacy_solar_edge_links():
                     "solaredge_designer_link": history.data.get("data").get("solaredge_designer_link")
                 })
                 print(history.lead_id, history.data.get("data").get("solaredge_designer_link"))
+
+
+def fix_legacy_copy_tab_pdf():
+    from app.modules.external.bitrix24.drive import get_folder, get_file_content
+    checked_ids = []
+    quotes = QuoteHistory.query.filter(QuoteHistory.datetime > "2023-01-15").filter(QuoteHistory.is_complete.is_(True)).all()
+    for quote in quotes:
+        if quote.lead_id not in checked_ids:
+            checked_ids.append(quote.lead_id)
+            print("lead", quote.lead_id)
+            folder_id = get_folder_id(parent_folder_id=442678, path=f"Vorgang {quote.lead_id}/Uploads/TAB")
+            if folder_id is None:
+                continue
+            existing_found = False
+            files = get_folder(folder_id, force=True)
+            for file in files:
+                if file["NAME"].find("Technischer Aufnahmebogen") >= 0:
+                    existing_found = True
+            if existing_found is False:
+                folder2_id = get_folder_id(parent_folder_id=442678, path=f"Vorgang {quote.lead_id}/Uploads/Vertragsunterlagen")
+                copy_file = None
+                files = get_folder(folder2_id, force=True)
+                for file in files:
+                    if file["NAME"].find("Technischer Aufnahmebogen") >= 0:
+                        if copy_file is None or parse(copy_file["UPDATE_TIME"]) < parse(file["UPDATE_TIME"]):
+                            copy_file = file
+                file_content = get_file_content(copy_file["ID"])
+                add_file(folder_id, {
+                    "filename": f'Technischer Aufnahmebogen.pdf',
+                    "file_content": file_content
+                })
