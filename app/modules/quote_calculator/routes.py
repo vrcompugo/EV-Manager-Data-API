@@ -1595,6 +1595,7 @@ def fix_legacy_copy_tab_pdf():
                         if copy_file is None or parse(copy_file["UPDATE_TIME"]) < parse(file["UPDATE_TIME"]):
                             copy_file = file
                 if copy_file is not None:
+                    print("copy file")
                     file_content = get_file_content(copy_file["ID"])
                     add_file(folder_id, {
                         "filename": f'Technischer Aufnahmebogen.pdf',
