@@ -696,7 +696,8 @@ def get_settings(section=None, domain_raw=None):
                     "comment": "UF_CRM_1652706710",
                     "contracting_heatpump_link": "UF_CRM_1652867586",
                     "heatpump_concept_link": "UF_CRM_1654263535401",
-                    "solaredge_designer_link": "UF_CRM_1676482069"
+                    "solaredge_designer_link": "UF_CRM_1676482069",
+                    "eos_upload_files": "UF_CRM_1678114017667"
                 }
             },
             "company": {

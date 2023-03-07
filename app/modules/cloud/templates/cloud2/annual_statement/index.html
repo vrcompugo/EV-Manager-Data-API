@@ -108,7 +108,9 @@
         <th>Art</th>
         <th>von</th>
         <th>bis</th>
-        <th>Betrag</th>
+        <th>Steuersatz</th>
+        <th>Netto</th>
+        <th>Brutto</th>
       </tr>
       {% set total_extra_usage = 0 %}
       {% for config in statement.configs %}
@@ -127,6 +129,8 @@
               </td>
               <td>{{ config[product].delivery_begin | dateformat }}</td>
               <td>{{ config[product].delivery_end | dateformat }}</td>
+              <td style="text-align: right; white-space: nowrap;">{{ config[product].taxrate | percentformat }}</td>
+              <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price_net | currencyformat }}</td>
               <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price | currencyformat }}</td>
             </tr>
           {% endif %}
@@ -136,6 +140,8 @@
             <td>{{ statement.extra_credit_label }}</td>
             <td></td>
             <td></td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.taxrate | percentformat }}</td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value_net | currencyformat }}</td>
             <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value | currencyformat }}</td>
           </tr>
         {% endif %}
@@ -144,12 +150,14 @@
             <td>{{ statement.extra_credit_label2 }}</td>
             <td></td>
             <td></td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.taxrate | percentformat }}</td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value2_net | currencyformat }}</td>
             <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value2 | currencyformat }}</td>
           </tr>
         {% endif %}
       {% endfor %}
       <tr class="summary">
-        <td colspan="3"><b>Summe</b></td>
+        <td colspan="5"><b>Summe</b></td>
         <td style="text-align: right; white-space: nowrap;">{{ (statement.cost_total - statement.total_cloud_price_incl_refund) | currencyformat }}</td>
       </tr>
     </table>
@@ -157,26 +165,48 @@
     <table>
       <tr class="heading">
         <th>(resultiert aus monatlichen Cloudbeiträgen)</th>
-        <th>Betrag pro Monat</th>
         <th>Anzahl Monate</th>
-        <th>Betrag</th>
+        <th>Steuersatz</th>
+        <th>Netto</th>
+        <th>Brutto</th>
       </tr>
       {% for config in statement.configs %}
-        <tr>
-          <td>
-            {% if config.cloud_price_incl_refund >= 0 %}
-              Forderung
-            {% else %}
-              Gutschrift
+        {% if config["ecloud"] %}
+          {% for product in ["lightcloud", "heatcloud", "ecloud"] + config["customer_products"] %}
+            {% if config[product] %}
+              <tr>
+                <td>
+                  {% if config[product].cloud_price_incl_refund >= 0 %}
+                    Forderung {{ config[product].label }}
+                  {% else %}
+                    Gutschrift {{ config[product].label }}
+                  {% endif %}
+                </td>
+                <td>{{ (12 * config[product].percent_year) | numberformat }}</td>
+                <td>{{ config[product].taxrate | percentformat }}</td>
+                <td>{{ config[product].total_cloud_price_incl_refund_net | currencyformat }}</td>
+                <td style="text-align: right; white-space: nowrap;">{{ config[product].total_cloud_price_incl_refund | currencyformat }}</td>
+              </tr>
             {% endif %}
-          </td>
-          <td>{{ config.cloud_price_incl_refund | currencyformat }}</td>
-          <td>{{ (12 * config.percent_year) | numberformat }}</td>
-          <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
-        </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td>
+              {% if config.cloud_price_incl_refund >= 0 %}
+                Forderung
+              {% else %}
+                Gutschrift
+              {% endif %}
+            </td>
+            <td>{{ (12 * config.percent_year) | numberformat }}</td>
+            <td>{{ config.taxrate | percentformat }}</td>
+            <td>{{ config.total_cloud_price_incl_refund_net | currencyformat }}</td>
+            <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
+          </tr>
+        {% endif %}
       {% endfor %}
       <tr class="summary">
-        <td colspan="3"><b>Summe</b></td>
+        <td colspan="4"><b>Summe</b></td>
         <td style="text-align: right; white-space: nowrap;">{{ statement.total_cloud_price_incl_refund | currencyformat }}</td>
       </tr>
     </table>

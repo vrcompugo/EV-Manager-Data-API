@@ -211,6 +211,11 @@ def quote_calculator_set_defaults(lead_id):
             data["data"][f"upload_link_{folder['key']}"] = f"https://keso.bitrix24.de/docs/path/Auftragsordner/Vorgang {lead['unique_identifier']}{folder['path']}"
             update_data[f"upload_folder_id_{folder['key']}"] = data["data"][f"upload_folder_id_{folder['key']}"]
             update_data[f"upload_link_{folder['key']}"] = data["data"][f"upload_link_{folder['key']}"]
+    if lead.get("eos_upload_files") in [None, "", 0, "0"]:
+        token_data = {
+            "unique_identifier": lead["unique_identifier"]
+        }
+        update_data["eos_upload_files"] = f"https://api.korbacher-energiezentrum.de/vue/quote_calculator/uploader/{encode_jwt(token_data, expire_minutes=60*24*180)['token']}"
     if len(update_data.keys()) > 0:
         update_lead(lead_id, update_data)
     histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(QuoteHistory.is_complete.is_(True)).order_by(QuoteHistory.datetime.desc()).all()
