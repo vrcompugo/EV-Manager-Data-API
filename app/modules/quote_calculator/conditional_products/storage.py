@@ -31,7 +31,7 @@ def add_product(data):
         data["products"].append(product)
 
         product = get_product(label="Montage Stromspeicher", category="Stromspeicher")
-        product["quantity"] = math.ceil(data["calculated"]["storage_size"] / 10)
+        product["quantity"] = math.ceil((stack_count + 1) / 4)
         data["products"].append(product)
     else:
         if not is_overwrite:
