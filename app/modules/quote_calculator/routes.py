@@ -11,7 +11,7 @@ from dateutil.parser import parse
 from app import db
 from app.config import email_config
 from app.decorators import api_response, log_request
-from app.modules.auth import get_auth_info
+from app.modules.auth import get_auth_info, validate_jwt
 from app.modules.auth.jwt_parser import decode_jwt, encode_jwt, encode_shared_jwt
 from app.modules.external.bitrix24.lead import get_lead, update_lead, add_lead
 from app.modules.external.bitrix24.deal import get_deal, update_deal
@@ -58,6 +58,15 @@ UNCALCULATED_FIELDS_ROOF = [
 def route_reload_products():
     reload_products(force=True)
     return {"status": "success"}
+
+
+@blueprint.route("/uploader/<token>", methods=['GET', 'POST'])
+def route_uploader_token(token):
+    data = decode_jwt(token)
+    history = QuoteHistory.query.filter(QuoteHistory.lead_id == data["unique_identifier"]).order_by(QuoteHistory.datetime.desc()).first()
+    if history is None:
+        return {"status": "failed"}
+    return {"status": "success", "data": history.data}
 
 
 @blueprint.route("/history/<history_id>", methods=['PUT'])
@@ -333,11 +342,63 @@ def quote_calculator_calculate(lead_id):
         mimetype='application/json')
 
 
+@blueprint.route("/<lead_id>/uploader_store", methods=['POST'])
+@api_response
+def quote_calculator_uploader_store(lead_id):
+    auth_info = None
+    try:
+        raw = validate_jwt()
+        if raw.get("unique_identifier") == lead_id:
+            auth_info = raw
+    except Exception as e:
+        pass
+    if auth_info is None:
+        auth_info = get_auth_info()
+    if auth_info is None:
+        return Response(
+            '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
+            status=501,
+            mimetype='application/json')
+    post_data = request.json
+    lead_id = int(lead_id)
+    history_quote = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    history_quote_complete = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).filter(QuoteHistory.is_complete).order_by(QuoteHistory.datetime.desc()).first()
+    data2 = None
+    data = json.loads(json.dumps(history_quote.data))
+    if history_quote_complete is not None:
+        data2 = json.loads(json.dumps(history_quote_complete.data))
+    for key in post_data.keys():
+        if isinstance(post_data[key], list):
+            pass
+        if isinstance(post_data[key], list):
+            pass
+        if key[:8] == "tab_img_" or key[:12] == "tab_comment_":
+            data["data"][key] = post_data[key]
+            if data2 is not None:
+                data2["data"][key] = post_data[key]
+    history_quote.data = data
+    if history_quote_complete is not None:
+        history_quote_complete.data = data2
+    db.session.commit()
+    return Response(
+        json.dumps({"status": "success", "data": history_quote.data}),
+        status=200,
+        mimetype='application/json')
+
+
 @blueprint.route("/<lead_id>/upload_file", methods=['POST'])
 @api_response
 def quote_calculator_upload_file(lead_id):
-    auth_info = get_auth_info()
-    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+    auth_info = None
+    try:
+        raw = validate_jwt()
+        if raw.get("unique_identifier") == lead_id:
+            auth_info = raw
+    except Exception as e:
+        pass
+    if auth_info is None:
+        auth_info = get_auth_info()
+    if auth_info is not None:
         post_data = request.form
         lead_id = int(lead_id)
         if lead_id <= 0:
@@ -366,8 +427,16 @@ def quote_calculator_upload_file(lead_id):
 @blueprint.route("/<lead_id>/view_upload_file", methods=['POST'])
 @api_response
 def quote_calculator_view_upload_file(lead_id):
-    auth_info = get_auth_info()
-    if auth_info is not None and auth_info["domain_raw"] == "keso.bitrix24.de":
+    auth_info = None
+    try:
+        raw = validate_jwt()
+        if raw.get("unique_identifier") == lead_id:
+            auth_info = raw
+    except Exception as e:
+        pass
+    if auth_info is None:
+        auth_info = get_auth_info()
+    if auth_info is not None:
         post_data = request.json
         lead_id = int(lead_id)
         if lead_id <= 0:
@@ -376,7 +445,7 @@ def quote_calculator_view_upload_file(lead_id):
                 status=404,
                 mimetype='application/json')
         if 'file_id' in post_data:
-            public_link = get_public_link(post_data['file_id'])
+            public_link = get_public_link(post_data['file_id'], extra_data={"resize": "200x200"})
             is_sample = False
         else:
             public_link = '/static/tab/samples/' + post_data['samplepath']
@@ -389,6 +458,7 @@ def quote_calculator_view_upload_file(lead_id):
         '{"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}',
         status=501,
         mimetype='application/json')
+
 
 @blueprint.route("/<lead_id>/calculate_heating_usage", methods=['POST'])
 @api_response
