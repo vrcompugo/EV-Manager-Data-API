@@ -167,18 +167,20 @@
         <th>Betrag</th>
       </tr>
       {% for config in statement.configs %}
-        <tr>
-          <td>
-            {% if config.cloud_price_incl_refund >= 0 %}
-              Forderung
-            {% else %}
-              Gutschrift
-            {% endif %}
-          </td>
-          <td>{{ config.cloud_price_incl_refund | currencyformat }}</td>
-          <td>{{ (12 * config.percent_year) | numberformat }}</td>
-          <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
-        </tr>
+        {% if config.cloud_price_incl_refund %}
+          <tr>
+            <td>
+              {% if config.cloud_price_incl_refund >= 0 %}
+                Forderung
+              {% else %}
+                Gutschrift
+              {% endif %}
+            </td>
+            <td>{{ config.cloud_price_incl_refund | currencyformat }}</td>
+            <td>{{ (12 * config.percent_year) | numberformat }}</td>
+            <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
+          </tr>
+        {% endif %}
       {% endfor %}
       <tr class="summary">
         <td colspan="3"><b>Summe</b></td>
