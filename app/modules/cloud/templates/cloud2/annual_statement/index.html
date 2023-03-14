@@ -122,7 +122,12 @@
                   {{ (config[product].extra_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
                 {% else %}
                   Minderverbrauch <small>({{ config[product].total_extra_usage | numberformat("de", 0)}} kWh
-                  ab -250 kWh je {{ (config[product].cashback_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
+                  {% if config[product].extra_usage_buffer %}
+                    ab -{{config[product].extra_usage_buffer | numberformat("de", 0) }} kWh
+                  {% else %}
+                    ab -250 kWh
+                  {% endif %}
+                  je {{ (config[product].cashback_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
                 {% endif %}
               </td>
               <td>{{ config[product].delivery_begin | dateformat }}</td>

@@ -1051,8 +1051,12 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement_config[product]["cashback_price_per_kwh"] = statement_config["ecloud_cashback_price_per_kwh"]
                 else:
                     statement_config[product]["cashback_price_per_kwh"] = statement_config["cashback_price_per_kwh"]
-                if statement_config[product]["total_extra_usage"] < -250:
-                    statement_config[product]["total_extra_price"] = (statement_config[product]["total_extra_usage"] + 250) * statement_config[product]["cashback_price_per_kwh"]
+
+                statement_config[product]["extra_usage_buffer"] = 250
+                if manuell_data.get("corrected_250kwh") not in [None, "", 0, False, "false"]:
+                    statement_config[product]["extra_usage_buffer"] = round(250 * percent_year)
+                if statement_config[product]["total_extra_usage"] < -statement_config[product]["extra_usage_buffer"]:
+                    statement_config[product]["total_extra_price"] = (statement_config[product]["total_extra_usage"] + statement_config[product]["extra_usage_buffer"]) * statement_config[product]["cashback_price_per_kwh"]
 
                 elif statement_config[product]["total_extra_usage"] > 0:
                     statement_config[product]["total_extra_price"] = statement_config[product]["total_extra_usage"] * statement_config[product]["extra_price_per_kwh"]
