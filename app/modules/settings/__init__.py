@@ -384,7 +384,8 @@ def get_settings(section=None, domain_raw=None):
                     "Texte": 304,
                     "Dachsanierung online Bogen": 290,
                     "Optionen Heizung online": 302,
-                    "Solarthermie online": 300
+                    "Solarthermie online": 300,
+                    "PV Artikel": 482
                 }
             },
             "task": {

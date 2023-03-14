@@ -328,6 +328,18 @@ def calculate_products(data):
                     quantity=1,
                     products=data["products"]
                 )
+
+            flatroof_kwp = 0
+            for roof in data["data"].get("roofs"):
+                if roof.get("roof_type") in ["Flachdach"] and roof.get("pv_kwp_used") not in [None, "", 0]:
+                    flatroof_kwp = flatroof_kwp + float(roof.get("pv_kwp_used"))
+            if flatroof_kwp > 0:
+                add_direct_product(
+                    label="Aufständerung & Beschwerung",
+                    category="PV Artikel",
+                    quantity=flatroof_kwp,
+                    products=data["products"]
+                )
         technik_and_service_produkt = None
         if data["data"].get("cloud_quote_type") not in ["combination_quote"] and ("technik_service_packet" in data["data"]["extra_options"] or "technik_service_packet" in data["data"]["extra_options_zero"]):
             quantity = 0
@@ -462,7 +474,7 @@ def calculate_products(data):
                 )
             elif storage_product["NAME"].find("Home 4") >= 0:
                 add_direct_product(
-                    label="Home4 BackUp",
+                    label="Home4 AC-Notstromsystem",
                     category="Stromspeicher",
                     quantity=quantity,
                     products=data["products"]

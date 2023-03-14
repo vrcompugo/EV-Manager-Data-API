@@ -18,7 +18,7 @@ def add_product(data):
         if int(data["data"]["overwrite_storage_size"]) > size:
             size = int(data["data"]["overwrite_storage_size"])
             is_overwrite = True
-    if size <= 10:
+    if False and size <= 10:
         version = "Senec Lithium Speicher"
         stack_count = math.ceil((size - 2.5) / 2.5)
         if stack_count < 1:
@@ -40,6 +40,20 @@ def add_product(data):
                 size = size + math.ceil(float(data["data"].get("power_usage")) / 4200) * 4.2
             if data["data"].get("heater_usage") not in [None, "", 0, "0"]:
                 size = size + math.ceil(float(data["data"].get("heater_usage")) / 9000) * 4.2
+            full_usage = float(data["data"].get("power_usage")) + float(data["data"].get("heater_usage"))
+            size = 0
+            if 0 < full_usage <= 8000:
+                size = 8.4
+            if 8000 < full_usage <= 12300:
+                size = 12.6
+            if 123000 < full_usage <= 16600:
+                size = 16.8
+            if 16600 < full_usage <= 21000:
+                size = 21
+            if 21000 < full_usage:
+                size = 25.2
+            if 26000 < full_usage:
+                raise Exception("storage produkt could not be calculated")
         if "solaredge" not in data["data"]["extra_options"]:
             version = "SENEC Home 4 Hybrid"
             product = get_product(label="SENEC Home 4 Hybrid (Gehäuse)", category="Stromspeicher")
@@ -48,8 +62,6 @@ def add_product(data):
             product = get_product(label="SENEC Home 4 AC (Gehäuse)", category="Stromspeicher")
         product["quantity"] = 1
         stack_count = math.ceil(size / 4.2)
-        if stack_count < 3:
-            stack_count = 3
         stack = get_product(label="SENEC Home 4 Batteriemodul 4,2 kW", category="Stromspeicher")
         product["NAME"] = f"{version} {round(stack_count * 4.2, 1)} kWh"
         product["PRICE"] = float(product["PRICE"]) * math.ceil(stack_count / 6) + float(stack["PRICE"]) * stack_count
