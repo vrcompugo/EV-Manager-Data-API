@@ -839,6 +839,9 @@ def get_annual_statement_data(data, year, manuell_data):
                 if parse(statement_config[product].get("delivery_begin")).year > year:
                     del statement_config[product]
                     continue
+                if config.get("delivery_end") not in [None, "", 0] and normalize_date(statement_config[product].get("delivery_begin")) >= normalize_date(config.get("delivery_end")):
+                    del statement_config[product]
+                    continue
                 if product == "lightcloud" and statement_config[product]["extra_price_per_kwh"] < 0.3379:
                     if statement_config.get("cloud_number").find("Custom") < 0:
                         statement_config[product]["extra_price_per_kwh"] = 0.3379
