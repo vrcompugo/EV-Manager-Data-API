@@ -40,13 +40,17 @@ def add_product(data):
                 size = size + math.ceil(float(data["data"].get("power_usage")) / 4200) * 4.2
             if data["data"].get("heater_usage") not in [None, "", 0, "0"]:
                 size = size + math.ceil(float(data["data"].get("heater_usage")) / 9000) * 4.2
-            full_usage = float(data["data"].get("power_usage")) + float(data["data"].get("heater_usage"))
+            full_usage = 0
+            if data["data"].get("power_usage") not in [None, "", 0, "0"]:
+                full_usage = full_usage + float(data["data"].get("power_usage"))
+            if data["data"].get("heater_usage") not in [None, "", 0, "0"]:
+                full_usage = full_usage + float(data["data"].get("heater_usage"))
             size = 0
             if 0 < full_usage <= 8000:
                 size = 8.4
             if 8000 < full_usage <= 12300:
                 size = 12.6
-            if 123000 < full_usage <= 16600:
+            if 12300 < full_usage <= 16600:
                 size = 16.8
             if 16600 < full_usage <= 21000:
                 size = 21
