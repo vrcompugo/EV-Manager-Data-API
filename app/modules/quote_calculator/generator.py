@@ -337,6 +337,8 @@ def generate_datasheet_pdf(lead_id, data):
         if "wwwp" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, config["nibe_wp"], cached=True)
         if "wallbox" in data["data"]["extra_options"]:
+            if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-pro-11kW":
+                add_pdf_by_drive_id(merger, 436174, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/436174/?&ncc=1&filename=Senec+Wallbox.pdf
             if "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "senec-22kW":
                 add_pdf_by_drive_id(merger, 436174, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/436174/?&ncc=1&filename=Senec+Wallbox.pdf
             elif "extra_options_wallbox_variant" in data["data"] and data["data"]["extra_options_wallbox_variant"] == "control-11kW":
