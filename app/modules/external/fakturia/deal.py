@@ -477,6 +477,11 @@ def initilize_faktura_data(deal):
         "category_id": 15,
         "cloud_contract_number": f'{cloud_contract_number}'
     })
+    for unassigend_deal in unassigend_deals:
+        if "UF_CRM_1623743780" in unassigend_deal:
+            del unassigend_deal["UF_CRM_1623743780"]
+        if "fakturia_data" in unassigend_deal:
+            del unassigend_deal["fakturia_data"]
     offer = OfferV2.query.options(db.subqueryload("items")).filter(OfferV2.number == deal.get("cloud_number")).first()
     if offer is not None:
         for item in offer.items:
