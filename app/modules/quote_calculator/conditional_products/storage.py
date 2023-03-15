@@ -14,11 +14,10 @@ def add_product(data):
     if data["data"].get("heater_usage") not in [None, "", 0, "0"]:
         size = size + math.ceil(float(data["data"].get("heater_usage")) / 6100) * 2.5
     is_overwrite = False
-    if "overwrite_storage_size" in data["data"] and data["data"]["overwrite_storage_size"] != "":
+    if "overwrite_storage_size" in data["data"] and str(data["data"]["overwrite_storage_size"]) in ["5", "7.5", "10"]:
         if int(data["data"]["overwrite_storage_size"]) > size:
             size = int(data["data"]["overwrite_storage_size"])
             is_overwrite = True
-    if False and size <= 10:
         version = "Senec Lithium Speicher"
         stack_count = math.ceil((size - 2.5) / 2.5)
         if stack_count < 1:
