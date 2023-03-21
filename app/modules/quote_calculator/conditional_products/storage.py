@@ -4,10 +4,6 @@ from app.modules.external.bitrix24.products import get_product
 
 
 def add_product(data):
-    if "storage_size" not in data["calculated"] or data["calculated"]["storage_size"] is None:
-        raise Exception("storage produkt could not be calculated")
-    if data["calculated"]["storage_size"] == 0:
-        return None
     size = 0
     if data["data"].get("power_usage") not in [None, "", 0, "0"]:
         size = size + math.ceil(float(data["data"].get("power_usage")) / 2500) * 2.5
