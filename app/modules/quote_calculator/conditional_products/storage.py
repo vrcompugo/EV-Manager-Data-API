@@ -14,7 +14,7 @@ def add_product(data):
     if data["data"].get("heater_usage") not in [None, "", 0, "0"]:
         size = size + math.ceil(float(data["data"].get("heater_usage")) / 6100) * 2.5
     is_overwrite = False
-    if int(data["data"]["overwrite_storage_size"]) > size:
+    if "overwrite_storage_size" in data["data"] and int(data["data"]["overwrite_storage_size"]) > size:
         size = int(data["data"]["overwrite_storage_size"])
         is_overwrite = True
     if "overwrite_storage_size" in data["data"] and str(data["data"]["overwrite_storage_size"]) in ["5", "7.5", "10"]:
