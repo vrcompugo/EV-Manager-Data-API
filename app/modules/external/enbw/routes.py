@@ -25,12 +25,15 @@ def upload_contract():
     auth_info = get_auth_info()
     if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
         return {"status": "failed", "data": {}, "message": "auth failed"}
-    data = request.json
-    if data is None or data.get("id") is None:
+    data = request.form
+    contract_file = request.files.get("contract_file")
+    if data is None or data.get("deal_id") is None:
         return {"status": "failed", "data": {}, "message": "no id"}
-    deal = get_deal(data.get("id"))
+    deal = get_deal(data.get("deal_id"), force_reload=True)
     if deal is None:
         return {"status": "failed", "data": {}, "message": "deal not found"}
+    if deal.get("cloud_contract_number") in [None, "", 0, "0"]:
+        return {"status": "failed", "data": {}, "message": "keine vertragsnummer hinterlegt"}
     sub_contract_number = deal.get("cloud_contract_number")
     main_contract_number = normalize_contract_number(deal.get("cloud_contract_number"))
     contract = ENBWContract.query.filter(ENBWContract.sub_contract_number == sub_contract_number).first()
@@ -50,7 +53,7 @@ def upload_contract():
         db.session.add(contract)
         db.session.commit()
     try:
-        contract_data = send_contract(contract)
+        contract_data = send_contract(contract, contract_file)
         contract.joulesId = contract_data.get("joulesId")
         contract.status = "transfered"
         contract.status_message = "Übertragen an ENBW. Warten auf Rückmeldung"

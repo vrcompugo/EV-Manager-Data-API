@@ -263,9 +263,10 @@ def initilize_service_contract_data(deal):
 
 def get_cloud_contract_data_by_deal(deal):
     cloud_contract_number = normalize_contract_number(deal.get("cloud_contract_number"))
-    contract = ENBWContract.query.options(db.subqueryload("histories")).filter(ENBWContract.sub_contract_number == deal.get("cloud_contract_number")).first()
-    if contract is not None:
-        deal["enbw_data"] = contract.to_dict()
+    if deal.get("cloud_contract_number") not in [None, "", 0, "0"]:
+        contract = ENBWContract.query.options(db.subqueryload("histories")).filter(ENBWContract.sub_contract_number == deal.get("cloud_contract_number")).first()
+        if contract is not None:
+            deal["enbw_data"] = contract.to_dict()
     deal = set_default_data(deal)
     if deal is None:
         return {"status": "failed", "data": {"error": "Cloud Nummer konnten nicht gefunden werden"}, "message": ""}

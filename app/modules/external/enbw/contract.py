@@ -1,9 +1,12 @@
 import json
 import datetime
+import base64
+from werkzeug import FileStorage
 
 from app.exceptions import ApiException
 from app.modules.external.bitrix24.deal import get_deal
 from app.modules.external.bitrix24.contact import get_contact
+from app.modules.external.bitrix24.drive import get_folder_id, get_folder, get_file_content
 from app.modules.cloud.services.contract import get_contract_data, normalize_date
 from app.modules.settings import get_settings
 
@@ -12,12 +15,34 @@ from .models.enbw_contract import ENBWContract
 from .models.enbw_contract_history import ENBWContractHistory
 
 
-def send_contract(contract: ENBWContract):
+def send_contract(contract: ENBWContract, contract_file: FileStorage):
 
     config = get_settings(section="external/enbw")
-    deal = get_deal(contract.deal_id)
+    deal = get_deal(contract.deal_id, force_reload=True)
     contact = get_contact(deal.get("contact_id"))
     requested_usage = int(deal.get("delivery_usage")) * 0.5
+    contract_files = []
+    if contract_file is not None:
+        file_content = contract_file.read()
+        contract_files = [{
+            "file_type": "contract",
+            "name": "Vertrag.pdf",
+            "content": base64.b64encode(file_content)
+        }]
+    else:
+        contract_folder_id = get_folder_id(parent_folder_id=442678, path=f"Vorgang {deal.get('unique_identifier')}/Uploads/Vertragsunterlagen")
+        if contract_folder_id is not None:
+            files = get_folder(contract_folder_id)
+            for file in files:
+                if file.get("NAME").find("Maklervollmacht") >= 0:
+                    file_content = get_file_content(file.get("ID"))
+                    contract_files = [{
+                        "file_type": "contract",
+                        "name": "Vertrag.pdf",
+                        "content": base64.b64encode(file_content)
+                    }]
+    if len(contract_files) == 0:
+        raise ApiException("no valid contract file", "Keine Maklervollmacht-PDF gefunden")
     address_data = {
         "area_code": "05631",
         "city": deal.get("delivery_city"),
@@ -108,9 +133,9 @@ def send_contract(contract: ENBWContract):
             "first_name": deal.get("delivery_first_name"),
             "last_name": deal.get("delivery_last_name"),
             "suffix": "Herr"
-        }
+        },
+        "files": contract_files
     }
-
     contract_data = post("/clients", enbw_data, contract=contract)
     if contract_data is None:
         raise ApiException("transfer failed", "Übertragung an ENBW fehlgeschlagen")
