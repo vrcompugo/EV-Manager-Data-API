@@ -27,7 +27,7 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage):
         contract_files = [{
             "file_type": "contract",
             "name": "Vertrag.pdf",
-            "content": base64.b64encode(file_content)
+            "content": base64.b64encode(file_content).decode('utf-8')
         }]
     else:
         contract_folder_id = get_folder_id(parent_folder_id=442678, path=f"Vorgang {deal.get('unique_identifier')}/Uploads/Vertragsunterlagen")
@@ -39,7 +39,7 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage):
                     contract_files = [{
                         "file_type": "contract",
                         "name": "Vertrag.pdf",
-                        "content": base64.b64encode(file_content)
+                        "content": base64.b64encode(file_content).decode('utf-8')
                     }]
     if len(contract_files) == 0:
         raise ApiException("no valid contract file", "Keine Maklervollmacht-PDF gefunden")
