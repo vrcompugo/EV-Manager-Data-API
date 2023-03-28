@@ -600,7 +600,8 @@ def get_settings(section=None, domain_raw=None):
                     "zoom_appointment": "UF_CRM_5FA43F99B141A",
                     "zoom_link": "UF_CRM_5FA70A10C20DC",
                     "price_per_kwh": "UF_CRM_1676891819",
-                    "power_extra_usage": "UF_CRM_1676891711"
+                    "power_extra_usage": "UF_CRM_1676891711",
+                    "upload_link_tab": "UF_CRM_1656489097"
                 }
             },
             "invoice": {
