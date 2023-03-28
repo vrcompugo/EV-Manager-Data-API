@@ -96,8 +96,10 @@ def get_export_data(task_data, contact_data, deal_data, company_data):
                     planned_teamlead = get_user(deal_data["planned_teamlead"][0])["LAST_NAME"]
                 data["Name"] =  data["Name"] + f", {traufhohe} Meter, Team {planned_teamlead}, {roof_toppings}, KW {deal_data.get('construction_calendar_week')}"
             files = []
+            print(deal_data.get("upload_link_tab"))
             if deal_data.get("upload_link_tab") not in [None, ""]:
                 folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_tab").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
+                print(deal_data.get("upload_link_tab"), folder_id)
         if str(deal_data.get("category_id")) == "32":
             folder_id = get_folder_id(parent_folder_id=442678, path=deal_data.get("upload_link_electric").replace("https://keso.bitrix24.de/docs/path/Auftragsordner/", ""))
         if str(deal_data.get("category_id")) == "9":
