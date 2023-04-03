@@ -26,6 +26,7 @@ from app.modules.offer.offer_services import add_item_v2, update_item_v2, get_on
 from app.models import OfferV2
 
 from .quote_data import calculate_quote, calculate_heating_usage
+from .synergy import calculate_synergy_wi, generate_synergy_pdf
 from .generator import generate_commission_pdf, generate_order_confirmation_pdf, generate_bluegen_pdf, generate_bluegen_wi_pdf, generate_cover_pdf, generate_quote_pdf, generate_datasheet_pdf, generate_summary_pdf, generate_letter_pdf, generate_contract_summary_pdf, generate_heating_pdf, generate_roof_reconstruction_pdf, generate_quote_summary_pdf, generate_contract_summary_part1_pdf, generate_contract_summary_part2_pdf, generate_contract_summary_part3_pdf, generate_contract_summary_part4_pdf, generate_contract_summary_part4_1_pdf, generate_contract_summary_part5_pdf, generate_heatpump_auto_generate_pdf
 from .models.quote_history import QuoteHistory
 
@@ -35,7 +36,7 @@ blueprint = Blueprint("quote_calculator", __name__, template_folder='templates')
 
 UNCALCULATED_FIELDS = [
     # customer data
-    "birthday", "iban", "bic", "bankname", "extra_notes", "cloud_number", "solaredge_designer_link",
+    "birthday", "birthdate", "iban", "bic", "bankname", "extra_notes", "cloud_number", "solaredge_designer_link",
     # elektro tab
     "tab_building_type", "oberleitung_vorhanden", "kabelkanal_color", "tab_has_cellar_external_entrance",
     "is_new_building", "power_meter_number", "main_malo_id", "heatcloud_power_meter_number",
@@ -762,11 +763,19 @@ def quote_calculator_cloud_pdfs_action(lead_id):
     from app.modules.importer.sources.bitrix24._association import find_association
 
     lead = get_lead(lead_id)
+    history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    if history.data["data"].get("cloud_quote_type") in ["synergy"]:
+        data = json.loads(json.dumps(history.data))
+        subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
+        genrate_pdf(data, generate_synergy_pdf, lead_id, "pdf_wi_file_id", "Synergie WI.pdf", subfolder_id)
+        history.data = data
+        db.session.commit()
+        return {"status": "success", "data": history.data}
+
     lead_link = find_association("Lead", remote_id=lead_id)
     reseller_link = None
     if "assigned_by_id" in lead and lead["assigned_by_id"] is not None and lead["assigned_by_id"] != "":
         reseller_link = find_association("Reseller", remote_id=lead["assigned_by_id"])
-    history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     folder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
     calculated = history.data["calculated"]
     data = history.data["data"]
@@ -1185,6 +1194,19 @@ def quote_calculator_heatpump_autogenerate_pdf_action(lead_id):
     lead_update_data = {"pdf_heatpump_auto_generate_link": data["pdf_heatpump_auto_generate_link"]}
     update_lead(lead_id, lead_update_data)
     return data
+
+
+@blueprint.route("/<lead_id>/contract_summary_pdf4", methods=['GET'])
+@log_request
+def quote_calculator_contract_summary_pdf4(lead_id):
+    history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
+    data = json.loads(json.dumps(history.data))
+
+    pdf = generate_synergy_pdf(lead_id, data)
+
+    return Response(pdf,
+        status=200,
+        mimetype='application/pdf')
 
 
 @blueprint.route("/<lead_id>/contract_summary_pdf3", methods=['GET'])
