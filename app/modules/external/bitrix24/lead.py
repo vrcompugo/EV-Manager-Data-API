@@ -149,7 +149,6 @@ def update_lead(id, data, domain=None):
     config = get_settings(section="external/bitrix24", domain_raw=domain)
     fields = config["lead"]["fields"]
     update_data = flatten_dict(data, update_data, fields=fields, config=config)
-    print(update_data)
     response = post("crm.lead.update", update_data, domain=domain)
     if "result" in response and response["result"]:
         return True
