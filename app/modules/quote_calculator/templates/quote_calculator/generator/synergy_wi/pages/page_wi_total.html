@@ -1,0 +1,161 @@
+<style>
+  .page_blank_note {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    font-size: 0.7em;
+  }
+  .page_wi_total {
+    padding: 3em;
+  }
+  .page_wi_total .left-side {
+    flex: 1 0 45%;
+    margin-right: 1em;
+  }
+  .page_wi_total .right-side {
+    flex: 1 1 60%;
+
+    margin-left: 1em;
+  }
+</style>
+
+<div class="page_wi_total">
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <h2>Wirtschaftlichkeitsberechnung</h2>
+      <h2 style="font-size: 1.2rem;">Zusammenfassung &amp; Gegenüberstellung</h2>
+    </div>
+
+    <div class="right-side" style="text-align: left;">
+      <img src="{{ base_url }}static/synergy_wi/logo-synergie.jpg" style="width: 300px; height: auto;">
+    </div>
+  </div>
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <br>
+      <table style="font-size: 0.9em;" cellspacing="0">
+        <tr>
+          <th colspan="2">Energiekosten OHNE Synergie 360</th>
+        </tr>
+        <tr>
+          <td>Lichtstrom</td>
+          <td>{{ data.calculated.conventional_cost_light_total | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td>Wärmestrom</td>
+          <td>{{ data.calculated.conventional_cost_heating_total | currencyformat }}</td>
+        </tr>
+      </table>
+      <br>
+      <table style="font-size: 0.9em;" cellspacing="0">
+        <tr>
+          <th colspan="3">Monatliche Belastung</th>
+        </tr>
+        <tr>
+          <td>Heute</td>
+          <td>in 15 Jahren</td>
+          <td>in 30 Jahren</td>
+        </tr>
+        <tr>
+          <td>{{ data.calculated.conventional_cost_monthly_today | currencyformat }} mtl.</td>
+          <td>{{ data.calculated.conventional_cost_monthly_15years | currencyformat }} mtl.</td>
+          <td>{{ data.calculated.conventional_cost_monthly_30years | currencyformat }} mtl.</td>
+        </tr>
+      </table>
+    </div>
+    <div class="right-side">
+      <br>
+      <table style="font-size: 0.9em;" cellspacing="0">
+        <tr>
+          <th colspan="2">Energiekosten MIT Synergie 360 über {{ data.calculated.runtime }} Jahre</th>
+        </tr>
+        <tr>
+          <td>Lichtstrom</td>
+          <td>{{ data.calculated.synergy_total | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td>Rücklagen</td>
+          <td>{{ data.calculated.maintainance_cost_total | currencyformat }}</td>
+        </tr>
+        {% if data.loan_calculation and data.loan_calculation.interest_cost > 0 %}
+          <tr>
+            <td>Finanzierung</td>
+            <td>{{ data.loan_calculation.interest_cost | currencyformat }}</td>
+          </tr>
+        {% endif %}
+        <tr>
+          <td>Investition</td>
+          <td>{{ data.total_net | currencyformat }}</td>
+        </tr>
+      </table>
+      <br>
+      <table style="font-size: 0.9em;" cellspacing="0">
+        <tr>
+          <th colspan="3">
+            Monatliche Belastung
+
+            {% if data.loan_calculation and data.loan_calculation.interest_rate > 0 %}
+              inkl. Finanzierungsrate (Zinssatz {{ data.loan_calculation.interest_rate | percentformat("de", 2) }} pro Jahr)
+            {% endif %}
+          </th>
+        </tr>
+        <tr>
+          <td>Heute</td>
+          <td>in 15 Jahren</td>
+          <td>in 30 Jahren</td>
+        </tr>
+        <tr>
+          <td>{{ data.calculated.synergy_monthly_today_total | currencyformat }} mtl.</td>
+          <td>{{ data.calculated.synergy_monthly_15years_total | currencyformat }} mtl.</td>
+          <td>{{ data.calculated.synergy_monthly_30years_total | currencyformat }} mtl.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <br>
+      <div class="bar-line">
+        <div class="label big-number" style="padding-left: 85%;"><span>{{ data.calculated.conventional_cost_monthly_avarage_30years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: 85%">&nbsp;</div>
+        </div>
+      </div>
+      <div style="font-weight: bold; font-size: 0.95em;">Durchschnittliche Kosten pro Monat OHNE Synergie 360 über 30 Jahre</div>
+    </div>
+    <div class="right-side">
+      <br>
+      <div class="bar-line blue">
+        <div class="label big-number" style="padding-left: {{ (data.calculated.synergy_monthly_avarage_30years / data.calculated.conventional_cost_monthly_avarage_30years) * 100 }}%;"><span>{{ data.calculated.synergy_monthly_avarage_30years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: {{ (data.calculated.synergy_monthly_avarage_30years / data.calculated.conventional_cost_monthly_avarage_30years) * 100 }}%">&nbsp;</div>
+        </div>
+      </div>
+      <div style="font-weight: bold; font-size: 0.95em;">Durchschnittliche Kosten pro Monat MIT Synergie 360 über 30 Jahre</div>
+    </div>
+  </div>
+  <br>
+  <p>
+    Photovoltaikanlagen können zur Wertsteigerung einer Immobilie führen. Eine Solaranlage auf dem
+    Dach bieten finanzielle und ökologische Vorteile. Richtig
+    geplant, verdienen Sie mit der Anlage Geld und zusätzlich steigt der Wert der Immobilie.
+  </p>
+
+  <p>
+    Heizungsmodernisierung trägt zur Wertsteigerung von Immobilien bei. 48 Prozent der befragten Makler
+    gehen davon aus, dass sich bereits der Anschein eines hohen energetischen Sanierungsbedarfs negativ auf die Immobilie auswirkt.
+  </p>
+</div>
+
+<div class="page_blank_note">
+  &nbsp;
+</div>
+
+<div class="page_logo">
+  <img src="{{ base_url }}static/synergy_wi/logo-energie360.jpg" style="width: 200px; height: auto;">
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter2.html') %}

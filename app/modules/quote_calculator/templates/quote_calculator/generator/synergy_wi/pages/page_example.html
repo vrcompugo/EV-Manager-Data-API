@@ -1,0 +1,109 @@
+<style>
+  .page_blank_note {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    font-size: 0.7em;
+  }
+  .page_example .left-side {
+    flex: 1 0 45%;
+    background-image: url("{{ base_url }}static/synergy_wi/world.jpg");
+    background-size: cover;
+    margin: 3em;
+    margin-right: 0;
+  }
+  .page_example .right-side {
+    flex: 1 1 60%;
+    margin: 3em;
+    margin-left: 2em;
+  }
+  .bar {
+    width: 100%;
+    height: 10px;
+    border-radius: 6px;
+    background-color: #1A4061;
+  }
+  .bar-2 {
+    background-color: #868DA2;
+    border-radius: 0 6px 6px 0;
+  }
+  .bar-1 {
+    background-color: #B2B5C1;
+    border-radius: 0 6px 6px 0;
+  }
+</style>
+
+<div class="page_example layout horizontal" style="height: 100vh">
+  <div class="left-side">&nbsp;</div>
+  <div class="right-side">
+    <div style="text-align: right">
+      <img src="{{ base_url }}static/synergy_wi/logo-synergie.jpg" style="width: 300px; height: auto;">
+    </div>
+    <br>
+    <h2>Lohnt sich für Sie und</h2>
+    <h3>für das Klima</h3>
+    <br>
+    <b>Ihre Beispielrechnung:</b><br>
+    <br>
+    Die Komplettlösung Synergie360 kostet {{ data.total_net | currencyformat }}.
+    Unser Kunde profitiert von bis zu
+    {{ (data.calculated.direct_market_cashback * 100) | numberformat("de", 0) }} Cent / kwh
+    bei der Direktvermarktung Ihrer Überschüsse sowie dem Nutzen von negativen
+    Strompreisen der Börse. Durch diese Kombination aus Selbstversorgung und höherer
+    Erträge gegenüber der EEG Umlage ergeben sich große Einsparpotentiale.<br>
+    <br>
+    <div class="blue" style="text-align: right; font-weight: bold;">{{ data.calculated.conventional_cost_total_30years | currencyformat }}</div>
+    <div class="bar"></div>
+    <div class="layout horizontal">
+      <small class="flex">
+        Die oben genannten Energiekosten ergeben sich aus den von Ihnen zu zahlenden Grundgebühren
+        und ihren angegebenen Energiekosten, unter Berücksichtigung einer Preissteigerung bei
+        Strom von {{ data.calculated.power_increase_rate | percentformat("de", 2) }} sowie, wenn ausgewählt, bei Wärmekosten von {{ data.calculated.heating_increase_rate | percentformat("de", 2) }}.
+        Berücksichtigt wurde eine Inflation von {{ data.calculated.inflation_rate | percentformat("de", 2) }} jeweils pro Jahr innerhalb der kommenden
+        {{ data.calculated.runtime }} Jahre.
+      </small>
+      <div style="white-space: nowrap; padding-left: 1em;">30 Jahre</div>
+    </div>
+    <br>
+    <div class="layout horizontal">
+      <div style="flex: 2">
+        <div style="text-align: right;">
+          Synergie 360<br>
+          {{ data.calculated.synergy_total_investment_cost_30years | currencyformat }}
+        </div>
+        <div class="bar"></div>
+      </div>
+      <div style="flex: 2">
+        <div style="text-align: right; transform: translateX(-2px);">
+          Version 2<br>
+          {{ data.calculated.version2.total_cost_30years | currencyformat }}
+        </div>
+        <div class="bar bar-2" style="transform: translateX(-2px);"></div>
+      </div>
+      <div style="flex: 1">
+        <div style="text-align: right; transform: translateX(-4px);">
+          Version 1<br>
+          {{ data.calculated.version1.total_cost_30years | currencyformat }}
+        </div>
+        <div class="bar bar-1" style="transform: translateX(-4px);"></div>
+      </div>
+    </div>
+
+    <div class="layout horizontal">
+      <small class="flex">
+        Synergie360 über {{ data.calculated.runtime }} Jahren inkl. Investion, laufenden Kosten und Verrechnung aus den Überschüssen der Stromproduktion
+      </small>
+      <div style="white-space: nowrap; padding-left: 1em;">{{ data.calculated.runtime }} Jahre</div>
+    </div>
+  </div>
+</div>
+
+<div class="page_blank_note">
+  &nbsp;
+</div>
+
+<div class="page_logo">
+  <img src="{{ base_url }}static/synergy_wi/logo-energie360.jpg" style="width: 200px; height: auto;">
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter2.html') %}

@@ -441,8 +441,10 @@ def generate_summary_pdf(lead_id, data):
     customer_name = ""
     if "contact" in data:
         customer_name = data["contact"]["name"] + " " + data["contact"]["last_name"]
-    add_pdf_by_drive_id(merger, data["pdf_cover_file_id"])
-    add_pdf_by_drive_id(merger, data["pdf_letter_file_id"])
+    if "pdf_cover_file_id" in data and data["pdf_cover_file_id"] > 0:
+        add_pdf_by_drive_id(merger, data["pdf_cover_file_id"])
+    if "pdf_letter_file_id" in data and data["pdf_letter_file_id"] > 0:
+        add_pdf_by_drive_id(merger, data["pdf_letter_file_id"])
     if "pdf_wi_file_id" in data and data["pdf_wi_file_id"] > 0:
         add_pdf_by_drive_id(merger, data["pdf_wi_file_id"])
     '''if "pdf_bluegen_file_id" in data and data["pdf_bluegen_file_id"] > 0:

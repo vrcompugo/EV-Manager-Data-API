@@ -1,0 +1,157 @@
+<style>
+  .page_blank_note {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    font-size: 0.7em;
+  }
+  .page_wi_compare {
+    padding: 3em;
+  }
+  .page_wi_compare .left-side {
+    flex: 1 0 45%;
+    margin-right: 1em;
+  }
+  .page_wi_compare .right-side {
+    flex: 1 1 60%;
+    margin-left: 1em;
+  }
+  .page_wi_compare .sub-left {
+    width: 150px;
+    text-align: center;
+  }
+  .page_wi_compare .sub-right {
+    flex: 1;
+  }
+</style>
+
+<div class="page_wi_compare">
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <h2>Wirtschaftlichkeitsberechnung</h2>
+      <h2 style="font-size: 1.1rem;">Monatskalkulation Zukunfsprojektion</h2>
+    </div>
+
+    <div class="right-side" style="text-align: left;">
+      <img src="{{ base_url }}static/synergy_wi/logo-synergie.jpg" style="width: 300px; height: auto;">
+    </div>
+  </div>
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <br>
+      <div class="big-number" style="padding-bottom: 1.3em;">Investition: 0 €</div>
+      <br>
+      <div class="bar-line">
+        <div class="label big-number" style="padding-left: {{ (85 / data.calculated.conventional_cost_monthly_30years) * data.calculated.conventional_cost_monthly_today }}%;"><span>{{ data.calculated.conventional_cost_monthly_today | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: {{ (85 / data.calculated.conventional_cost_monthly_30years) * data.calculated.conventional_cost_monthly_today }}%">&nbsp;</div>
+        </div>
+      </div>
+      <small>Heute</small>
+      <br>
+      <br>
+      <div class="bar-line">
+        <div class="label big-number" style="padding-left: {{ (85 / data.calculated.conventional_cost_monthly_30years) * data.calculated.conventional_cost_monthly_10years }}%;"><span>{{ data.calculated.conventional_cost_monthly_10years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: {{ (85 / data.calculated.conventional_cost_monthly_30years) * data.calculated.conventional_cost_monthly_10years }}%">&nbsp;</div>
+        </div>
+      </div>
+      <small>10 Jahre</small>
+      <br>
+      <br>
+      <div class="bar-line">
+        <div class="label big-number" style="padding-left: {{ (85 / data.calculated.conventional_cost_monthly_30years) * data.calculated.conventional_cost_monthly_20years }}%;"><span>{{ data.calculated.conventional_cost_monthly_20years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: {{ (85 / data.calculated.conventional_cost_monthly_30years) * data.calculated.conventional_cost_monthly_20years }}%">&nbsp;</div>
+        </div>
+      </div>
+      <small>20 Jahre</small>
+      <br>
+      <br>
+      <div class="bar-line">
+        <div class="label big-number" style="padding-left: 85%;"><span>{{ data.calculated.conventional_cost_monthly_30years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: 85%">&nbsp;</div>
+        </div>
+      </div>
+      <small>30 Jahre</small>
+    </div>
+    <div class="right-side">
+      <br>
+      <div class="layout horizontal">
+        <div class="sub-left big-number">
+          monatliche Ersparnis
+        </div>
+        <div class="sub-right big-number">Investition: {{ data.total_net| currencyformat("de", 0) }}</div>
+      </div>
+      <br>
+      <div class="layout horizontal">
+        <div class="sub-left big-number">{{ (data.calculated.conventional_cost_monthly_today - data.calculated.synergy_monthly_today_total) | currencyformat("de", 0) }}</div>
+        <div class="sub-right">
+          <div class="bar-line blue">
+            <div class="label big-number"><span style="transform: none;">{{ data.calculated.synergy_monthly_today_total | currencyformat }}</span></div>
+            <div class="bar">
+              <div class="bar-segment" style="width: 2%">&nbsp;</div>
+            </div>
+          </div>
+          <div style="text-align: right;"><small>Heute</small></div>
+        </div>
+      </div>
+      <br>
+      <div class="layout horizontal">
+        <div class="sub-left big-number">{{ (data.calculated.conventional_cost_monthly_10years - data.calculated.synergy_monthly_10years_total) | currencyformat("de", 0) }}</div>
+        <div class="sub-right">
+          <div class="bar-line blue">
+            <div class="label big-number"><span style="transform: none;">{{ data.calculated.synergy_monthly_10years_total | currencyformat }}</span></div>
+            <div class="bar">
+              <div class="bar-segment" style="width: 4%">&nbsp;</div>
+            </div>
+          </div>
+          <div style="text-align: right;"><small>10 Jahre</small></div>
+        </div>
+      </div>
+      <br>
+      <div class="layout horizontal">
+        <div class="sub-left big-number">{{ (data.calculated.conventional_cost_monthly_20years - data.calculated.synergy_monthly_20years_total) | currencyformat("de", 0) }}</div>
+        <div class="sub-right">
+          <div class="bar-line blue">
+            <div class="label big-number"><span style="transform: none;">{{ data.calculated.synergy_monthly_20years_total | currencyformat }}</span></div>
+            <div class="bar">
+              <div class="bar-segment" style="width: 6%">&nbsp;</div>
+            </div>
+          </div>
+          <div style="text-align: right;"><small>20 Jahre</small></div>
+        </div>
+      </div>
+      <br>
+      <div class="layout horizontal">
+        <div class="sub-left big-number">{{ (data.calculated.conventional_cost_monthly_30years - data.calculated.synergy_monthly_30years_total) | currencyformat("de", 0) }}</div>
+        <div class="sub-right">
+          <div class="bar-line blue">
+            <div class="label big-number"><span style="transform: none;">{{ data.calculated.synergy_monthly_30years_total | currencyformat }}</span></div>
+            <div class="bar">
+              <div class="bar-segment" style="width: 6%">&nbsp;</div>
+            </div>
+          </div>
+          <div style="text-align: right;"><small>30 Jahre</small></div>
+        </div>
+      </div>
+      <br>
+      {% if data.loan_calculation and data.loan_calculation.interest_rate > 0 %}
+        Finanzierungsbeispiel gerechnet über {{ data.loan_calculation.runtime_in_years }} Jahre Laufzeit mit {{ data.loan_calculation.interest_rate | percentformat("de", 2)}} effkt. Jahreszins
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="page_blank_note">
+  &nbsp;
+</div>
+
+<div class="page_logo">
+  <img src="{{ base_url }}static/synergy_wi/logo-energie360.jpg" style="width: 200px; height: auto;">
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter2.html') %}

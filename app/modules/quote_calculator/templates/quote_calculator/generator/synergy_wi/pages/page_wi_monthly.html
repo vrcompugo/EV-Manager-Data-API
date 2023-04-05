@@ -1,0 +1,183 @@
+<style>
+  .page_blank_note {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    font-size: 0.7em;
+  }
+  .page_wi_monthly {
+    padding: 3em;
+  }
+  .page_wi_monthly .left-side {
+    flex: 1 0 45%;
+    margin-right: 1em;
+  }
+  .page_wi_monthly .right-side {
+    flex: 1 1 60%;
+
+    margin-left: 1em;
+  }
+</style>
+
+<div class="page_wi_monthly">
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <h2>Wirtschaftlichkeitsberechnung</h2>
+      <h2 style="font-size: 1.1rem;">Monatskalkulation Zukunfsprojektion</h2>
+    </div>
+
+    <div class="right-side" style="text-align: left;">
+      <img src="{{ base_url }}static/synergy_wi/logo-synergie.jpg" style="width: 300px; height: auto;">
+    </div>
+  </div>
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <br>
+      <div class="big-number">Investition: 0 €</div>
+      <br>
+      <table style="font-size: 0.9em;" cellspacing="0">
+        <tr>
+          <th>Beschreibung</th>
+          <th>kWh/Jahr</th>
+          <th>monatliche Kosten</th>
+        </tr>
+        <tr>
+          <td>Lichtstrom-Jahresverbrauch</td>
+          <td>{{ data.calculated.total_light_usage | numberformat("de", 0) }}</td>
+          <td>{{ data.calculated.conventional_cost_light_monthly_today | currencyformat }}</td>
+        </tr>
+        {% if data.calculated.heater_usage > 0 %}
+          <tr>
+            <td>Wärmestrom-Jahresverbrauch</td>
+            <td>{{ data.calculated.heater_usage | numberformat("de", 0) }}</td>
+            <td>{{ data.calculated.conventional_cost_heating_monthly_today | currencyformat }}</td>
+          </tr>
+        {% endif %}
+        {% if data.calculated.car_usage > 0 %}
+          <tr>
+            <td>E-Auto-Jahresverbrauch</td>
+            <td>{{ data.calculated.car_usage | numberformat("de", 0) }}</td>
+            <td>{{ data.calculated.conventional_cost_car_monthly_today | currencyformat }}</td>
+          </tr>
+        {% endif %}
+      </table>
+      <br>
+      <small>Die hier genannten Energiekosten ergeben sich aus den von Ihnen zu zahlenden Grundgebühren
+      und ihren angegebenen Energiekosten, unter Berücksichtigung einer Preissteigerung bei
+      Strom von {{ data.calculated.power_increase_rate | percentformat("de", 2) }} sowie, wenn ausgewählt, bei Wärmekosten von {{ data.calculated.heating_increase_rate | percentformat("de", 2) }}.
+      Berücksichtigt wurde eine Inflation von {{ data.calculated.inflation_rate | percentformat("de", 2) }} jeweils pro Jahr innerhalb der kommenden
+      {{ data.calculated.runtime }} Jahre.</small>
+    </div>
+    <div class="right-side">
+      <br>
+      <div class="big-number blue">Investition: {{ data.total_net| currencyformat("de", 0) }}</div>
+      <br>
+      <table style="font-size: 0.9em;" class="blue" cellspacing="0">
+        <tr>
+          <th width="45%">Beschreibung</th>
+          <th width="22%">kWh/Jahr</th>
+          <th width="33%">monatliche Kosten</th>
+        </tr>
+        <tr>
+          <td>Jahresverbrauch</td>
+          <td>{{ data.calculated.total_usage | numberformat("de", 0) }}</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Bei Autakie {{ data.calculated.autocracy_rate | percentformat("de", 0) }}<br>aus Netzbezug</td>
+          <td>{{ data.calculated.net_usage | numberformat("de", 0) }}</td>
+          <td>{{ data.calculated.net_usage_cost_monthly | currencyformat }}</td>
+        </tr>
+        <tr>
+          <td>
+            Flexibler Synergie360 Bonus<br>
+            <small>
+              Direktvermarktungs-Mehrerlös
+              und/oder EEG Verkauf*
+            </small>
+          </td>
+          <td>{{ data.calculated.direct_usage | numberformat("de", 0) }}</td>
+          <td>
+            {{ data.calculated.synergy_bonus_monthly | currencyformat }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Überstrom-Verkauf EEG/Direkt
+          </td>
+          <td>{{ data.calculated.feeding_amount | numberformat("de", 0) }}</td>
+          <td>
+            {{ data.calculated.feeding_amount_bonus_monthly | numberformat("de", 2) }}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <br>
+      <div class="bar-line">
+        <div class="label big-number" style="padding-left: 25%;"><span>{{ data.calculated.conventional_cost_monthly_today | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: 25%">&nbsp;</div>
+        </div>
+      </div>
+      <small>Heute</small>
+      <br>
+
+      <div class="bar-line">
+        <div class="label big-number" style="padding-left: 50%;"><span>{{ data.calculated.conventional_cost_monthly_15years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: 50%">&nbsp;</div>
+        </div>
+      </div>
+      <small>15 Jahre</small>
+      <br>
+      <div class="bar-line">
+        <div class="label big-number" style="padding-left: 85%;"><span>{{ data.calculated.conventional_cost_monthly_30years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: 85%">&nbsp;</div>
+        </div>
+      </div>
+      <small>30 Jahre</small>
+    </div>
+    <div class="right-side">
+      <br>
+      <div class="bar-line blue">
+        <div class="label big-number"><span style="transform: none;">{{ data.calculated.synergy_monthly_today | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: 2%">&nbsp;</div>
+        </div>
+      </div>
+      <div style="text-align: right;"><small>Heute</small></div>
+      <div class="bar-line blue">
+        <div class="label big-number"><span style="transform: none;">{{ data.calculated.synergy_monthly_15years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: 4%">&nbsp;</div>
+        </div>
+      </div>
+      <div style="text-align: right;"><small>15 Jahre</small></div>
+      <div class="bar-line blue">
+        <div class="label big-number"><span style="transform: none;">{{ data.calculated.synergy_monthly_30years | currencyformat }}</span></div>
+        <div class="bar">
+          <div class="bar-segment" style="width: 6%">&nbsp;</div>
+        </div>
+      </div>
+      <div style="text-align: right;"><small>30 Jahre</small></div>
+
+    </div>
+  </div>
+</div>
+
+<div class="page_blank_note">
+  &nbsp;
+</div>
+
+<div class="page_logo">
+  <img src="{{ base_url }}static/synergy_wi/logo-energie360.jpg" style="width: 200px; height: auto;">
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter2.html') %}

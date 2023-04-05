@@ -770,6 +770,9 @@ def quote_calculator_cloud_pdfs_action(lead_id):
         genrate_pdf(data, generate_synergy_pdf, lead_id, "pdf_wi_file_id", "Synergie WI.pdf", subfolder_id)
         history.data = data
         db.session.commit()
+        update_lead(lead_id, {
+            "cloud_type_lead": "Synergie360"
+        })
         return {"status": "success", "data": history.data}
 
     lead_link = find_association("Lead", remote_id=lead_id)
@@ -859,6 +862,9 @@ def quote_calculator_cloud_pdfs_action(lead_id):
             })
     history.data = history_data
     db.session.commit()
+    update_lead(lead_id, {
+        "cloud_type_lead": ""
+    })
     return {"status": "success", "data": history.data}
 
 
@@ -1046,9 +1052,11 @@ def quote_calculator_summary_pdf_action(lead_id):
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
     subfolder_id = create_folder_path(parent_folder_id=442678, path=f"Vorgang {lead['unique_identifier']}/Angebote/Version {history.id}")
-
-    genrate_pdf(data, generate_cover_pdf, lead_id, "pdf_cover_file_id", "Deckblatt.pdf", subfolder_id)
-    genrate_pdf(data, generate_letter_pdf, lead_id, "pdf_letter_file_id", "Anschreiben.pdf", subfolder_id)
+    data["pdf_cover_file_id"] = 0
+    data["pdf_letter_file_id"] = 0
+    if data["data"].get("cloud_quote_type") not in ["synergy"]:
+        genrate_pdf(data, generate_cover_pdf, lead_id, "pdf_cover_file_id", "Deckblatt.pdf", subfolder_id)
+        genrate_pdf(data, generate_letter_pdf, lead_id, "pdf_letter_file_id", "Anschreiben.pdf", subfolder_id)
     genrate_pdf(data, generate_summary_pdf, lead_id, "pdf_summary_file_id", "Energiemappe.pdf", subfolder_id)
     data["pdf_summary_link"] = get_public_link(data["pdf_summary_file_id"])
     if "has_heating_quote" in data["data"] and data["data"]["has_heating_quote"]:
@@ -1202,7 +1210,7 @@ def quote_calculator_contract_summary_pdf4(lead_id):
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
 
-    pdf = generate_synergy_pdf(lead_id, data)
+    pdf = generate_synergy_pdf(lead_id, data, [12])
 
     return Response(pdf,
         status=200,

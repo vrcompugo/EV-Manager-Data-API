@@ -1,0 +1,163 @@
+<style>
+  .page_blank_note {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    font-size: 0.7em;
+  }
+  .page_graph {
+    padding: 3em;
+    min-height: 400px;
+  }
+  .page_graph .graph {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+  }
+  .page_graph .graph .text {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.05em;
+    padding-top: 3.2em;
+    font-weight: bold;
+    white-space: nowrap;
+    width: 100px;
+    height: 327px;
+    text-align: right;
+
+  }
+  .page_graph .graph span {
+    flex: 1 1;
+  }
+  .page_graph .graph svg {
+    position: absolute;
+    width: 300px;
+    left: 180px;
+    top: 20px;
+  }
+  .page_graph .left-side {
+    flex: 1 0 45%;
+    margin-right: 1em;
+  }
+  .page_graph .right-side {
+    flex: 1 1 60%;
+    margin-left: 1em;
+  }
+</style>
+
+<div class="page_graph">
+
+  <div class="layout horizontal">
+    <div class="left-side">
+      <h2>Wirtschaftlichkeitsberechnung</h2>
+      <h2 style="font-size: 1.1rem;">Monatskalkulation Zukunfsprojektion</h2>
+    </div>
+
+    <div class="right-side" style="text-align: right;">
+      <img src="{{ base_url }}static/synergy_wi/logo-synergie.jpg" style="width: 300px; height: auto;">
+    </div>
+  </div>
+  <div class="graph">
+    <br>
+    <br>
+    <div class="graph">
+      <svg viewBox="0 0 100 120">
+        <polyline
+          fill="none"
+          stroke="#2991CF"
+          stroke-width="1"
+          points="
+            3,{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}
+            51,{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}
+            98,{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}"/>
+        <circle cx="3" cy="{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}" r="2" fill="#2991CF" />
+        <circle cx="51" cy="{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}" r="2" fill="#2991CF" />
+        <circle cx="98" cy="{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}" r="2" fill="#2991CF" />
+        <polyline
+          fill="none"
+          stroke="#A1CB43"
+          stroke-width="1"
+          points="
+            3,{{ (1 - data.calculated.graph_data.version1_total_cost_percent) * 98 + 16 }}
+            51,{{ (1 - data.calculated.graph_data.version2_total_cost_percent) * 98 + 16 }}
+            98,{{ (1 - data.calculated.graph_data.synergy_total_cost_percent) * 98 + 16 }}"/>
+        <circle cx="3" cy="{{ (1 - data.calculated.graph_data.version1_total_cost_percent) * 98 + 16 }}" r="2" fill="#A1CB43" />
+        <circle cx="51" cy="{{ (1 - data.calculated.graph_data.version2_total_cost_percent) * 98 + 16 }}" r="2" fill="#A1CB43" />
+        <circle cx="98" cy="{{ (1 - data.calculated.graph_data.synergy_total_cost_percent) * 98 + 16 }}" r="2" fill="#A1CB43" />
+        <polyline
+          fill="none"
+          stroke="#A1CB43"
+          stroke-width="1"
+          points="
+            3,{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}
+            3,{{ (1 - data.calculated.graph_data.version1_total_cost_percent) * 98 + 16 }}"
+          stroke-dasharray="1"/>
+        <polyline
+          fill="none"
+          stroke="#A1CB43"
+          stroke-width="1"
+          points="
+            51,{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}
+            51,{{ (1 - data.calculated.graph_data.version2_total_cost_percent) * 98 + 16 }}"
+          stroke-dasharray="1"/>
+        <polyline
+          fill="none"
+          stroke="#A1CB43"
+          stroke-width="1"
+          points="
+            98,{{ (1 - data.calculated.graph_data.conventional_cost_percent) * 98 + 16 }}
+            98,{{ (1 - data.calculated.graph_data.synergy_total_cost_percent) * 98 + 16 }}"
+          stroke-dasharray="1"/>
+        <polyline
+          fill="none"
+          stroke="#fff"
+          stroke-width="1"
+          points="
+            3,{{ (1 - data.calculated.graph_data.version1_investment_percent) * 98 + 16 }}
+            51,{{ (1 - data.calculated.graph_data.version2_investment_percent) * 98 + 16 }}
+            98,{{ (1 - data.calculated.graph_data.synergy_investment_percent) * 98 + 16 }}"/>
+        <circle cx="3" cy="{{ (1 - data.calculated.graph_data.version1_investment_percent) * 98 + 16 }}" r="2" fill="#fff" />
+        <circle cx="51" cy="{{ (1 - data.calculated.graph_data.version2_investment_percent) * 98 + 16 }}" r="2" fill="#fff" />
+        <circle cx="98" cy="{{ (1 - data.calculated.graph_data.synergy_investment_percent) * 98 + 16 }}" r="2" fill="#fff" />
+      </svg>
+      <div class="text">
+        {% for i in range(data.calculated.graph_data.max, 0, -20000) %}
+          <span>{{ i | currencyformat("de", 0)}}</span>
+        {% endfor %}
+        <span>0 €</span>
+      </div>
+    </div>
+    <img src="{{ base_url }}static/synergy_wi/graph.jpg" style="width: 92vw; height: auto;">
+  </div>
+
+  <div style="position: absolute; padding: 0.5em;">
+    <div style="display: grid; grid-template-columns: 200px 200px; white-space: nowrap;">
+      <div>
+        <div style="display: inline-block; background-color: #fff; width: calc(2em + 2px); height: 3px; border: 1px solid #666; vertical-align: middle;"></div>
+        Investition
+      </div>
+      <div>
+        <div style="display: inline-block; width: 2em; height: 0; border: 2px solid #A1CB43; vertical-align: middle;"></div>
+        Synergie360 Gesamtkosten über 30 Jahre</div>
+      <div>
+        <div style="display: inline-block; width: 2em; height: 0; border: 2px dashed #A1CB43; vertical-align: middle;"></div>
+        Ersparnis über 30 Jahre
+      </div>
+      <div>
+        <div style="display: inline-block; width: 2em; height: 0; border: 2px solid #2991CF; vertical-align: middle;"></div>
+        Konventionelle Stromkosten über 30 Jahre
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page_blank_note">
+  &nbsp;
+</div>
+
+<div class="page_logo">
+  <img src="{{ base_url }}static/synergy_wi/logo-energie360.jpg" style="width: 200px; height: auto;">
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter2.html') %}

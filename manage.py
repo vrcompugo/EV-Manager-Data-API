@@ -78,9 +78,9 @@ def rerun_auto_assign_lead_to_user():
 
 
 @manager.command
-def get_test_lead():
-    from app.modules.external.bitrix24.lead import get_lead
-    print(json.dumps(get_lead(30162), indent=2))
+def get_test_deal():
+    from app.modules.external.bitrix24.deal import get_deal
+    print(json.dumps(get_deal(144847)["UF_CRM_1572966728920"], indent=2))
 
 
 @manager.command

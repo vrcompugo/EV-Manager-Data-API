@@ -74,6 +74,9 @@ def calculate_commission_data(quote_data, data, quote_key=""):
                 if data["data"][f"{quote_key}_discount_percent"] > 15:
                     data["data"][f"{quote_key}_discount_percent"] = 15
                     data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
+                if data["data"]["cloud_quote_type"] == 'synergy' and data["data"][f"{quote_key}_discount_percent"] > 8:
+                    data["data"][f"{quote_key}_discount_percent"] = 8
+                    data["data"][f"{quote_key}_discount_euro"] = round(quote_data["subtotal_net"] * (data["data"][f"{quote_key}_discount_percent"] / 100), 2)
             elif quote_key == "bluegen_quote":
                 if data["data"][f"{quote_key}_discount_percent"] > 4:
                     data["data"][f"{quote_key}_discount_percent"] = 4

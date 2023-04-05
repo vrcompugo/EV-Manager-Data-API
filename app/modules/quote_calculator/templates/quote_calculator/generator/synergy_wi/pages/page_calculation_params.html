@@ -1,0 +1,79 @@
+<style>
+  .page_calculation_params .left-side {
+    flex: 1 0 45%;
+    background-image: url("{{ base_url }}static/synergy_wi/house.jpg");
+    background-size: cover;
+    margin: 3em;
+    margin-right: 0;
+  }
+  .page_calculation_params .right-side {
+    flex: 1 1 60%;
+    margin: 3em;
+    margin-left: 2em;
+  }
+</style>
+
+<div class="page_calculation_params layout horizontal" style="height: 100vh">
+  <div class="left-side">&nbsp;</div>
+  <div class="right-side">
+    <h2>Berechnungsparameter<br>im Überblick</h2>
+    <h3>Anlage und Haus</h3>
+    <br>
+    <br>
+    <table class="shadow" cellspacing="0">
+      <tr>
+        <th>Immobilienart</th>
+        <td>
+          Ein- bis Zweifamilienhaus
+          H0D - Privathaushalt
+        </td>
+      </tr>
+      <tr>
+        <th>Stromverbrauch</th>
+        <td>{{ data.calculated.total_usage | numberformat("de", 0) }} kWh pro Jahr</td>
+      </tr>
+      <tr>
+        <th>Größe der PV-Anlage</th>
+        <td>{{ data.calculated.pv_kwp | numberformat("de", 2) }} kwp</td>
+      </tr>
+      <tr>
+        <th>Empfohlene Mindestgröße</th>
+        <td>{{ data.calculated.min_kwp | numberformat("de", 0) }} kWp</td>
+      </tr>
+      <tr>
+        <th>Ertrag der PV-Anlage</th>
+        <td>{{ data.calculated.pv_efficiancy | numberformat("de", 0) }} kWh je kWp pro Jahr</td>
+      </tr>
+      <tr>
+        <th>Degradation der PV-Anlage</th>
+        <td>0,15 %</td>
+      </tr>
+      <tr>
+        <th>Speichersystem</th>
+        <td>Senec Lithium {{ data.calculated.storage_size | numberformat("de", 1) }} kWh</td>
+      </tr>
+      <tr>
+        <th>Empfohlenes Speichersystem</th>
+        <td>Senec Lithium {{ data.calculated.min_storage_size | numberformat("de", 1) }} kWh</td>
+      </tr>
+      <tr>
+        <th>Ausrichtung der PV-Anlage</th>
+        <td>{{ data.calculated.orientation_label }}</td>
+      </tr>
+      <tr>
+        <th>Verwendeter Autarkiegrad</th>
+        <td>{{ data.calculated.autocracy_rate | percentformat("de", 0) }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="page_blank_note">
+  &nbsp;
+</div>
+
+<div class="page_logo">
+  <img src="{{ base_url }}static/synergy_wi/logo-energie360.jpg" style="width: 200px; height: auto;">
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter2.html') %}

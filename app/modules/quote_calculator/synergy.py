@@ -14,7 +14,7 @@ def calculate_synergy_wi(data):
     if data.get("pv_kwp", 0) in [None, "", 0]:
         return data
     calculated = {
-        "runtime": 25,
+        "runtime": 30,
         "storage_size": 0,
         "pv_kwp": 0,
         "cloud_price": 0,
@@ -22,6 +22,7 @@ def calculate_synergy_wi(data):
         "power_usage": 0,
         "power_extra_usage": 0,
         "heater_usage": 0,
+        "car_usage": 0,
         "consumer_usage": 0,
         "total_light_usage": 0,
         "total_usage": 0,
@@ -31,18 +32,32 @@ def calculate_synergy_wi(data):
         "conventional_price_consumer": 0,
         "conventional_power_cost_per_kwh": 0.39,
         "conventional_heating_cost_per_kwh": 0.29,
+        "conventional_car_cost_per_kwh": 0.39,
         "pv_efficiancy": 0,
         "autocracy_rate": 71,
-        "direct_market_cashback": 0.12,
-        "direct_usage_cashback": 0.1 / 12,
-        "eeg_cashback": 0.08,
+        "max_autocracy_rate": 89.75,
+        "direct_market_cashback": 0.1,
+        "synergy_bonus_factor": 0.1 / 12,
+        "autocracy_missing_kwp_nerf": 1.7,
+        "synergy_first_missing_storage_stack_autocracy_nerf": 12,
+        "synergy_first_missing_storage_stack_cash_nerf": 22,
+        "synergy_missing_storage_stack_autocracy_nerf": 7,
+        "synergy_missing_storage_stack_cash_nerf": 20,
+        "synergy_extra_storage_stack_autocracy_bonus": 7,
+        "synergy_extra_storage_stack_cash_bonus": 39,
+        "synergy_extra_additional_storage_stack_autocracy_bonus": 1.5,
+        "synergy_extra_additional_storage_stack_cash_bonus": 29,
+        "synergy_car_bonus": 30,
+        "synergy_hard_max_bonus": 99,
+        "eeg_cashback": 0.1,
         "total_cost_runtime": 0,
         "total_cost_runtime_conventional": 0,
-        "power_increase_rate": 3.75,
-        "heating_increase_rate": 4.00,
+        "power_increase_rate": 3.9,
+        "heating_increase_rate": 3.9,
+        "car_increase_rate": 3.9,
         "inflation_rate": 1.00,
         "total_price_increase_rate": 0,
-        "financing_rate": 3.99,
+        "financing_rate": 4.89,
         "conventional_cost_light_monthly_today": 0,
         "conventional_cost_light_monthly_10years": 0,
         "conventional_cost_light_monthly_20years": 0,
@@ -63,13 +78,23 @@ def calculate_synergy_wi(data):
         "synergy_monthly_today": 0,
         "synergy_monthly_10years": 0,
         "synergy_monthly_20years": 0,
-        "lightcloud_extra_price_per_kwh": 0.39,
-        "heatcloud_extra_price_per_kwh": 0.29,
-        "maintainance_rate": 0.065,
+        "lightcloud_extra_price_per_kwh": 0.24,
+        "heatcloud_extra_price_per_kwh": 0.28,
+        "car_extra_price_per_kwh": 0.24,
+        "maintainance_rate": 0.0605,
         "min_kwp": 0,
         "min_kwp_light": 0,
         "extra_stacks": 0,
         "extra_synergy_bonus": 0,
+        "kwp_factor": 1.69,
+        "kwp_heating_factor": 1.216,
+        "kwp_car_factor": 1.186,
+        "version1_investment_cost_per_kwp": 1390,
+        "version2_investment_cost_storage": 10000,
+        "version1_energy_factor": 0.75,
+        "version2_energy_factor": 0.55,
+        "version1_2_heating_decrase": 0.4,
+        "version1_2_car_decrase": 0.4,
 
         "pricing_options": [],
         "cashback_price_per_kwh": 0,
@@ -114,43 +139,47 @@ def calculate_synergy_wi(data):
     pv_efficiancy_values = {
         "south": 912,
         "west_east": 867,
-        "south_west_east": 700,
-        "north_west_east": 680,
+        "south_west_east": 874,
+        "north_west_east": 788,
         "north": 603
     }
-    for field in ["pv_kwp", "autocracy_rate", "power_usage", "power_extra_usage", "heater_usage", "consumer_usage"]:
+    for field in [
+        "pv_kwp", "autocracy_rate", "power_usage", "power_extra_usage", "heater_usage", "car_usage", "consumer_usage", "car_count",
+        "power_increase_rate", "heating_increase_rate", "car_increase_rate", "inflation_rate", "financing_rate",
+        ]:
         if data.get(field) not in [None, "", 0]:
             calculated[field] = float(data.get(field))
     calculated["power_usage"] = calculated["power_usage"] + calculated["power_extra_usage"]
     calculated["power_extra_usage"] = 0
     calculated["total_usage"] = 0
-    for field in ["power_usage", "power_extra_usage", "heater_usage", "consumer_usage"]:
+    for field in ["power_usage", "power_extra_usage", "heater_usage","car_usage", "consumer_usage"]:
         if data.get(field) not in [None, "", 0]:
             calculated["total_usage"] = calculated["total_usage"] + calculated[field]
-    calculated["total_light_usage"] = calculated["total_usage"] - calculated["heater_usage"]
-    calculated["min_kwp"] = calculated["total_usage"] * 1.5 / 1000
+    calculated["total_light_usage"] = calculated["total_usage"] - calculated["heater_usage"] - calculated["car_usage"]
+    calculated["min_kwp"] = calculated["total_usage"] * calculated["kwp_factor"] / 1000
     if calculated["heater_usage"] > 0:
-        calculated["min_kwp"] = calculated["total_usage"] * 1.825 / 1000
+        calculated["min_kwp"] = calculated["min_kwp"] * calculated["kwp_heating_factor"]
+    if calculated["car_usage"] > 0:
+        calculated["min_kwp"] = calculated["min_kwp"] * calculated["kwp_car_factor"]
     calculated["min_kwp_light"] = calculated["min_kwp"]
     if calculated["min_kwp"] < calculated["pv_kwp"]:
         calculated["max_kwp"] = calculated["min_kwp"]
         calculated["kwp_extra"] = calculated["pv_kwp"] - calculated["max_kwp"]
-        if calculated["kwp_extra"] > 1:
-            percent_kwp = calculated["min_kwp"] / calculated["pv_kwp"]
-            calculated["autocracy_rate"] = math.floor(calculated["autocracy_rate"] + (100 - calculated["autocracy_rate"]) * percent_kwp * 0.06)
-            if calculated["autocracy_rate"] > 100:
-                calculated["autocracy_rate"] = 100
+        percent_kwp = calculated["min_kwp"] / calculated["pv_kwp"]
+        calculated["autocracy_rate"] = math.floor(calculated["autocracy_rate"] + (100 - calculated["autocracy_rate"]) * percent_kwp * 0.06)
     else:
         calculated["max_kwp"] = calculated["pv_kwp"]
         calculated["kwp_extra"] = calculated["max_kwp"] - calculated["min_kwp"]
-        percent_kwp = calculated["pv_kwp"] / calculated["min_kwp"]
-        calculated["autocracy_rate"] = math.floor(calculated["autocracy_rate"] * (1.25*percent_kwp**3 - 3.3*percent_kwp**2 + 3.05*percent_kwp))
-
+        #percent_kwp = calculated["pv_kwp"] / calculated["min_kwp"]
+        #calculated["autocracy_rate"] = math.floor(calculated["autocracy_rate"] * (1.25*percent_kwp**3 - 3.3*percent_kwp**2 + 3.05*percent_kwp))
+        calculated["autocracy_rate"] = calculated["autocracy_rate"] + calculated["autocracy_missing_kwp_nerf"] * calculated["kwp_extra"]
     size = 0
     if calculated["power_usage"] not in [None, "", 0, "0"]:
         size = size + math.ceil(calculated["power_usage"] / 4200) * 4.2
     if calculated["heater_usage"] not in [None, "", 0, "0"]:
         size = size + math.ceil(calculated["heater_usage"] / 9000) * 4.2
+    if calculated["car_usage"] not in [None, "", 0, "0"]:
+        size = size + math.ceil(calculated["car_usage"] / 4200) * 4.2
     size = 0
     if 0 < calculated["total_usage"] <= 8000:
         size = 8.4
@@ -168,17 +197,19 @@ def calculate_synergy_wi(data):
     calculated["storage_size"] = size
     if data.get("overwrite_storage_size") not in [None, 0, ""]:
         calculated["storage_size"] = float(data.get("overwrite_storage_size"))
+    calculated["extra_stacks"] = math.floor((calculated["storage_size"] - calculated["min_storage_size"]) / 4.2)
+
     if calculated["storage_size"] > calculated["min_storage_size"]:
-        calculated["extra_stacks"] = math.floor((calculated["storage_size"] - calculated["min_storage_size"]) / 4.2)
-        calculated["autocracy_rate"] = calculated["autocracy_rate"] + 7
-        calculated["extra_synergy_bonus"] = calculated["extra_synergy_bonus"] + 35
-        if calculated["extra_stacks"] > 1:
-            calculated["autocracy_rate"] = calculated["autocracy_rate"] + (calculated["extra_stacks"] - 1) * 1.5
-            calculated["extra_synergy_bonus"] = calculated["extra_synergy_bonus"] + (calculated["extra_stacks"] - 1) * 35
-    if calculated["autocracy_rate"] > 100:
-        calculated["autocracy_rate"] = 100
+        calculated["autocracy_rate"] = calculated["autocracy_rate"] + calculated["synergy_extra_storage_stack_autocracy_bonus"] + (calculated["extra_stacks"] - 1) * calculated["synergy_extra_additional_storage_stack_autocracy_bonus"]
+        calculated["extra_synergy_bonus"] = calculated["extra_synergy_bonus"] - (calculated["synergy_extra_storage_stack_cash_bonus"] + (calculated["extra_stacks"] - 1) * calculated["synergy_extra_additional_storage_stack_cash_bonus"])
+    if calculated["storage_size"] < calculated["min_storage_size"]:
+        calculated["autocracy_rate"] = calculated["autocracy_rate"] - calculated["synergy_first_missing_storage_stack_autocracy_nerf"] - (-calculated["extra_stacks"] - 1) * calculated["synergy_missing_storage_stack_autocracy_nerf"]
+        calculated["extra_synergy_bonus"] = calculated["extra_synergy_bonus"] - (calculated["synergy_first_missing_storage_stack_cash_nerf"] + (calculated["extra_stacks"] - 1) * calculated["synergy_missing_storage_stack_cash_nerf"])
+    if calculated["autocracy_rate"] > calculated["max_autocracy_rate"]:
+        calculated["autocracy_rate"] = calculated["max_autocracy_rate"]
     calculated["power_total_increase_rate"] = calculated["inflation_rate"] + calculated["power_increase_rate"]
     calculated["heating_total_increase_rate"] = calculated["inflation_rate"] + calculated["heating_increase_rate"]
+    calculated["car_total_increase_rate"] = calculated["inflation_rate"] + calculated["car_increase_rate"]
     if "roofs" in data:
         orientation_labels = []
         pv_efficiancy = 0
@@ -200,82 +231,121 @@ def calculate_synergy_wi(data):
         calculated["pv_efficiancy"] = pv_efficiancy
     calculated["pv_production"] = calculated["pv_kwp"] * calculated["pv_efficiancy"]
     calculated["direct_usage"] = calculated["total_usage"] * (calculated["autocracy_rate"] / 100)
-    calculated["synergy_bonus_monthly"] = calculated["direct_usage"] * calculated["direct_usage_cashback"]
-    if calculated["synergy_bonus_monthly"] < 12:
-        calculated["synergy_bonus_monthly"] = 12
-    if calculated["synergy_bonus_monthly"] > 55:
-        calculated["synergy_bonus_monthly"] = 55
+    calculated["synergy_bonus_monthly"] = -1 * calculated["direct_usage"] * calculated["synergy_bonus_factor"]
+    if calculated["synergy_bonus_monthly"] > -12:
+        calculated["synergy_bonus_monthly"] = -12
     calculated["synergy_bonus_monthly"] = calculated["synergy_bonus_monthly"] + calculated["extra_synergy_bonus"]
+    if calculated["synergy_bonus_monthly"] < -calculated["synergy_hard_max_bonus"]:
+        calculated["synergy_bonus_monthly"] = -calculated["synergy_hard_max_bonus"]
+    if calculated["car_usage"] not in [None, "", 0, "0"] and calculated["car_count"] not in [None, "", 0, "0"]:
+        calculated["synergy_bonus_monthly"] = calculated["synergy_bonus_monthly"] - (calculated["car_count"] * calculated["synergy_car_bonus"])
     calculated["synergy_bonus"] = calculated["synergy_bonus_monthly"] * 12
     calculated["net_usage"] = calculated["total_usage"] - calculated["direct_usage"]
     calculated["net_usage_cost"] = calculated["net_usage"] * calculated["lightcloud_extra_price_per_kwh"]
     calculated["net_usage_cost_monthly"] = calculated["net_usage_cost"] / 12
     calculated["feeding_amount"] = calculated["pv_production"] - calculated["direct_usage"]
-    calculated["feeding_amount_bonus"] = calculated["feeding_amount"] * calculated["eeg_cashback"]
+    calculated["feeding_amount_bonus"] = -1 * calculated["feeding_amount"] * calculated["eeg_cashback"]
     calculated["feeding_amount_bonus_monthly"] = calculated["feeding_amount_bonus"] / 12
-    calculated["synergy_monthly_today"] = calculated["net_usage_cost_monthly"] - calculated["synergy_bonus_monthly"] - calculated["feeding_amount_bonus_monthly"]
-    calculated["synergy_monthly_10years"] = calculated["net_usage_cost_monthly"] * (1 + calculated["power_total_increase_rate"] / 100) ** 10 - calculated["synergy_bonus_monthly"] - calculated["feeding_amount_bonus_monthly"]
-    calculated["synergy_monthly_20years"] = calculated["net_usage_cost_monthly"] * (1 + calculated["power_total_increase_rate"] / 100) ** 20 - calculated["synergy_bonus_monthly"] - calculated["feeding_amount_bonus_monthly"]
+    calculated["synergy_monthly_today"] = calculated["net_usage_cost_monthly"] + calculated["synergy_bonus_monthly"] + calculated["feeding_amount_bonus_monthly"]
     calculated["conventional_cost_light_monthly_today"] = (calculated["total_light_usage"] * calculated["conventional_power_cost_per_kwh"]) / 12
     calculated["conventional_cost_heating_monthly_today"] = (calculated["heater_usage"] * calculated["conventional_heating_cost_per_kwh"]) / 12
-    calculated["conventional_cost_monthly_today"] = calculated["conventional_cost_light_monthly_today"] + calculated["conventional_cost_heating_monthly_today"]
-    calculated["conventional_cost_light_monthly_10years"] = calculated["conventional_cost_light_monthly_today"] * (1 + calculated["power_total_increase_rate"] / 100) ** 10
-    calculated["conventional_cost_heating_monthly_10years"] = calculated["conventional_cost_heating_monthly_today"] * (1 + calculated["heating_total_increase_rate"] / 100) ** 10
-    calculated["conventional_cost_monthly_10years"] = calculated["conventional_cost_light_monthly_10years"] + calculated["conventional_cost_heating_monthly_10years"]
-    calculated["conventional_cost_light_monthly_20years"] = calculated["conventional_cost_light_monthly_today"] * (1 + calculated["power_total_increase_rate"] / 100) ** 20
-    calculated["conventional_cost_heating_monthly_20years"] = calculated["conventional_cost_heating_monthly_today"] * (1 + calculated["heating_total_increase_rate"] / 100) ** 20
-    calculated["conventional_cost_monthly_20years"] = calculated["conventional_cost_light_monthly_20years"] + calculated["conventional_cost_heating_monthly_20years"]
+    calculated["conventional_cost_car_monthly_today"] = (calculated["car_usage"] * calculated["conventional_car_cost_per_kwh"]) / 12
+    calculated["conventional_cost_monthly_today"] = calculated["conventional_cost_light_monthly_today"] + calculated["conventional_cost_heating_monthly_today"] + calculated["conventional_cost_car_monthly_today"]
+    for i in range(10, 35, 5):
+        calculated[f"synergy_monthly_{i}years"] = calculated["net_usage_cost_monthly"] * (1 + calculated["power_increase_rate"] / 100) ** i + calculated["synergy_bonus_monthly"] + calculated["feeding_amount_bonus_monthly"]
+        calculated[f"conventional_cost_light_monthly_{i}years"] = calculated["conventional_cost_light_monthly_today"] * (1 + calculated["power_total_increase_rate"] / 100) ** i
+        calculated[f"conventional_cost_heating_monthly_{i}years"] = calculated["conventional_cost_heating_monthly_today"] * (1 + calculated["heating_total_increase_rate"] / 100) ** i
+        calculated[f"conventional_cost_car_monthly_{i}years"] = calculated["conventional_cost_car_monthly_today"] * (1 + calculated["car_total_increase_rate"] / 100) ** i
+        calculated[f"conventional_cost_monthly_{i}years"] = calculated[f"conventional_cost_light_monthly_{i}years"] + calculated[f"conventional_cost_heating_monthly_{i}years"] + calculated[f"conventional_cost_car_monthly_{i}years"]
     calculated["conventional_cost_light_total"] = 0
     calculated["conventional_cost_heating_total"] = 0
+    calculated["conventional_cost_car_total"] = 0
     calculated["conventional_cost_total"] = 0
     calculated["synergy_total"] = 0
-    for i in range(calculated["runtime"]):
+    for i in range(1, calculated["runtime"] + 1):
+        calculated["synergy_total"] = calculated["synergy_total"] + (calculated["net_usage_cost_monthly"] * (1 + calculated["power_increase_rate"] / 100) ** i + calculated["synergy_bonus_monthly"] + calculated["feeding_amount_bonus_monthly"]) * 12
         calculated["conventional_cost_light_total"] = calculated["conventional_cost_light_total"] + (calculated["conventional_cost_light_monthly_today"] * (1 + calculated["power_total_increase_rate"] / 100) ** i) * 12
-        calculated["conventional_cost_heating_total"] = calculated["conventional_cost_heating_total"] + (calculated["conventional_cost_heating_monthly_today"] * (1 + calculated["power_total_increase_rate"] / 100) ** i) * 12
-        calculated["conventional_cost_total"] = calculated["conventional_cost_total"] + calculated["conventional_cost_light_total"] + calculated["conventional_cost_heating_total"]
-        calculated["synergy_total"] = calculated["synergy_total"] + (calculated["net_usage_cost_monthly"] * (1 + calculated["power_total_increase_rate"] / 100) ** i - calculated["synergy_bonus_monthly"] - calculated["feeding_amount_bonus_monthly"]) * 12
-    calculated["conventional_cost_monthly_avarage"] = (calculated["conventional_cost_monthly_today"] + calculated["conventional_cost_monthly_10years"] + calculated["conventional_cost_monthly_20years"]) / 3
+        calculated["conventional_cost_heating_total"] = calculated["conventional_cost_heating_total"] + (calculated["conventional_cost_heating_monthly_today"] * (1 + calculated["heating_total_increase_rate"] / 100) ** i) * 12
+        calculated["conventional_cost_car_total"] = calculated["conventional_cost_car_total"] + (calculated["conventional_cost_car_monthly_today"] * (1 + calculated["car_total_increase_rate"] / 100) ** i) * 12
+        calculated["conventional_cost_total"] = calculated["conventional_cost_light_total"] + calculated["conventional_cost_heating_total"] + calculated["conventional_cost_car_total"]
+        if i in [10, 15, 20, 25, 30]:
+            calculated[f"synergy_total_{i}years"] = calculated["synergy_total"]
+            calculated[f"conventional_cost_total_{i}years"] = calculated["conventional_cost_total"]
+            calculated[f"conventional_cost_monthly_avarage_{i}years"] = calculated["conventional_cost_total"] / i / 12
+    calculated["version1"] = {
+        "investment_cost": calculated["pv_kwp"] * calculated["version1_investment_cost_per_kwp"],
+    }
+    calculated["version2"] = {
+        "investment_cost": calculated["pv_kwp"] * calculated["version1_investment_cost_per_kwp"] + calculated["version2_investment_cost_storage"],
+    }
+    if i in [10, 15, 20, 25, 30]:
+        calculated["version1"][f"energy_cost_{i}years"] = calculated[f"conventional_cost_total_{i}years"] * calculated["version1_energy_factor"]
+        calculated["version1"][f"total_cost_{i}years"] = calculated["version1"][f"energy_cost_{i}years"] + calculated["version1"]["investment_cost"]
+        calculated["version1"][f"savings_{i}years"] = calculated[f"conventional_cost_total_{i}years"] - calculated["version1"][f"total_cost_{i}years"]
+        calculated["version2"][f"energy_cost_{i}years"] = calculated[f"conventional_cost_total_{i}years"] * calculated["version2_energy_factor"]
+        calculated["version2"][f"total_cost_{i}years"] = calculated["version2"][f"energy_cost_{i}years"] + calculated["version2"]["investment_cost"]
+        calculated["version2"][f"savings_{i}years"] = calculated[f"conventional_cost_total_{i}years"] - calculated["version2"][f"total_cost_{i}years"]
+
     return calculated
+
 
 def calculate_synergy_wi2(return_data):
     calculated = return_data["calculated"]
-    calculated["maintainance_cost_yearly"] = (return_data["total_net"] * calculated["maintainance_rate"]) / calculated["runtime"]
-    calculated["maintainance_cost_total"] = calculated["maintainance_cost_yearly"] * calculated["runtime"]
-    total_pv_cost = calculated["maintainance_cost_total"]
+    calculated["maintainance_cost_total"] = return_data["total_net"] * calculated["maintainance_rate"]
+    calculated["maintainance_cost_monthly"] = calculated["maintainance_cost_total"] / 10 / 12
+    calculated["invenstment_cost_total"] = return_data["total_net"]
+    calculated["invenstment_cost_monthly"] = return_data["total_net"] / 20 / 12
     if "loan_calculation" in return_data:
-        total_pv_cost = total_pv_cost + return_data["loan_calculation"]["interest_cost"]
-    total_pv_cost = total_pv_cost + return_data["total_net"]
-    calculated["total_pv_cost_monthly"] = total_pv_cost / (calculated["runtime"] * 12)
+        calculated["invenstment_cost_total"] = return_data["loan_calculation"]["total_cost"]
+        calculated["invenstment_cost_monthly"] = return_data["loan_calculation"]["monthly_payment"]
 
-    calculated["synergy_monthly_today_total"] = calculated["synergy_monthly_today"] + calculated["total_pv_cost_monthly"]
-    calculated["synergy_monthly_10years_total"] = calculated["synergy_monthly_10years"] + calculated["total_pv_cost_monthly"]
-    calculated["synergy_monthly_20years_total"] = calculated["synergy_monthly_20years"] + calculated["total_pv_cost_monthly"]
-    calculated["synergy_monthly_avarage"] = (calculated["synergy_monthly_today_total"] + calculated["synergy_monthly_10years_total"] + calculated["synergy_monthly_20years_total"]) / 3
+    calculated["synergy_monthly_today_total"] = calculated["synergy_monthly_today"] + calculated["invenstment_cost_monthly"]
+    for i in range(10, 35, 5):
+        if i <= 20:
+            calculated[f"synergy_monthly_{i}years_total"] = calculated[f"synergy_monthly_{i}years"] + calculated["invenstment_cost_monthly"]
+            calculated[f"synergy_total_investment_cost_{i}years"] = calculated[f"synergy_total_{i}years"] + i * 12 * calculated["invenstment_cost_monthly"]
+        else:
+            calculated[f"synergy_monthly_{i}years_total"] = calculated[f"synergy_monthly_{i}years"] + calculated["maintainance_cost_monthly"]
+            calculated[f"synergy_total_investment_cost_{i}years"] = calculated[f"synergy_total_{i}years"] + calculated["invenstment_cost_total"] + (i - 20) * 12 * calculated["maintainance_cost_monthly"]
+        calculated[f"synergy_monthly_avarage_{i}years"] = calculated[f"synergy_total_investment_cost_{i}years"] / i / 12
+        calculated[f"synergy_total_savings_{i}years"] = calculated[f"conventional_cost_total_{i}years"] - calculated[f"synergy_total_investment_cost_{i}years"]
+
+    calculated["graph_data"] = {
+        "max": math.ceil(calculated["conventional_cost_total_30years"] / 20000) * 20000,
+    }
+    calculated["graph_data"]["conventional_cost_percent"] = calculated["conventional_cost_total_30years"] / calculated["graph_data"]["max"]
+    calculated["graph_data"]["synergy_investment_percent"] = calculated["invenstment_cost_total"] / calculated["graph_data"]["max"]
+    calculated["graph_data"]["synergy_total_cost_percent"] = calculated["synergy_total_investment_cost_30years"] / calculated["graph_data"]["max"]
+    calculated["graph_data"]["version2_investment_percent"] = calculated["version2"]["investment_cost"] / calculated["graph_data"]["max"]
+    calculated["graph_data"]["version2_total_cost_percent"] = calculated["version2"]["total_cost_30years"]  / calculated["graph_data"]["max"]
+    calculated["graph_data"]["version1_investment_percent"] = calculated["version1"]["investment_cost"] / calculated["graph_data"]["max"]
+    calculated["graph_data"]["version1_total_cost_percent"] = calculated["version1"]["total_cost_30years"] / calculated["graph_data"]["max"]
     return return_data["calculated"]
 
-def generate_synergy_pdf(lead_id, data):
+def generate_synergy_pdf(lead_id, data, only_pages=None):
     config_general = get_settings(section="general")
     if data is not None:
         data["base_url"] = config_general["base_url"]
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
+        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7476459)))  # https://keso.bitrix24.de/disk/downloadFile/7476459/?&ncc=1&filename=Synergie+360+WI.pdf
         content = render_template(
             "quote_calculator/generator/synergy_wi/index.html",
             base_url=config_general["base_url"],
             lead_id=lead_id,
-            data=data
+            data=data,
+            total_pages=base_pdf.getNumPages()
         )
         data["datetime"] = str(data["datetime"])
         overlay_pdf = PdfFileReader(io.BytesIO(gotenberg_pdf(
             content,
             margins=["0", "0", "0", "0"],
             landscape=True)))
-        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7476459)))  # https://keso.bitrix24.de/disk/downloadFile/7476459/?&ncc=1&filename=Synergie+360+WI.pdf
         pdf = PdfFileWriter()
         for i in range(0, base_pdf.getNumPages()):
-            #if i not in [0]:
-            #    continue
-            if i in [8, 9, 11, 12]:
+            if only_pages is not None and i not in only_pages:
+                continue
+            if i in [10, 11, 12, 13, 14, 15]:
                 page = overlay_pdf.getPage(i)
             else:
                 page = overlay_pdf.getPage(i)

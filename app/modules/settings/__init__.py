@@ -96,7 +96,11 @@ def get_settings(section=None, domain_raw=None):
                     "2440": "Wärmecloud",
                     "262": "Spezial",
                     "4154": "Consumer",
-                    "3598": "keine Auswahl"
+                    "3598": "keine Auswahl",
+                    "8705": "Synergie360"
+                },
+                "cloud_type_lead": {
+                    "8709": "Synergie360"
                 },
                 "quote_type": {
                     "": "nicht ausgewählt",
@@ -699,7 +703,8 @@ def get_settings(section=None, domain_raw=None):
                     "contracting_heatpump_link": "UF_CRM_1652867586",
                     "heatpump_concept_link": "UF_CRM_1654263535401",
                     "solaredge_designer_link": "UF_CRM_1676482069",
-                    "eos_upload_files": "UF_CRM_1678114017667"
+                    "eos_upload_files": "UF_CRM_1678114017667",
+                    "cloud_type_lead": "UF_CRM_1623242009"
                 }
             },
             "company": {

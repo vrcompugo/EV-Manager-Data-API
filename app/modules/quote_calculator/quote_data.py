@@ -1,19 +1,25 @@
 import json
-import re
 import datetime
 import traceback
+import json
+import datetime
+from flask import render_template
+from PyPDF2 import PdfFileMerger, PdfFileWriter, PdfFileReader
+
+from app.modules.settings import get_settings
+from app.modules.external.bitrix24.user import get_user
+from app.modules.external.bitrix24.products import get_list as get_product_list, get_product
+from app.modules.cloud.services.calculation import calculate_cloud as get_cloud_calculation
 
 from app.modules.reseller.models.reseller import Reseller, ResellerSchema
 from app.modules.cloud.services.calculation import calculate_cloud as get_cloud_calculation
 from app.modules.importer.sources.bitrix24._association import find_association
 from app.modules.external.bitrix24.lead import get_lead
-from app.modules.external.bitrix24.deal import get_deal, get_deals
+from app.modules.external.bitrix24.deal import get_deals
 from app.modules.external.bitrix24.user import get_user
 from app.modules.external.bitrix24.products import get_list as get_product_list, get_product
-from app.modules.external.bitrix24.contact import get_contact
 from app.modules.settings import get_settings
 from app.modules.loan_calculation import loan_calculation
-from app.utils.jinja_filters import currencyformat
 
 from .conditional_products.pvmodule import add_product as add_product_pv_module
 from .conditional_products.storage import add_product as add_product_storage
@@ -22,6 +28,7 @@ from .heating_quote import get_heating_calculation, get_heating_products
 from .bluegen_quote import get_bluegen_calculation, get_bluegen_calculation2, get_bluegen_products
 from .roof_reconstruction_quote import get_roof_reconstruction_calculation, get_roof_reconstruction_products
 from .commission import calculate_commission_data
+from .synergy import calculate_synergy_wi, calculate_synergy_wi2
 
 
 def calculate_quote(lead_id, data=None, create_quote=False):
@@ -69,10 +76,15 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "datetime": str(datetime.datetime.now()),
         "data": {
             "status_id": lead_data.get("status_id"),
+            "cloud_quote_type": "synergy",
             "emove_tarif": "none",
             "bluegen_cell_count": 1,
+            "power_increase_rate": 3.9,
+            "heating_increase_rate": 3.9,
+            "car_increase_rate": 3.9,
+            "inflation_rate": 1.00,
             "price_increase_rate": 5.75,
-            "inflation_rate": 1.75,
+            "inflation_rate": 1.00,
             "runtime": 30,
             "financing_rate": 3.75,
             "module_type": default_module_type,
@@ -156,8 +168,11 @@ def calculate_quote(lead_id, data=None, create_quote=False):
                 if 330 in return_data["assigned_user"]["UF_DEPARTMENT"] or "330" in return_data["assigned_user"]["UF_DEPARTMENT"]:
                     return_data["data"]["price_guarantee"] = "2_years"
                     data["price_guarantee"] = "2_years"
-            calculated = get_cloud_calculation(data)
-            return_data["calculated"] = calculated
+            if data.get("cloud_quote_type") in ["synergy"]:
+                return_data["calculated"] = calculate_synergy_wi(data)
+            else:
+                calculated = get_cloud_calculation(data)
+                return_data["calculated"] = calculated
             if data.get("cloud_quote_type") not in ["followup_quote", "interim_quote"]:
                 return_data = calculate_products(return_data)
                 if "commission_value" in return_data["calculated"]:
@@ -167,6 +182,8 @@ def calculate_quote(lead_id, data=None, create_quote=False):
                 return_data["total_tax"] = 0
                 return_data["total"] = 0
                 return_data["tax_rate"] = config["taxrate"]
+            if data.get("cloud_quote_type") in ["synergy"]:
+                return_data["calculated"] = calculate_synergy_wi2(return_data)
         if "has_roof_reconstruction_quote" in data and data["has_roof_reconstruction_quote"]:
             return_data["roof_reconstruction_quote"]["calculated"] = get_roof_reconstruction_calculation(return_data)
             return_data = get_roof_reconstruction_products(return_data)
@@ -221,7 +238,7 @@ def calculate_products(data):
     try:
         add_product_pv_module(data)
         storage_product = add_product_storage(data)
-        if data["data"].get("cloud_quote_type") not in ["combination_quote"]:
+        if data["data"].get("cloud_quote_type") not in ["combination_quote", "synergy"]:
             add_direct_product(
                 label="Cloud Fähigkeit",
                 category="Stromspeicher",
@@ -267,21 +284,21 @@ def calculate_products(data):
                 quantity=1,
                 products=data["products"]
             )
-        if kwp_normal_roof > 0:
+        if kwp_normal_roof > 0.02:
             add_direct_product(
                 label="Montage DC",
                 category="PV Module",
                 quantity=kwp_normal_roof,
                 products=data["products"]
             )
-        if kwp_special_roof > 0:
+        if kwp_special_roof > 0.02:
             add_direct_product(
                 label="Montage DC bes. Dacheindeckung",
                 category="PV Module",
                 quantity=kwp_special_roof,
                 products=data["products"]
             )
-        if kwp_cheap_roof > 0:
+        if kwp_cheap_roof > 0.02:
             add_direct_product(
                 label="Montage DC Trapez",
                 category="PV Module",
@@ -300,13 +317,14 @@ def calculate_products(data):
             quantity=kwp,
             products=data["products"]
         )'''
-        if "cloud_price_heatcloud" in data["calculated"] and float(data["calculated"]["cloud_price_heatcloud"]) > 0:
-            add_direct_product(
-                label="Wärme Cloud Paket",
-                category="Elektrik",
-                quantity=1,
-                products=data["products"]
-            )
+        if data.get("cloud_quote_type") not in ["synergy"]:
+            if "cloud_price_heatcloud" in data["calculated"] and float(data["calculated"]["cloud_price_heatcloud"]) > 0:
+                add_direct_product(
+                    label="Wärme Cloud Paket",
+                    category="Elektrik",
+                    quantity=1,
+                    products=data["products"]
+                )
         if "min_kwp_refresh" in data["calculated"] and int(data["calculated"]["min_kwp_refresh"]) > 0:
             add_direct_product(
                 label="Integrierung der Bestand-PV-Anlage in das neue Cloud Konzept",

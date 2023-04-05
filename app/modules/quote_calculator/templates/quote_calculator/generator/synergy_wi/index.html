@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>asd</title>
+  {% include('feasibility_study_2020/style.html') %}
+  <style>
+    body { font-size: 0.9rem; color: #555554}
+    h2 {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 1.4em;
+      color: #1A4061;
+      font-weight: bold;
+      margin: 0;
+    }
+    h3 {
+      font-family: 'Open Sans', sans-serif;
+      color: #b1ca07;
+      font-size: 1.4em;
+      font-weight: bold;
+      margin: 0;
+    }
+    table {
+      width: 100%;
+    }
+    table.shadow {
+      box-shadow: 4px 2px 0 0px #1A4061;
+    }
+    table td {
+      background-color: #fff;
+      text-align: left;
+      border-bottom: 2px solid #fff;
+      padding: 0.3em 0.5em;
+    }
+    table.shadow td {
+      border: none;
+      border-right: 1px solid #B6B5B3;
+      background-color: #fff;
+    }
+    table th {
+      background-color: #C2C3C1;
+      font-weight: bold;
+      text-align: left;
+      padding: 0.3em 0.5em;
+    }
+    table.blue th {
+      background-color: #B6D5E4;
+      font-weight: bold;
+      text-align: left;
+    }
+    table.shadow th {
+      color: #1A4061;
+      font-weight: bold;
+      text-align: left;
+    }
+    table.shadow th,
+    table.shadow td {
+      padding: 0.5em 2em;
+    }
+
+    table tr:nth-child(even) td {
+      background-color: #E4E4E3;
+    }
+    table.blue tr:nth-child(odd) td {
+      background-color: #DBEBF3;
+    }
+    table.shadow tr:nth-child(odd) th,
+    table.shadow tr:nth-child(odd) td {
+      background-color: #D7D8D7;
+    }
+    table.shadow tr:nth-child(even) th,
+    table.shadow tr:nth-child(even) td {
+      background-color: #fff;
+    }
+    table.shadow tr td:last-child {
+      border-right: none;
+    }
+    td.center {
+      text-align: center;
+    }
+    .page_blank_note {
+      position: absolute;
+      left: 15px;
+      bottom: 15px;
+      font-size: 0.7em;
+    }
+    .page_logo {
+      position: absolute;
+      right: 44px;
+      bottom: 40px;
+    }
+    .big-number {
+      font-size: 1.6em;
+      font-weight: bold;
+    }
+    .blue {
+      color:#1A4061;
+    }
+    .bar-line {
+      width: 100%;
+      padding-bottom: 0.2em;
+    }
+    .bar-line .label {
+      padding-bottom: 0.2em;
+    }
+    .bar-line .label span {
+      display: inline-block;
+      white-space: nowrap;
+      transform: translateX(-50%);
+    }
+    .bar-line .bar {
+      background-color: #D7D8D7;
+      border-radius: 6px;
+    }
+    .bar-line.blue .bar {
+      background-color: #B9D7E7;
+    }
+    .bar-line .bar .bar-segment {
+      background-color: #636463;
+      line-height: 10px;
+      height: 10px;
+      border-radius: 6px;
+    }
+    .bar-line.blue .bar .bar-segment {
+      background-color: #1A4061;
+    }
+  </style>
+</head>
+<body>
+
+
+  {% for i in range(total_pages) %}
+    {% set current_page = i %}
+    <div class="page">
+      {% if current_page == 1 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_cover.html') %}
+      {% elif current_page == 10 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_calculation_params.html') %}
+      {% elif current_page == 11 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_example.html') %}
+      {% elif current_page == 12 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_graph.html') %}
+      {% elif current_page == 13 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_wi_monthly.html') %}
+      {% elif current_page == 14 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_wi_compare.html') %}
+      {% elif current_page == 15 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_wi_total.html') %}
+      {% else %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_blank.html') %}
+      {% endif %}
+    </div>
+  {% endfor %}
+
+
+</body>
+</html>
+
+

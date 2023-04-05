@@ -1,0 +1,69 @@
+<style>
+.page-number .pie {
+  border-radius: 100%;
+  height: calc(var(--size, 200) * 1px);
+  overflow: hidden;
+  position: relative;
+  width: calc(var(--size, 200) * 1px);
+}
+
+.page-number .pie .pie__segment {
+  --a: calc(var(--over50, 0) * -100%);
+  --b: calc((1 + var(--over50, 0)) * 100%);
+  --degrees: calc((var(--offset, 0) / 100) * 360);
+  -webkit-clip-path: polygon(var(--a) var(--a), var(--b) var(--a), var(--b) var(--b), var(--a) var(--b));
+  clip-path: polygon(var(--a) var(--a), var(--b) var(--a), var(--b) var(--b), var(--a) var(--b));
+  height: 100%;
+  position: absolute;
+  -webkit-transform: translate(0, -50%) rotate(90deg) rotate(calc(var(--degrees) * 1deg));
+  transform: translate(0, -50%) rotate(90deg) rotate(calc(var(--degrees) * 1deg));
+  -webkit-transform-origin: 50% 100%;
+  transform-origin: 50% 100%;
+  width: 100%;
+  z-index: calc(1 + var(--over50));
+}
+
+.page-number .pie .pie__segment::after,
+.page-number .pie .pie__segment::before {
+  background: var(--bg, #e74c3c);
+  content: '';
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
+.page-number .pie .pie__segment::before {
+  --degrees: calc((var(--value, 45) / 100) * 360);
+  transform: translate(0, 100%) rotate(calc(var(--degrees) * 1deg));
+  transform-origin: 50% 0%;
+}
+
+.page-number .pie .pie__segment::after {
+  opacity: var(--over50, 0);
+}
+.page-number {
+  position: absolute;
+  display: flex;
+  right: 15px;
+  bottom: 15px;
+
+}
+.page-value {
+    position: absolute;
+    background-color: #ffffff;
+    border-radius: 100%;
+    margin: 5px;
+    z-index: 10;
+    width: 15px;
+    height: 15px;
+    text-align: center;
+    line-height: 14px;
+    font-size: 10px;
+}
+</style>
+<div class="page-number">
+  <div class="page-value">{{ current_page + 1 }}</div>
+  <div class="pie" style="--size: 25; background-color: #1A61AC;;">
+    <div class="pie__segment" style="--offset: 0; --value: {{ (current_page + 1) / total_pages * 100 }}; {% if (current_page + 1) / total_pages * 100 > 50 %}--over50: 1;{% endif %} --bg: #99C31D;"></div>
+  </div>
+</div>
