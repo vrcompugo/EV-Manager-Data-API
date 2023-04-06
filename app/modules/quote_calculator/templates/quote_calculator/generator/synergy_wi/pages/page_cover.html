@@ -15,11 +15,14 @@
 
 <div class="page_cover">
   <div class="info">
-    Jim Knopf<br>
-    Musterstraße 36<br>
-    12345 Musterstadt<br>
+    {% if data.contact %}
+      {% if data.data.is_commercial %}
+        Firma<br>
+      {% endif %}
+      {{ data.contact | addressblock2 | nltobr }}
+    {% endif %}
     <br>
-    Erstellt am: 07.12.2023
+    Erstellt am: {{ data.datetime | dateformat }}
   </div>
 </div>
 
