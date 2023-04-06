@@ -156,23 +156,6 @@ def calculate_synergy_wi(data):
         if data.get(field) not in [None, "", 0]:
             calculated["total_usage"] = calculated["total_usage"] + calculated[field]
     calculated["total_light_usage"] = calculated["total_usage"] - calculated["heater_usage"] - calculated["car_usage"]
-    calculated["min_kwp"] = calculated["total_usage"] * calculated["kwp_factor"] / 1000
-    if calculated["heater_usage"] > 0:
-        calculated["min_kwp"] = calculated["min_kwp"] * calculated["kwp_heating_factor"]
-    if calculated["car_usage"] > 0:
-        calculated["min_kwp"] = calculated["min_kwp"] * calculated["kwp_car_factor"]
-    calculated["min_kwp_light"] = calculated["min_kwp"]
-    if calculated["min_kwp"] < calculated["pv_kwp"]:
-        calculated["max_kwp"] = calculated["min_kwp"]
-        calculated["kwp_extra"] = calculated["pv_kwp"] - calculated["max_kwp"]
-        percent_kwp = calculated["min_kwp"] / calculated["pv_kwp"]
-        calculated["autocracy_rate"] = math.floor(calculated["autocracy_rate"] + (100 - calculated["autocracy_rate"]) * percent_kwp * 0.06)
-    else:
-        calculated["max_kwp"] = calculated["pv_kwp"]
-        calculated["kwp_extra"] = calculated["max_kwp"] - calculated["min_kwp"]
-        #percent_kwp = calculated["pv_kwp"] / calculated["min_kwp"]
-        #calculated["autocracy_rate"] = math.floor(calculated["autocracy_rate"] * (1.25*percent_kwp**3 - 3.3*percent_kwp**2 + 3.05*percent_kwp))
-        calculated["autocracy_rate"] = calculated["autocracy_rate"] + calculated["autocracy_missing_kwp_nerf"] * calculated["kwp_extra"]
     size = 0
     if calculated["power_usage"] not in [None, "", 0, "0"]:
         size = size + math.ceil(calculated["power_usage"] / 4200) * 4.2
@@ -192,7 +175,24 @@ def calculate_synergy_wi(data):
     if 21000 < calculated["total_usage"]:
         size = 25.2
     if 26000 < calculated["total_usage"]:
-        raise Exception("storage produkt could not be calculated")
+        calculated["autocracy_rate"] = 63
+    calculated["min_kwp"] = calculated["total_usage"] * calculated["kwp_factor"] / 1000
+    if calculated["heater_usage"] > 0:
+        calculated["min_kwp"] = calculated["min_kwp"] * calculated["kwp_heating_factor"]
+    if calculated["car_usage"] > 0:
+        calculated["min_kwp"] = calculated["min_kwp"] * calculated["kwp_car_factor"]
+    calculated["min_kwp_light"] = calculated["min_kwp"]
+    if calculated["min_kwp"] < calculated["pv_kwp"]:
+        calculated["max_kwp"] = calculated["min_kwp"]
+        calculated["kwp_extra"] = calculated["pv_kwp"] - calculated["max_kwp"]
+        percent_kwp = calculated["min_kwp"] / calculated["pv_kwp"]
+        calculated["autocracy_rate"] = math.floor(calculated["autocracy_rate"] + (100 - calculated["autocracy_rate"]) * percent_kwp * 0.06)
+    else:
+        calculated["max_kwp"] = calculated["pv_kwp"]
+        calculated["kwp_extra"] = calculated["max_kwp"] - calculated["min_kwp"]
+        #percent_kwp = calculated["pv_kwp"] / calculated["min_kwp"]
+        #calculated["autocracy_rate"] = math.floor(calculated["autocracy_rate"] * (1.25*percent_kwp**3 - 3.3*percent_kwp**2 + 3.05*percent_kwp))
+        calculated["autocracy_rate"] = calculated["autocracy_rate"] + calculated["autocracy_missing_kwp_nerf"] * calculated["kwp_extra"]
     calculated["min_storage_size"] = size
     calculated["storage_size"] = size
     if data.get("overwrite_storage_size") not in [None, 0, ""]:

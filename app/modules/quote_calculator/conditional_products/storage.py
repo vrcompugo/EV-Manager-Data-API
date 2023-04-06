@@ -55,8 +55,6 @@ def add_product(data):
                 size = 21
             if 21000 < full_usage:
                 size = 25.2
-            if 26000 < full_usage:
-                raise Exception("storage produkt could not be calculated")
         if "solaredge" not in data["data"]["extra_options"]:
             version = "SENEC Home 4 Hybrid"
             product = get_product(label="SENEC Home 4 Hybrid (Gehäuse)", category="Stromspeicher")
