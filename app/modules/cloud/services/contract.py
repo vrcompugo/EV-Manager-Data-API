@@ -221,6 +221,9 @@ def load_contract_data(contract_number):
                 if deals[0]["stage_id"] == "C126:NEW":
                     annual_statement["status"].append("is_generated")
                     annual_statement["deal"]["status"] = "Neu"
+                if deals[0]["stage_id"] == "C126:UC_XM96DH":
+                    annual_statement["status"].append("report_2022")
+                    annual_statement["deal"]["status"] = "Abrechnung 2022"
                 if deals[0]["stage_id"] == "C126:UC_883FVL":
                     annual_statement["status"].append("old_contract")
                     annual_statement["deal"]["status"] = "Altvertrag manuelle bearbeitung"
@@ -745,11 +748,14 @@ def get_annual_statement_data(data, year, manuell_data):
         "warnings": [],
         "pv_system": data["pv_system"],
         "total_usage": 0,
+        "taxrate": 19,
         "total_extra_usage": 0,
         "total_extra_price": 0,
         "total_extra_price_net": 0,
         "total_cloud_price": 0,
+        "total_cloud_price_net": 0,
         "total_cloud_price_incl_refund": 0,
+        "total_cloud_price_incl_refund_net": 0,
         "available_values": [],
         "extra_price_per_kwh": 0.27
     }
@@ -812,11 +818,15 @@ def get_annual_statement_data(data, year, manuell_data):
             statement_config["cashback_price_per_kwh"] = float(manuell_data.get("cashback_price_per_kwh")) / 100
         if manuell_data.get("ecloud_cashback_price_per_kwh") not in [None, ""]:
             statement_config["ecloud_cashback_price_per_kwh"] = float(manuell_data.get("ecloud_cashback_price_per_kwh")) / 100
+        statement_config["taxrate"] = statement["taxrate"]
         statement_config["total_usage"] = 0
         statement_config["total_extra_usage"] = 0
         statement_config["total_extra_price"] = 0
+        statement_config["total_extra_price_net"] = 0
         statement_config["total_cloud_price"] = 0
+        statement_config["total_cloud_price_net"] = 0
         statement_config["total_cloud_price_incl_refund"] = 0
+        statement_config["total_cloud_price_incl_refund_net"] = 0
         delivery_end = str(year) + "-12-31"
         if config.get("delivery_end") is not None and parse(config.get("delivery_end")).year == year:
             delivery_end = str(config.get("delivery_end"))
@@ -842,6 +852,10 @@ def get_annual_statement_data(data, year, manuell_data):
                 if config.get("delivery_end") not in [None, "", 0] and normalize_date(statement_config[product].get("delivery_begin")) >= normalize_date(config.get("delivery_end")):
                     del statement_config[product]
                     continue
+                statement_config[product]["taxrate"] = statement_config["taxrate"]
+                if product == "ecloud":
+                    statement_config[product]["taxrate"] = 7
+                statement_config[product]["cloud_price_incl_refund_net"] = round(statement_config[product]["cloud_price_incl_refund"] / (1 + statement_config[product]["taxrate"] / 100), 2)
                 if product == "lightcloud" and statement_config[product]["extra_price_per_kwh"] < 0.3379:
                     if statement_config.get("cloud_number").find("Custom") < 0:
                         statement_config[product]["extra_price_per_kwh"] = 0.3379
@@ -1041,10 +1055,17 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement_config[product]["actual_usage_net"] = statement_config[product]["actual_usage"]
                 percent_year = calculate_year_diff(statement_config[product]["delivery_begin"], statement_config[product]["delivery_end"], manuell_data.get("corrected_datediff"))
                 statement_config[product]["total_cloud_price"] = statement_config[product]["cloud_price"] * 12 * percent_year
+                statement_config[product]["total_cloud_price_net"] = statement_config[product]["total_cloud_price"] / (1 + statement_config["taxrate"] / 100)
                 statement_config[product]["total_cloud_price_incl_refund"] = statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
+                statement_config[product]["total_cloud_price_incl_refund_net"] = statement_config[product]["total_cloud_price_incl_refund"] / (1 + statement_config["taxrate"] / 100)
+                statement_config[product]["extra_price_per_kwh_net"] = statement_config[product]["extra_price_per_kwh"] / (1 + statement_config["taxrate"] / 100)
+                if statement["taxrate"] != statement_config[product]["taxrate"]:
+                    statement_config[product]["total_cloud_price"] = round(statement_config[product]["total_cloud_price_net"] * (1 + statement_config[product]["taxrate"] / 100), 4)
+                    statement_config[product]["total_cloud_price_incl_refund"] = round(statement_config[product]["total_cloud_price_incl_refund_net"] * (1 + statement_config[product]["taxrate"] / 100), 4)
+                    statement_config[product]["extra_price_per_kwh"] = round(statement_config[product]["extra_price_per_kwh_net"] * (1 + statement_config[product]["taxrate"] / 100), 4)
+
+                statement_config[product]["percent_year"] = percent_year
                 statement_config["percent_year"] = percent_year
-                statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
-                statement_config["total_cloud_price_incl_refund"] = statement_config["total_cloud_price_incl_refund"] + statement_config[product]["total_cloud_price_incl_refund"]
                 statement_config[product]["total_extra_usage"] = statement_config[product]["actual_usage"] - statement_config[product]["allowed_usage"]
                 statement_config[product]["total_extra_price"] = 0
                 if product == "ecloud":
@@ -1060,14 +1081,37 @@ def get_annual_statement_data(data, year, manuell_data):
 
                 elif statement_config[product]["total_extra_usage"] > 0:
                     statement_config[product]["total_extra_price"] = statement_config[product]["total_extra_usage"] * statement_config[product]["extra_price_per_kwh"]
+                statement_config[product]["total_extra_price_net"] = round(statement_config[product]["total_extra_price"] / (1 + statement_config[product]["taxrate"] / 100), 2)
+
+                if product == "ecloud" and str(year) == "2022":
+                    statement["has_ecloud_tax_reduction"] = True
+                    statement_config[product]["special_refund"] = {
+                        "label": "Dezember Hilfe Gas",
+                        "percent_year": 1/12,
+                        "taxrate": 7,
+                        "total": -(statement_config[product]["usage"] * 1/12 * statement_config[product]["extra_price_per_kwh"] + statement_config[product]["cloud_price"])
+                    }
+                    statement_config[product]["special_refund"]["total_net"] = statement_config[product]["special_refund"]["total"] / (1 + statement_config[product]["special_refund"]["taxrate"] / 100)
+                    statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["special_refund"]["total"]
+                    statement_config["total_cloud_price_net"] = statement_config["total_cloud_price_net"] + statement_config[product]["special_refund"]["total_net"]
+                    statement_config["total_cloud_price_incl_refund"] = statement_config["total_cloud_price_incl_refund"] + statement_config[product]["special_refund"]["total"]
+                    statement_config["total_cloud_price_incl_refund_net"] = statement_config["total_cloud_price_incl_refund_net"] + statement_config[product]["special_refund"]["total_net"]
+                statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
+                statement_config["total_cloud_price_net"] = statement_config["total_cloud_price_net"] + statement_config[product]["cloud_price_incl_refund_net"] * 12 * percent_year
+                statement_config["total_cloud_price_incl_refund"] = statement_config["total_cloud_price_incl_refund"] + statement_config[product]["total_cloud_price_incl_refund"]
+                statement_config["total_cloud_price_incl_refund_net"] = statement_config["total_cloud_price_incl_refund_net"] + statement_config[product]["total_cloud_price_incl_refund_net"]
                 statement_config["total_extra_price"] = statement_config["total_extra_price"] + statement_config[product]["total_extra_price"]
+                statement_config["total_extra_price_net"] = statement_config["total_extra_price_net"] + statement_config[product]["total_extra_price_net"]
                 statement_config["total_extra_usage"] = statement_config["total_extra_usage"] + statement_config[product]["total_extra_usage"]
                 statement_config["total_usage"] = statement_config["total_usage"] + statement_config[product]["actual_usage"]
             statement["total_usage"] = statement["total_usage"] + statement_config["total_usage"]
             statement["total_extra_usage"] = statement["total_extra_usage"] + statement_config["total_extra_usage"]
             statement["total_cloud_price"] = statement["total_cloud_price"] + statement_config["total_cloud_price"]
+            statement["total_cloud_price_net"] = statement["total_cloud_price_net"] + statement_config["total_cloud_price_net"]
             statement["total_cloud_price_incl_refund"] = statement["total_cloud_price_incl_refund"] + statement_config["total_cloud_price_incl_refund"]
+            statement["total_cloud_price_incl_refund_net"] = statement["total_cloud_price_incl_refund_net"] + statement_config["total_cloud_price_incl_refund_net"]
             statement["total_extra_price"] = statement["total_extra_price"] + statement_config["total_extra_price"]
+            statement["total_extra_price_net"] = statement["total_extra_price_net"] + statement_config["total_extra_price_net"]
 
             statement_config["consumers"] = []
             for customer_product in customer_products:
@@ -1097,9 +1141,6 @@ def get_annual_statement_data(data, year, manuell_data):
                 statement[f"total_self_usage_{product}"] = 0
             statement[f"total_self_usage_{product}"] = statement[f"total_self_usage_{product}"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
             statement["total_self_usage"] = statement["total_self_usage"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
-    statement["total_extra_price_net"] = statement["total_extra_price"] / 1.19
-    statement["total_cloud_price_net"] = statement["total_cloud_price"] / 1.19
-    statement["total_cloud_price_incl_refund_net"] = statement["total_cloud_price_incl_refund"] / 1.19
 
     statement["pre_payments_total"] = statement["total_cloud_price_incl_refund"]
     if data.get("fakturia") is not None and data.get("fakturia").get("contractStatus") not in ["ENDED"]:

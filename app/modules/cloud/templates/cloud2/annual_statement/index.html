@@ -108,7 +108,9 @@
         <th>Art</th>
         <th>von</th>
         <th>bis</th>
-        <th>Betrag</th>
+        <th>Steuersatz</th>
+        <th>Netto</th>
+        <th>Brutto</th>
       </tr>
       {% set total_extra_usage = 0 %}
       {% for config in statement.configs %}
@@ -132,6 +134,8 @@
               </td>
               <td>{{ config[product].delivery_begin | dateformat }}</td>
               <td>{{ config[product].delivery_end | dateformat }}</td>
+              <td style="text-align: right; white-space: nowrap;">{{ config[product].taxrate | percentformat }}</td>
+              <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price_net | currencyformat }}</td>
               <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price | currencyformat }}</td>
             </tr>
           {% endif %}
@@ -141,6 +145,8 @@
             <td>{{ statement.extra_credit_label }}</td>
             <td></td>
             <td></td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.taxrate | percentformat }}</td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value_net | currencyformat }}</td>
             <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value | currencyformat }}</td>
           </tr>
         {% endif %}
@@ -149,41 +155,77 @@
             <td>{{ statement.extra_credit_label2 }}</td>
             <td></td>
             <td></td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.taxrate | percentformat }}</td>
+            <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value2_net | currencyformat }}</td>
             <td style="text-align: right; white-space: nowrap;">{{ statement.extra_credit_value2 | currencyformat }}</td>
           </tr>
         {% endif %}
       {% endfor %}
       <tr class="summary">
-        <td colspan="3"><b>Summe</b></td>
+        <td colspan="5"><b>Summe</b></td>
         <td style="text-align: right; white-space: nowrap;">{{ (statement.cost_total - statement.total_cloud_price_incl_refund) | currencyformat }}</td>
       </tr>
     </table>
-    <h3>Forderungen aus 2022</h3>
+    <h3>Forderungen aus {{ statement.year }}</h3>
     <table>
       <tr class="heading">
         <th>(resultiert aus monatlichen Cloudbeiträgen)</th>
-        <th>Betrag pro Monat</th>
         <th>Anzahl Monate</th>
-        <th>Betrag</th>
+        <th>Steuersatz</th>
+        <th>Netto</th>
+        <th>Brutto</th>
       </tr>
       {% for config in statement.configs %}
         {% if config.cloud_price_incl_refund %}
-          <tr>
-            <td>
-              {% if config.cloud_price_incl_refund >= 0 %}
-                Forderung
-              {% else %}
-                Gutschrift
+          {% if config["ecloud"] %}
+            {% for product in ["lightcloud", "heatcloud", "ecloud"] + config["customer_products"] %}
+              {% if config[product] %}
+                <tr>
+                  <td>
+                    {% if config[product].cloud_price_incl_refund >= 0 %}
+                      Forderung {{ config[product].label }}
+                    {% else %}
+                      Gutschrift {{ config[product].label }}
+                    {% endif %}
+                  </td>
+                  <td>{{ (12 * config[product].percent_year) | numberformat }}</td>
+                  <td>{{ config[product].taxrate | percentformat }}</td>
+                  <td>{{ config[product].total_cloud_price_incl_refund_net | currencyformat }}</td>
+                  <td style="text-align: right; white-space: nowrap;">{{ config[product].total_cloud_price_incl_refund | currencyformat }}</td>
+                </tr>
+                {% if product == "ecloud" and config[product].special_refund %}
+                  <tr>
+                    <td>
+                      {{ config[product].special_refund.label }}
+                    </td>
+                    <td>{{ (12 * config[product].special_refund.percent_year) | numberformat }}</td>
+                    <td>{{ config[product].special_refund.taxrate | percentformat }}</td>
+                    <td>{{ config[product].special_refund.total_net | currencyformat }}</td>
+                    <td style="text-align: right; white-space: nowrap;">{{ config[product].special_refund.total | currencyformat }}</td>
+                  </tr>
+                {% endif %}
               {% endif %}
-            </td>
-            <td>{{ config.cloud_price_incl_refund | currencyformat }}</td>
-            <td>{{ (12 * config.percent_year) | numberformat }}</td>
-            <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
-          </tr>
+            {% endfor %}
+          {% else %}
+            {% if config.cloud_price_incl_refund %}
+            <tr>
+                <td>
+                  {% if config.cloud_price_incl_refund >= 0 %}
+                    Forderung
+                  {% else %}
+                    Gutschrift
+                  {% endif %}
+                </td>
+                  <td>{{ (12 * config.percent_year) | numberformat }}</td>
+              <td>{{ config.taxrate | percentformat }}</td>
+              <td>{{ config.total_cloud_price_incl_refund_net | currencyformat }}</td>
+                <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
+              </tr>
+          {% endif %}
         {% endif %}
       {% endfor %}
       <tr class="summary">
-        <td colspan="3"><b>Summe</b></td>
+        <td colspan="4"><b>Summe</b></td>
         <td style="text-align: right; white-space: nowrap;">{{ statement.total_cloud_price_incl_refund | currencyformat }}</td>
       </tr>
     </table>
@@ -191,7 +233,7 @@
     <h3>Geleistete Zahlungen/Gutschriften</h3>
     <table>
       <tr class="heading">
-        <th>{{ year }}</th>
+        <th>{{ statement.year }}</th>
         <th>Betrag</th>
       </tr>
       <tr>
@@ -217,6 +259,9 @@
     Ihr Team von energie360<br>
     <br>
     <small>* Diese Abrechnung wurde unter Vorbehalt der angegebenen Einspeisemengen berechnet. Sollten sich die Einspeisemengen rückwirkend ändern, so wird diese Abrechnung auch korrigiert. Die Cloudgebühren sowie die Kosten für die Zusatzpakete wurden unter der Tatsache, dass diese regelmäßig bezahlt wurden, erstellt. Sollte dies nicht der Fall sein und noch offene Forderungen unsererseits vorliegen, so werden diese Rechnungen separat angemahnt und verrechnet. Bei Nichtvorliegen EEG-Vergütung, behalten wir uns vor den Verbrauch mit {{ (statement.extra_price_per_kwh * 100 ) | numberformat }} Cent/kWh zu berechnen.</small>
+    {% if statement.has_ecloud_tax_reduction %}
+      Die Umsatzsteuer für eCloud Produkte wird vom 01.10.2022 bis zum 31.03.2024 auf 7% reduziert.
+    {% endif %}
     <img src="{{ base_url }}static/cloud/contract/annual_statement/Stromkennzeichen%20{{ statement.year - 1 }}.jpeg" style="width: 100%; height: auto;" />
 
     <h2>Zur Abrechnung verwendete Zählerstände</h2>
