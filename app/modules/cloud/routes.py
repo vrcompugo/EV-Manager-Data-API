@@ -290,7 +290,7 @@ class OrderUpload(Resource):
         offer_v2_data["data"]["old_power_invoice_id"] = data["old_power_invoice_id"]
         offer_v2_data["data"]["sepa_form_id"] = data["sepa_form_id"]
         offer_v2_data["data"]["ibn_protocoll_id"] = data["ibn_protocoll_id"]
-        offer_v2_data["data"]["mandate_netprovider_id"] = data["mandate_netprovider_id"]
+        offer_v2_data["data"]["mandate_netprovider_id"] = data.get("mandate_netprovider_id")
         offer_v2_data["data"]["bankowner"] = data["bankowner"]
         offer_v2_data["data"]["iban"] = data["iban"]
         offer_v2_data["data"]["bic"] = data["bic"]
