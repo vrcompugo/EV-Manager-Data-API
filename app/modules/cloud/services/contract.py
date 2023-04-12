@@ -221,6 +221,9 @@ def load_contract_data(contract_number):
                 if deals[0]["stage_id"] == "C126:NEW":
                     annual_statement["status"].append("is_generated")
                     annual_statement["deal"]["status"] = "Neu"
+                if deals[0]["stage_id"] == "C126:UC_XM96DH":
+                    annual_statement["status"].append("report_2022")
+                    annual_statement["deal"]["status"] = "Abrechnung 2022"
                 if deals[0]["stage_id"] == "C126:UC_883FVL":
                     annual_statement["status"].append("old_contract")
                     annual_statement["deal"]["status"] = "Altvertrag manuelle bearbeitung"
@@ -1072,6 +1075,19 @@ def get_annual_statement_data(data, year, manuell_data):
                     statement_config[product]["total_extra_price"] = statement_config[product]["total_extra_usage"] * statement_config[product]["extra_price_per_kwh"]
                 statement_config[product]["total_extra_price_net"] = round(statement_config[product]["total_extra_price"] / (1 + statement_config[product]["taxrate"] / 100), 2)
 
+                if product == "ecloud" and str(year) == "2022":
+                    statement["has_ecloud_tax_reduction"] = True
+                    statement_config[product]["special_refund"] = {
+                        "label": "Dezember Hilfe Gas",
+                        "percent_year": 1/12,
+                        "taxrate": 7,
+                        "total": -(statement_config[product]["usage"] * 1/12 * statement_config[product]["extra_price_per_kwh"] + statement_config[product]["cloud_price"])
+                    }
+                    statement_config[product]["special_refund"]["total_net"] = statement_config[product]["special_refund"]["total"] / (1 + statement_config[product]["special_refund"]["taxrate"] / 100)
+                    statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["special_refund"]["total"]
+                    statement_config["total_cloud_price_net"] = statement_config["total_cloud_price_net"] + statement_config[product]["special_refund"]["total_net"]
+                    statement_config["total_cloud_price_incl_refund"] = statement_config["total_cloud_price_incl_refund"] + statement_config[product]["special_refund"]["total"]
+                    statement_config["total_cloud_price_incl_refund_net"] = statement_config["total_cloud_price_incl_refund_net"] + statement_config[product]["special_refund"]["total_net"]
                 statement_config["total_cloud_price"] = statement_config["total_cloud_price"] + statement_config[product]["cloud_price_incl_refund"] * 12 * percent_year
                 statement_config["total_cloud_price_net"] = statement_config["total_cloud_price_net"] + statement_config[product]["cloud_price_incl_refund_net"] * 12 * percent_year
                 statement_config["total_cloud_price_incl_refund"] = statement_config["total_cloud_price_incl_refund"] + statement_config[product]["total_cloud_price_incl_refund"]
