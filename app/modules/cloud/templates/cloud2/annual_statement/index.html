@@ -221,6 +221,7 @@
               <td>{{ config.total_cloud_price_incl_refund_net | currencyformat }}</td>
                 <td style="text-align: right; white-space: nowrap;">{{ config.total_cloud_price_incl_refund | currencyformat }}</td>
               </tr>
+            {% endif %}
           {% endif %}
         {% endif %}
       {% endfor %}
