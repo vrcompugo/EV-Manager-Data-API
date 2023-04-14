@@ -116,28 +116,55 @@
       {% for config in statement.configs %}
         {% for product in ["lightcloud", "heatcloud", "ecloud"] + config["customer_products"] %}
           {% if config[product] and config[product].total_extra_usage != 0 %}
-            <tr>
-              <td>
-                {{ config[product].label }}
-                {% if config[product].total_extra_usage > 0 %}
-                  Mehrverbrauch <small>({{ config[product].total_extra_usage | numberformat("de", 0)}} kWh je
-                  {{ (config[product].extra_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
-                {% else %}
-                  Minderverbrauch <small>({{ config[product].total_extra_usage | numberformat("de", 0)}} kWh
-                  {% if config[product].extra_usage_buffer %}
-                    ab -{{config[product].extra_usage_buffer | numberformat("de", 0) }} kWh
+            {% if config[product]["parts"] %}
+              {% for part in config[product]["parts"] %}
+                <tr>
+                  <td>
+                    {{ config[product].label }}
+                    {% if part.total_extra_usage > 0 %}
+                      Mehrverbrauch <small>({{ part.total_extra_usage | numberformat("de", 0)}} kWh je
+                      {{ (part.extra_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
+                    {% else %}
+                      Minderverbrauch <small>({{ part.total_extra_usage | numberformat("de", 0)}} kWh
+                      {% if config[product].extra_usage_buffer %}
+                        ab -{{part.extra_usage_buffer | numberformat("de", 0) }} kWh
+                      {% else %}
+                        ab -250 kWh
+                      {% endif %}
+                      je {{ (part.cashback_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
+                    {% endif %}
+                  </td>
+                  <td>{{ part.delivery_begin | dateformat }}</td>
+                  <td>{{ part.delivery_end | dateformat }}</td>
+                  <td style="text-align: right; white-space: nowrap;">{{ part.taxrate | percentformat }}</td>
+                  <td style="text-align: right; white-space: nowrap;">{{ part.total_extra_price_net | currencyformat }}</td>
+                  <td style="text-align: right; white-space: nowrap;">{{ part.total_extra_price | currencyformat }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td>
+                  {{ config[product].label }}
+                  {% if config[product].total_extra_usage > 0 %}
+                    Mehrverbrauch <small>({{ config[product].total_extra_usage | numberformat("de", 0)}} kWh je
+                    {{ (config[product].extra_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
                   {% else %}
-                    ab -250 kWh
+                    Minderverbrauch <small>({{ config[product].total_extra_usage | numberformat("de", 0)}} kWh
+                    {% if config[product].extra_usage_buffer %}
+                      ab -{{config[product].extra_usage_buffer | numberformat("de", 0) }} kWh
+                    {% else %}
+                      ab -250 kWh
+                    {% endif %}
+                    je {{ (config[product].cashback_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
                   {% endif %}
-                  je {{ (config[product].cashback_price_per_kwh * 100) | numberformat("de", 2) }} Cent/kWh)</small>
-                {% endif %}
-              </td>
-              <td>{{ config[product].delivery_begin | dateformat }}</td>
-              <td>{{ config[product].delivery_end | dateformat }}</td>
-              <td style="text-align: right; white-space: nowrap;">{{ config[product].taxrate | percentformat }}</td>
-              <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price_net | currencyformat }}</td>
-              <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price | currencyformat }}</td>
-            </tr>
+                </td>
+                <td>{{ config[product].delivery_begin | dateformat }}</td>
+                <td>{{ config[product].delivery_end | dateformat }}</td>
+                <td style="text-align: right; white-space: nowrap;">{{ config[product].taxrate | percentformat }}</td>
+                <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price_net | currencyformat }}</td>
+                <td style="text-align: right; white-space: nowrap;">{{ config[product].total_extra_price | currencyformat }}</td>
+              </tr>
+            {% endif %}
           {% endif %}
         {% endfor %}
         {% if statement.extra_credit_value != 0 %}
@@ -180,19 +207,37 @@
           {% if config["ecloud"] %}
             {% for product in ["lightcloud", "heatcloud", "ecloud"] + config["customer_products"] %}
               {% if config[product] %}
-                <tr>
-                  <td>
-                    {% if config[product].cloud_price_incl_refund >= 0 %}
-                      Forderung {{ config[product].label }}
-                    {% else %}
-                      Gutschrift {{ config[product].label }}
-                    {% endif %}
-                  </td>
-                  <td>{{ (12 * config[product].percent_year) | numberformat }}</td>
-                  <td>{{ config[product].taxrate | percentformat }}</td>
-                  <td>{{ config[product].total_cloud_price_incl_refund_net | currencyformat }}</td>
-                  <td style="text-align: right; white-space: nowrap;">{{ config[product].total_cloud_price_incl_refund | currencyformat }}</td>
-                </tr>
+                {% if config[product]["parts"] %}
+                  {% for part in config[product]["parts"] %}
+                    <tr>
+                      <td>
+                        {% if part.total_cloud_price_incl_refund >= 0 %}
+                          Forderung {{ config[product].label }}
+                        {% else %}
+                          Gutschrift {{ config[product].label }}
+                        {% endif %}
+                      </td>
+                      <td>{{ (12 * part.percent_year) | numberformat }}</td>
+                      <td>{{ part.taxrate | percentformat }}</td>
+                      <td>{{ part.total_cloud_price_incl_refund_net | currencyformat }}</td>
+                      <td style="text-align: right; white-space: nowrap;">{{ part.total_cloud_price_incl_refund | currencyformat }}</td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td>
+                      {% if config[product].cloud_price_incl_refund >= 0 %}
+                        Forderung {{ config[product].label }}
+                      {% else %}
+                        Gutschrift {{ config[product].label }}
+                      {% endif %}
+                    </td>
+                    <td>{{ (12 * config[product].percent_year) | numberformat }}</td>
+                    <td>{{ config[product].taxrate | percentformat }}</td>
+                    <td>{{ config[product].total_cloud_price_incl_refund_net | currencyformat }}</td>
+                    <td style="text-align: right; white-space: nowrap;">{{ config[product].total_cloud_price_incl_refund | currencyformat }}</td>
+                  </tr>
+                {% endif %}
                 {% if product == "ecloud" and config[product].special_refund %}
                   <tr>
                     <td>
