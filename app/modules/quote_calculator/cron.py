@@ -179,9 +179,9 @@ def cron_follow_cloud_quote():
         "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)
     for index, deal in enumerate(deals):
-        if index >= 20:
+        if index >= 30:
             return
-        if index >= 10: # do only 10 per batch
+        if index >= 20: # do only 10 per batch
             print("follow quote1:", deal["id"])
             recreate_quote(deal["id"], create_new_quote=True, move_phase=False)
         else:
