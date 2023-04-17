@@ -181,10 +181,11 @@ def cron_follow_cloud_quote():
     for index, deal in enumerate(deals):
         if index >= 20:
             return
-        print("follow quote:", deal["id"])
         if index >= 10: # do only 10 per batch
+            print("follow quote1:", deal["id"])
             recreate_quote(deal["id"], create_new_quote=True, move_phase=False)
         else:
+            print("follow quote2:", deal["id"])
             recreate_quote(deal["id"], create_new_quote=True, move_phase=True)
 
 
