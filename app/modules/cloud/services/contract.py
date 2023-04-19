@@ -449,6 +449,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
     config["measuring_concept"] = data["main_deal"].get("measuring_concept")
     legacy_cloud = False
     offer_v2 = OfferV2.query.filter(OfferV2.number == cloud_number).first()
+    print('why?', offer_v2)
     if offer_v2 is None:
         survey = None
         try:
