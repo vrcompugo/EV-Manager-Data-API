@@ -213,9 +213,11 @@
             </table>
             <div style="padding: 0 1em;">
                 <b>Extra Stromverbraucher</b><br/>
-                {% for option in data.data.tab_power_usage_options %}
-                    - {{ option }}<br/>
-                {% endfor %}
+                {% if data.data.tab_power_usage_options %}
+                    {% for option in data.data.tab_power_usage_options %}
+                        - {{ option }}<br/>
+                    {% endfor %}
+                {% endif %}
             </div>
             <div style="padding: 0 1em;">
                 <b>kWh Gesamtleistung (Großverbraucher)</b><br/>
