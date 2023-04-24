@@ -27,9 +27,11 @@ def get_tarifs(contract: ENBWContract):
         "street_number": deal.get("delivery_street_nb"),
         "zipcode": deal.get("delivery_zip")
     }
-
+    tarif_type = 1
+    if deal.get("is_cloud_heatcloud") in ["1", "Y", True, "true"]:
+        tarif_type = 2
     tarif_request = {
-        "tariff_type": 1,
+        "tariff_type": tarif_type, # 1 = Strom, 2 = Heating
         "customer_type": 0,
         "client_type": 0,
         "counter_type": 0,
