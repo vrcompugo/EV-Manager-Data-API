@@ -4,7 +4,7 @@ import base64
 from werkzeug import FileStorage
 
 from app.exceptions import ApiException
-from app.modules.external.bitrix24.deal import get_deal
+from app.modules.external.bitrix24.deal import get_deal, update_deal
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.drive import get_folder_id, get_folder, get_file_content
 from app.modules.cloud.services.contract import get_contract_data, normalize_date
@@ -143,5 +143,7 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage):
         if  "message" in contract_data:
             raise ApiException("transfer failed", contract_data["message"])
         raise ApiException("transfer failed", "Übertragung an ENBW fehlgeschlagen")
-    print(json.dumps(contract_data, indent=2))
+    update_deal(deal.get("id"), {
+        "contract_managed_by": "ENBW",
+    })
     return contract_data

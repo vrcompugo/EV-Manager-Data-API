@@ -338,6 +338,11 @@ def get_settings(section=None, domain_raw=None):
                     "": None,
                     "8243": "RG-",
                     "8245": "GU-"
+                },
+                "contract_managed_by": {
+                    "": None,
+                    "8721": "Sherpa",
+                    "8723": "ENBW",
                 }
             },
             "product": {
@@ -605,7 +610,8 @@ def get_settings(section=None, domain_raw=None):
                     "zoom_link": "UF_CRM_5FA70A10C20DC",
                     "price_per_kwh": "UF_CRM_1676891819",
                     "power_extra_usage": "UF_CRM_1676891711",
-                    "upload_link_tab": "UF_CRM_1656489097"
+                    "upload_link_tab": "UF_CRM_1656489097",
+                    "contract_managed_by": "UF_CRM_1682334663"
                 }
             },
             "invoice": {
