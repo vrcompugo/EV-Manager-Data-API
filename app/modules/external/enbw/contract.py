@@ -16,7 +16,7 @@ from .models.enbw_contract import ENBWContract
 from .models.enbw_contract_history import ENBWContractHistory
 
 
-def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_name):
+def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id):
 
     config = get_settings(section="external/enbw")
     deal = get_deal(contract.deal_id, force_reload=True)
@@ -57,11 +57,11 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_name
     tarif = None
     tarifs = get_tarifs(contract)
     for item in tarifs:
-        if item["tariff_name"] == tarif_name:
+        if str(item["base_tariff_id"]) == str(tarif_id):
             tarif = item
             break
     if tarif is None:
-        raise ApiException("no valid tarif", f"{tarif_name} ENBW Tariff nicht gefunden")
+        raise ApiException("no valid tarif", f"{tarif_id} ENBW Tariff nicht gefunden")
     contract.tarif_data = tarif
     enbw_data = {
         "extern_id": config.get("extern_id"),

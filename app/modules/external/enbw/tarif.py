@@ -46,4 +46,6 @@ def get_tarifs(contract: ENBWContract):
     tarif_data = post("/tariffs", tarif_request, contract=contract)
     if "data" not in tarif_data or "tariffs" not in tarif_data["data"] or len(tarif_data["data"]["tariffs"]) == 0:
         raise ApiException("no valid tarif", "Kein ENBW Tariff für die Kundendaten gefunden")
+    for tarif in tarif_data["data"]["tariffs"]:
+        tarif["label"] = tarif.get("tariff_name") + " " + tarif.get("base_tariff").get("tariff_id") + " " + tarif.get("base_price_monthly_de") + " " + tarif.get("kwh_price_cent_raw_de") + " " + tarif.get("yearly_price_de")
     return tarif_data["data"]["tariffs"]

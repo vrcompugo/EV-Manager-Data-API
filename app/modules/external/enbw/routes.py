@@ -71,7 +71,7 @@ def upload_contract():
         return {"status": "failed", "data": {}, "message": "no id"}
     if data.get("tarif") in [None, "", 0]:
         return {"status": "failed", "data": {}, "message": "no tarif"}
-    tarif_name = data.get("tarif")
+    tarif_id = data.get("tarif")
     deal = get_deal(data.get("deal_id"), force_reload=True)
     if deal is None:
         return {"status": "failed", "data": {}, "message": "deal not found"}
@@ -96,7 +96,7 @@ def upload_contract():
         db.session.add(contract)
         db.session.commit()
     try:
-        contract_data = send_contract(contract, contract_file, tarif_name)
+        contract_data = send_contract(contract, contract_file, tarif_id)
         contract.joulesId = contract_data.get("joulesId")
         contract.status = "transfered"
         contract.status_message = "Übertragen an ENBW. Warten auf Rückmeldung"
