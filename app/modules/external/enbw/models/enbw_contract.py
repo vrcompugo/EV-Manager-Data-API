@@ -11,6 +11,7 @@ class ENBWContract(BaseModel, db.Model):
     sub_contract_number = db.Column(db.String(120))
     deal_id = db.Column(db.Integer)
     joulesId = db.Column(db.String(50))
+    tarif_data = db.Column(db.JSON)
     status = db.Column(db.String(50))
     status_message = db.Column(db.String(250))
     histories = db.relationship("ENBWContractHistory", order_by="desc(ENBWContractHistory.id)")

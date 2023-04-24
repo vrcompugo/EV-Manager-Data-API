@@ -11,11 +11,12 @@ from app.modules.cloud.services.contract import get_contract_data, normalize_dat
 from app.modules.settings import get_settings
 
 from ._connector import post
+from .tarif import get_tarifs
 from .models.enbw_contract import ENBWContract
 from .models.enbw_contract_history import ENBWContractHistory
 
 
-def send_contract(contract: ENBWContract, contract_file: FileStorage):
+def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_name):
 
     config = get_settings(section="external/enbw")
     deal = get_deal(contract.deal_id, force_reload=True)
@@ -53,28 +54,15 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage):
         "street_number": deal.get("delivery_street_nb"),
         "zipcode": deal.get("delivery_zip")
     }
-    tarif_request = {
-        "tariff_type": 1,
-        "customer_type": 0,
-        "client_type": 0,
-        "counter_type": 0,
-        "query_date": normalize_date(datetime.datetime.now()).strftime("%d.%m.%Y"),
-        "brand": "0",
-        "tariff_variant": 0,
-        "consumption": requested_usage,
-        "zip": address_data["zipcode"],
-        "city": address_data["city"],
-        "street": f'{address_data["street_name"]} {address_data["street_number"]}'
-    }
-    tarif_data = post("/tariffs", tarif_request, contract=contract)
-    if "data" not in tarif_data or "tariffs" not in tarif_data["data"] or len(tarif_data["data"]["tariffs"]) == 0:
-        raise ApiException("no valid tarif", "Kein ENBW Tariff für die Kundendaten gefunden")
-    cheapest_tarif = None
-    for tarif in tarif_data["data"]["tariffs"]:
-        if cheapest_tarif is None or tarif["yearly_price"] < cheapest_tarif["yearly_price"]:
-            cheapest_tarif = tarif
-    if cheapest_tarif is None:
-        raise ApiException("no valid tarif", "Kein ENBW Tariff für die Kundendaten gefunden")
+    tarif = None
+    tarifs = get_tarifs(contract)
+    for item in tarifs:
+        if item["tariff_name"] == tarif_name:
+            tarif = item
+            break
+    if tarif is None:
+        raise ApiException("no valid tarif", f"{tarif_name} ENBW Tariff nicht gefunden")
+    contract.tarif_data = tarif
     enbw_data = {
         "extern_id": config.get("extern_id"),
         "partner_id": config.get("partner_id"),
@@ -96,8 +84,8 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage):
             "previous_client_number": "",
             "previous_supplier": deal.get("energie_delivery_code"),
             "previous_volume": requested_usage,
-            "rate_ap": cheapest_tarif["rawSourceTariff"]["preise"][0]["arbeitspreis"]["brutto"],
-            "rate_gp": cheapest_tarif["rawSourceTariff"]["preise"][0]["grundpreisJahr"]["brutto"],
+            "rate_ap": tarif["rawSourceTariff"]["preise"][0]["arbeitspreis"]["brutto"],
+            "rate_gp": tarif["rawSourceTariff"]["preise"][0]["grundpreisJahr"]["brutto"],
             "self_terminated": "0",
             "sign_date": normalize_date(datetime.datetime.now()).strftime("%Y-%m-%d"),
             "agree_permission_date": normalize_date(datetime.datetime.now()).strftime("%Y-%m-%d"),
@@ -105,11 +93,11 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage):
             "start_delivery_next_possible": "1",
             "start_delivery_type": 1,
             "status": 0,
-            "tariff_brand": cheapest_tarif["brand"],
+            "tariff_brand": tarif["brand"],
             "tariff_city": address_data["city"],
             "tariff_energy_type": 1,
-            "tariff_id": cheapest_tarif["base_tariff"]["tariff_id"],
-            "campaign_identifier": cheapest_tarif["campaign"],
+            "tariff_id": tarif["base_tariff"]["tariff_id"],
+            "campaign_identifier": tarif["campaign"],
             "tariff_street": address_data["street_name"],
             "tariff_street_number": address_data["street_number"],
             "tariff_zip": address_data["zipcode"],
