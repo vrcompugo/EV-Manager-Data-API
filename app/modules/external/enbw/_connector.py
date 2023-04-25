@@ -67,8 +67,6 @@ def post(url, post_data=None, files=None, contract:ENBWContract=None):
             )
             db.session.add(history)
         base_url = config["url"]
-        if url == "/tariffs":
-            base_url = "https://enbw-staging.joulesapp.de/service"
         response = requests.post(
             base_url + url,
             headers={
