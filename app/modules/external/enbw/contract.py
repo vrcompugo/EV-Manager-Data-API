@@ -133,5 +133,6 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id):
         raise ApiException("transfer failed", "Übertragung an ENBW fehlgeschlagen")
     update_deal(deal.get("id"), {
         "contract_managed_by": "ENBW",
+        "contract_transfered_at": str(datetime.datetime.now()),
     })
     return contract_data

@@ -611,7 +611,8 @@ def get_settings(section=None, domain_raw=None):
                     "price_per_kwh": "UF_CRM_1676891819",
                     "power_extra_usage": "UF_CRM_1676891711",
                     "upload_link_tab": "UF_CRM_1656489097",
-                    "contract_managed_by": "UF_CRM_1682334663"
+                    "contract_managed_by": "UF_CRM_1682334663",
+                    "contract_transfered_at": "UF_CRM_1682413256"
                 }
             },
             "invoice": {
