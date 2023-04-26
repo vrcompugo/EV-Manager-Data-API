@@ -1646,9 +1646,9 @@ def cron_transfer_fakturia_annual_invoice():
             print("fakturia")
             print(json.dumps(contract, indent=2))
             min_delivery_begin = None
-            max_year = 2021
+            max_year = 0
             for annual_statement in contract.get("annual_statements"):
-                if max_year < annual_statement.get("year") and annual_statement.get("data") is not None and annual_statement.get("pdf_link") is not None:
+                if max_year == 0 or (max_year < annual_statement.get("year") and annual_statement.get("data") is not None and annual_statement.get("pdf_link") is not None):
                     max_year = annual_statement.get("year")
             for config in contract["configs"]:
                 if config["delivery_begin"] not in [None, ""] and (min_delivery_begin is None or min_delivery_begin > parse(config["delivery_begin"])):
