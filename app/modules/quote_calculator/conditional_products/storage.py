@@ -25,6 +25,7 @@ def add_product(data):
         product["PRICE"] = float(product["PRICE"]) + float(stack["PRICE"]) * stack_count
         data["products"].append(product)
 
+        return_product = json.loads(json.dumps(product))
         product = get_product(label="Montage Stromspeicher", category="Stromspeicher")
         product["quantity"] = math.ceil((stack_count + 1) / 4)
         data["products"].append(product)
@@ -54,7 +55,11 @@ def add_product(data):
             if 16600 < full_usage <= 21000:
                 size = 21
             if 21000 < full_usage:
-                size = 25.2
+                size = (math.ceil(full_usage / 4200)) * 4.2
+            if float(data["data"].get("heater_usage")) > 0:
+                size = size + 4.2
+            if size > 50.4:
+                size = 50.4 + math.ceil((full_usage - 50400) / 2 / 4200) * 4.2
         if "solaredge" not in data["data"]["extra_options"]:
             version = "SENEC Home 4 Hybrid"
             product = get_product(label="SENEC Home 4 Hybrid (Gehäuse)", category="Stromspeicher")
@@ -68,7 +73,7 @@ def add_product(data):
         product["PRICE"] = float(product["PRICE"]) * math.ceil(stack_count / 6) + float(stack["PRICE"]) * stack_count
         data["products"].append(product)
         product["storagebox_count"] = math.ceil(stack_count / 6)
-        return_product = product
+        return_product = json.loads(json.dumps(product))
         product = get_product(label="Montage Stromspeicher Home4", category="Stromspeicher")
         product["quantity"] = return_product["storagebox_count"]
         data["products"].append(product)
@@ -77,4 +82,4 @@ def add_product(data):
         data["products"].append(product)
         return return_product
 
-    return product
+    return return_product

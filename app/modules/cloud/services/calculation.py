@@ -434,9 +434,6 @@ def calculate_cloud(data):
         result["min_kwp_light"] = power_usage * power_to_kwp_factor * direction_factor_kwp / 1000
         if "name" not in user or user["name"].lower() not in ["aev", "eeg", "bsh"]:
             if "extra_options" in data:
-                if "price_guarantee" in data and data["price_guarantee"] not in ["2_years", "1_year"]:
-                    if "solaredge" not in data["extra_options"]:
-                        data["extra_options"].append("solaredge")
                 if "solaredge" not in data["extra_options"]:
                     result["min_kwp_light"] = result["min_kwp_light"] + 0.44
         if data.get("lightcloud_min_kwp_overwrite") in [True]:

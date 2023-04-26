@@ -47,9 +47,10 @@ def calculate_quote(lead_id, data=None, create_quote=False):
                     module_type_options.append(
                         {
                             'value': int(product["ID"]),
-                            'label': product["NAME"],
+                            'label': product["NAME"] + (" (ab August)" if int(product["ID"]) == 20845 else ""),
                             'kWp': product['kwp'],
-                            'qm': product['qm']
+                            'qm': product['qm'],
+                            'disable': True if int(product["ID"]) == 20845 else False
                         }
                     )
                 if str(product["SECTION_ID"]) in [str(categories["PV Module (Archiv)"])]:
@@ -96,7 +97,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
                 "direction": "west_east"
             }],
             "consumers": [],
-            "extra_options": ["technik_service_packet", "solaredge"],
+            "extra_options": ["technik_service_packet"],
             "extra_options_zero": [],
             "reconstruction_extra_options": [],
             "heating_quote_extra_options": ["renewable_ready", "multistorage_freshwater"],
@@ -543,6 +544,14 @@ def calculate_products(data):
                 quantity=1,
                 products=data["products"]
             )
+        print("yxc", storage_product["NAME"])
+        if storage_product is not None and storage_product["NAME"].find("Senec Lithium Speicher") >= 0 and data["data"].get("cloud_quote_type") in [None, ""]:
+            if data["calculated"]["power_usage"] in [3000, 4000, 5000, 6000, 7500, 9000, 11000] and data["calculated"]["heater_usage"] == 0:
+                product = get_product(label="Paket Aktion CLOUD", category="Extra Pakete")
+                if product is not None:
+                    product["quantity"] = 1
+                    product["PRICE"] = -1666.66666667
+                    data["products"].append(product)
         '''add_direct_product(
             label="E.MW (energie-monitoring-wireless)",
             category="Extra Pakete",

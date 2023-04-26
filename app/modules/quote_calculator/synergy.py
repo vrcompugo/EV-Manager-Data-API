@@ -173,9 +173,12 @@ def calculate_synergy_wi(data):
     if 16600 < calculated["total_usage"] <= 21000:
         size = 21
     if 21000 < calculated["total_usage"]:
-        size = 25.2
-    if 26000 < calculated["total_usage"]:
-        calculated["autocracy_rate"] = 63
+        size = math.ceil(calculated["total_usage"] / 4200) * 4.2
+    if calculated["heater_usage"] > 0:
+        size = size + 4.2
+    if size > 50.4:
+        size = 50.4 + math.ceil((calculated["total_usage"] - 50400) / 2 / 4200) * 4.2
+        calculated["autocracy_rate"] = 64
     calculated["min_kwp"] = calculated["total_usage"] * calculated["kwp_factor"] / 1000
     if calculated["heater_usage"] > 0:
         calculated["min_kwp"] = calculated["min_kwp"] * calculated["kwp_heating_factor"]
