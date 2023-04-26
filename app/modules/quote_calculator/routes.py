@@ -240,6 +240,7 @@ def quote_calculator_set_defaults(lead_id):
     data["data"]["assistant"] = False
     if data["data"].get("has_pv_quote") in [None, False, 0] and data["data"].get("has_roof_reconstruction_quote") in [None, False, 0] and data["data"].get("has_heating_quote") in [None, False, 0] and data["data"].get("has_bluegen_quote") in [None, False, 0]:
         data["data"]["assistant"] = True
+    print("assistant", data["data"]["assistant"])
     return data
 
 
