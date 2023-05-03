@@ -148,7 +148,7 @@
                         <th>Hauptzählernummer (Malo ID)</th>
                         <th>{{ data.data.power_meter_number }} ({{ data.data.malo_id }})</th>
                     </tr>
-                    {% if data.data.heater_usage > 0 %}
+                    {% if data.data.heater_usage and data.data.heater_usage > 0 %}
                         <tr>
                             <th>Wärmecloud Zählernummer</th>
                             <th>{{ data.data.heatcloud_power_meter_number }}</th>
