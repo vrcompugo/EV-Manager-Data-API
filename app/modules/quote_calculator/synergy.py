@@ -331,7 +331,8 @@ def generate_synergy_pdf(lead_id, data, only_pages=None):
         data["base_url"] = config_general["base_url"]
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
-        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7476459)))  # https://keso.bitrix24.de/disk/downloadFile/7476459/?&ncc=1&filename=Synergie+360+WI.pdf
+        # base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7476459)))  # https://keso.bitrix24.de/disk/downloadFile/7476459/?&ncc=1&filename=Synergie+360+WI.pdf
+        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7800623)))  # https://keso.bitrix24.de/disk/downloadFile/7800623/?&ncc=1&filename=Broschu%CC%88re+03052023.pdf
         content = render_template(
             "quote_calculator/generator/synergy_wi/index.html",
             base_url=config_general["base_url"],
@@ -348,7 +349,7 @@ def generate_synergy_pdf(lead_id, data, only_pages=None):
         for i in range(0, base_pdf.getNumPages()):
             if only_pages is not None and i not in only_pages:
                 continue
-            if i in [10, 11, 12, 13, 14, 15]:
+            if i in [11, 12, 13, 14, 15, 16]:
                 page = overlay_pdf.getPage(i)
             else:
                 page = overlay_pdf.getPage(i)
