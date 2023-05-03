@@ -183,8 +183,6 @@ def quote_calculator_set_defaults(lead_id):
             data["data"]["extra_options"] = []
         if "tab_power_usage_options" not in data["data"]:
             data["data"]["tab_power_usage_options"] = []
-        if "solaredge" not in data["data"]["extra_options"]:
-            data["data"]["extra_options"].append("solaredge")
         data["quote_datetime"] = data["datetime"]
         if "status_id" not in data["data"]:
             lead_data = get_lead(lead_id)
