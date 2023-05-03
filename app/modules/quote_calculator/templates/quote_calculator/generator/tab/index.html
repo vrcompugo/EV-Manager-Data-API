@@ -154,7 +154,7 @@
                             <th>{{ data.data.heatcloud_power_meter_number }}</th>
                         </tr>
                     {% endif %}
-                    {% if len(data.data.consumers) > 0 %}
+                    {% if data.data.consumers and len(data.data.consumers) > 0 %}
                         {% for consumer in data.data.consumers %}
                             <tr>
                                 <th>Consumer Zählernummer (Malo ID)</th>
