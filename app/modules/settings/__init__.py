@@ -87,7 +87,8 @@ def get_settings(section=None, domain_raw=None):
                     "4010": "solar_edge_change_test",
                     "4054": "enpal_mvt",
                     "4056": "enpal_verbau",
-                    "4074": "additional_electric"
+                    "4074": "additional_electric",
+                    "8749": "aufmass_wp"
                 },
                 "cloud_type": {
                     "234": "Zero",
@@ -612,7 +613,8 @@ def get_settings(section=None, domain_raw=None):
                     "power_extra_usage": "UF_CRM_1676891711",
                     "upload_link_tab": "UF_CRM_1656489097",
                     "contract_managed_by": "UF_CRM_1682334663",
-                    "contract_transfered_at": "UF_CRM_1682413256"
+                    "contract_transfered_at": "UF_CRM_1682413256",
+                    "enbw_contract_number": "UF_CRM_1683013392"
                 }
             },
             "invoice": {

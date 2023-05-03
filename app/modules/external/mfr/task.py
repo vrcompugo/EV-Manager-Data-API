@@ -445,7 +445,8 @@ def get_template_id_by_deal(deal_data):
         "solar_edge_change_test": "18147409920",
         "enpal_mvt": "18214387720",
         "enpal_verbau": "18214387721",
-        "additional_electric": "18511986693"
+        "additional_electric": "18511986693",
+        "aufmass_wp": "42852253735"
     }
     if deal_data is None:
         return config["default"]
