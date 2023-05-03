@@ -491,7 +491,7 @@ def generate_contract_summary_pdf(lead_id, data):
     else:
         add_pdf_by_drive_id(merger, 443352, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/443352/?&ncc=1&filename=Verkaufsunterlagen.pdf
     if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
-        if "data" in data and data["data"].get("cloud_quote_type") in ["synergy"]:
+        if False and "data" in data and data["data"].get("cloud_quote_type") in ["synergy"]:
             add_pdf_by_drive_id(merger, 7800527, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/7800527/?&ncc=1&filename=contractingvertrag_synergie360_2023_formular.pdf
         else:
             add_pdf_by_drive_id(merger, 2528314, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2528314/?&ncc=1&filename=contractingvertrag_januar_2022.pdf
@@ -518,7 +518,7 @@ def generate_contract_summary_part2_pdf(lead_id, data):
 
 def generate_contract_summary_part3_pdf(lead_id, data):
     if datetime.datetime.now() >= datetime.datetime(2021,12,14,0,0,0):
-        if "data" in data and data["data"].get("cloud_quote_type") in ["synergy"]:
+        if False and "data" in data and data["data"].get("cloud_quote_type") in ["synergy"]:
             return get_file_content_cached(7800527) # https://keso.bitrix24.de/disk/downloadFile/7800527/?&ncc=1&filename=contractingvertrag_synergie360_2023_formular.pdf
         return get_file_content_cached(2528314)  # https://keso.bitrix24.de/disk/downloadFile/2528314/?&ncc=1&filename=contractingvertrag_januar_2022.pdf
     return get_file_content_cached(443350)  # Contractigvertrag
