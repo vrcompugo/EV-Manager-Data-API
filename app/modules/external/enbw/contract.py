@@ -149,6 +149,7 @@ def cron_update_contract_status():
             value = value.strip('"')
         if values[0] == "JoulesID":
             continue
+        print(values)
         contract = ENBWContract.query.filter(ENBWContract.joulesId == values[0]).first()
         if contract is None:
             contract = ENBWContract.query.filter(ENBWContract.sub_contract_number == values[1]).first()
@@ -158,7 +159,7 @@ def cron_update_contract_status():
             .filter(ENBWContractHistory.api_response_status == values[4])\
             .first()
         history = ENBWContractHistory()
-        if contract is None:
+        if contract is not None:
             history.enbw_contract_id = contract.id
         if contract.enbw_contract_number is None:
             contract.enbw_contract_number = values[2]
