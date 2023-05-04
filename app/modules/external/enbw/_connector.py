@@ -5,6 +5,8 @@ import random
 import hmac
 import hashlib
 import re
+import pysftp
+import os
 
 from app import db
 from app.modules.settings import get_settings
@@ -128,3 +130,26 @@ def put(url, post_data=None, files=None, contract:ENBWContract=None):
                 db.session.commit()
             print(response.text)
     return None
+
+
+def get_ftp_file(path):
+    cnopts = pysftp.CnOpts(knownhosts='known_hosts')
+    host = 'energyretail.de'
+    port = 22
+    username = 'energie360_enbw'
+    password= 'rvsgda7Wrn6w9YYbP15I'
+    try:
+        conn = pysftp.Connection(host=host,port=port,username=username, password=password, cnopts=cnopts)
+        print("connection established successfully")
+    except:
+        print('failed to establish connection to targeted server')
+    filename = get_temp_file_name()
+    conn.get(path, filename)
+    with open(filename, 'r', encoding='utf-8', errors='ignore') as fh:
+        content = fh.read()
+    os.unlink(filename)
+    return content
+
+
+def get_temp_file_name():
+    return f"tmp_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(0, 1000000)}"

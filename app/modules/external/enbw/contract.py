@@ -3,6 +3,7 @@ import datetime
 import base64
 from werkzeug import FileStorage
 
+from app import db
 from app.exceptions import ApiException
 from app.modules.external.bitrix24.deal import get_deal, update_deal
 from app.modules.external.bitrix24.contact import get_contact
@@ -10,7 +11,7 @@ from app.modules.external.bitrix24.drive import get_folder_id, get_folder, get_f
 from app.modules.cloud.services.contract import get_contract_data, normalize_date
 from app.modules.settings import get_settings
 
-from ._connector import post
+from ._connector import post, get_ftp_file
 from .tarif import get_tarifs
 from .models.enbw_contract import ENBWContract
 from .models.enbw_contract_history import ENBWContractHistory
@@ -136,3 +137,39 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id):
         "contract_transfered_at": str(datetime.datetime.now()),
     })
     return contract_data
+
+
+def cron_update_contract_status():
+
+    csv_file = get_ftp_file('status/status_historie_latest.csv')
+    lines = csv_file.split("\n")
+    for line in lines:
+        values = line.split(";")
+        for value in values:
+            value = value.strip('"')
+        if values[0] == "JoulesID":
+            continue
+        contract = ENBWContract.query.filter(ENBWContract.joulesId == values[0]).first()
+        if contract is None:
+            contract = ENBWContract.query.filter(ENBWContract.sub_contract_number == values[1]).first()
+        history = ENBWContractHistory.query\
+            .filter(ENBWContractHistory.enbw_contract_id == contract.id)\
+            .filter(ENBWContractHistory.datetime == values[3])\
+            .filter(ENBWContractHistory.api_response_status == values[4])\
+            .first()
+        history = ENBWContractHistory()
+        if contract is None:
+            history.enbw_contract_id = contract.id
+        if contract.enbw_contract_number is None:
+            contract.enbw_contract_number = values[2]
+            update_deal(contract.deal_id, {
+                "enbw_contract_number": values[2]
+            })
+        history.datetime = values[3]
+        history.action = 'cron'
+        history.post_data = None
+        history.api_response_status = values[4]
+        history.api_response = None
+        history.api_response_raw = ";".join(values)
+        db.session.add(history)
+        db.session.commit()

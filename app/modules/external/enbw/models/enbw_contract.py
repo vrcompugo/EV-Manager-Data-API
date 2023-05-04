@@ -10,6 +10,7 @@ class ENBWContract(BaseModel, db.Model):
     main_contract_number = db.Column(db.String(120))
     sub_contract_number = db.Column(db.String(120))
     deal_id = db.Column(db.Integer)
+    enbw_contract_number = db.Column(db.String(50))
     joulesId = db.Column(db.String(50))
     tarif_data = db.Column(db.JSON)
     status = db.Column(db.String(50))

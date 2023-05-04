@@ -255,3 +255,11 @@ def cron(section=None):
             cron_generate_weekly_invoice_bundles()
         except Exception as e:
             print(traceback.format_exc())
+
+    if section == "productive-test" or section == "cron_update_contract_status":
+        from app.modules.external.enbw.contract import cron_update_contract_status
+        try:
+            cron_update_contract_status()
+        except Exception as e:
+            print(traceback.format_exc())
+
