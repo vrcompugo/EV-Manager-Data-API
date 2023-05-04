@@ -145,8 +145,8 @@ def cron_update_contract_status():
     lines = csv_file.split("\n")
     for line in lines:
         values = line.split(";")
-        for value in values:
-            value = value.replace('"', '')
+        for index, value in enumerate(values):
+            values[index] = value.replace('"', '')
         if values[0] == "JoulesID":
             continue
         print(values)
