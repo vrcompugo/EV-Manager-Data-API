@@ -146,31 +146,34 @@ def cron_update_contract_status():
     for line in lines:
         values = line.split(";")
         for value in values:
-            value = value.strip('"')
+            value = value.replace('"', '')
         if values[0] == "JoulesID":
             continue
         print(values)
         contract = ENBWContract.query.filter(ENBWContract.joulesId == values[0]).first()
         if contract is None:
+            return
             contract = ENBWContract.query.filter(ENBWContract.sub_contract_number == values[1]).first()
         history = ENBWContractHistory.query\
-            .filter(ENBWContractHistory.enbw_contract_id == contract.id)\
             .filter(ENBWContractHistory.datetime == values[3])\
-            .filter(ENBWContractHistory.api_response_status == values[4])\
-            .first()
-        history = ENBWContractHistory()
+            .filter(ENBWContractHistory.api_response_status == values[4])
         if contract is not None:
-            history.enbw_contract_id = contract.id
-        if contract.enbw_contract_number is None:
-            contract.enbw_contract_number = values[2]
-            update_deal(contract.deal_id, {
-                "enbw_contract_number": values[2]
-            })
-        history.datetime = values[3]
-        history.action = 'cron'
-        history.post_data = None
-        history.api_response_status = values[4]
-        history.api_response = None
-        history.api_response_raw = ";".join(values)
-        db.session.add(history)
-        db.session.commit()
+            history = history.filter(ENBWContractHistory.enbw_contract_id == contract.id)
+        history = history.first()
+        if history is None:
+            history = ENBWContractHistory()
+            if contract is not None:
+                history.enbw_contract_id = contract.id
+            if contract.enbw_contract_number is None:
+                contract.enbw_contract_number = values[2]
+                update_deal(contract.deal_id, {
+                    "enbw_contract_number": values[2]
+                })
+            history.datetime = values[3]
+            history.action = 'cron'
+            history.post_data = None
+            history.api_response_status = values[4]
+            history.api_response = None
+            history.api_response_raw = ";".join(values)
+            db.session.add(history)
+            db.session.commit()
