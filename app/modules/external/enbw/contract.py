@@ -147,7 +147,7 @@ def cron_update_contract_status():
         values = line.split(";")
         for index, value in enumerate(values):
             values[index] = value.replace('"', '')
-        if values[0] == "JoulesID":
+        if values[0] in ["JoulesID", ""]:
             continue
         print(values)
         contract = ENBWContract.query.filter(ENBWContract.joulesId == values[0]).first()

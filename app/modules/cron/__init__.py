@@ -256,7 +256,7 @@ def cron(section=None):
         except Exception as e:
             print(traceback.format_exc())
 
-    if section == "productive-test" or section == "cron_update_contract_status":
+    if section == "productive" or section == "cron_update_contract_status":
         from app.modules.external.enbw.contract import cron_update_contract_status
         try:
             cron_update_contract_status()
