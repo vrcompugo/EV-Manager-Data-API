@@ -25,6 +25,7 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
     last_week_begin = datetime.datetime(last_week_monday.year, last_week_monday.month, last_week_monday.day)
     last_week_end = last_week_begin + datetime.timedelta(days=6, hours=23, minutes=59, seconds=59)
     week_number = last_week_begin.isocalendar()[1]
+    print(week_number)
     year = last_week_begin.year
     bundle = InvoiceBundle.query.filter(InvoiceBundle.kw == week_number).filter(InvoiceBundle.year == year).first()
     if bundle is None:
