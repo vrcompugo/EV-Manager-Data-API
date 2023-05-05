@@ -403,6 +403,12 @@ def run_fix_legacy_solar_edge_links():
     fix_legacy_solar_edge_links()
 
 
+@manager.command
+def run_generate_weekly_invoice_bundles():
+    from app.modules.invoice import cron_generate_weekly_invoice_bundles
+    cron_generate_weekly_invoice_bundles(offset_weeks=9)
+
+
 if __name__ == '__main__':
     sa.orm.configure_mappers()
     manager.run()
