@@ -69,10 +69,6 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
             "filter[>updatedTime]": str(last_week_begin),
             "filter[<updatedTime]": str(last_week_end)
         }, force_reload=True)
-        items = items + get_invoices_bitrix({
-            "filter[>createdTime]": str(last_week_begin),
-            "filter[<createdTime]": str(last_week_end)
-        }, force_reload=True)
     if len(items) > 0:
         for item in items:
             if item.get("stageid") != "DT31_2:UC_QL7S39":
