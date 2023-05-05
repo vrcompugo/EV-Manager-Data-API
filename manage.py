@@ -404,9 +404,10 @@ def run_fix_legacy_solar_edge_links():
 
 
 @manager.command
-def run_generate_weekly_invoice_bundles():
+@manager.option("-kw", "--kw", dest='kw', default=0)
+def run_generate_weekly_invoice_bundles(kw):
     from app.modules.invoice import cron_generate_weekly_invoice_bundles
-    cron_generate_weekly_invoice_bundles(offset_weeks=9)
+    cron_generate_weekly_invoice_bundles(offset_weeks=int(kw))
 
 
 if __name__ == '__main__':
