@@ -916,7 +916,7 @@ def get_export_data_cloud(deal, contact):
         "recurUnit": "MONTH",
         "duePeriod": 0,
         "dueUnit": "DAY",
-        "paymentMethod": "BANKTRANSFER" if is_negative else "SEPA_DEBIT",
+        "paymentMethod": "SEPA_DEBIT",
         "contractStatus": "ACTIVE",
         "trialPeriod": 0,
         "trialUnit": "DAY",
