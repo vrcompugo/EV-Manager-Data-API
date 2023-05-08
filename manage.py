@@ -410,6 +410,12 @@ def run_generate_weekly_invoice_bundles(kw):
     cron_generate_weekly_invoice_bundles(offset_weeks=int(kw))
 
 
+@manager.command
+def run_process_existing_enbw_contracts():
+    from app.modules.external.enbw.contract import process_existing_enbw_contracts
+    process_existing_enbw_contracts()
+
+
 if __name__ == '__main__':
     sa.orm.configure_mappers()
     manager.run()

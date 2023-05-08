@@ -2,6 +2,7 @@ import json
 import datetime
 import base64
 from werkzeug import FileStorage
+from sqlalchemy import or_
 
 from app import db
 from app.exceptions import ApiException
@@ -175,5 +176,49 @@ def cron_update_contract_status():
             history.api_response_status = values[4]
             history.api_response = None
             history.api_response_raw = ";".join(values)
+            if values[4] in ["Besttigt", "Bestätigt"]:
+                update_deal(contract.deal_id, {
+                    "cloud_delivery_begin": values[5],
+                    "stage_id": "C15:UC_D88VXL"
+                })
+                contract.status = "success"
+                contract.status_message = "Bestätigt"
+            if values[4] in ["Error"]:
+                if contract.enbw_contract_number in [None, "", 0, "0"]:
+                    update_deal(contract.deal_id, {
+                        "stage_id": "C15:UC_A8XIOF"
+                    })
+                else:
+                    update_deal(contract.deal_id, {
+                        "stage_id": "C15:UC_U3M2IG"
+                    })
+                contract.status = "error"
+                contract.status_message = "Error"
             db.session.add(history)
             db.session.commit()
+
+
+def process_existing_enbw_contracts():
+    histories = ENBWContractHistory.query.filter(or_(ENBWContractHistory.api_response_status == "Besttigt", ENBWContractHistory.api_response_status == "Error")).all()
+    for history in histories:
+        contract = history.contract
+        if history.api_response_status in ["Besttigt", "Bestätigt"]:
+            values = history.api_response_raw.split(";")
+            update_deal(contract.deal_id, {
+                "cloud_delivery_begin": values[5],
+                "stage_id": "C15:UC_D88VXL"
+            })
+            contract.status = "success"
+            contract.status_message = "Bestätigt"
+        if history.api_response_status in ["Error"]:
+            if contract.enbw_contract_number in [None, "", 0, "0"]:
+                update_deal(contract.deal_id, {
+                    "stage_id": "C15:UC_A8XIOF"
+                })
+            else:
+                update_deal(contract.deal_id, {
+                    "stage_id": "C15:UC_U3M2IG"
+                })
+            contract.status = "error"
+            contract.status_message = "Error"
+        db.session.commit()

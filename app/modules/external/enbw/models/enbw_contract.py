@@ -15,4 +15,4 @@ class ENBWContract(BaseModel, db.Model):
     tarif_data = db.Column(db.JSON)
     status = db.Column(db.String(50))
     status_message = db.Column(db.String(250))
-    histories = db.relationship("ENBWContractHistory", order_by="desc(ENBWContractHistory.id)")
+    histories = db.relationship("ENBWContractHistory", order_by="desc(ENBWContractHistory.id)", backref="contract")
