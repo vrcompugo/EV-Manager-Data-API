@@ -175,24 +175,26 @@ def cron_update_contract_status():
             history.api_response_status = values[4]
             history.api_response = None
             history.api_response_raw = ";".join(values)
-            if values[4] in ["Besttigt", "Bestätigt"]:
-                update_deal(contract.deal_id, {
-                    "cloud_delivery_begin": values[5],
-                    "stage_id": "C15:UC_D88VXL"
-                })
-                contract.status = "success"
-                contract.status_message = "Bestätigt"
-            if values[4] in ["Error"]:
-                if contract.enbw_contract_number in [None, "", 0, "0"]:
+            deal = get_deal(contract.deal_id, force_reload=True)
+            if deal.get("stage_id") in ["C15:UC_R6HWHP"]:
+                if values[4] in ["Besttigt", "Bestätigt"]:
                     update_deal(contract.deal_id, {
-                        "stage_id": "C15:UC_A8XIOF"
+                        "cloud_delivery_begin": values[5],
+                        "stage_id": "C15:UC_D88VXL"
                     })
-                else:
-                    update_deal(contract.deal_id, {
-                        "stage_id": "C15:UC_U3M2IG"
-                    })
-                contract.status = "error"
-                contract.status_message = "Error"
+                    contract.status = "success"
+                    contract.status_message = "Bestätigt"
+                if values[4] in ["Error"]:
+                    if contract.enbw_contract_number in [None, "", 0, "0"]:
+                        update_deal(contract.deal_id, {
+                            "stage_id": "C15:UC_A8XIOF"
+                        })
+                    else:
+                        update_deal(contract.deal_id, {
+                            "stage_id": "C15:UC_U3M2IG"
+                        })
+                    contract.status = "error"
+                    contract.status_message = "Error"
             db.session.add(history)
             db.session.commit()
 
@@ -201,6 +203,9 @@ def process_existing_enbw_contracts():
     histories = ENBWContractHistory.query.filter(or_(ENBWContractHistory.api_response_status == "Besttigt", ENBWContractHistory.api_response_status == "Error")).all()
     for history in histories:
         contract = history.contract
+        deal = get_deal(contract.deal_id, force_reload=True)
+        if deal.get("stage_id") not in ["C15:UC_R6HWHP"]:
+            continue
         if history.api_response_status in ["Besttigt", "Bestätigt"]:
             values = history.api_response_raw.split(";")
             update_deal(contract.deal_id, {
@@ -220,4 +225,4 @@ def process_existing_enbw_contracts():
                 })
             contract.status = "error"
             contract.status_message = "Error"
-        db.session.commit()
+    db.session.commit()
