@@ -86,7 +86,7 @@ def append_bitrix_item(item, bundle, zip_archive, zipfile, document_function, we
     document = document_function(item.get("id"))
     if document is None:
         return zip_archive, zipfile, index
-    if zipfile.getbuffer().nbytes > 69000000:
+    if zipfile.getbuffer().nbytes > 59000000:
         upload_zipfile(zip_archive, zipfile, bundle, index)
         index = index + 1
         zipfile = BytesIO()
@@ -135,7 +135,7 @@ def append_item(item, bundle, zip_archive, zipfile, document_function, week_numb
     print(item.get("number"))
     print(zip_archive)
     print(zipfile.getbuffer().nbytes)
-    if zipfile.getbuffer().nbytes > 69000000:
+    if zipfile.getbuffer().nbytes > 59000000:
         upload_zipfile(zip_archive, zipfile, bundle, index)
         index = index + 1
         zipfile = BytesIO()
