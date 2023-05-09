@@ -94,6 +94,7 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id):
             "start_delivery": normalize_date(datetime.datetime.now()).strftime("%Y-%m-%d"),
             "start_delivery_next_possible": "1",
             "start_delivery_type": 1,
+            "preferred_billing_date": normalize_date(datetime.datetime.now()).strftime("%Y-12-31"),
             "status": 0,
             "tariff_brand": tarif["brand"],
             "tariff_city": address_data["city"],
