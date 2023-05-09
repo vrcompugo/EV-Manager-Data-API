@@ -116,8 +116,8 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id):
             "zipcode": "34497"
         },
         "CorrespondensePrivateData": {
-            "first_name": "Andre",
-            "last_name": "Schön",
+            "first_name": "-",
+            "last_name": "Energie360 GmbH & Co. KG",
             "suffix": "Herr"
         },
         "PrivateData": {
