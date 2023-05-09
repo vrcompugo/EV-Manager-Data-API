@@ -56,7 +56,7 @@ def add_product(data):
                 size = 21
             if 21000 < full_usage:
                 size = (math.ceil(full_usage / 4200)) * 4.2
-            if float(data["data"].get("heater_usage")) > 0:
+            if data["data"].get("heater_usage") not in [None, "", "0"] and float(data["data"].get("heater_usage")) > 0:
                 size = size + 4.2
             if size > 50.4:
                 size = 50.4 + math.ceil((full_usage - 50400) / 2 / 4200) * 4.2
