@@ -1101,7 +1101,7 @@ def get_annual_statement_data(data, year, manuell_data):
                         half_tax = {
                             "delivery_begin": "2022-10-01",
                             "delivery_end": "2022-12-31",
-                            "percent_year": (1 - percent_full_tax),
+                            "percent_year": 4 / 12,
                             "taxrate": statement_config[product]["taxrate"],
                             "total_cloud_price": round((statement_config[product]["total_cloud_price_net"] * (1 - percent_full_tax)) * (1 + statement_config[product]["taxrate"] / 100), 4),
                             "total_cloud_price_incl_refund_net": statement_config[product]["total_cloud_price_incl_refund_net"] * (1 - percent_full_tax),
