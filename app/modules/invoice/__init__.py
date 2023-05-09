@@ -66,8 +66,8 @@ def cron_generate_weekly_invoice_bundles(offset_weeks=0):
         items = get_invoices_bitrix({}, force_reload=True)
     else:
         items = get_invoices_bitrix({
-            "filter[>updatedTime]": str(last_week_begin),
-            "filter[<updatedTime]": str(last_week_end)
+            "filter[>createdTime]": str(last_week_begin),
+            "filter[<createdTime]": str(last_week_end)
         }, force_reload=True)
     if len(items) > 0:
         for item in items:
