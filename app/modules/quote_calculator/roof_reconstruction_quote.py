@@ -37,6 +37,24 @@ def get_roof_reconstruction_products(data):
             data=data["roof_reconstruction_quote"]["calculated"]
         )
 
+        data["roof_reconstruction_quote"]["calculated"]["roof_sqm"] = float(data["roof_reconstruction_quote"]["calculated"]["roof_sqm"])
+        gerust_product = "Gerüst Pauschale. 900"
+        if data["roof_reconstruction_quote"]["calculated"]["roof_sqm"] <= 150:
+            gerust_product = "Gerüst Pauschale. 150"
+        if 150 < data["roof_reconstruction_quote"]["calculated"]["roof_sqm"] <= 250:
+            gerust_product = "Gerüst Pauschale. 250"
+        if 250 < data["roof_reconstruction_quote"]["calculated"]["roof_sqm"] <= 350:
+            gerust_product = "Gerüst Pauschale. 350"
+        if 350 < data["roof_reconstruction_quote"]["calculated"]["roof_sqm"] <= 500:
+            gerust_product = "Gerüst Pauschale. 500"
+        add_direct_product(
+            label=gerust_product,
+            category=f"Dachsanierung online Bogen",
+            quantity=1,
+            products=data["roof_reconstruction_quote"]["products"],
+            data=data["roof_reconstruction_quote"]["calculated"]
+        )
+
         trash_management_quantity = 0
         if "trash_management" in data["data"]["reconstruction_extra_options"]:
             if data["data"].get("reconstruction_extra_options_trash_management_amount", 0) not in [0, "", None]:
