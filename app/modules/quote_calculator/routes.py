@@ -1322,14 +1322,12 @@ def get_insign_callback(token):
                     "id": file_id,
                     "filename": file["displayname"] + ".pdf"
                 })
-    if token_data.get("history_id") not in [None, "", 0]:
-        history = QuoteHistory.query.filter(QuoteHistory.id == token_data.get("history_id")).first()
-        if history is not None:
-            file_content = get_file_content(history.data["pdf_summary_file_id"])
-            add_file(token_data["upload_folder_id_contract"], {
-                "filename": token_data["number"] + " Energiekonzept.pdf",
-                "file_content": file_content
-            })
+    if token_data.get("pdf_summary_file_id") not in [None, "", 0]:
+        file_content = get_file_content(token_data.get("pdf_summary_file_id"))
+        add_file(token_data["upload_folder_id_contract"], {
+            "filename": token_data["number"] + " Energiekonzept.pdf",
+            "file_content": file_content
+        })
 
     if len(collection_files) > 0:
         jwt = encode_shared_jwt(data={
@@ -1575,7 +1573,7 @@ def get_insign_session(data):
             "bluegen_quote_sum_net": data["bluegen_quote"].get("total_net"),
             "roof_reconstruction_quote_sum_net": data["roof_reconstruction_quote"].get("total_net"),
             "pv_kwp": None,
-            "history_id": data.get("history_id"),
+            "pdf_summary_file_id": data.get("pdf_summary_file_id"),
             "documents": token_documents,
             "upload_folder_id_tab": data["data"].get("upload_folder_id_tab"),
             "upload_folder_id_electric": data["data"]["upload_folder_id_electric"],
