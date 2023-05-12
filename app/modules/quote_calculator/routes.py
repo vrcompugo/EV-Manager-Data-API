@@ -16,7 +16,7 @@ from app.modules.auth.jwt_parser import decode_jwt, encode_jwt, encode_shared_jw
 from app.modules.external.bitrix24.lead import get_lead, update_lead, add_lead
 from app.modules.external.bitrix24.deal import get_deal, update_deal
 from app.modules.external.bitrix24.quote import get_quote, add_quote, update_quote_products
-from app.modules.external.bitrix24.drive import get_file, add_file, get_folder_id, get_public_link, create_folder_path
+from app.modules.external.bitrix24.drive import get_file, add_file, get_folder_id, get_public_link, create_folder_path, get_file_content
 from app.modules.external.bitrix24.products import reload_products
 from app.modules.external.bitrix24.contact import add_contact
 from app.modules.external.insign.models.insign_log import InsignLog
@@ -1322,6 +1322,15 @@ def get_insign_callback(token):
                     "id": file_id,
                     "filename": file["displayname"] + ".pdf"
                 })
+    if token_data.get("history_id") not in [None, "", 0]:
+        history = QuoteHistory.query.filter(QuoteHistory.id == token_data.get("history_id")).first()
+        if history is not None:
+            file_content = get_file_content(history.data["pdf_summary_file_id"])
+            add_file(token_data["upload_folder_id_contract"], {
+                "filename": token_data["number"] + " Energiekonzept.pdf",
+                "file_content": file_content
+            })
+
     if len(collection_files) > 0:
         jwt = encode_shared_jwt(data={
             "files": collection_files
@@ -1566,6 +1575,7 @@ def get_insign_session(data):
             "bluegen_quote_sum_net": data["bluegen_quote"].get("total_net"),
             "roof_reconstruction_quote_sum_net": data["roof_reconstruction_quote"].get("total_net"),
             "pv_kwp": None,
+            "history_id": data.get("history_id"),
             "documents": token_documents,
             "upload_folder_id_tab": data["data"].get("upload_folder_id_tab"),
             "upload_folder_id_electric": data["data"]["upload_folder_id_electric"],
