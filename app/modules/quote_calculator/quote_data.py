@@ -544,7 +544,7 @@ def calculate_products(data):
                 quantity=1,
                 products=data["products"]
             )
-        print("yxc", storage_product["NAME"])
+
         if storage_product is not None and storage_product["NAME"].find("Senec Lithium Speicher") >= 0 and data["data"].get("cloud_quote_type") in [None, ""]:
             if data["calculated"]["power_usage"] in [3000, 4000, 5000, 6000, 7500, 9000, 11000] and data["calculated"]["heater_usage"] == 0:
                 product = get_product(label="Paket Aktion CLOUD", category="Extra Pakete")
@@ -552,6 +552,25 @@ def calculate_products(data):
                     product["quantity"] = 1
                     product["PRICE"] = -1666.66666667
                     data["products"].append(product)
+
+        if str(data["assigned_user"]["UF_DEPARTMENT"]) not in ["523", "525", "529", "270", "527"]:
+            if data["data"].get("cloud_quote_type") in ["synergy"] and data["data"].get("pv_quote_discount_euro") not in [None, "", 0]:
+                print("aslnc")
+                data["subtotal_net"] = 0
+                for product in data["products"]:
+                    if product["PRICE"] is not None:
+                        product["PRICE"] = float(product["PRICE"])
+                        product["total_price"] = float(product["PRICE"]) * float(product["quantity"])
+                        data["subtotal_net"] = data["subtotal_net"] + product["total_price"]
+                    else:
+                        print(product["NAME"])
+                print(float(data["data"].get("pv_quote_discount_euro")) / (data["subtotal_net"]* 0.9))
+                if float(data["data"].get("pv_quote_discount_euro")) / (data["subtotal_net"] * 0.9) >= 0.05:
+                    product = get_product(label="Innovationsbonus INTER-SOLAR", category="Stromspeicher")
+                    if product is not None:
+                        product["quantity"] = 1
+                        product["PRICE"] = -float(product["PRICE"])
+                        data["products"].append(product)
         '''add_direct_product(
             label="E.MW (energie-monitoring-wireless)",
             category="Extra Pakete",
