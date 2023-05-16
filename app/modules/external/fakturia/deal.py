@@ -267,9 +267,12 @@ def get_cloud_contract_data_by_deal(deal):
         contract = ENBWContract.query.options(db.subqueryload("histories")).filter(ENBWContract.sub_contract_number == deal.get("cloud_contract_number")).first()
         if contract is not None:
             deal["enbw_data"] = contract.to_dict()
-            if isinstance(deal["enbw_data"].get("files"), list):
-                for index, file in enumerate(deal["enbw_data"].get("files")):
-                    deal["enbw_data"]["files"][index]["content"] = '...'
+            if isinstance(deal["enbw_data"].get("histories"), list):
+                for index, history in enumerate(deal["enbw_data"].get("histories")):
+                    if history.get("post_data") not in [None, ""]:
+                        if isinstance(history.get("post_data").get("files"), list):
+                            for index2, file in enumerate(history.get("post_data").get("files")):
+                                deal["enbw_data"]["histories"][index]["post_data"]["files"][index2]["content"] = '...'
     deal = set_default_data(deal)
     if deal is None:
         return {"status": "failed", "data": {"error": "Cloud Nummer konnten nicht gefunden werden"}, "message": ""}
