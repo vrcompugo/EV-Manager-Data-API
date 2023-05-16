@@ -1198,11 +1198,13 @@ def get_annual_statement_data(data, year, manuell_data):
     if manuell_data.get("extra_credit_value") not in [None, "", 0]:
         statement["extra_credit_label"] = manuell_data.get("extra_credit_label")
         statement["extra_credit_value"] = -float(manuell_data.get("extra_credit_value"))
+    statement["extra_credit_value_net"] =  statement["extra_credit_value"] / (1 + statement["taxrate"] / 100)
     statement["extra_credit_value2"] = 0
     statement["extra_credit_label2"] = ""
     if manuell_data.get("extra_credit_value2") not in [None, "", 0]:
         statement["extra_credit_label2"] = manuell_data.get("extra_credit_label2")
         statement["extra_credit_value2"] = -float(manuell_data.get("extra_credit_value2"))
+    statement["extra_credit_value2_net"] =  statement["extra_credit_value2"] / (1 + statement["taxrate"] / 100)
     statement["cost_total"] = statement["total_cloud_price_incl_refund"] + statement["total_extra_price"] + statement["extra_credit_value"] + statement["extra_credit_value2"]
     statement["to_pay"] = statement["total_cloud_price_incl_refund"] - statement["pre_payments_total"] + statement["total_extra_price"] + statement["extra_credit_value"] + statement["extra_credit_value2"]
     statement["to_pay_net"] = statement["to_pay"] / 1.19
