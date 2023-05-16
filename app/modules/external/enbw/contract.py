@@ -177,7 +177,7 @@ def cron_update_contract_status():
             history.api_response = None
             history.api_response_raw = ";".join(values)
             deal = get_deal(contract.deal_id, force_reload=True)
-            if deal.get("stage_id") in ["C15:UC_R6HWHP"]:
+            if deal.get("stage_id") in ["C15:UC_R6HWHP", "C15:UC_A8XIOF"]:
                 if values[4] in ["Besttigt", "Bestätigt"]:
                     update_deal(contract.deal_id, {
                         "cloud_delivery_begin": values[5],
