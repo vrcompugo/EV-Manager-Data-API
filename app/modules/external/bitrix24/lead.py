@@ -308,7 +308,7 @@ def run_cron_auto_assign_leads():
     from app.modules.user import auto_assign_lead_to_user
     leads = get_leads({
         "SELECT": "full",
-        "FILTER[SOURCE_ID]": "41",
+        "FILTER[UF_CRM_1684247325]": "1",
         "FILTER[ASSIGNED_BY_ID]": "106"
     }, force_reload=True)
     if leads is None:
