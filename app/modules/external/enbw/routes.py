@@ -114,5 +114,8 @@ def upload_contract():
         raise e
 
     deal["enbw_data"] = contract.to_dict()
+    if isinstance(deal["enbw_data"].get("files"), list):
+        for file in deal["enbw_data"].get("files"):
+            file["content"] = '...'
 
     return {"status": "success", "data": deal}
