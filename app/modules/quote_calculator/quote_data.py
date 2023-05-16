@@ -545,7 +545,7 @@ def calculate_products(data):
                 products=data["products"]
             )
 
-        if storage_product is not None and storage_product["NAME"].find("Senec Lithium Speicher") >= 0 and data["data"].get("cloud_quote_type") in [None, ""]:
+        if storage_product is not None and storage_product["NAME"].find("Senec Lithium Speicher") >= 0 and data["data"].get("cloud_quote_type") in [None, "", 0]:
             if data["calculated"]["power_usage"] in [3000, 4000, 5000, 6000, 7500, 9000, 11000] and data["calculated"]["heater_usage"] == 0:
                 product = get_product(label="Paket Aktion CLOUD", category="Extra Pakete")
                 if product is not None:
@@ -555,7 +555,6 @@ def calculate_products(data):
 
         if str(data["assigned_user"]["UF_DEPARTMENT"]) not in ["523", "525", "529", "270", "527"]:
             if data["data"].get("cloud_quote_type") in ["synergy"] and data["data"].get("pv_quote_discount_euro") not in [None, "", 0]:
-                print("aslnc")
                 data["subtotal_net"] = 0
                 for product in data["products"]:
                     if product["PRICE"] is not None:
@@ -564,7 +563,6 @@ def calculate_products(data):
                         data["subtotal_net"] = data["subtotal_net"] + product["total_price"]
                     else:
                         print(product["NAME"])
-                print(float(data["data"].get("pv_quote_discount_euro")) / (data["subtotal_net"]* 0.9))
                 if float(data["data"].get("pv_quote_discount_euro")) / (data["subtotal_net"] * 0.9) >= 0.05:
                     product = get_product(label="Innovationsbonus INTER-SOLAR", category="Stromspeicher")
                     if product is not None:

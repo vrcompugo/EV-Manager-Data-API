@@ -144,7 +144,7 @@ def calculate_synergy_wi(data):
         "north": 603
     }
     for field in [
-        "pv_kwp", "autocracy_rate", "power_usage", "power_extra_usage", "heater_usage", "car_usage", "consumer_usage", "car_count",
+        "pv_kwp", "power_usage", "power_extra_usage", "heater_usage", "car_usage", "consumer_usage", "car_count",
         "power_increase_rate", "heating_increase_rate", "car_increase_rate", "inflation_rate", "financing_rate",
         ]:
         if data.get(field) not in [None, "", 0]:
@@ -210,6 +210,9 @@ def calculate_synergy_wi(data):
         calculated["extra_synergy_bonus"] = calculated["extra_synergy_bonus"] - (calculated["synergy_first_missing_storage_stack_cash_nerf"] + (calculated["extra_stacks"] - 1) * calculated["synergy_missing_storage_stack_cash_nerf"])
     if calculated["autocracy_rate"] > calculated["max_autocracy_rate"]:
         calculated["autocracy_rate"] = calculated["max_autocracy_rate"]
+    if data.get("autocracy_rate") not in [None, "", 0] and data.get("synergy_autarkie_overwrite") not in [None, "", 0]:
+        calculated["autocracy_rate"] = float(data.get("autocracy_rate"))
+        print("asd", calculated["autocracy_rate"])
     calculated["power_total_increase_rate"] = calculated["inflation_rate"] + calculated["power_increase_rate"]
     calculated["heating_total_increase_rate"] = calculated["inflation_rate"] + calculated["heating_increase_rate"]
     calculated["car_total_increase_rate"] = calculated["inflation_rate"] + calculated["car_increase_rate"]
