@@ -268,8 +268,8 @@ def get_cloud_contract_data_by_deal(deal):
         if contract is not None:
             deal["enbw_data"] = contract.to_dict()
             if isinstance(deal["enbw_data"].get("files"), list):
-                for file in deal["enbw_data"].get("files"):
-                    file["content"] = '...'
+                for index, file in enumerate(deal["enbw_data"].get("files")):
+                    deal["enbw_data"]["files"][index]["content"] = '...'
     deal = set_default_data(deal)
     if deal is None:
         return {"status": "failed", "data": {"error": "Cloud Nummer konnten nicht gefunden werden"}, "message": ""}
