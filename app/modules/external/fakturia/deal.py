@@ -355,8 +355,8 @@ def get_cloud_contract_data_by_deal(deal):
         unassigend_deals[index]["link"] = f"https://keso.bitrix24.de/crm/deal/details/{unassigend_deal['id']}/"
     if len(deal["item_lists"]) > 0:
         deal["item_lists"][0]["start"] = delivery_begin
-    for list in deal["item_lists"]:
-        for item in list["items"]:
+    for item_list in deal["item_lists"]:
+        for item in item_list["items"]:
             deal_index = next((index for (index, subdeal) in enumerate(unassigend_deals) if item.get("deal") is not None and subdeal["id"] == item["deal"]["id"]), None)
             if deal_index is not None:
                 item["deal"]["link"] = unassigend_deals[deal_index]['link']
