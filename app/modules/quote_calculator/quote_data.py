@@ -233,10 +233,13 @@ def calculate_products(data):
 
         kwp_special_roof = round(kwp_special_roof, 2)
         kwp_normal_roof = round(kwp_normal_roof, 2)
-
+    taxrate = config["taxrate"]
+    if kwp < 30:
+        taxrate = 0
     if kwp == 0:
         return data
     try:
+
         add_product_pv_module(data)
         storage_product = add_product_storage(data)
         if data["data"].get("cloud_quote_type") not in ["combination_quote", "synergy"]:
@@ -606,9 +609,9 @@ def calculate_products(data):
             print(product["NAME"])
     calculate_commission_data(data, data, quote_key="pv_quote")
     data["total_net"] = data["subtotal_net"]
-    data["total_tax"] = data["total_net"] * (config["taxrate"] / 100)
+    data["total_tax"] = data["total_net"] * (taxrate / 100)
     data["total"] = data["total_net"] + data["total_tax"]
-    data["tax_rate"] = config["taxrate"]
+    data["tax_rate"] = taxrate
     if data.get("data").get("investment_type") == 'financing' and data.get("data").get("financing_bank") in ["energie360"]:
         if data.get("data").get("loan_runtime") in [None, "", "0", 0]:
             data["data"]["loan_runtime"] = 240
