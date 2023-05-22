@@ -54,8 +54,11 @@ def auto_assign_lead_to_user(lead_id):
         update_data = {"assigned_by_id": 344}
     else:
         update_data = {"assigned_by_id": user.user_id}
-    update_lead(lead_id, update_data)
-    update_contact(lead_data["contact_id"], update_data)
+    if update_data["assigned_by_id"] != lead_data["assigned_by_id"]:
+        update_lead(lead_id, update_data)
+        update_contact(lead_data["contact_id"], update_data)
+    else:
+        print("not updating")
     if user is not None:
         if user.current_cycle_index is None or user.current_cycle_index != current_cycle_index:
             user.current_cycle_index = current_cycle_index
