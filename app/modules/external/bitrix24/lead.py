@@ -315,4 +315,5 @@ def run_cron_auto_assign_leads():
         print("leads could not be loaded")
         return
     for lead in leads:
+        print("assign lead", lead["id"])
         auto_assign_lead_to_user(lead["id"])
