@@ -14,9 +14,11 @@ def run_mfr_amqp_messaging_subscriptor():
         # Default is None; to receive forever.
         with client.get_subscription_receiver(topic_name="17291739136", subscription_name=queue_name) as receiver:
             for msg in receiver:
-                print("asd", msg.__dict__)
-                if msg.message._application_properties.get(b"ServiceRequestId", None) is not None:
-                    service_request_id = str(msg.message._application_properties.get(b"ServiceRequestId", None))
+                print("asd_1", msg.properties.__dict__)
+                print("asd_3", msg._message.__dict__)
+                print("asd_2", msg.message.__dict__)
+                if msg.message.application_properties.get(b"ServiceRequestId", None) is not None:
+                    service_request_id = str(msg.message.application_properties.get(b"ServiceRequestId", None))
                     if service_request_id not in ["", "0"]:
                         try:
                             print(service_request_id)
