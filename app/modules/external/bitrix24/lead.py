@@ -309,7 +309,7 @@ def run_cron_auto_assign_leads():
     leads = get_leads({
         "SELECT": "full",
         "FILTER[UF_CRM_1684247325]": "1",
-        "FILTER[ASSIGNED_BY_ID]": "106"
+        "FILTER[ASSIGNED_BY_ID]": "344"
     }, force_reload=True)
     if leads is None:
         print("leads could not be loaded")
