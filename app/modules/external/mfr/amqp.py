@@ -13,6 +13,7 @@ def run_mfr_amqp_messaging_subscriptor():
         # max_wait_time specifies how long the receiver should wait with no incoming messages before stopping receipt.
         # Default is None; to receive forever.
         with client.get_subscription_receiver(topic_name="17291739136", subscription_name=queue_name) as receiver:
+            print("yxc", receiver)
             for msg in receiver:
                 print("asd", msg)
                 if msg.message._application_properties.get(b"ServiceRequestId", None) is not None:
