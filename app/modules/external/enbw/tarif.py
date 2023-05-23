@@ -27,11 +27,8 @@ def get_tarifs(contract: ENBWContract):
         "street_number": deal.get("delivery_street_nb"),
         "zipcode": deal.get("delivery_zip")
     }
-    tarif_type = 1
-    if deal.get("is_cloud_heatcloud") in ["1", "Y", True, "true"]:
-        tarif_type = 2
     tarif_request = {
-        "tariff_type": tarif_type, # 1 = Strom, 2 = Heating
+        "tariff_type": 1, # 1 = Strom, 2 = Heating
         "customer_type": 0,
         "client_type": 0,
         "counter_type": 0,
@@ -43,6 +40,9 @@ def get_tarifs(contract: ENBWContract):
         "city": address_data["city"],
         "street": f'{address_data["street_name"]} {address_data["street_number"]}'
     }
+    if deal.get("is_cloud_heatcloud") in ["1", "Y", True, "true"]:
+        tarif_request["tariff_type"] = 2
+        tarif_request["consumption_type"] = 0
     tarif_data = post("/tariffs", tarif_request, contract=contract)
     if "data" not in tarif_data or "tariffs" not in tarif_data["data"] or len(tarif_data["data"]["tariffs"]) == 0:
         raise ApiException("no valid tarif", "Kein ENBW Tariff für die Kundendaten gefunden")
