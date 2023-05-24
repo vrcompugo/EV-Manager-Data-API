@@ -297,6 +297,10 @@ def set_missing_values(deal):
             if "tax_consult" in history.data["data"]["extra_options"]:
                 update_data["tax_consultant"] = "Ja"
             if "wwwp" in history.data["data"]["extra_options"]:
+                if history.data["data"]["extra_options_wwwp_variant"] == "L":
+                    update_data["bwwp"] = ["Ja"]
+                if history.data["data"]["extra_options_wwwp_variant"] == "XL":
+                    update_data["bwwp"] = ["Ja"]
                 if history.data["data"]["extra_options_wwwp_variant"] == "NIBE L":
                     update_data["bwwp"] = ["Nibe 160"]
                 if history.data["data"]["extra_options_wwwp_variant"] == "NIBE XL":

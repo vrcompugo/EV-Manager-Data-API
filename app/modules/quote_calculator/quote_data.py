@@ -419,6 +419,20 @@ def calculate_products(data):
             quantity = 0
             if "wwwp" in data["data"]["extra_options"]:
                 quantity = 1
+            if data["data"]["extra_options_wwwp_variant"] == "L":
+                add_direct_product(
+                    label="Warmwasserwärmepumpe 200/5",
+                    category="Online - Heizung - WP",
+                    quantity=quantity,
+                    products=data["products"]
+                )
+            if data["data"]["extra_options_wwwp_variant"] == "XL":
+                add_direct_product(
+                    label="Warmwasserwärmepumpe 270/5",
+                    category="Online - Heizung - WP",
+                    quantity=quantity,
+                    products=data["products"]
+                )
             if data["data"]["extra_options_wwwp_variant"] == "NIBE L":
                 add_direct_product(
                     label="Brauchwasser-Wärmepumpe L",

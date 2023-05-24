@@ -197,7 +197,8 @@ def get_settings(section=None, domain_raw=None):
                     "200": "Taglio 100",
                     "202": "Taglio 180",
                     "204": "ecoStar WT",
-                    "206": "ecoStar 2.2 (zzgl. Pufferspeicher)"
+                    "206": "ecoStar 2.2 (zzgl. Pufferspeicher)",
+                    "8859": "Ja"
                 },
                 "hwp": {
                     "1698": "keine Auswahl",
