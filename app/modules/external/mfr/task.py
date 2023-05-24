@@ -448,14 +448,14 @@ def get_template_id_by_deal(deal_data):
         "additional_electric": "18511986693",
         "aufmass_wp": "42852253735"
     }
+    if deal_data.get("mfr_category", "") != "default" and deal_data.get("mfr_category", "") in config:
+        return config[deal_data.get("mfr_category", "")]
     if deal_data is None:
         return config["default"]
     if deal_data.get("category_id", "") == "32":
         return config["electric"]
     if deal_data.get("category_id", "") == "1":
         return config["roof"]
-    if deal_data.get("mfr_category", "") != "default" and deal_data.get("mfr_category", "") in config:
-        return config[deal_data.get("mfr_category", "")]
     if deal_data.get("category_id", "") == "9":
         return config["heating"]
     if deal_data.get("category_id", "") == "134":
