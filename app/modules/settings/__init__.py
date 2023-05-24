@@ -88,7 +88,8 @@ def get_settings(section=None, domain_raw=None):
                     "4054": "enpal_mvt",
                     "4056": "enpal_verbau",
                     "4074": "additional_electric",
-                    "8749": "aufmass_wp"
+                    "8749": "aufmass_wp",
+                    "8845": "logistic"
                 },
                 "cloud_type": {
                     "234": "Zero",

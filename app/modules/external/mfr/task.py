@@ -446,7 +446,8 @@ def get_template_id_by_deal(deal_data):
         "enpal_mvt": "18214387720",
         "enpal_verbau": "18214387721",
         "additional_electric": "18511986693",
-        "aufmass_wp": "42852253735"
+        "aufmass_wp": "42852253735",
+        "logistic": "43163254799"
     }
     if deal_data.get("mfr_category", "") != "default" and deal_data.get("mfr_category", "") in config:
         return config[deal_data.get("mfr_category", "")]
