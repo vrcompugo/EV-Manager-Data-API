@@ -241,6 +241,8 @@ def calculate_synergy_wi(data):
     if calculated["synergy_bonus_monthly"] > -12:
         calculated["synergy_bonus_monthly"] = -12
     calculated["synergy_bonus_monthly"] = calculated["synergy_bonus_monthly"] + calculated["extra_synergy_bonus"]
+    if calculated["synergy_bonus_monthly"] > 0:
+        calculated["synergy_bonus_monthly"] = 0
     if calculated["synergy_bonus_monthly"] < -calculated["synergy_hard_max_bonus"]:
         calculated["synergy_bonus_monthly"] = -calculated["synergy_hard_max_bonus"]
     if calculated["car_usage"] not in [None, "", 0, "0"] and calculated["car_count"] not in [None, "", 0, "0"]:
