@@ -82,6 +82,8 @@ def get_contacts(payload, force_reload=False):
     while payload["start"] is not None:
         data = post("crm.contact.list", payload, force_reload=force_reload)
         if "result" in data:
+            if data["total"] > 1000:
+                return None
             payload["start"] = data["next"] if "next" in data else None
             for item in data["result"]:
                 result.append(convert_config_values(item))
