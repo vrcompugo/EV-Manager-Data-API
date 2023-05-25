@@ -86,6 +86,7 @@ def get_contacts(payload, force_reload=False):
             for item in data["result"]:
                 result.append(convert_config_values(item))
             if data["total"] > 1000:
+                print("error: more than 1000 contacts")
                 return result
         else:
             print("error3:", data)

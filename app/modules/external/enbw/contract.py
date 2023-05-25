@@ -18,7 +18,7 @@ from .models.enbw_contract import ENBWContract
 from .models.enbw_contract_history import ENBWContractHistory
 
 
-def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id):
+def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id, is_terminated=False):
 
     config = get_settings(section="external/enbw")
     deal = get_deal(contract.deal_id, force_reload=True)
@@ -127,6 +127,8 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id):
         },
         "files": contract_files
     }
+    if is_terminated:
+        enbw_data["Client"]["self_terminated"] = "1"
     contract_data = post("/clients", enbw_data, contract=contract)
     if contract_data is None:
         raise ApiException("transfer failed", "Übertragung an ENBW fehlgeschlagen")
