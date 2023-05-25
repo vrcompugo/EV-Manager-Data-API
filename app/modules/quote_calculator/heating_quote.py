@@ -120,7 +120,7 @@ def get_heating_products(data):
                     quantity=1,
                     products=data["heating_quote"]["products"]
                 )
-            if "extra_warm_water" in data["data"].get("heating_quote_extra_options", []):
+            if data["data"].get("heating_quote_extra_options") not in [None, ""] and "extra_warm_water" in data["data"].get("heating_quote_extra_options", []):
                 quantity = 1
                 if data["data"].get("heating_quote_extra_options_extra_warm_water_count", 0) not in [0, "", None]:
                     quantity = int(data["data"].get("heating_quote_extra_options_extra_warm_water_count"))
