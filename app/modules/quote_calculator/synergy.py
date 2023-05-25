@@ -299,6 +299,8 @@ def calculate_synergy_wi(data):
 
 def calculate_synergy_wi2(return_data):
     calculated = return_data["calculated"]
+    if "total_net" not in return_data:
+        print("asd", json.dumps(return_data, indent=2))
     calculated["maintainance_cost_total"] = return_data["total_net"] * calculated["maintainance_rate"]
     calculated["maintainance_cost_monthly"] = calculated["maintainance_cost_total"] / 10 / 12
     calculated["invenstment_cost_total"] = return_data["total_net"]
