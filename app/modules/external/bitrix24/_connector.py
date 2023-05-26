@@ -48,6 +48,8 @@ def post(url, post_data=None, files=None, domain=None, force_reload=False, recur
             data = response.json()
             if "error" in data and data["error"] in ["OVERLOAD_LIMIT", "QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT", "INTERNAL_SERVER_ERROR", "ERROR_CORE"]:
                 store_cache("post", url=url, post_data=post_data, domain=domain, data=data)
+                if data["error"] == "OVERLOAD_LIMIT":
+                    raise Exception("OVERLOAD_LIMIT")
                 if data["error"] == "ERROR_CORE" and data["error_description"] != "Servicefehler: The provided token has expired":
                     raise Exception("error core problem")
                 if depth > 2:
