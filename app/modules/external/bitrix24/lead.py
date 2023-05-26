@@ -211,15 +211,15 @@ def run_aev_lead_convert():
     now = datetime.now()
     leads = get_leads({
         "FILTER[>DATE_CREATE]": config.get("last_import", "2021-01-01"),
-        "FILTER[SOURCE_ID]": "23"
+        "FILTER[=SOURCE_ID]": "23"
     })
     if leads is not None:
         for lead_data in leads:
             lead = get_lead(lead_data["id"])
             lead["unique_identifier"] = lead["id"]
             deal_datas = get_deals({
-                "FILTER[UF_CRM_5FA43F983EBAB]": lead["unique_identifier"],
-                "FILTER[CATEGORY_ID]": "170",
+                "FILTER[=UF_CRM_5FA43F983EBAB]": lead["unique_identifier"],
+                "FILTER[=CATEGORY_ID]": "170",
                 "SELECT[0]": "ID",
                 "SELECT[1]": "UF_CRM_5FA43F983EBAB"
             })
@@ -243,7 +243,7 @@ def run_bennemann_lead_convert():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
-        "FILTER[CATEGORY_ID]": "180"
+        "FILTER[=CATEGORY_ID]": "180"
     }, force_reload=True)
     if deals is not None:
         for deal in deals:
@@ -274,7 +274,7 @@ def run_extern_lead_convert():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
-        "FILTER[CATEGORY_ID]": "239"
+        "FILTER[=CATEGORY_ID]": "239"
     }, force_reload=True)
     if deals is not None:
         for deal in deals:
@@ -299,8 +299,8 @@ def run_cron_auto_assign_leads():
     from app.modules.user import auto_assign_lead_to_user
     leads = get_leads({
         "SELECT": "full",
-        "FILTER[UF_CRM_1684247325]": "1",
-        "FILTER[ASSIGNED_BY_ID]": "344"
+        "FILTER[=UF_CRM_1684247325]": "1",
+        "FILTER[=ASSIGNED_BY_ID]": "344"
     }, force_reload=True)
     if leads is None:
         print("leads could not be loaded")

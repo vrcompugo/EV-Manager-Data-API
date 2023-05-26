@@ -86,7 +86,7 @@ def get_contact_by_email(email):
     if email is None:
         return None
     data = post("crm.contact.list", {
-        "filter[EMAIL]": email.strip()
+        "filter[=EMAIL]": email.strip()
     })
     if "result" in data:
         if len(data["result"]) == 0:

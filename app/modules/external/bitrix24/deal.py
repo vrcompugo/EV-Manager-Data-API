@@ -61,9 +61,9 @@ def get_deals_normalized(filters):
         payload[f"SELECT[{len(payload)}]"] = field
     for filter in filters.keys():
         if filter in config['deal']['fields']:
-            payload[f"FILTER[{config['deal']['fields'][filter]}]"] = filters[filter]
+            payload[f"FILTER[={config['deal']['fields'][filter]}]"] = filters[filter]
         else:
-            payload[f"FILTER[{filter.upper()}]"] = filters[filter]
+            payload[f"FILTER[={filter.upper()}]"] = filters[filter]
     return get_deals(payload)
 
 
@@ -175,8 +175,8 @@ def run_cron_add_missing_values():
     last_import_datetime = datetime.datetime.now()
     payload = {
         "SELECT": "full",
-        "filter[CATEGORY_ID]": 0,
-        "filter[STAGE_ID]": "NEW",
+        "filter[=CATEGORY_ID]": 0,
+        "filter[=STAGE_ID]": "NEW",
     }
     if "last_import_datetime" in config:
         payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]

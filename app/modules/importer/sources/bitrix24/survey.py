@@ -38,7 +38,7 @@ def run_export(local_id=None):
         "id": 326908
     })
     response = post("crm.lead.userfield.list", {
-        "filter[FIELD_NAME]": "UF_CRM_1572968349"
+        "filter[=FIELD_NAME]": "UF_CRM_1572968349"
     })
     print(json.dumps(response, indent=2))
     return None
