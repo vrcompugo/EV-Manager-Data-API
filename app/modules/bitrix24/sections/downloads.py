@@ -17,43 +17,16 @@ def register_routes(api: Blueprint):
         from app.modules.importer.sources.bitrix24.lead import run_import
         from app.modules.importer.sources.bitrix24.order import run_import as order_import
 
-        lead = None
+        lead_id = None
         if request.form.get("PLACEMENT") == "CRM_LEAD_DETAIL_TAB":
             lead_id = json.loads(request.form.get("PLACEMENT_OPTIONS"))["ID"]
-            lead_link = find_association("Lead", remote_id=lead_id)
-            if lead_link is None:
-                run_import(remote_id=lead_id)
-                lead_link = find_association("Lead", remote_id=lead_id)
-            if lead_link is None:
-                return "Lead not found"
-            lead = Lead.query.filter(Lead.id == lead_link.local_id).first()
-            if lead is None:
-                return "Lead not found2"
         if request.form.get("PLACEMENT") == "CRM_DEAL_DETAIL_TAB":
             order_id = json.loads(request.form.get("PLACEMENT_OPTIONS"))["ID"]
             deal_data = get_deal(order_id)
             if deal_data.get("unique_identifier") not in [None, "", "0"]:
                 lead_id = deal_data.get("unique_identifier")
-                lead_link = find_association("Lead", remote_id=lead_id)
-                if lead_link is None:
-                    return render_template("downloads/lead_downloads2.html", lead_id=deal_data.get("unique_identifier"))
-                else:
-                    lead = Lead.query.filter(Lead.id == lead_link.local_id).first()
-                    if lead is not None:
-                        return render_template("downloads/lead_downloads.html", lead=lead)
-            order_link = find_association("Order", remote_id=order_id)
-            if order_link is None:
-                order_import(remote_id=order_id)
-                order_link = find_association("Order", remote_id=order_id)
-            if order_link is None:
-                return "Order not found"
-            order = Order.query.filter(Order.id == order_link.local_id).first()
-            lead = Lead.query.filter(Lead.customer_id == order.customer_id).first()
-            if lead is None:
-                return "Order Lead not found"
-
-        if lead is not None:
-            return render_template("downloads/lead_downloads.html", lead=lead)
+        if lead_id is not None:
+            return render_template("downloads/lead_downloads.html", lead_id=lead_id)
         return "No Placement"
 
     @api.route("/downloads/reload/", methods=["GET"])

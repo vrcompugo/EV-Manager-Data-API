@@ -24,7 +24,7 @@
         document.getElementById("download_page").innerHTML = this.responseText;
         setTimeout(reloader, 10000);
       });
-      oReq.open("GET", "/bitrix24/downloads/reload/?lead_id={{ lead.id }}");
+      oReq.open("GET", "/bitrix24/downloads/reload2/?lead_id={{ lead_id }}");
       oReq.send();
     };
     reloader();
