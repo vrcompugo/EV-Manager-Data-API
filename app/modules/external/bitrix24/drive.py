@@ -34,7 +34,7 @@ def get_file(id, force_reload=False):
 def get_file_content(id=None, url=None):
     file_data = {}
     if id is not None:
-        file_data = get_file(id, force_reload=True)
+        file_data = get_file(id)
         if file_data is None:
             print("error: cant get file for content")
     if url is not None:
