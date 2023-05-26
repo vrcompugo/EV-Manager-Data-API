@@ -13,6 +13,7 @@ def register_routes(api: Blueprint):
 
     @api.route("/downloads/", methods=["GET", "POST"])
     def downloads():
+        return "error1", 500
         from app.modules.importer.sources.bitrix24._association import find_association
         from app.modules.importer.sources.bitrix24.lead import run_import
         from app.modules.importer.sources.bitrix24.order import run_import as order_import
@@ -31,6 +32,7 @@ def register_routes(api: Blueprint):
 
     @api.route("/downloads/reload/", methods=["GET"])
     def reload():
+        return "error1", 500
         from app.modules.importer.sources.bitrix24._connector import post
         from app.modules.importer.sources.bitrix24._association import find_association
 
