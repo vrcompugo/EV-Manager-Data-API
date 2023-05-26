@@ -46,6 +46,8 @@ def post(url, post_data=None, files=None, domain=None, force_reload=False, recur
         response = requests.post(base_url + url, data=post_data)
         try:
             data = response.json()
+            if data["total"] > 1000:
+                raise Exception("error: more than 1000 objects")
             if "error" in data and data["error"] in ["QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT", "INTERNAL_SERVER_ERROR", "ERROR_CORE"]:
                 if data["error"] == "ERROR_CORE" and data["error_description"] != "Servicefehler: The provided token has expired":
                     raise Exception("error core problem")
