@@ -52,21 +52,9 @@ def get_contact(id, force_reload=False):
 
 def get_contacts_by_changedate(changedate):
     payload = {
-        "FILTER[>DATE_MODIFY]": str(changedate),
-        "start": 0
+        "FILTER[>DATE_MODIFY]": str(changedate)
     }
-    result = []
-    while payload["start"] is not None:
-        data = post("crm.contact.list", payload)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            for item in data["result"]:
-                result.append(convert_config_values(item))
-        else:
-            print("error3:", data)
-            payload["start"] = None
-            return None
-    return result
+    return get_contacts(payload, force_reload=False)
 
 
 def get_contacts(payload, force_reload=False):
@@ -81,20 +69,11 @@ def get_contacts(payload, force_reload=False):
     list_request("crm.contact.list", payload, result, convert_config_values, force_reload=force_reload)
     return result
 
-
 def get_contact_by_email(email):
-    if email is None:
-        return None
-    data = post("crm.contact.list", {
+    payload = {
         "filter[=EMAIL]": email.strip()
-    })
-    if "result" in data:
-        if len(data["result"]) == 0:
-            return None
-        return convert_config_values(data["result"][0])
-    else:
-        print("error get contact by email:", data)
-    return None
+    }
+    return get_contacts(payload, force_reload=False)
 
 
 def add_contact(data, domain=None):

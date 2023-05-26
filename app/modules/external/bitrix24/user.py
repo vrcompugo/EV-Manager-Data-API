@@ -75,6 +75,7 @@ def get_users_per_department(department_id):
 
 
 def cron_refresh_users():
+    return
     oldest_user = UserCache.query.order_by(UserCache.last_update.asc()).first()
     if oldest_user.last_update is None or oldest_user.last_update < (datetime.datetime.now() - datetime.timedelta(days=1)):
         print("refreshing users")
