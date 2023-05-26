@@ -57,6 +57,7 @@ def register_routes(api: Blueprint):
 
     @api.route("/downloads/reload2/", methods=["GET"])
     def reload2():
+        return "error1", 500
         lead_id = request.args.get("lead_id")
         histories = QuoteHistory.query.filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).all()
         return render_template("downloads/lead_downloads2_list.html", histories=histories)
