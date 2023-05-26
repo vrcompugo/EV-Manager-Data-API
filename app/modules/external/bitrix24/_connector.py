@@ -53,6 +53,7 @@ def post(url, post_data=None, files=None, domain=None, force_reload=False, recur
                 if depth > 4:
                     raise Exception("to manny retrys")
                 print("post error", data["error"], depth)
+                time.sleep(2)
                 raise Exception("to manny retrys")
             if recursion is False:
                 store_cache("post", url=url, post_data=post_data, domain=domain, data=data)
