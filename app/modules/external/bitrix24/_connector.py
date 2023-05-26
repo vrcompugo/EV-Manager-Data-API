@@ -53,13 +53,11 @@ def post(url, post_data=None, files=None, domain=None, force_reload=False, recur
                     raise Exception("to manny retrys")
                 print("post error", data["error"], depth)
                 return post(url, post_data, files, recursion=True, depth=depth + 1)
-            if data["total"] > 1000:
-                raise Exception("error: more than 1000 objects")
             if recursion is False:
                 store_cache("post", url=url, post_data=post_data, domain=domain, data=data)
             return data
         except Exception as e:
-            print("error", response.text)
+            print("error", e, response.text)
     return {}
 
 
@@ -129,3 +127,25 @@ def store_cache(method, url, parameters=None, post_data=None, domain=None, data=
         request_cache.domain = domain
     db.session.add(request_cache)
     db.session.commit()
+
+
+def list_request(url, payload, result, convert_config_values, force_reload=False):
+    payload["start"] = -1
+    payload['ORDER[ID]'] = "ASC"
+    counter = 0
+    while counter < 2:
+        print(payload)
+        data = post(url, payload, force_reload=True)
+        if "result" in data:
+            for item in data["result"]:
+                last_id = item["ID"]
+                result.append(convert_config_values(item))
+            print(len(data["result"]))
+            if len(data["result"]) < 50:
+                return result
+            payload["filter[>ID]"] = last_id
+        else:
+            print("error3:", data)
+            payload["start"] = None
+            return None
+    return result

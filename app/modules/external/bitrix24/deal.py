@@ -11,7 +11,7 @@ from app.modules.external.bitrix24.user import get_user
 from app.utils.dict_func import flatten_dict
 from app.modules.quote_calculator.models.quote_history import QuoteHistory
 
-from ._connector import get, post
+from ._connector import get, post, list_request
 from ._field_values import convert_field_euro_from_remote, convert_field_select_from_remote
 
 
@@ -42,7 +42,6 @@ def convert_config_values(data_raw):
 
 
 def get_deals(payload, force_reload=False):
-    payload["start"] = 0
     result = []
     if "SELECT" in payload and payload["SELECT"] == "full":
         del payload["SELECT"]
@@ -50,16 +49,8 @@ def get_deals(payload, force_reload=False):
         payload["SELECT[0]"] = "*"
         for index, field in enumerate(config["deal"]["fields"]):
             payload[f"SELECT[{index + 1}]"] = config["deal"]["fields"][field]
-    while payload["start"] is not None:
-        data = post("crm.deal.list", payload, force_reload=force_reload)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            for item in data["result"]:
-                result.append(convert_config_values(item))
-        else:
-            print("error3:", data)
-            payload["start"] = None
-            return None
+    list_request("crm.deal.list", payload, result, convert_config_values, force_reload=force_reload)
+
     return result
 
 

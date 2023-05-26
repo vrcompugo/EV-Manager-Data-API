@@ -7,7 +7,7 @@ from app.modules.external.bitrix24.user import get_user
 from app.modules.external.bitrix24.deal import add_deal, get_deals, update_deal
 from app.utils.dict_func import flatten_dict
 
-from ._connector import get, post
+from ._connector import get, post, list_request
 from ._field_values import convert_field_euro_from_remote, convert_field_select_from_remote
 
 
@@ -192,18 +192,9 @@ def get_leads_by_createdate(created_after_datetime):
 
 
 def get_leads(payload, force_reload=False):
-    payload["start"] = 0
     result = []
-    while payload["start"] is not None:
-        data = post("crm.lead.list", payload, force_reload=force_reload)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            for item in data["result"]:
-                result.append(convert_config_values(item))
-        else:
-            print("error3:", data)
-            payload["start"] = None
-            return None
+    list_request("crm.lead.list", payload, result, convert_config_values, force_reload=force_reload)
+
     return result
 
 

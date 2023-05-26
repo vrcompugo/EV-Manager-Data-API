@@ -2,7 +2,7 @@ import json
 from operator import index
 from app.modules.settings import get_settings
 
-from ._connector import get, post
+from ._connector import get, post, list_request
 from ._field_values import flatten_dict
 
 
@@ -72,16 +72,7 @@ def get_tasks(payload, force_reload=False):
         for index, field in enumerate(config["task"]["fields"]):
             payload[f"select[{index + 1}]"] = "UF_AUTO_" + config["task"]["fields"][field].replace("ufAuto", "")
     result = []
-    while payload["start"] is not None:
-        data = post("tasks.task.list", payload, force_reload=force_reload)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            for item in data["result"]["tasks"]:
-                result.append(convert_config_values(item))
-        else:
-            print("error3:", data)
-            payload["start"] = None
-            return None
+    list_request("tasks.task.list", payload, result, convert_config_values, force_reload=force_reload)
     return result
 
 

@@ -1,7 +1,7 @@
 import json
 from app.modules.settings import get_settings
 
-from ._connector import get, post
+from ._connector import get, post, list_request
 from ._field_values import flatten_dict
 
 
@@ -70,7 +70,6 @@ def get_contacts_by_changedate(changedate):
 
 
 def get_contacts(payload, force_reload=False):
-    payload["start"] = 0
     result = []
     if "SELECT" in payload and payload["SELECT"] == "full":
         del payload["SELECT"]
@@ -79,19 +78,7 @@ def get_contacts(payload, force_reload=False):
         payload["SELECT[1]"] = "EMAIL"
         for index, field in enumerate(config["contact"]["fields"]):
             payload[f"SELECT[{index + 2}]"] = config["contact"]["fields"][field]
-    while payload["start"] is not None:
-        data = post("crm.contact.list", payload, force_reload=force_reload)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            for item in data["result"]:
-                result.append(convert_config_values(item))
-            if data["total"] > 1000:
-                print("error: more than 1000 contacts")
-                return result
-        else:
-            print("error3:", data)
-            payload["start"] = None
-            return None
+    list_request("crm.contact.list", payload, result, convert_config_values, force_reload=force_reload)
     return result
 
 

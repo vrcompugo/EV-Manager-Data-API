@@ -80,8 +80,11 @@ def rerun_auto_assign_lead_to_user():
 @manager.command
 def get_test_deal():
     from app.modules.external.bitrix24.deal import get_deal
-    from app.modules.external.bitrix24.lead import get_lead
-    print(json.dumps(get_lead(89627), indent=2))
+    from app.modules.external.bitrix24.lead import get_leads
+    leads = get_leads({
+        "filter[>DATE_MODIFY]": "2023-05-26 08:30:00",
+    })
+    print(len(leads))
 
 
 @manager.command
