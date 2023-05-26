@@ -50,11 +50,11 @@ def post(url, post_data=None, files=None, domain=None, force_reload=False, recur
                 store_cache("post", url=url, post_data=post_data, domain=domain, data=data)
                 if data["error"] == "ERROR_CORE" and data["error_description"] != "Servicefehler: The provided token has expired":
                     raise Exception("error core problem")
-                if depth > 4:
+                if depth > 2:
                     raise Exception("to manny retrys")
-                print("post error", data["error"], depth)
+                print("retry error", data["error"], depth)
                 time.sleep(2)
-                raise Exception("to manny retrys")
+                return post(url, post_data, files, recursion=True, depth=depth + 1)
             if recursion is False:
                 store_cache("post", url=url, post_data=post_data, domain=domain, data=data)
             return data
