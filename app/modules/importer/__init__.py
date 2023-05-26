@@ -3,6 +3,7 @@ from app.utils.error_handler import error_handler
 
 
 def cron():
+    return
 
     from .sources.bitrix24.reseller import run_import
     try:

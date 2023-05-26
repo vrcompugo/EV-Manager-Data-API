@@ -69,6 +69,7 @@ def filter_export_data(lead):
 
 
 def run_import(minutes=None):
+    return None
     print("Loading Product List")
     products_data = {
         "next": 0
@@ -93,6 +94,7 @@ def run_import(minutes=None):
 
 
 def run_export(remote_id=None, local_id=None):
+    return None
     if local_id is not None:
         link = find_association("Product", local_id=local_id)
         product = Product.query.get(link.local_id)

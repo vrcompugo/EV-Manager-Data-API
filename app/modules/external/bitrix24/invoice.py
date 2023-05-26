@@ -5,7 +5,7 @@ from app.modules.settings import get_settings
 from app.modules.external.bitrix24.contact import get_contact
 from app.modules.external.bitrix24.documents import get_documents as get_documents_bitrix
 
-from ._connector import get, post
+from ._connector import get, post, list_request
 from ._field_values import flatten_dict
 
 
@@ -103,17 +103,7 @@ def get_invoices(payload, force_reload=False):
         payload["SELECT[0]"] = "*"
         for index, field in enumerate(config["invoice"]["fields"]):
             payload[f"SELECT[{index + 1}]"] = config["invoice"]["fields"][field]
-    while payload["start"] is not None:
-        print(payload)
-        data = post("crm.item.list", payload, force_reload=force_reload)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            for item in data["result"]["items"]:
-                result.append(convert_config_values(item))
-        else:
-            print("error3:", data)
-            payload["start"] = None
-            return None
+    list_request("crm.item.list", payload, result, convert_config_values, force_reload=force_reload)
     return result
 
 

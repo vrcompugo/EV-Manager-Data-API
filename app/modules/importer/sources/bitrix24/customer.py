@@ -139,6 +139,7 @@ def run_import(remote_id=None, local_id=None):
 
 
 def run_cron_import():
+    return None
     print("bitrix24 customer import")
     config = get_config_item("importer/bitrix24")
     post_data = {
@@ -173,6 +174,7 @@ def run_cron_import():
 
 
 def run_customer_lead_import(lead_item_data):
+    return None
     remote_id = lead_item_data["ID"]
     lead_item_data["UF_CRM_1572950758"] = lead_item_data["UF_CRM_5DD4020221169"]
     lead_item_data["UF_CRM_1572950777"] = lead_item_data["UF_CRM_5DD402022E300"]
@@ -195,6 +197,7 @@ def run_customer_lead_import(lead_item_data):
 
 
 def run_export(remote_id=None, local_id=None):
+    return None
     customer = None
     if local_id is not None:
         customer = Customer.query.get(local_id)

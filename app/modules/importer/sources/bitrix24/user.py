@@ -68,7 +68,7 @@ def filter_export_data(lead):
 
 
 def run_import():
-
+    return
     print("Loading User List")
     users_data = {
         "next": 0

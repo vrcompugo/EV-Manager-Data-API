@@ -12,7 +12,7 @@ from app.modules.auth import get_auth_info
 from app.modules.settings import get_settings, set_settings
 from app.modules.auth.jwt_parser import encode_jwt
 
-from ._connector import get, post
+from ._connector import get, post, list_request
 from .models.drive_folder import BitrixDriveFolder
 from .contact import get_contacts, get_contact, update_contact
 from .deal import get_deal, get_deals, update_deal
@@ -77,6 +77,10 @@ def get_attached_file(id):
     return None
 
 
+def convert_config_values(item):
+    return item
+
+
 def get_folder(id, namefilter=None, force=False):
     payload = {
         "id": id,
@@ -85,16 +89,8 @@ def get_folder(id, namefilter=None, force=False):
     if namefilter is not None:
         payload["filter[=NAME]"] = namefilter
     result = []
-    while payload["start"] is not None:
-        data = post("disk.folder.getchildren", payload, force_reload=force)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            result = result + data["result"]
-        else:
-            print("error3:", data)
-            print(payload)
-            payload["start"] = None
-            return None
+    list_request("disk.folder.getchildren", payload, result, convert_config_values, force_reload=force)
+
     return result
 
 
@@ -431,6 +427,7 @@ def run_cron_external_company_folder_creation():
 
 
 def run_legacy_folder_creation():
+    return None # dangerous to run
     payload = {
         "id": 649168,
         "start": 0

@@ -174,21 +174,10 @@ def set_address_if_empty(data):
 
 def get_leads_by_createdate(created_after_datetime):
     payload = {
-        "FILTER[>DATE_CREATE]": str(created_after_datetime),
-        "start": 0
+        "FILTER[>DATE_CREATE]": str(created_after_datetime)
     }
-    result = []
-    while payload["start"] is not None:
-        data = post("crm.lead.list", payload, force_reload=True)
-        if "result" in data:
-            payload["start"] = data["next"] if "next" in data else None
-            for item in data["result"]:
-                result.append(item)
-        else:
-            print("error3:", data)
-            payload["start"] = None
-            return None
-    return result
+    return get_leads(payload, force_reload=False)
+
 
 
 def get_leads(payload, force_reload=False):
