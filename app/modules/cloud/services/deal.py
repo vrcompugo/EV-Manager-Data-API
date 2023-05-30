@@ -18,7 +18,7 @@ def cron_split_cloud_contract():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "15",
-        "FILTER[=STAGE_ID]": "C15:17",
+        "FILTER[STAGE_ID]": "C15:17",
     }, force_reload=True)
     if deals is None:
         print("deals could not be loaded")
@@ -76,7 +76,7 @@ def cron_mein_portal_initial_documents():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "172",
-        "FILTER[=STAGE_ID]": "C172:NEW"
+        "FILTER[STAGE_ID]": "C172:NEW"
     })
     for deal in deals:
         print(deal["id"])
@@ -94,13 +94,13 @@ def cron_mein_portal_initial_documents():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "32",
-        "FILTER[=STAGE_ID]": "C32:WON",
+        "FILTER[STAGE_ID]": "C32:WON",
         "FILTER[>DATE_MODIFY]": "2021-07-01"
     })
     deals2 = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "32",
-        "FILTER[=STAGE_ID]": "C32:21",
+        "FILTER[STAGE_ID]": "C32:21",
         "FILTER[>DATE_MODIFY]": "2021-07-01"
     })
     if deals is None:
@@ -130,7 +130,7 @@ def cron_copy_cloud_deal_values():
     payload = {
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": "15",
-        "FILTER[=STAGE_ID]": "C15:WON"
+        "FILTER[STAGE_ID]": "C15:WON"
     }
     if "last_import_datetime" in config:
         payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]

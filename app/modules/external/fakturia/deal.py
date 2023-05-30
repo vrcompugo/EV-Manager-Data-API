@@ -1018,7 +1018,7 @@ def export_deal(deal_id):
 def run_cron_export():
     deals = get_deals({
         "FILTER[CATEGORY_ID]": 70,
-        "FILTER[=STAGE_ID]": "C70:3",
+        "FILTER[STAGE_ID]": "C70:3",
         "SELECT": "full"
     }, force_reload=True)
     if deals is None:
@@ -1028,7 +1028,7 @@ def run_cron_export():
         if deal.get("iban") not in [None, "", "None"]:
             contracting_deals = get_deals({
                 "FILTER[CATEGORY_ID]": 68,
-                "FILTER[=STAGE_ID]": "C68:NEW",
+                "FILTER[STAGE_ID]": "C68:NEW",
                 "FILTER[=UF_CRM_5FA43F983EBAB]": deal.get("unique_identifier"),
                 "SELECT": "full"
             })
@@ -1052,7 +1052,7 @@ def run_cron_export():
             })
     deals = get_deals({
         "FILTER[CATEGORY_ID]": "68",
-        "FILTER[=STAGE_ID]": "C68:NEW",
+        "FILTER[STAGE_ID]": "C68:NEW",
         "SELECT": "full"
     }, force_reload=True)
     for deal in deals:
@@ -1070,7 +1070,7 @@ def run_cron_export():
             })
     deals = get_deals({
         "FILTER[CATEGORY_ID]": "202",
-        "FILTER[=STAGE_ID]": "C202:NEW",
+        "FILTER[STAGE_ID]": "C202:NEW",
         "SELECT": "full"
     }, force_reload=True)
     for deal in deals:

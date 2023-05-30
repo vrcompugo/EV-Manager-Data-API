@@ -1628,7 +1628,7 @@ def cron_transfer_fakturia_annual_invoice():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 126,
-        "FILTER[=STAGE_ID]": "C126:UC_L0M7DR"
+        "FILTER[STAGE_ID]": "C126:UC_L0M7DR"
     }, force_reload=True)
     for deal in deals:
         if float(deal.get("opportunity")) == 0.0:
@@ -1688,12 +1688,12 @@ def find_credit_memo_bugs():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 126,
-        "FILTER[=STAGE_ID]": "C126:WON"
+        "FILTER[STAGE_ID]": "C126:WON"
     }, force_reload=True)
     deals = deals + get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 126,
-        "FILTER[=STAGE_ID]": "C126:FINAL_INVOICE"
+        "FILTER[STAGE_ID]": "C126:FINAL_INVOICE"
     }, force_reload=True)
     count = 0
     amount = 0
@@ -1901,12 +1901,12 @@ def move_2022_contracts():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 126,
-        "FILTER[=STAGE_ID]": "C126:WON"
+        "FILTER[STAGE_ID]": "C126:WON"
     }, force_reload=True)
     deals = deals + get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 126,
-        "FILTER[=STAGE_ID]": "C126:FINAL_INVOICE"
+        "FILTER[STAGE_ID]": "C126:FINAL_INVOICE"
     }, force_reload=True)
     for deal in deals:
         contract = get_contract_data(deal.get("contract_number"), force_reload=False)
@@ -1935,7 +1935,7 @@ def remove_double_follow_contracts():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[CATEGORY_ID]": 220,
-        "FILTER[=STAGE_ID]": "C220:NEW"
+        "FILTER[STAGE_ID]": "C220:NEW"
     }, force_reload=True)
     for deal in deals:
         print(".", end = '')
