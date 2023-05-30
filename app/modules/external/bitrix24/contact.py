@@ -74,7 +74,10 @@ def get_contact_by_email(email):
         "SELECT": "full",
         "filter[EMAIL]": email.strip()
     }
-    return get_contacts(payload, force_reload=False)
+    contacts = get_contacts(payload, force_reload=False)
+    if len(contacts) > 0:
+        return contacts[0]
+    return None
 
 
 def add_contact(data, domain=None):
