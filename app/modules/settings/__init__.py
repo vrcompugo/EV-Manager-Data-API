@@ -51,7 +51,7 @@ def get_settings(section=None, domain_raw=None):
         return data
     if full_section == "keso.bitrix24.de/external/bitrix24":
         data = {
-            "url": "https://keso.bitrix24.de/rest/1/6a0ju20zp3ya1qls/",
+            "url": "https://keso.bitrix24.de/rest/106/ofkx73p2z5id90ab/",
             "taxrate": 19,
             "select_lists": {
                 "transaction_code": {
