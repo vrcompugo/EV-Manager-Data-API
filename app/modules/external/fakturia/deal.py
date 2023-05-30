@@ -1016,6 +1016,7 @@ def export_deal(deal_id):
 
 
 def run_cron_export():
+    return
     deals = get_deals({
         "FILTER[CATEGORY_ID]": 70,
         "FILTER[STAGE_ID]": "C70:3",

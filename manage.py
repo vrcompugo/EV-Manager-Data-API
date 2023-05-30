@@ -84,7 +84,7 @@ def get_test_deal():
     from app.modules.external.bitrix24.contact import get_contacts, get_contact
     contacts = get_contacts({
         "SELECT": "full",
-        "FILTER[>DATE_MODIFY]": "2023-05-30 15:20:00"
+        "filter[>DATE_MODIFY]": "2023-05-30 15:09:00"
     }, force_reload=True)
     print(len(contacts))
 
