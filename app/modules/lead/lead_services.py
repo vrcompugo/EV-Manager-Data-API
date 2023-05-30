@@ -149,6 +149,7 @@ def lead_commission_calulation(lead: Lead):
 
 
 def auto_assignment_facebook_leads():
+    return # not needed anymore
     from app.modules.user import auto_assign_lead_to_user
     from app.modules.external.bitrix24.lead import get_leads_by_createdate
     from app.modules.importer.sources.bitrix24.lead import run_import as run_bitrix_lead_import
