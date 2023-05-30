@@ -231,7 +231,7 @@ def run_bennemann_lead_convert():
     now = datetime.now()
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
+        "FILTER[>DATE_MODIFY]": config.get("last_import", "2021-01-01"),
         "FILTER[CATEGORY_ID]": "180"
     }, force_reload=True)
     if deals is not None:
@@ -262,7 +262,7 @@ def run_extern_lead_convert():
     now = datetime.now()
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
+        "FILTER[>DATE_MODIFY]": config.get("last_import", "2021-01-01"),
         "FILTER[CATEGORY_ID]": "239"
     }, force_reload=True)
     if deals is not None:
@@ -289,7 +289,7 @@ def run_cron_auto_assign_leads():
     config = get_settings("external/bitrix24/last_lead_assign")
     leads = get_leads({
         "SELECT": "full",
-        "FILTER[>CHANGED_DATE]": config.get("last_execute", "2023-05-30"),
+        "FILTER[>DATE_MODIFY]": config.get("last_execute", "2023-05-30"),
         "FILTER[=UF_CRM_1684247325]": "1",
         "FILTER[ASSIGNED_BY_ID]": "344"
     }, force_reload=True)

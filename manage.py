@@ -80,11 +80,15 @@ def rerun_auto_assign_lead_to_user():
 @manager.command
 def get_test_deal():
     from app.modules.external.bitrix24.deal import get_deal
-    from app.modules.external.bitrix24.lead import get_leads
+    from app.modules.external.bitrix24.lead import get_leads, get_lead
+    print(json.dumps(get_deal(166423), indent=2))
+    return
     leads = get_leads({
-        "filter[=ASSIGNED_BY_ID]": "344",
-        "filter[=STATUS_ID]": "NEW",
-    })
+        "SELECT": "full",
+        "FILTER[>DATE_MODIFY]": "2023-05-30",
+        "FILTER[=UF_CRM_1684247325]": "1",
+        "FILTER[ASSIGNED_BY_ID]": "344"
+    }, force_reload=True)
     print(len(leads))
 
 
