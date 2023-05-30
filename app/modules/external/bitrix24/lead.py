@@ -286,8 +286,10 @@ def run_extern_lead_convert():
 
 def run_cron_auto_assign_leads():
     from app.modules.user import auto_assign_lead_to_user
+    config = get_settings("external/bitrix24/last_lead_assign")
     leads = get_leads({
         "SELECT": "full",
+        "FILTER[>CHANGED_DATE]": config.get("last_execute", "2023-05-30"),
         "FILTER[=UF_CRM_1684247325]": "1",
         "FILTER[=ASSIGNED_BY_ID]": "344"
     }, force_reload=True)
@@ -297,3 +299,7 @@ def run_cron_auto_assign_leads():
     for lead in leads:
         print("assign lead", lead["id"])
         auto_assign_lead_to_user(lead["id"])
+    config = get_settings("external/bitrix24/last_lead_assign")
+    if config is not None:
+        config["last_execute"] = now.astimezone().isoformat()
+    set_settings("external/bitrix24/last_lead_assign", config)
