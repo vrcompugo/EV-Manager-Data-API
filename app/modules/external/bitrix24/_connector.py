@@ -137,7 +137,7 @@ def list_request(url, payload, result, convert_config_values, force_reload=False
     payload["start"] = -1
     payload['ORDER[ID]'] = "ASC"
     counter = 0
-    while counter < 2:
+    while counter < 20:
         print(payload)
         data = post(url, payload, force_reload=True)
         if "result" in data:
@@ -152,4 +152,5 @@ def list_request(url, payload, result, convert_config_values, force_reload=False
             print("error3:", data)
             payload["start"] = None
             return None
+        counter = counter + 1
     return result
