@@ -287,6 +287,7 @@ def run_extern_lead_convert():
 def run_cron_auto_assign_leads():
     from app.modules.user import auto_assign_lead_to_user
     config = get_settings("external/bitrix24/last_lead_assign")
+    now = datetime.now()
     leads = get_leads({
         "SELECT": "full",
         "FILTER[>DATE_MODIFY]": config.get("last_execute", "2023-05-30"),
