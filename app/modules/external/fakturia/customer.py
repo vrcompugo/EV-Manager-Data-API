@@ -83,7 +83,7 @@ def run_cron_export():
     import_time = datetime.now()
     contacts = get_contacts({
         "SELECT": "full",
-        "FILTER[>DATE_MODIFY]": str(config.get("last_contact_export_time", "2021-01-20 00:00:00"))
+        "filter[>DATE_MODIFY]": str(config.get("last_contact_export_time", "2021-01-20 00:00:00"))
     }, force_reload=True)
     if contacts is None:
         print("contacts could not be loaded")
