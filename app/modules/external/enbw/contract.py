@@ -158,8 +158,8 @@ def cron_update_contract_status():
         if contract is None:
             contract = ENBWContract.query.filter(ENBWContract.sub_contract_number == values[1]).first()
         history = ENBWContractHistory.query\
-            .filter(ENBWContractHistory.datetime == values[3])\
-            .filter(ENBWContractHistory.api_response_status == values[4])
+            .filter(ENBWContractHistory.datetime == values[4])\
+            .filter(ENBWContractHistory.api_response_status == values[5])
         if contract is not None:
             history = history.filter(ENBWContractHistory.enbw_contract_id == contract.id)
         history = history.first()
@@ -168,21 +168,21 @@ def cron_update_contract_status():
             if contract is not None:
                 history.enbw_contract_id = contract.id
             if contract.enbw_contract_number is None:
-                contract.enbw_contract_number = values[2]
+                contract.enbw_contract_number = values[3]
                 update_deal(contract.deal_id, {
-                    "enbw_contract_number": values[2]
+                    "enbw_contract_number": values[3]
                 })
-            history.datetime = values[3]
+            history.datetime = values[4]
             history.action = 'cron'
             history.post_data = None
-            history.api_response_status = values[4]
+            history.api_response_status = values[5]
             history.api_response = None
             history.api_response_raw = ";".join(values)
             deal = get_deal(contract.deal_id, force_reload=True)
             if deal.get("stage_id") in ["C15:UC_R6HWHP", "C15:UC_A8XIOF"]:
                 if values[4] in ["Besttigt", "Bestätigt"]:
                     update_deal(contract.deal_id, {
-                        "cloud_delivery_begin": values[5],
+                        "cloud_delivery_begin": values[6],
                         "stage_id": "C15:UC_D88VXL"
                     })
                     contract.status = "success"
