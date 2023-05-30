@@ -71,7 +71,8 @@ def get_contacts(payload, force_reload=False):
 
 def get_contact_by_email(email):
     payload = {
-        "filter[=EMAIL]": email.strip()
+        "SELECT": "full",
+        "filter[EMAIL]": email.strip()
     }
     return get_contacts(payload, force_reload=False)
 
