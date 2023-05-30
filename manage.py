@@ -169,7 +169,7 @@ def create_cloud_contract_deals():
     config = get_settings(section="external/bitrix24")
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 126
+        "FILTER[CATEGORY_ID]": 126
     })
     existing_deals = []
     for deal in deals:
@@ -230,7 +230,7 @@ def create_cloud_contract_deals2():
     config = get_settings(section="external/bitrix24")
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 126
+        "FILTER[CATEGORY_ID]": 126
     }, force_reload=True)
     existing_deals = []
     for deal in deals:
@@ -275,8 +275,8 @@ def generate_cloud_contract_reports():
 
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 126,
-        "FILTER[=STAGE_ID]": "C126:PREPAYMENT_INVOICE"
+        "FILTER[CATEGORY_ID]": 126,
+        "FILTER[STAGE_ID]": "C126:PREPAYMENT_INVOICE"
     })
     for deal in deals:
         print(deal.get("contract_number"))

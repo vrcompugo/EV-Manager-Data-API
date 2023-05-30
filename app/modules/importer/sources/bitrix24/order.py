@@ -192,7 +192,7 @@ def run_import_by_lead(lead: Lead):
         if link is not None:
             response = post("crm.deal.list", {
                 "FILTER[=LEAD_ID]": link.remote_id,
-                "FILTER[=CATEGORY_ID]": 66
+                "FILTER[CATEGORY_ID]": 66
             })
             pp.pprint(response)
             if "result" in response and len(response["result"]) > 0:
@@ -212,18 +212,18 @@ def run_cron_import():
     if "data" in config and "last_order_import_datetime" in config["data"]:
         deals = post("crm.deal.list", {
             "FILTER[>DATE_MODIFY]": config["data"]["last_order_import_datetime"],
-            "FILTER[=CATEGORY_ID]": 66
+            "FILTER[CATEGORY_ID]": 66
         })
         deals2 = post("crm.deal.list", {
             "FILTER[>DATE_MODIFY]": config["data"]["last_order_import_datetime"],
-            "FILTER[=CATEGORY_ID]": 124
+            "FILTER[CATEGORY_ID]": 124
         })
     else:
         deals = post("crm.deal.list", {
-            "FILTER[=CATEGORY_ID]": 66
+            "FILTER[CATEGORY_ID]": 66
         })
         deals2 = post("crm.deal.list", {
-            "FILTER[=CATEGORY_ID]": 124
+            "FILTER[CATEGORY_ID]": 124
         })
 
     last_import = str(datetime.now())

@@ -175,7 +175,7 @@ def run_cron_add_missing_values():
     last_import_datetime = datetime.datetime.now()
     payload = {
         "SELECT": "full",
-        "filter[=CATEGORY_ID]": 0,
+        "filter[CATEGORY_ID]": 0,
         "filter[=STAGE_ID]": "NEW",
     }
     if "last_import_datetime" in config:

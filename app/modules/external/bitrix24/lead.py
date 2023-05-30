@@ -208,7 +208,7 @@ def run_aev_lead_convert():
             lead["unique_identifier"] = lead["id"]
             deal_datas = get_deals({
                 "FILTER[=UF_CRM_5FA43F983EBAB]": lead["unique_identifier"],
-                "FILTER[=CATEGORY_ID]": "170",
+                "FILTER[CATEGORY_ID]": "170",
                 "SELECT[0]": "ID",
                 "SELECT[1]": "UF_CRM_5FA43F983EBAB"
             })
@@ -232,7 +232,7 @@ def run_bennemann_lead_convert():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
-        "FILTER[=CATEGORY_ID]": "180"
+        "FILTER[CATEGORY_ID]": "180"
     }, force_reload=True)
     if deals is not None:
         for deal in deals:
@@ -263,7 +263,7 @@ def run_extern_lead_convert():
     deals = get_deals({
         "SELECT": "full",
         "FILTER[>CHANGED_DATE]": config.get("last_import", "2021-01-01"),
-        "FILTER[=CATEGORY_ID]": "239"
+        "FILTER[CATEGORY_ID]": "239"
     }, force_reload=True)
     if deals is not None:
         for deal in deals:

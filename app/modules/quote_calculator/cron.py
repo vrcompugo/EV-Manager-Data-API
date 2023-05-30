@@ -23,7 +23,7 @@ from app.modules.quote_calculator.quote_data import calculate_heating_usage
 def cron_heatpump_auto_quote_generator():
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 210,
+        "FILTER[CATEGORY_ID]": 210,
         "FILTER[=STAGE_ID]": "C210:NEW"
     }, force_reload=True)
     if deals is None:
@@ -39,7 +39,7 @@ def cron_heatpump_auto_quote_generator():
 
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 210,
+        "FILTER[CATEGORY_ID]": 210,
         "FILTER[=STAGE_ID]": "C210:PREPAYMENT_INVOI"
     }, force_reload=True)
     for deal in deals:
@@ -174,7 +174,7 @@ def cron_follow_cloud_quote():
 
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 220,
+        "FILTER[CATEGORY_ID]": 220,
         "FILTER[=STAGE_ID]": "C220:UC_38IJOQ",
         "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)
@@ -192,7 +192,7 @@ def cron_follow_cloud_quote():
 def cron_follow_cloud_quote_test():
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 220,
+        "FILTER[CATEGORY_ID]": 220,
         "FILTER[=STAGE_ID]": "C220:UC_38IJOQ",
         "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)

@@ -124,7 +124,7 @@ def load_contract_data(contract_number):
         "SELECT": "full",
         f"FILTER[={system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
         f"FILTER[={system_config['deal']['fields']['is_cloud_master_deal']}]": "1",
-        "FILTER[=CATEGORY_ID]": 15
+        "FILTER[CATEGORY_ID]": 15
     }, force_reload=True)
     if len(deals) > 1:
         return {
@@ -139,7 +139,7 @@ def load_contract_data(contract_number):
         deals = get_deals({
             "SELECT": "full",
             f"FILTER[={system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
-            "FILTER[=CATEGORY_ID]": 176
+            "FILTER[CATEGORY_ID]": 176
         }, force_reload=True)
         if len(deals) < 1:
             return {
@@ -209,7 +209,7 @@ def load_contract_data(contract_number):
             deals = get_deals({
                 "SELECT": "full",
                 f"FILTER[={system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
-                "FILTER[=CATEGORY_ID]": 126
+                "FILTER[CATEGORY_ID]": 126
             }, force_reload=True)
             if len(deals) > 0:
                 annual_statement["deal"] = {
@@ -585,7 +585,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 "SELECT": "full",
                 f"FILTER[={settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
                 f"FILTER[={settings['deal']['fields']['is_cloud_heatcloud']}]": "1",
-                "FILTER[=CATEGORY_ID]": 15
+                "FILTER[CATEGORY_ID]": 15
             }, force_reload=True)
             if len(deals) != 1:
                 config["errors"].append({
@@ -636,7 +636,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 "SELECT": "full",
                 f"FILTER[={settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
                 f"FILTER[={settings['deal']['fields']['is_cloud_ecloud']}]": "1",
-                "FILTER[=CATEGORY_ID]": 15
+                "FILTER[CATEGORY_ID]": 15
             }, force_reload=True)
             if len(deals) != 1:
                 config["errors"].append({
@@ -695,7 +695,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 "SELECT": "full",
                 f"FILTER[={settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
                 f"FILTER[={settings['deal']['fields']['is_cloud_consumer']}]": "1",
-                "FILTER[=CATEGORY_ID]": 15
+                "FILTER[CATEGORY_ID]": 15
             }, force_reload=True)
             for index, consumer in enumerate(config["consumers"]):
                 existing_deal = next((i for i in deals if str(i["delivery_usage"]) == str(consumer["usage"]) and i.get("is_used") is not True), None)
@@ -1421,7 +1421,7 @@ def generate_annual_report_pdf(contract_number, year):
         deals = get_deals({
             "SELECT": "full",
             f"FILTER[={config['deal']['fields']['cloud_contract_number']}]": contract_number,
-            "FILTER[=CATEGORY_ID]": 126,
+            "FILTER[CATEGORY_ID]": 126,
         })
         if deals is not None and len(deals) > 0:
             deal_id = deals[0].get("id")
@@ -1627,7 +1627,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
 def cron_transfer_fakturia_annual_invoice():
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 126,
+        "FILTER[CATEGORY_ID]": 126,
         "FILTER[=STAGE_ID]": "C126:UC_L0M7DR"
     }, force_reload=True)
     for deal in deals:
@@ -1687,12 +1687,12 @@ def cron_transfer_fakturia_annual_invoice():
 def find_credit_memo_bugs():
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 126,
+        "FILTER[CATEGORY_ID]": 126,
         "FILTER[=STAGE_ID]": "C126:WON"
     }, force_reload=True)
     deals = deals + get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 126,
+        "FILTER[CATEGORY_ID]": 126,
         "FILTER[=STAGE_ID]": "C126:FINAL_INVOICE"
     }, force_reload=True)
     count = 0
@@ -1900,12 +1900,12 @@ def string_stripper(text):
 def move_2022_contracts():
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 126,
+        "FILTER[CATEGORY_ID]": 126,
         "FILTER[=STAGE_ID]": "C126:WON"
     }, force_reload=True)
     deals = deals + get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 126,
+        "FILTER[CATEGORY_ID]": 126,
         "FILTER[=STAGE_ID]": "C126:FINAL_INVOICE"
     }, force_reload=True)
     for deal in deals:
@@ -1934,7 +1934,7 @@ def remove_double_follow_contracts():
     deleted_contracts = []
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[=CATEGORY_ID]": 220,
+        "FILTER[CATEGORY_ID]": 220,
         "FILTER[=STAGE_ID]": "C220:NEW"
     }, force_reload=True)
     for deal in deals:
@@ -1967,7 +1967,7 @@ def add_cloud_values():
     deals = get_deals({
         "SELECT": "full",
         f"FILTER[={system_config['deal']['fields']['is_cloud_master_deal']}]": "1",
-        "FILTER[=CATEGORY_ID]": 176
+        "FILTER[CATEGORY_ID]": 176
     }, force_reload=True)
     for deal in deals:
         print(deal.get("id"))

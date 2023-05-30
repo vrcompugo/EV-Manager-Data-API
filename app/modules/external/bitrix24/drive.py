@@ -276,7 +276,7 @@ def run_cron_folder_creation():
 
     drive_insurance_folder = next((item for item in config["folders"] if item["key"] == "drive_insurance_folder"), None)
     if drive_insurance_folder is not None:
-        deals_insurance = get_deals({"FILTER[=CATEGORY_ID]": "70", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
+        deals_insurance = get_deals({"FILTER[CATEGORY_ID]": "70", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
         for deal in deals_insurance:
             print("deal:", deal["id"])
             deal = get_deal(deal["id"])
@@ -285,7 +285,7 @@ def run_cron_folder_creation():
                 create_folder_path(drive_insurance_folder["folder_id"], deal_path)
                 update_deal(deal["id"], {"drive_insurance_folder": f"{drive_insurance_folder['base_url']}{deal_path}"})
                 time.sleep(1)
-        deals_insurance_external = get_deals({"FILTER[=CATEGORY_ID]": "110", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
+        deals_insurance_external = get_deals({"FILTER[CATEGORY_ID]": "110", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
         for deal in deals_insurance_external:
             print("deal:", deal["id"])
             deal = get_deal(deal["id"])
@@ -298,7 +298,7 @@ def run_cron_folder_creation():
     drive_rental_folder = next((item for item in config["folders"] if item["key"] == "drive_rental_contract_folder"), None)
     drive_rental_folder2 = next((item for item in config["folders"] if item["key"] == "drive_rental_documents_folder"), None)
     if drive_rental_folder is not None and drive_rental_folder2 is not None:
-        deals_rental = get_deals({"FILTER[=CATEGORY_ID]": "168", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
+        deals_rental = get_deals({"FILTER[CATEGORY_ID]": "168", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
         for deal in deals_rental:
             print("deal:", deal["id"])
             deal = get_deal(deal["id"])
@@ -312,7 +312,7 @@ def run_cron_folder_creation():
 
     drive_cloud_folder = next((item for item in config["folders"] if item["key"] == "drive_cloud_folder"), None)
     if drive_cloud_folder is not None:
-        deals_cloud = get_deals({"FILTER[=CATEGORY_ID]": "15", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
+        deals_cloud = get_deals({"FILTER[CATEGORY_ID]": "15", "FILTER[>DATE_CREATE]": str(last_import)}, force_reload=True)
         for deal in deals_cloud:
             print("deal:", deal["id"])
             deal = get_deal(deal["id"])
@@ -351,7 +351,7 @@ def run_cron_heating_folder_creation():
 
     deals = get_deals({
         "FILTER[>DATE_MODIFY]": last_import,
-        "FILTER[=CATEGORY_ID]": 9,
+        "FILTER[CATEGORY_ID]": 9,
         "SELECT[0]": "*",
         "SELECT[1]": "ID",
         "SELECT[2]": "UF_CRM_60A60FF556B0C"
@@ -387,7 +387,7 @@ def run_cron_external_company_folder_creation():
 
     deals = get_deals({
         "FILTER[>DATE_MODIFY]": last_import,
-        "FILTER[=CATEGORY_ID]": 142,
+        "FILTER[CATEGORY_ID]": 142,
         "SELECT": "full"
     }, force_reload=True)
     if deals is None:
