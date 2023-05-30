@@ -50,8 +50,11 @@ def get_settings(section=None, domain_raw=None):
         }
         return data
     if full_section == "keso.bitrix24.de/external/bitrix24":
+        command_line = ' '.join(sys.argv)
+        is_running_server = ('/usr/src/app/manage.py run' in command_line)
+        print(command_line, is_running_server)
         data = {
-            "url": "https://keso.bitrix24.de/rest/106/ofkx73p2z5id90ab/",
+            "url": "https://keso.bitrix24.de/rest/106/ofkx73p2z5id90ab/" if is_running_server else "https://keso.bitrix24.de/rest/106/3d9cnu5u14xzi07e/",
             "taxrate": 19,
             "select_lists": {
                 "transaction_code": {
