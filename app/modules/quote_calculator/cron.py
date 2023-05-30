@@ -23,8 +23,8 @@ from app.modules.quote_calculator.quote_data import calculate_heating_usage
 def cron_heatpump_auto_quote_generator():
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": 210,
-        "FILTER[STAGE_ID]": "C210:NEW"
+        "filter[CATEGORY_ID]": 210,
+        "filter[STAGE_ID]": "C210:NEW"
     }, force_reload=True)
     if deals is None:
         print("deals could not be loaded")
@@ -39,8 +39,8 @@ def cron_heatpump_auto_quote_generator():
 
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": 210,
-        "FILTER[STAGE_ID]": "C210:PREPAYMENT_INVOI"
+        "filter[CATEGORY_ID]": 210,
+        "filter[STAGE_ID]": "C210:PREPAYMENT_INVOI"
     }, force_reload=True)
     for deal in deals:
         print("generate auto heating quote", deal["id"])
@@ -174,8 +174,8 @@ def cron_follow_cloud_quote():
 
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": 220,
-        "FILTER[STAGE_ID]": "C220:UC_38IJOQ",
+        "filter[CATEGORY_ID]": 220,
+        "filter[STAGE_ID]": "C220:UC_38IJOQ",
         "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)
     for index, deal in enumerate(deals):
@@ -192,8 +192,8 @@ def cron_follow_cloud_quote():
 def cron_follow_cloud_quote_test():
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": 220,
-        "FILTER[STAGE_ID]": "C220:UC_38IJOQ",
+        "filter[CATEGORY_ID]": 220,
+        "filter[STAGE_ID]": "C220:UC_38IJOQ",
         "ORDER[UF_CRM_1662987508]": "ASC"
     }, force_reload=True)
     print("number", len(deals))

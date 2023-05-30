@@ -61,9 +61,9 @@ def get_deals_normalized(filters):
         payload[f"SELECT[{len(payload)}]"] = field
     for filter in filters.keys():
         if filter in config['deal']['fields']:
-            payload[f"FILTER[={config['deal']['fields'][filter]}]"] = filters[filter]
+            payload[f"filter[={config['deal']['fields'][filter]}]"] = filters[filter]
         else:
-            payload[f"FILTER[={filter.upper()}]"] = filters[filter]
+            payload[f"filter[={filter.upper()}]"] = filters[filter]
     return get_deals(payload)
 
 

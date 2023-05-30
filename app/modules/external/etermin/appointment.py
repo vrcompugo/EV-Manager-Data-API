@@ -34,7 +34,7 @@ def import_new_appointments():
         for appointment in response["data"]:
             if appointment.get('SelectedAnswers') in [None, ""]:
                 continue
-            existing_deals = get_deals({"FILTER[=UF_CRM_1614177772351]": appointment['ID']}, force_reload=True)
+            existing_deals = get_deals({"filter[=UF_CRM_1614177772351]": appointment['ID']}, force_reload=True)
             if len(existing_deals) == 0:
                 contact = get_contact_by_email(appointment["Email"])
                 deal_data = {

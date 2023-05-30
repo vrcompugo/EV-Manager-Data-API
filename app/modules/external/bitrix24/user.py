@@ -33,7 +33,7 @@ def get_user_by_email(email):
     user_cached = UserCache.query.filter(UserCache.email == email).first()
     if user_cached is None:
         data = post("user.get", {
-            "FILTER[=email]": email
+            "filter[=email]": email
         })
         if "result" in data and len(data["result"]) > 0:
             return get_user(data["result"][0]["ID"])
@@ -57,7 +57,7 @@ def get_users_per_department(department_id):
         result.append(user_cached.data)
     if False and refresh is True or len(users_cached) == 0:
         payload = {
-            "FILTER[=UF_DEPARTMENT]": department_id,
+            "filter[=UF_DEPARTMENT]": department_id,
             "start": 0
         }
         while payload["start"] is not None:

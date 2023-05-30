@@ -146,7 +146,7 @@ def run_cron_import():
         "ORDER[DATE_MODIFY]": "DESC"
     }
     if config is not None and "data" in config and "last_customer_import" in config["data"]:
-        post_data["FILTER[>DATE_MODIFY]"] = config["data"]["last_customer_import"]
+        post_data["filter[>DATE_MODIFY]"] = config["data"]["last_customer_import"]
     response = {"next": 0}
     last_customer_import = str(datetime.datetime.now())
     while "next" in response:

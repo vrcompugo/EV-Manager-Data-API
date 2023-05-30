@@ -174,7 +174,7 @@ def set_address_if_empty(data):
 
 def get_leads_by_createdate(created_after_datetime):
     payload = {
-        "FILTER[>DATE_CREATE]": str(created_after_datetime)
+        "filter[>DATE_CREATE]": str(created_after_datetime)
     }
     return get_leads(payload, force_reload=False)
 
@@ -199,16 +199,16 @@ def run_aev_lead_convert():
         return None
     now = datetime.now()
     leads = get_leads({
-        "FILTER[>DATE_CREATE]": config.get("last_import", "2021-01-01"),
-        "FILTER[=SOURCE_ID]": "23"
+        "filter[>DATE_CREATE]": config.get("last_import", "2021-01-01"),
+        "filter[=SOURCE_ID]": "23"
     })
     if leads is not None:
         for lead_data in leads:
             lead = get_lead(lead_data["id"])
             lead["unique_identifier"] = lead["id"]
             deal_datas = get_deals({
-                "FILTER[=UF_CRM_5FA43F983EBAB]": lead["unique_identifier"],
-                "FILTER[CATEGORY_ID]": "170",
+                "filter[=UF_CRM_5FA43F983EBAB]": lead["unique_identifier"],
+                "filter[CATEGORY_ID]": "170",
                 "SELECT[0]": "ID",
                 "SELECT[1]": "UF_CRM_5FA43F983EBAB"
             })
@@ -231,8 +231,8 @@ def run_bennemann_lead_convert():
     now = datetime.now()
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[>DATE_MODIFY]": config.get("last_import", "2021-01-01"),
-        "FILTER[CATEGORY_ID]": "180"
+        "filter[>DATE_MODIFY]": config.get("last_import", "2021-01-01"),
+        "filter[CATEGORY_ID]": "180"
     }, force_reload=True)
     if deals is not None:
         for deal in deals:
@@ -262,8 +262,8 @@ def run_extern_lead_convert():
     now = datetime.now()
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[>DATE_MODIFY]": config.get("last_import", "2021-01-01"),
-        "FILTER[CATEGORY_ID]": "239"
+        "filter[>DATE_MODIFY]": config.get("last_import", "2021-01-01"),
+        "filter[CATEGORY_ID]": "239"
     }, force_reload=True)
     if deals is not None:
         for deal in deals:
@@ -290,9 +290,9 @@ def run_cron_auto_assign_leads():
     now = datetime.now()
     leads = get_leads({
         "SELECT": "full",
-        "FILTER[>DATE_MODIFY]": config.get("last_execute", "2023-05-30"),
-        "FILTER[=UF_CRM_1684247325]": "1",
-        "FILTER[ASSIGNED_BY_ID]": "344"
+        "filter[>DATE_MODIFY]": config.get("last_execute", "2023-05-30"),
+        "filter[=UF_CRM_1684247325]": "1",
+        "filter[ASSIGNED_BY_ID]": "344"
     }, force_reload=True)
     if leads is None:
         print("leads could not be loaded")

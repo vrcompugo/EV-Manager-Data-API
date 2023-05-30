@@ -46,7 +46,7 @@ def check_contacts():
     from app.modules.external.bitrix24.contact import get_contacts
     contacts = get_contacts({
         "SELECT": "full",
-        "FILTER[>DATE_MODIFY]": "2021-11-08 13:00:00"
+        "filter[>DATE_MODIFY]": "2021-11-08 13:00:00"
     })
     print(json.dumps(contacts, indent=2))
 
@@ -79,14 +79,15 @@ def rerun_auto_assign_lead_to_user():
 
 @manager.command
 def get_test_deal():
-    from app.modules.external.bitrix24.deal import get_deal
+    from app.modules.external.bitrix24.deal import get_deal, get_deals
     from app.modules.external.bitrix24.lead import get_leads, get_lead
     from app.modules.external.bitrix24.contact import get_contacts, get_contact
-    contacts = get_contacts({
-        "SELECT": "full",
-        "filter[>DATE_MODIFY]": "2023-05-30 15:09:00"
+    deals = get_deals({
+        "filter[CATEGORY_ID]": "68",
+        "filter[STAGE_ID]": "C68:NEW",
+        "SELECT": "full"
     }, force_reload=True)
-    print(len(contacts))
+    print(len(deals))
 
 
 @manager.command
@@ -170,7 +171,7 @@ def create_cloud_contract_deals():
     config = get_settings(section="external/bitrix24")
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": 126
+        "filter[CATEGORY_ID]": 126
     })
     existing_deals = []
     for deal in deals:
@@ -231,7 +232,7 @@ def create_cloud_contract_deals2():
     config = get_settings(section="external/bitrix24")
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": 126
+        "filter[CATEGORY_ID]": 126
     }, force_reload=True)
     existing_deals = []
     for deal in deals:
@@ -276,8 +277,8 @@ def generate_cloud_contract_reports():
 
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": 126,
-        "FILTER[STAGE_ID]": "C126:PREPAYMENT_INVOICE"
+        "filter[CATEGORY_ID]": 126,
+        "filter[STAGE_ID]": "C126:PREPAYMENT_INVOICE"
     })
     for deal in deals:
         print(deal.get("contract_number"))

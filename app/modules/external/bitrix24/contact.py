@@ -52,7 +52,7 @@ def get_contact(id, force_reload=False):
 
 def get_contacts_by_changedate(changedate):
     payload = {
-        "FILTER[>DATE_MODIFY]": str(changedate)
+        "filter[>DATE_MODIFY]": str(changedate)
     }
     return get_contacts(payload, force_reload=False)
 

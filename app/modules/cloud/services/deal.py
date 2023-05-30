@@ -17,8 +17,8 @@ def cron_split_cloud_contract():
     print("split_cloud_contract")
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": "15",
-        "FILTER[STAGE_ID]": "C15:17",
+        "filter[CATEGORY_ID]": "15",
+        "filter[STAGE_ID]": "C15:17",
     }, force_reload=True)
     if deals is None:
         print("deals could not be loaded")
@@ -75,8 +75,8 @@ def cron_mein_portal_initial_documents():
     return
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": "172",
-        "FILTER[STAGE_ID]": "C172:NEW"
+        "filter[CATEGORY_ID]": "172",
+        "filter[STAGE_ID]": "C172:NEW"
     })
     for deal in deals:
         print(deal["id"])
@@ -93,15 +93,15 @@ def cron_mein_portal_initial_documents():
     '''
     deals = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": "32",
-        "FILTER[STAGE_ID]": "C32:WON",
-        "FILTER[>DATE_MODIFY]": "2021-07-01"
+        "filter[CATEGORY_ID]": "32",
+        "filter[STAGE_ID]": "C32:WON",
+        "filter[>DATE_MODIFY]": "2021-07-01"
     })
     deals2 = get_deals({
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": "32",
-        "FILTER[STAGE_ID]": "C32:21",
-        "FILTER[>DATE_MODIFY]": "2021-07-01"
+        "filter[CATEGORY_ID]": "32",
+        "filter[STAGE_ID]": "C32:21",
+        "filter[>DATE_MODIFY]": "2021-07-01"
     })
     if deals is None:
         deals = deals2
@@ -129,8 +129,8 @@ def cron_copy_cloud_deal_values():
     last_import_datetime = datetime.now()
     payload = {
         "SELECT": "full",
-        "FILTER[CATEGORY_ID]": "15",
-        "FILTER[STAGE_ID]": "C15:WON"
+        "filter[CATEGORY_ID]": "15",
+        "filter[STAGE_ID]": "C15:WON"
     }
     if "last_import_datetime" in config:
         payload["filter[>DATE_MODIFY]"] = config["last_import_datetime"]
@@ -153,8 +153,8 @@ def copy_cloud_deal_values(deal):
     print("deal", deal.get("id"))
     follow_deals = get_deals({
         "SELECT": "full",
-        f"FILTER[={system_config['deal']['fields']['cloud_contract_number']}]": deal.get("contract_number"),
-        "FILTER[CATEGORY_ID]": 220
+        f"filter[={system_config['deal']['fields']['cloud_contract_number']}]": deal.get("contract_number"),
+        "filter[CATEGORY_ID]": 220
     }, force_reload=True)
     if deal.get("is_cloud_master_deal") not in ["1", 1, True]:
         if len(follow_deals) >= 1:
