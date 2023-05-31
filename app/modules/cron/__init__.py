@@ -31,14 +31,6 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "import_leads_hausfrage":
-        from app.modules.external.hausfrage.deal import run_cron_import
-        print("cron", "import_leads_hausfrage")
-        try:
-            run_cron_import()
-        except Exception as e:
-            error_handler()
-
     if section == "productive" or section == "import_leads_senec":
         from app.modules.external.senec.deal import run_cron_import
         print("cron", "import_leads_senec")
