@@ -79,14 +79,18 @@ def rerun_auto_assign_lead_to_user():
 
 @manager.command
 def get_test_deal():
-    from app.modules.external.bitrix24.deal import get_deal, get_deals
+    from app.modules.external.bitrix24.deal import get_deal, get_deals, list_request, update_deal
     from app.modules.external.bitrix24.lead import get_leads, get_lead
     from app.modules.external.bitrix24.contact import get_contacts, get_contact
+    #update_deal("153049", { "STAGE_ID": "C15:7" })
+    #return
     deals = get_deals({
-        "filter[CATEGORY_ID]": "68",
-        "filter[STAGE_ID]": "C68:NEW",
+        "filter[!CATEGORY_ID]": "68",
+        "filter[STAGE_ID]": "C68:PREPARATION",
         "SELECT": "full"
     }, force_reload=True)
+    for deal in deals:
+        print(deal.get("id"), deal.get("category_id"))
     print(len(deals))
 
 
