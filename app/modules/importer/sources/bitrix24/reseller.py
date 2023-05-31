@@ -69,7 +69,6 @@ def filter_export_data(lead):
 
 
 def run_import():
-    return
     from app.utils.google_geocoding import geocode_address
 
     print("Loading Reseller List")

@@ -75,7 +75,6 @@ def run_import(remote_id=None, local_id=None):
 
 
 def run_export(remote_id=None, local_id=None):
-    return
     pp = pprint.PrettyPrinter(indent=2)
     config = get_config_item("importer/bitrix24")
 

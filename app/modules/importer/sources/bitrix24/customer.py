@@ -139,7 +139,6 @@ def run_import(remote_id=None, local_id=None):
 
 
 def run_cron_import():
-    return None
     print("bitrix24 customer import")
     config = get_config_item("importer/bitrix24")
     post_data = {
