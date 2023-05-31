@@ -83,13 +83,8 @@ def get_test_deal():
     from app.modules.external.bitrix24.lead import get_leads, get_lead
     from app.modules.external.bitrix24.task import get_tasks
     from app.modules.external.bitrix24.contact import get_contacts, get_contact
-    #update_deal("153049", { "STAGE_ID": "C15:7" })
+    #update_deal("153505", { "STAGE_ID": "C15:4" })
     #return
-    tasks = get_tasks({'select[0]': 'TITLE', 'select[1]': 'DESCRIPTION', 'select[2]': 'UF_CRM_TASK', 'select[3]': 'CONTACT_ID', 'select[4]': 'COMPANY_ID', 'select[5]': 'TIME_ESTIMATE', 'select[6]': 'UF_AUTO_422491195439', 'select[7]': 'STATUS', 'select[8]': 'START_DATE_PLAN', 'select[9]': 'END_DATE_PLAN', 'select[10]': 'RESPONSIBLE_ID', 'select[11]': 'ACCOMPLICES', 'select[12]': 'SUBORDINATE', 'select[13]': 'AUDITORS', 'select[14]': 'DEADLINE', 'select[15]': 'UF_AUTO_219922666303', 'select[16]': 'UF_AUTO_343721853755', 'select[17]': 'UF_AUTO_513701476131', 'filter[>CHANGED_DATE]': '2023-05-31T09:46:49.059355+00:00', 'filter[TITLE]': '%[mfr]%', 'start': -1, 'ORDER[ID]': 'ASC'})
-    #print(json.dumps(tasks, indent=2))
-    for task in tasks:
-        print(task.get("id"))
-    return
     deals = get_deals({
         "filter[!CATEGORY_ID]": "68",
         "filter[STAGE_ID]": "C68:PREPARATION",
