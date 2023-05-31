@@ -171,8 +171,8 @@ def list_request_tasks(url, payload, result, convert_config_values, force_reload
             for item in data["result"]["tasks"]:
                 last_id = item["id"]
                 result.append(convert_config_values(item))
-            print(len(data["result"]))
-            if len(data["result"]) < 50:
+            print(len(data["result"]["tasks"]))
+            if len(data["result"]["tasks"]) < 50:
                 return result
             payload["filter[>id]"] = last_id
         else:
