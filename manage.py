@@ -81,9 +81,34 @@ def rerun_auto_assign_lead_to_user():
 def get_test_deal():
     from app.modules.external.bitrix24.deal import get_deal, get_deals, list_request, update_deal
     from app.modules.external.bitrix24.lead import get_leads, get_lead
+    from app.modules.external.bitrix24.task import get_tasks
     from app.modules.external.bitrix24.contact import get_contacts, get_contact
     #update_deal("153049", { "STAGE_ID": "C15:7" })
     #return
+    tasks = get_tasks({
+        "select[0]": "TITLE",
+        "select[1]": "DESCRIPTION",
+        "select[2]": "UF_CRM_TASK",
+        "select[3]": "CONTACT_ID",
+        "select[4]": "COMPANY_ID",
+        "select[5]": "TIME_ESTIMATE",
+        "select[6]": "UF_AUTO_422491195439",
+        "select[7]": "STATUS",
+        "select[8]": "START_DATE_PLAN",
+        "select[9]": "END_DATE_PLAN",
+        "select[10]": "RESPONSIBLE_ID",
+        "select[11]": "ACCOMPLICES",
+        "select[12]": "SUBORDINATE",
+        "select[13]": "AUDITORS",
+        "select[14]": "DEADLINE",
+        "select[15]": "UF_AUTO_219922666303",
+        "select[16]": "UF_AUTO_343721853755",
+        "select[17]": "UF_AUTO_513701476131",
+        "filter[>CHANGED_DATE]": "2023-05-31 00:00:00",
+        "filter[TITLE]": "%[mfr]%"
+    }, force_reload=True)
+    print(tasks)
+    return
     deals = get_deals({
         "filter[!CATEGORY_ID]": "68",
         "filter[STAGE_ID]": "C68:PREPARATION",
