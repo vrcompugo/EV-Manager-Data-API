@@ -62,8 +62,6 @@ def export_deal_sherpa_route(deal_id):
 @blueprint.route("/<deal_id>/create_contract_number", methods=['POST'])
 @api_response
 def create_contract_number_route(deal_id):
-
-    return {"status": "failed", "data": {}, "message": "import failed"}
     from app.modules.importer.sources.bitrix24.order import run_export_fields
     from app.modules.importer.sources.bitrix24.order import run_import as order_import
     from app.modules.order.order_services import generate_contract_number
