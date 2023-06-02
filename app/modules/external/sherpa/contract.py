@@ -67,13 +67,13 @@ def import_contracts_for_anual_report():
             contract.main_contract_number = contract.contract_number
         deals = get_deals({
             "SELECT": "full",
-            f"filter[={system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
+            f"filter[{system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
             "filter[CATEGORY_ID]": 126
         }, force_reload=True)
         if len(deals) == 0:
             deals2 = get_deals({
                 "SELECT": "full",
-                f"filter[={system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
+                f"filter[{system_config['deal']['fields']['cloud_contract_number']}]": contract.main_contract_number,
                 "filter[CATEGORY_ID]": 15
             }, force_reload=True)
             post_data = {

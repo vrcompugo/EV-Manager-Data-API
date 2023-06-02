@@ -153,7 +153,7 @@ def copy_cloud_deal_values(deal):
     print("deal", deal.get("id"))
     follow_deals = get_deals({
         "SELECT": "full",
-        f"filter[={system_config['deal']['fields']['cloud_contract_number']}]": deal.get("contract_number"),
+        f"filter[{system_config['deal']['fields']['cloud_contract_number']}]": deal.get("contract_number"),
         "filter[CATEGORY_ID]": 220
     }, force_reload=True)
     if deal.get("is_cloud_master_deal") not in ["1", 1, True]:
