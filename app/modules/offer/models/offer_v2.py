@@ -4,11 +4,12 @@ from marshmallow import fields
 from enum import Enum
 
 from app import db
+from app.basemodel import BaseModel
 from app.modules.customer.models.customer import CustomerSchema
 from app.modules.reseller.models.reseller import ResellerSchema
 
 
-class OfferV2(db.Model):
+class OfferV2(BaseModel, db.Model):
     __versioned__ = {}
     __tablename__ = "offer_v2"
 

@@ -1,4 +1,6 @@
+import json
 from flask import request
+from sqlalchemy import or_
 from flask_restplus import Resource
 from flask_restplus import Namespace, fields
 from luqum.parser import parser
@@ -6,8 +8,9 @@ from luqum.parser import parser
 from app import db
 from app.decorators import token_required, api_response
 from app.models import OfferV2
+from app.modules.auth import get_auth_info, validate_jwt
 
-from .offer_services import add_item, update_item, get_items, get_one_item, generate_cloud_pdf, generate_feasibility_study_pdf, generate_offer_pdf
+from .offer_services import add_item, update_item, get_items, get_one_item, generate_cloud_pdf, generate_feasibility_study_pdf, generate_offer_pdf, get_one_item_v2
 
 
 api = Namespace('Offer')
@@ -104,6 +107,46 @@ class User(Resource):
         """Update User """
         data = request.json
         return update_item(id, data=data)
+
+
+@api.route('/v2/<quote_number>')
+class User(Resource):
+    @api_response
+    def get(self, quote_number):
+        auth_info = get_auth_info()
+        if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+            return {"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}
+        fields = request.args.get("fields") or "_default_"
+        offer = OfferV2.query.filter(OfferV2.number == quote_number).first()
+        if offer is None:
+            return {"status": "error", "error_code": "not_found", "message": "Angebot nicht gefunden"}, 404
+        item_dict = offer.to_dict()
+        item_dict["pdf_link"] = offer.pdf.public_link if offer.pdf is not None else None
+        item_dict["data_txt"] = json.dumps(item_dict.get("data"), indent=4)
+        item_dict["calculated_txt"] = json.dumps(item_dict.get("calculated"), indent=4)
+        if not item_dict:
+            api.abort(404)
+        else:
+            return {
+                "status": "success",
+                "data": item_dict
+            }
+
+    @api.response(201, 'User successfully updated.')
+    @api.doc('update offer')
+    @api_response
+    def put(self, quote_number):
+        auth_info = get_auth_info()
+        if auth_info is None or auth_info["domain_raw"] != "keso.bitrix24.de":
+            return {"status": "error", "error_code": "not_authorized", "message": "user not authorized for this action"}
+        data = request.json
+        offer = OfferV2.query.filter(OfferV2.number == quote_number).first()
+        if offer is None:
+            return {"status": "error", "error_code": "not_found", "message": "Angebot nicht gefunden"}, 404
+        offer.data = json.loads(data.get("data_txt"))
+        offer.calculated = json.loads(data.get("calculated_txt"))
+        db.session.commit()
+        return self.get(quote_number)
 
 
 @api.route('/<id>/PDF')
