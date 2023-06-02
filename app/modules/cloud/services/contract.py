@@ -122,7 +122,7 @@ def load_contract_data(contract_number):
     }
     deals = get_deals({
         "SELECT": "full",
-        f"filter[={system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
+        f"filter[{system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
         f"filter[={system_config['deal']['fields']['is_cloud_master_deal']}]": "1",
         "filter[CATEGORY_ID]": 15
     }, force_reload=True)
@@ -138,7 +138,7 @@ def load_contract_data(contract_number):
     if len(deals) < 1:
         deals = get_deals({
             "SELECT": "full",
-            f"filter[={system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
+            f"filter[{system_config['deal']['fields']['cloud_contract_number']}]": contract_number,
             "filter[CATEGORY_ID]": 176
         }, force_reload=True)
         if len(deals) < 1:
