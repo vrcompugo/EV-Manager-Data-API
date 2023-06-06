@@ -585,7 +585,6 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 "SELECT": "full",
                 f"filter[{settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
                 f"filter[={settings['deal']['fields']['is_cloud_heatcloud']}]": "1",
-                f"filter[!=STAGE_ID]": "C15:LOSE",
                 "filter[CATEGORY_ID]": 15
             }, force_reload=True)
             if len(deals) != 1:

@@ -82,7 +82,10 @@ def get_test_deal():
     from app.modules.external.bitrix24.deal import get_deal, get_deals, list_request, update_deal
     from app.modules.external.bitrix24.lead import get_leads, get_lead
     from app.modules.external.bitrix24.task import get_tasks
+    from app.modules.external.bitrix24.drive import get_file
     from app.modules.external.bitrix24.contact import get_contacts, get_contact
+    print(json.dumps(get_file(8050093), indent=2))
+    return
     #update_deal("153505", { "STAGE_ID": "C15:4" })
     #return
     deals = get_deals({
