@@ -146,9 +146,14 @@ def calculate_synergy_wi(data):
     for field in [
         "pv_kwp", "power_usage", "power_extra_usage", "heater_usage", "car_usage", "consumer_usage", "car_count",
         "power_increase_rate", "heating_increase_rate", "car_increase_rate", "inflation_rate", "financing_rate",
-        ]:
+        "conventional_power_cost_per_kwh", "conventional_heat_cost_per_kwh"]:
         if data.get(field) not in [None, "", 0]:
-            calculated[field] = float(data.get(field))
+            if field == "conventional_power_cost_per_kwh":
+                calculated[field] = float(data.get(field)) / 100
+            elif field == "conventional_heat_cost_per_kwh":
+                calculated["conventional_heating_cost_per_kwh"] = float(data.get(field)) / 100
+            else:
+                calculated[field] = float(data.get(field))
     calculated["power_usage"] = calculated["power_usage"] + calculated["power_extra_usage"]
     calculated["power_extra_usage"] = 0
     calculated["total_usage"] = 0
