@@ -140,13 +140,15 @@
       {% elif current_page == 12 %}
         {% include('quote_calculator/generator/synergy_wi/pages/page_example.html') %}
       {% elif current_page == 13 %}
-        {% include('quote_calculator/generator/synergy_wi/pages/page_graph.html') %}
-      {% elif current_page == 14 %}
         {% include('quote_calculator/generator/synergy_wi/pages/page_wi_monthly.html') %}
-      {% elif current_page == 15 %}
-        {% include('quote_calculator/generator/synergy_wi/pages/page_wi_compare.html') %}
-      {% elif current_page == 16 %}
+      {% elif current_page == 14 %}
         {% include('quote_calculator/generator/synergy_wi/pages/page_wi_total.html') %}
+      {% elif current_page == total_pages - 3 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_fineprint1.html') %}
+      {% elif current_page == total_pages - 2 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_fineprint2.html') %}
+      {% elif current_page == total_pages - 1 %}
+        {% include('quote_calculator/generator/synergy_wi/pages/page_fineprint3.html') %}
       {% else %}
         {% include('quote_calculator/generator/synergy_wi/pages/page_blank.html') %}
       {% endif %}

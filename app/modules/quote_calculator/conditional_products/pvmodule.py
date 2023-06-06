@@ -11,5 +11,10 @@ def add_product(data):
             else:
                 product["quantity"] = float(data["calculated"]["min_kwp"])
             data["products"].append(product)
+            if str(product.get("ID")) in ["21883"]:
+                discount_product = get_product(label="SENEC Black Edition AKTION", category="PV Module")
+                product["quantity"] = discount_product["quantity"]
+                discount_product["PRICE"] = -discount_product["PRICE"]
+                data["products"].append(discount_product)
         except Exception as e:
             pass

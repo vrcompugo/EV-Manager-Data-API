@@ -1,0 +1,53 @@
+<style>
+  .page_blank_note {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    font-size: 0.7em;
+  }
+  .page_wi_fineprint {
+    padding: 3.2rem 3.7rem;
+    font-size: 1em;
+    line-height: 1.15em;
+  }
+</style>
+
+<div class="page_wi_fineprint page_wi_fineprint1">
+  <h2>Erläuterungen</h2>
+  <br>
+  <br>
+  <b>Beteiligte Unternehmen</b><br>
+  Energie360 GmbH & Co. KG, ein Partnerunternehmen der EnBW Energie Baden-Württemberg AG<br>
+  SENEC GmbH, ein Unternehmen der EnBW Energie Baden-Württemberg AG<br>
+  EnBW Energie Baden-Württemberg AG, Messtellenbetrieb<br>
+  <br>
+  <b>Wirtschaftlichkeitsberechnung</b><br>
+  Der Kunde erhält vorliegend eine Konzeption in Form einer PV-Anlagen- und Speicherempfehlung durch Energie 360 GmbH & Co. KG,<br>
+  auf deren Basis vorliegende Berechnung erfolgt sind. Dem Kunden ist daher bekannt, dass die ihm in der „Wirtschaftlichkeitsberechnung“ aufgezeigten
+  Werte von seinen gemachten Angaben, seiner individuellen Anlagenkonfiguration (kWp, Speichergröße usw.), seinem individuellen Nutzungsverhalten
+  und weiteren äußeren Einflüssen (z.B. Wetter) oder zukünftigen zusätzliche Verbrauchern (z.B. E-Auto) abhängig ist und somit maßgeblich seinen Jahresverbrauch und seinen Autarkiegrad unmittelbar beeinflussen. Die hier genannten Energiekosten setzen sich aus den von Ihnen zu zahlenden Grundgebühren und den angegebenen Energiekosten zusammen. Dabei wurde eine Preissteigerung beim Strom von {{ data.calculated.power_increase_rate | percentformat("de", 2) }} sowie - falls ausgewählt - bei den Wärmekosten von {{ data.calculated.heating_increase_rate | percentformat("de", 2) }} berücksichtigt. Zusätzlich wurde eine jährliche Inflation von {{ data.calculated.inflation_rate | percentformat("de", 2) }} für die nächsten 30 Jahre berücksichtigt.<br>
+  <br>
+  <b>*3 Direktvermarktung & Flextarif</b><br>
+  Der Kunde erhält mit vorliegendem Konzept, Informationen über die Option mit seiner PV-Anlage an der Direktvermarktung von Strom teilzunehmen.
+  Die Teilnahme erfolgt dergestalt, dass der Kunde ab dem Zeitpunkt der Inbetriebnahme seiner PV-Anlage, Speicher und verbautem Energie-Management-Systems (EMS), den beteiligten Unternehmen die uneingeschränkte Genehmigung nebst erforderlichen Zugriffsrechten erteilt, die gesamte
+  PV-Anlage und alle seine Komponenten aktiv, u.a. durch direkten Fernzugriff, zu Steuern und somit Strom der PV-Anlage / dem Netz direkt an den
+  Strommärkten zu Ver-/Kaufen und folglich an der „Direktvermarktung von Strom“ teilzunehmen.<br>
+  <br>
+  <b>Absicherung</b><br>
+  Im Jahresdurchschnitt, erhält der Kunde für den durch seine PV-Anlage selbst produzierten Strom, welcher in das öffentliche Netz als Überstrom eingespeist wird, einen garantierten Mindestpreis je eingespeister kWh (1kWh), welcher sich nach dem EEG-Wert richtet, der auf den Zeitpunkt der Inbetriebnahme der Anlage fällt und ihm somit als Anlagenbetreiber nach EEG zustehen würde. Darüber hinaus wird der Kunde an Erlösen, welche durch die
+  Direktvermarktung generiert werden, beteiligt.<br>
+  <br>
+  <b>Technische Details</b><br>
+  Die PV-Anlage des Kunden wird durch Energie 360 GmbH & Co. KG zunächst dergestalt fertiggestellt, dass diese alle gemäß den Technischen Anschlussbedingungen (TAB) des Netzbetreibers erforderlichen Bedingungen erfüllt und offiziell in Betrieb genommen wird. Die PV-Anlage des Kunden wird
+  somit zunächst ohne die für die Direktvermarktung erforderlichen Komponenten, wie z.B. dem Smart-Zähler und dem Gateway sowie weiter Komponenten, montiert, fertiggestellt und in Betreib genommen. Dies ist der derzeitigen reduzierten Verfügbarkeit der hierfür notwendigen Komponenten
+</div>
+
+<div class="page_blank_note">
+  Zu Angebots-Nr.: {{ data.number }}
+</div>
+
+<div class="page_logo">
+  <img src="{{ base_url }}static/synergy_wi/logo-energie360.jpg" style="width: 200px; height: auto;">
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter2.html') %}

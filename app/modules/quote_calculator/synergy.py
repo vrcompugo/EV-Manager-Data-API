@@ -332,6 +332,7 @@ def calculate_synergy_wi2(return_data):
     calculated["graph_data"]["version1_total_cost_percent"] = calculated["version1"]["total_cost_30years"] / calculated["graph_data"]["max"]
     return return_data["calculated"]
 
+
 def generate_synergy_pdf(lead_id, data, only_pages=None):
     config_general = get_settings(section="general")
     if data is not None:
@@ -339,28 +340,54 @@ def generate_synergy_pdf(lead_id, data, only_pages=None):
         if "datetime" not in data:
             data["datetime"] = datetime.datetime.now()
         # base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7476459)))  # https://keso.bitrix24.de/disk/downloadFile/7476459/?&ncc=1&filename=Synergie+360+WI.pdf
-        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7800623)))  # https://keso.bitrix24.de/disk/downloadFile/7800623/?&ncc=1&filename=Broschu%CC%88re+03052023.pdf
+        # base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7800623)))  # https://keso.bitrix24.de/disk/downloadFile/7800623/?&ncc=1&filename=Broschu%CC%88re+03052023.pdf
+        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(8149181)))  # https://keso.bitrix24.de/disk/downloadFile/8149181/?&ncc=1&filename=Broschu%CC%88re+05062023.pdf
+        hide_pages = [16, 17, 18, 19, 20, 21, 24]
+        if data.get("data").get("module_kwp").get("label") == "PV-Modul Amerisolar 380 Watt Black":
+            hide_pages.remove(16)
+        if data.get("data").get("module_kwp").get("label") == "PV Modul SENEC.SOLAR 380 Watt BLACK":
+            hide_pages.remove(17)
+        if data.get("data").get("module_kwp").get("label") == "SENEC 410 Watt Hochleistungsmodul":
+            hide_pages.remove(18)
+        if data.get("data").get("module_kwp").get("label") == "BLACKSTAR SOLID FRAMED GLASS/GLASS 420 Watt":
+            hide_pages.remove(19)
+        if data.get("data").get("module_kwp").get("label") == "Bifazial Glas/Glas 410 Watt Black PV Modul.":
+            hide_pages.remove(20)
+        if "solaredge" in data.get("data").get("extra_options"):
+            hide_pages.remove(21)
+        if "wallbox" in data.get("data").get("extra_options") and data.get("data").get("extra_options_wallbox_variant") in ["senec-pro-11kW", "senec-pro-22kW"]:
+            hide_pages.remove(24)
+        print(hide_pages)
+        total_pages = base_pdf.getNumPages() - len(hide_pages)
         content = render_template(
             "quote_calculator/generator/synergy_wi/index.html",
             base_url=config_general["base_url"],
             lead_id=lead_id,
             data=data,
-            total_pages=base_pdf.getNumPages()
+            hide_pages=hide_pages,
+            total_pages=total_pages
         )
         data["datetime"] = str(data["datetime"])
         overlay_pdf = PdfFileReader(io.BytesIO(gotenberg_pdf(
             content,
             margins=["0", "0", "0", "0"],
             landscape=True)))
+        offset = 0
         pdf = PdfFileWriter()
-        for i in range(0, base_pdf.getNumPages()):
+        for i in range(0, total_pages):
             if only_pages is not None and i not in only_pages:
                 continue
-            if i in [11, 12, 13, 14, 15, 16]:
+            if i + offset in hide_pages:
+                offset = offset + 1
+                while i + offset in hide_pages:
+                    offset = offset + 1
+            print(base_pdf.getNumPages(), i, offset, i+offset+1)
+            if i in [11, 12, 13, 14, total_pages - 3, total_pages - 2, total_pages - 1]:
                 page = overlay_pdf.getPage(i)
             else:
                 page = overlay_pdf.getPage(i)
-                page.mergePage(base_pdf.getPage(i))
+                if i + offset < base_pdf.getNumPages():
+                    page.mergePage(base_pdf.getPage(i + offset))
             pdf.addPage(page)
         output = io.BytesIO()
         pdf.write(output)

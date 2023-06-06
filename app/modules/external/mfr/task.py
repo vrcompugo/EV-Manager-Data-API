@@ -426,6 +426,8 @@ def get_linked_data_by_task(task_data):
 
 
 def get_template_id_by_deal(deal_data):
+    if deal_data is None:
+        return config["default"]
     config = {
         "default": "17991565319",
         "electric": "17432084483",

@@ -1,0 +1,49 @@
+<style>
+  .page_blank_note {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    font-size: 0.7em;
+  }
+</style>
+
+<div class="page_wi_fineprint page_wi_fineprint1">
+  <p>
+    <b>Flex Strom</b><br>
+    Der Kunde kann zudem in einen „Reststromvertrag Flex“ wechseln. Hier kann der Kunde Strom zum Börsenpreis (zzgl. Steuern & Abgaben, Gebühren)
+    erhalten.
+  </p>
+  <p>
+    <b>*4 Testphase und Daten Kommunikation</b><br>
+    Der Kunde erteilt den beteiligten Unternehmen die Genehmigung, alle im Rahmen der Testphase notwendigen, erforderlichen, vorliegenden und generierbaren Daten, welche durch ihn oder seine PV-Anlage direkt oder indirekt generiert werden, zur freien Analyse und Simulation zu überlassen, zu verarbeiten, zu verwerten und deren Ergebnisse anonymisiert frei zu verwenden und zu vermarkten. Hierfür erhält der Kunde den oben in der „Wirtschaftlichkeitsberechnung“ aufgezeigten monatlichen Synergie360-Direktvermarktungsbetrag für 12 Monate garantiert und ausbezahlt.<br>
+    Die Berechnung des Bonusbetrages erfolgt auf Basis der vom Kunden angegebenen Werten und auf Basis der individuellen PV-Anlagenkonzipierung
+    mit Speicher sowie auf Erfahrungswerten aus historischen Strompreisentwicklungen und nicht garantierten Strompreisprognosen der Energiemärkte.
+    Der in der Wirtschaftlichkeitsberechnung kalkulierte Synergie360 Direktvermarktungs Euro-Betrag von {{ (data.calculated.synergy_bonus_monthly + data.calculated.feeding_amount_bonus_monthly) | currencyformat }} ist für die ersten 12 Monate garantiert.
+    Die Auszahlung für erfolgt in 2 Schritten. Die Summe {{ data.calculated.synergy_bonus_monthly | currencyformat }} wird einmalig nach erfolgter Inbetriebnahme an den Kunden
+    ausbezahlt. Die Restsumme wird nach EEG Grundlage vom Netzbetreiber an den an den Kunden überwiesen.<br>
+    Die Vereinbarung zur Testphase wird mit dem Kunden verbindlich für 12 Monate geschlossen. Sie beginnt mit dem Tag der offiziellen Inbetriebnahme
+    der PV-Anlage und endet automatisch nach 12 Monaten. Eine aktive Direktvermarktung von Strom find hierbei zunächst ausdrücklich nicht statt.
+  </p>
+  <p>
+    Sobald die erforderlichen Komponenten verfügbar sowie der Vertrag für die Direktvermarktung unterzeichnet sind, erhält der Kunde durch Energie 360
+    GmbH & Co. KG automatisch ein Angebot zur Montage dieser Komponenten (EMS). Die Komponenten- und Montagekosten belaufen sich derzeit auf
+    1.790€ zzgl. USt. Der Kunde erklärt sich bei einer Beauftragung damit einverstanden, dass die Montage der erforderlichen Komponenten bis zu 3 Monate
+    nach Ablauf der oben vereinbarten 12-monatigen Laufzeit erfolgen kann. Energie 360 GmbH & Co. KG ist jedoch bestrebt, die Montage zeitnah umzusetzen.<br>
+    Ab dem Zeitpunkt des Einbaus und Beginn des Direktvermarktervertrages kann der Kunde an der Direktvermarktung teilnehmen, welche ihm durch die
+    EnBW Energie Baden-Württemberg AG / oder einem Partnerunternehmen gesondert angeboten werden wird. Der Kunde wählt hier zwischen verschiedenen Tarifen, sowie Möglichkeiten des Direktstromvertriebs. Hier kann ebenfalls sofort der „Flex Tarif“ also ein Börsenstrom notierter Tarif vom Kunden
+    beantragt werden.
+  </p>
+  <p>
+    <b>Teilnahmevoraussetzungen</b><br>
+    Direktvermarktung „E360 Synergie Konzept“<br>
+    Der Kunde erhält vorliegend eine Konzeption in Form einer PV-Anlagen- und Speicherempfehlung durch Energie 360 GmbH & Co. KG. Diese Anlagenkonzeption stellt die optimale Auswahl der Komponentengrößen/-anzahl dar, um eine Direktvermarktung wirtschaftlich umzusetzen. Dem Kunden ist
+    jedoch freigestellt, eine von der vorgeschlagenen Konzeption abweichende Auswahl der Komponentengrößen/-anzahl zu treffen und an Energie 360
+    GmbH & Co. KG zu beauftragen.
+  </p>
+</div>
+
+<div class="page_blank_note">
+  Zu Angebots-Nr.: {{ data.number }}
+</div>
+
+{% include('feasibility_study_2020/elements/page_counter2.html') %}
