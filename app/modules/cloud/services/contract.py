@@ -585,6 +585,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                 "SELECT": "full",
                 f"filter[{settings['deal']['fields']['cloud_contract_number']}]": data["contract_number"],
                 f"filter[={settings['deal']['fields']['is_cloud_heatcloud']}]": "1",
+                f"filter[!=STAGE_ID]": "C15:LOSE",
                 "filter[CATEGORY_ID]": 15
             }, force_reload=True)
             if len(deals) != 1:
@@ -603,6 +604,7 @@ def get_cloud_config(data, cloud_number, delivery_begin, delivery_end, first_del
                     "id": deals[0].get("id"),
                     "title": deals[0].get("title")
                 }
+                print("heat", deals[0].get("id"))
                 if config["heatcloud"]["power_meter_number"] not in empty_values:
                     config["heatcloud"]["power_meter_number"] = string_stripper(config["heatcloud"]["power_meter_number"])
                 if deals[0].get("old_power_meter_numbers") not in empty_values:
