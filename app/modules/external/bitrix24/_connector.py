@@ -138,17 +138,13 @@ def list_request(url, payload, result, convert_config_values, force_reload=False
     payload['ORDER[ID]'] = "ASC"
     counter = 0
     while counter < 20:
-        print(payload)
         data = post(url, payload, force_reload=True)
         if "result" in data:
             if "tasks" in data["result"]:
                 data["result"] = data["result"]["tasks"]
             for item in data["result"]:
-                if "ID" not in item:
-                    print(json.dumps(item, indent=2))
                 last_id = item["ID"]
                 result.append(convert_config_values(item))
-            print(len(data["result"]))
             if len(data["result"]) < 50:
                 return result
             payload["filter[>ID]"] = last_id
@@ -165,13 +161,11 @@ def list_request_tasks(url, payload, result, convert_config_values, force_reload
     payload['ORDER[ID]'] = "ASC"
     counter = 0
     while counter < 20:
-        print(payload)
         data = post(url, payload, force_reload=True)
         if "result" in data:
             for item in data["result"]["tasks"]:
                 last_id = item["id"]
                 result.append(convert_config_values(item))
-            print(len(data["result"]["tasks"]))
             if len(data["result"]["tasks"]) < 50:
                 return result
             payload["filter[>id]"] = last_id

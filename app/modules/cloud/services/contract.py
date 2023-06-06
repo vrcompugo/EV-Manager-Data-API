@@ -1081,7 +1081,8 @@ def get_annual_statement_data(data, year, manuell_data):
 
                 if statement["taxrate"] != statement_config[product]["taxrate"]:
                     if product == "ecloud" and normalize_date(statement_config[product]["delivery_begin"]) < normalize_date("2022-10-01"):
-                        percent_full_tax = calculate_year_diff(statement_config[product]["delivery_begin"], "2022-09-30", manuell_data.get("corrected_datediff"))
+                        months_running = calculate_year_diff(statement_config[product]["delivery_begin"], "2022-12-31", manuell_data.get("corrected_datediff"))
+                        percent_full_tax = calculate_year_diff(statement_config[product]["delivery_begin"], "2022-09-30", manuell_data.get("corrected_datediff")) / months_running
                         statement_config[product]["parts"] = []
                         statement_config[product]["parts"].append({
                             "delivery_begin": statement_config[product]["delivery_begin"],
@@ -1103,12 +1104,12 @@ def get_annual_statement_data(data, year, manuell_data):
                             "delivery_end": "2022-12-31",
                             "percent_year": 3 / 12,
                             "taxrate": statement_config[product]["taxrate"],
-                            "total_cloud_price": round((statement_config[product]["total_cloud_price_net"] * (3 / 12)) * (1 + statement_config[product]["taxrate"] / 100), 4),
-                            "total_cloud_price_incl_refund_net": statement_config[product]["total_cloud_price_incl_refund_net"] * (3 / 12),
-                            "total_cloud_price_incl_refund": round(statement_config[product]["total_cloud_price_incl_refund_net"] * (3 / 12) * (1 + statement_config[product]["taxrate"] / 100), 4),
+                            "total_cloud_price": round((statement_config[product]["total_cloud_price_net"] * (1 - percent_full_tax)) * (1 + statement_config[product]["taxrate"] / 100), 4),
+                            "total_cloud_price_incl_refund_net": statement_config[product]["total_cloud_price_incl_refund_net"] * (1 - percent_full_tax),
+                            "total_cloud_price_incl_refund": round(statement_config[product]["total_cloud_price_incl_refund_net"] * (1 - percent_full_tax) * (1 + statement_config[product]["taxrate"] / 100), 4),
                             "extra_price_per_kwh": round(statement_config[product]["extra_price_per_kwh_net"] * (1 + statement_config[product]["taxrate"] / 100), 4),
-                            "total_extra_usage": statement_config[product]["total_extra_usage"] * (3 / 12),
-                            "extra_usage_buffer": statement_config[product]["extra_usage_buffer"] * (3 / 12),
+                            "total_extra_usage": statement_config[product]["total_extra_usage"] * (1 - percent_full_tax),
+                            "extra_usage_buffer": statement_config[product]["extra_usage_buffer"] * (1 - percent_full_tax),
                             "cashback_price_per_kwh": round((statement_config[product]["cashback_price_per_kwh"] / (1 + statement["taxrate"] / 100)) * (1 + statement_config[product]["taxrate"] / 100), 4)
                         }
                         if half_tax["total_extra_usage"] > 0:
