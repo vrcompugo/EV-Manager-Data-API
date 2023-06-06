@@ -1087,7 +1087,7 @@ def get_annual_statement_data(data, year, manuell_data):
                         statement_config[product]["parts"].append({
                             "delivery_begin": statement_config[product]["delivery_begin"],
                             "delivery_end": "2022-09-30",
-                            "percent_year": percent_full_tax,
+                            "percent_year": percent_full_tax * months_running,
                             "taxrate": statement["taxrate"],
                             "total_cloud_price": statement_config[product]["total_cloud_price"],
                             "total_cloud_price_incl_refund_net": statement_config[product]["total_cloud_price_incl_refund_net"] * percent_full_tax,
