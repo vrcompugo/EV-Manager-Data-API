@@ -159,13 +159,33 @@ def list_request_invoice(url, payload, result, convert_config_values, force_relo
     payload['ORDER[ID]'] = "ASC"
     counter = 0
     while counter < 20:
-        print(payload)
         data = post(url, payload, force_reload=True)
         if "result" in data:
             for item in data["result"]["items"]:
                 last_id = item["id"]
                 result.append(convert_config_values(item))
             if len(data["result"]["items"]) < 50:
+                return result
+            payload["filter[>id]"] = last_id
+        else:
+            print("error3:", data)
+            payload["start"] = None
+            return None
+        counter = counter + 1
+    return result
+
+
+def list_request_documents(url, payload, result, convert_config_values, force_reload=False):
+    payload["start"] = -1
+    payload['ORDER[ID]'] = "ASC"
+    counter = 0
+    while counter < 20:
+        data = post(url, payload, force_reload=True)
+        if "result" in data:
+            for item in data["result"]["documents"]:
+                last_id = item["id"]
+                result.append(convert_config_values(item))
+            if len(data["result"]["documents"]) < 50:
                 return result
             payload["filter[>id]"] = last_id
         else:
