@@ -119,7 +119,17 @@ class User(Resource):
         fields = request.args.get("fields") or "_default_"
         offer = OfferV2.query.filter(OfferV2.number == quote_number).first()
         if offer is None:
-            return {"status": "error", "error_code": "not_found", "message": "Angebot nicht gefunden"}, 404
+            if quote_number.find("-") < 0:
+                return {"status": "error", "error_code": "not_found", "message": "Angebot nicht gefunden"}, 404
+            quote_number_parts = quote_number.split("-")
+            try:
+                quote_id = int(quote_number_parts[len(quote_number_parts) - 1].strip())
+            except:
+                return {"status": "error", "error_code": "not_found", "message": "Angebot nicht gefunden"}, 404
+            offer = OfferV2.query.filter(OfferV2.id == quote_id).first()
+            if offer is None:
+                return {"status": "error", "error_code": "not_found", "message": "Angebot nicht gefunden"}, 404
+        if offer is None:
         item_dict = offer.to_dict()
         item_dict["pdf_link"] = offer.pdf.public_link if offer.pdf is not None else None
         item_dict["data_txt"] = json.dumps(item_dict.get("data"), indent=4)
