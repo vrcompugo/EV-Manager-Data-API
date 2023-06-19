@@ -190,7 +190,7 @@ def cron_update_contract_status():
                     })
                     contract.status = "success"
                     contract.status_message = "Bestätigt"
-                if values[4] in ["Error"]:
+                if values[5] in ["Error"]:
                     if contract.enbw_contract_number in [None, "", 0, "0"]:
                         update_deal(contract.deal_id, {
                             "stage_id": "C15:UC_A8XIOF"
