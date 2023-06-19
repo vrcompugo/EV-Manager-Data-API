@@ -12,7 +12,7 @@ from app.modules.external.bitrix24.drive import get_folder_id, get_folder, get_f
 from app.modules.cloud.services.contract import get_contract_data, normalize_date
 from app.modules.settings import get_settings
 
-from ._connector import post, get_ftp_file
+from ._connector import post, get_ftp_file, rename_ftp_file
 from .tarif import get_tarifs
 from .models.enbw_contract import ENBWContract
 from .models.enbw_contract_history import ENBWContractHistory
@@ -144,8 +144,9 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id, 
 
 
 def cron_update_contract_status():
-
-    csv_file = get_ftp_file('status/status_historie_latest.csv')
+    csv_filename = 'status/status_historie_latest.csv'
+    csv_newfilename = f'status/status_historie_latest_{str(datetime.datetime.now())}.csv'
+    csv_file = get_ftp_file(csv_filename)
     lines = csv_file.split("\n")
     for line in lines:
         values = line.split(";")
@@ -200,6 +201,7 @@ def cron_update_contract_status():
                     contract.status_message = "Error"
             db.session.add(history)
             db.session.commit()
+    rename_ftp_file(csv_filename, csv_newfilename)
 
 
 def process_existing_enbw_contracts():

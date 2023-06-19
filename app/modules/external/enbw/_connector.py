@@ -132,7 +132,7 @@ def put(url, post_data=None, files=None, contract:ENBWContract=None):
     return None
 
 
-def get_ftp_file(path):
+def get_ftp_connection():
     cnopts = pysftp.CnOpts(knownhosts='known_hosts')
     host = 'energyretail.de'
     port = 22
@@ -143,12 +143,22 @@ def get_ftp_file(path):
         print("connection established successfully")
     except:
         print('failed to establish connection to targeted server')
+    return conn
+
+
+def get_ftp_file(path):
+    conn = get_ftp_connection()
     filename = get_temp_file_name()
     conn.get(path, filename)
     with open(filename, 'r', encoding='utf-8', errors='ignore') as fh:
         content = fh.read()
     os.unlink(filename)
     return content
+
+
+def rename_ftp_file(path, new_path):
+    conn = get_ftp_connection()
+    return conn.rename(path, new_path)
 
 
 def get_temp_file_name():
