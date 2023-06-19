@@ -147,6 +147,8 @@ def cron_update_contract_status():
     csv_filename = 'status/status_historie_latest.csv'
     csv_newfilename = f'status/status_historie_latest_{str(datetime.datetime.now())}.csv'
     csv_file = get_ftp_file(csv_filename)
+    if csv_file is None:
+        return
     lines = csv_file.split("\n")
     for line in lines:
         values = line.split(";")

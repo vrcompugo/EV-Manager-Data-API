@@ -149,9 +149,13 @@ def get_ftp_connection():
 def get_ftp_file(path):
     conn = get_ftp_connection()
     filename = get_temp_file_name()
-    conn.get(path, filename)
-    with open(filename, 'r', encoding='utf-8', errors='ignore') as fh:
-        content = fh.read()
+    try:
+        conn.get(path, filename)
+        with open(filename, 'r', encoding='utf-8', errors='ignore') as fh:
+            content = fh.read()
+    except Exception as e:
+        print(e)
+        return None
     os.unlink(filename)
     return content
 
