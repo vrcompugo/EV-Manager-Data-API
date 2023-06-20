@@ -129,6 +129,7 @@ def send_contract(contract: ENBWContract, contract_file: FileStorage, tarif_id, 
     }
     if deal.get("is_cloud_heatcloud") in ["1", "Y", True, "true"]:
         enbw_data["Client"]["tariff_energy_type"] = 2
+        enbw_data["Client"]["malo"] = deal.get("malo_heatcloud"),
     if is_terminated:
         enbw_data["Client"]["self_terminated"] = "1"
         enbw_data["Client"]["start_delivery_next_possible"] = "0"
