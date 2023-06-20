@@ -7,7 +7,7 @@ from .task import import_by_id
 
 
 def run_mfr_amqp_messaging_subscriptor():
-    connstr = f"Endpoint=sb://mfr-trial.servicebus.windows.net/;SharedAccessKeyName=listenRule;SharedAccessKey=9dWzdLFU5cKzTHCfE4xsqCGE2AhjheIRjLtqXJgS7kY="
+    connstr = f"Endpoint=sb://mfr-prod.servicebus.windows.net/;SharedAccessKeyName=listenRule;SharedAccessKey=9dWzdLFU5cKzTHCfE4xsqCGE2AhjheIRjLtqXJgS7kY="
     queue_name = "kez-bitrix"
     with ServiceBusClient.from_connection_string(connstr) as client:
         # max_wait_time specifies how long the receiver should wait with no incoming messages before stopping receipt.
