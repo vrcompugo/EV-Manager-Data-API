@@ -287,6 +287,7 @@ def get_cloud_contract_data_by_deal(deal):
 
     if deal.get("is_cloud_master_deal") == "1" and deal.get("fakturia_data") not in [None, ""]:
         data = load_json_data(deal.get("fakturia_data"))
+        data["enbw_data"] = deal.get("enbw_data")
     else:
         if cloud_contract_number in [None, ""]:
             return deal
@@ -296,7 +297,9 @@ def get_cloud_contract_data_by_deal(deal):
             "is_cloud_master_deal": 1
         })
         if master_deal is not None and len(master_deal) > 0:
+            enbw_data = deal.get("enbw_data")
             deal = master_deal[0]
+            deal["enbw_data"] = enbw_data
             data = load_json_data(deal.get("fakturia_data"))
             if data is None:
                 data = initilize_faktura_data(master_deal[0])
