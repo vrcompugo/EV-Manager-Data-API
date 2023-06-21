@@ -72,7 +72,7 @@ def get_insign_callback(token):
             "order_sign_date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-01:00")
         }
         deal = get_deal(token_data["deal_id"])
-        if deal.get("stage_id") in ["C220:UC_8OMM5X", "C220:PREPARATION", "C220:PREPAYMENT_INVOI", "C220:UC_ZIICX6"]:
+        if deal.get("stage_id") in ["C220:UC_8OMM5X", "C220:PREPARATION", "C220:PREPAYMENT_INVOI", "C220:UC_ZIICX6", "C220:FINAL_INVOICE"]:
             deal_data["stage_id"] = "C220:EXECUTING"
         else:
             title = f"Neue Unterschrift {deal['title']}"
@@ -80,7 +80,7 @@ def get_insign_callback(token):
             add_task({
                 "fields[TITLE]": title,
                 "fields[DESCRIPTION]": description,
-                "fields[RESPONSIBLE_ID]": 670,
+                "fields[RESPONSIBLE_ID]": 1190,
                 "fields[DEADLINE]": str(datetime.datetime.now() + datetime.timedelta(days=14))
             })
         update_deal(token_data["deal_id"], deal_data)
