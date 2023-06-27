@@ -7,7 +7,7 @@ from app.utils.error_handler import error_handler
 
 
 def cron(section=None):
-    if section == "productive" or section == "user_cache_refresh":
+    if section == "productive2" or section == "user_cache_refresh":
         from app.modules.external.bitrix24.user import cron_refresh_users
         print("cron", "user_cache_refresh")
         try:
@@ -15,7 +15,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "import_leads_aroundhome":
+    if section == "productive2" or section == "import_leads_aroundhome":
         from app.modules.external.aroundhome.deal import run_cron_import
         print("cron", "import_leads_aroundhome")
         try:
@@ -23,7 +23,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "import_leads_daa":
+    if section == "productive2" or section == "import_leads_daa":
         from app.modules.external.daa.deal import run_cron_import
         print("cron", "import_leads_daa")
         try:
@@ -31,7 +31,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "import_leads_senec":
+    if section == "productive2" or section == "import_leads_senec":
         from app.modules.external.senec.deal import run_cron_import
         print("cron", "import_leads_senec")
         try:
@@ -39,7 +39,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "auto_assign_leads":
+    if section == "productive2" or section == "auto_assign_leads":
         from app.modules.external.bitrix24.lead import run_cron_auto_assign_leads
         print("cron", "auto_assign_leads")
         try:
@@ -47,7 +47,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "import_leads_wattfox":
+    if section == "productive2" or section == "import_leads_wattfox":
         from app.modules.external.wattfox.deal import run_cron_import
         print("cron", "import_leads_wattfox")
         try:
@@ -55,7 +55,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "import_power_meter_values":
+    if section == "productive2" or section == "import_power_meter_values":
         from app.modules.external.smartme.powermeter_measurement import run_cron_import
         print("cron", "import_power_meter_values")
         try:
@@ -63,35 +63,35 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "bennemann_lead_convert":
+    if section == "productive2" or section == "bennemann_lead_convert":
         from app.modules.external.bitrix24.lead import run_bennemann_lead_convert
         try:
             run_bennemann_lead_convert()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "extern_lead_convert":
+    if section == "productive2" or section == "extern_lead_convert":
         from app.modules.external.bitrix24.lead import run_extern_lead_convert
         try:
             run_extern_lead_convert()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "add_missing_deal_values":
+    if section == "productive2" or section == "add_missing_deal_values":
         from app.modules.external.bitrix24.deal import run_cron_add_missing_values
         try:
             run_cron_add_missing_values()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "copy_cloud_deal_values":
+    if section == "productive2" or section == "copy_cloud_deal_values":
         from app.modules.cloud.services.deal import cron_copy_cloud_deal_values
         try:
             cron_copy_cloud_deal_values()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "bitrix_user_import":
+    if section == "productive2" or section == "bitrix_user_import":
         from app.modules.importer.sources.bitrix24.reseller import run_import
         try:
             run_import()
@@ -104,70 +104,70 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "fakturia_customer_export":
+    if section == "productive2" or section == "fakturia_customer_export":
         from app.modules.external.fakturia.customer import run_cron_export
         try:
             run_cron_export()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "fakturia_deal_export":
+    if section == "productive2" or section == "fakturia_deal_export":
         from app.modules.external.fakturia.deal import run_cron_export
         try:
             run_cron_export()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "auto_assignment_facebook_leads":
+    if section == "productive2" or section == "auto_assignment_facebook_leads":
         from app.modules.lead.lead_services import auto_assignment_facebook_leads
         try:
             auto_assignment_facebook_leads()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "mfr_task_export":
+    if section == "productive2" or section == "mfr_task_export":
         from app.modules.external.mfr.task import run_cron_export
         try:
             run_cron_export()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "etermin_import":
+    if section == "productive2" or section == "etermin_import":
         from app.modules.external.etermin.appointment import import_new_appointments
         try:
             import_new_appointments()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "etermin_export":
+    if section == "productive2" or section == "etermin_export":
         from app.modules.external.etermin.appointment import export_appointments
         try:
             export_appointments()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "folder_creation":
+    if section == "productive2" or section == "folder_creation":
         from app.modules.external.bitrix24.drive import run_cron_folder_creation
         try:
             run_cron_folder_creation()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "heating_folder_creation":
+    if section == "productive2" or section == "heating_folder_creation":
         from app.modules.external.bitrix24.drive import run_cron_heating_folder_creation
         try:
             run_cron_heating_folder_creation()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "external_company_folder_creation":
+    if section == "productive2" or section == "external_company_folder_creation":
         from app.modules.external.bitrix24.drive import run_cron_external_company_folder_creation
         try:
             run_cron_external_company_folder_creation()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "find_stuck_orders":
+    if section == "productive2" or section == "find_stuck_orders":
         from app.models import OfferV2, Order, ImportIdAssociation
         try:
             offers = OfferV2.query.filter(OfferV2.is_sent.is_(True)).all()
@@ -185,35 +185,35 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "mfr_import":
+    if section == "productive2" or section == "mfr_import":
         from app.modules.external.mfr.amqp import run_cron_import
         try:
             run_cron_import()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "split_cloud_contract":
+    if section == "productive2" or section == "split_cloud_contract":
         from app.modules.cloud.services.deal import cron_split_cloud_contract
         try:
             cron_split_cloud_contract()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "mein_portal_initial_documents":
+    if section == "productive2" or section == "mein_portal_initial_documents":
         from app.modules.cloud.services.deal import cron_mein_portal_initial_documents
         try:
             cron_mein_portal_initial_documents()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "heatpump_auto_quote_generator":
+    if section == "productive2" or section == "heatpump_auto_quote_generator":
         from app.modules.quote_calculator.cron import cron_heatpump_auto_quote_generator
         try:
             cron_heatpump_auto_quote_generator()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "cron_follow_cloud_quote":
+    if section == "productive2" or section == "cron_follow_cloud_quote":
         from app.modules.quote_calculator.cron import cron_follow_cloud_quote
         try:
             cron_follow_cloud_quote()
@@ -227,7 +227,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "cron_transfer_fakturia_annual_invoice":
+    if section == "productive2" or section == "cron_transfer_fakturia_annual_invoice":
         from app.modules.cloud.services.contract import cron_transfer_fakturia_annual_invoice
         try:
             cron_transfer_fakturia_annual_invoice()
@@ -241,14 +241,14 @@ def cron(section=None):
         except Exception as e:
             print(traceback.format_exc())
 
-    if section == "productive" or section == "cron_generate_weekly_invoice_bundles":
+    if section == "productive2" or section == "cron_generate_weekly_invoice_bundles":
         from app.modules.invoice import cron_generate_weekly_invoice_bundles
         try:
             cron_generate_weekly_invoice_bundles()
         except Exception as e:
             print(traceback.format_exc())
 
-    if section == "productive" or section == "cron_update_contract_status":
+    if section == "productive2" or section == "cron_update_contract_status":
         from app.modules.external.enbw.contract import cron_update_contract_status
         try:
             cron_update_contract_status()
