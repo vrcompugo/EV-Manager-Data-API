@@ -90,6 +90,7 @@ def upload_contract():
     is_terminated = False
     if data.get("is_terminated") in ["true", "True", "1", 1, True]:
         is_terminated = True
+        is_terminated_date = data.get("is_terminated_date")
     if contract is None:
         contract = ENBWContract(
             main_contract_number=main_contract_number,
@@ -100,7 +101,7 @@ def upload_contract():
         db.session.add(contract)
         db.session.commit()
     try:
-        contract_data = send_contract(contract, contract_file, tarif_id, is_terminated)
+        contract_data = send_contract(contract, contract_file, tarif_id, is_terminated, is_terminated_date)
         contract.joulesId = contract_data.get("joulesId")
         contract.status = "transfered"
         contract.status_message = "Übertragen an ENBW. Warten auf Rückmeldung"
