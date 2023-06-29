@@ -88,6 +88,7 @@ def upload_contract():
             else:
                 return {"status": "failed", "data": {}, "message": f"Achtung! Bereits übertragen durch Auftrag ID: {contract.deal_id}"}
     is_terminated = False
+    is_terminated_date = None
     if data.get("is_terminated") in ["true", "True", "1", 1, True]:
         is_terminated = True
         is_terminated_date = data.get("is_terminated_date")
