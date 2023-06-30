@@ -1203,6 +1203,9 @@ def get_annual_statement_data(data, year, manuell_data):
         statement["pre_payments_total"] = statement["total_cloud_price_incl_refund"]
         if odoo_payment_amount is not None:
             statement["pre_payments_total"] = odoo_payment_amount
+    if manuell_data.get("paid_amount_overwrite") not in [None, ""]:
+        statement["pre_payments_total"] = float(manuell_data.get("paid_amount_overwrite"))
+        statement["payments"] = None
     statement["extra_credit_value"] = 0
     statement["extra_credit_label"] = ""
     if manuell_data.get("extra_credit_value") not in [None, "", 0]:
