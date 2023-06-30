@@ -1641,6 +1641,7 @@ def normalize_counter_values(start_date, end_date, numbers, values, manuell_data
 
 
 def cron_transfer_fakturia_annual_invoice():
+    return
     deals = get_deals({
         "SELECT": "full",
         "filter[CATEGORY_ID]": 126,
