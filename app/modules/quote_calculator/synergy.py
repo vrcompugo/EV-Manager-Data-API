@@ -346,7 +346,9 @@ def generate_synergy_pdf(lead_id, data, only_pages=None):
             data["datetime"] = datetime.datetime.now()
         # base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7476459)))  # https://keso.bitrix24.de/disk/downloadFile/7476459/?&ncc=1&filename=Synergie+360+WI.pdf
         # base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(7800623)))  # https://keso.bitrix24.de/disk/downloadFile/7800623/?&ncc=1&filename=Broschu%CC%88re+03052023.pdf
-        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(8149181)))  # https://keso.bitrix24.de/disk/downloadFile/8149181/?&ncc=1&filename=Broschu%CC%88re+05062023.pdf
+        # base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(8149181)))  # https://keso.bitrix24.de/disk/downloadFile/8149181/?&ncc=1&filename=Broschu%CC%88re+05062023.pdf
+        base_pdf = PdfFileReader(io.BytesIO(get_file_content_cached(8430171))) # https://keso.bitrix24.de/disk/downloadFile/8430171/?&ncc=1&filename=Brosch%C3%BCre+30062023+%281%29.pdf
+
         hide_pages = [16, 17, 18, 19, 20, 21, 24]
         if data.get("data").get("module_kwp").get("label") == "PV-Modul Amerisolar 380 Watt Black":
             hide_pages.remove(16)
