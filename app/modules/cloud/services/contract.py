@@ -1440,16 +1440,16 @@ def generate_annual_report_pdf(contract_number, year):
                 "annual_statement_link": statement["pdf_link"],
                 "opportunity": round(statement["to_pay"], 2),
                 "annual_report_amount": round(statement["to_pay"], 2),
-                "annual_report_begin": normalize_date(statement["delivery_begin"]),
-                "annual_report_end": normalize_date(statement["delivery_begin"])
+                "annual_report_begin": str(normalize_date(statement["delivery_begin"])),
+                "annual_report_end": str(normalize_date(statement["delivery_begin"]))
             })
             update_deal(deal_id, {
                 # "stage_id": "C126:UC_WT48N4",
                 "annual_statement_link": statement["pdf_link"],
                 "opportunity": round(statement["to_pay"], 2),
                 "annual_report_amount": round(statement["to_pay"], 2),
-                "annual_report_begin": normalize_date(statement["delivery_begin"]),
-                "annual_report_end": normalize_date(statement["delivery_begin"])
+                "annual_report_begin": str(normalize_date(statement["delivery_begin"])),
+                "annual_report_end": str(normalize_date(statement["delivery_begin"]))
             })
     db.session.commit()
     return data
