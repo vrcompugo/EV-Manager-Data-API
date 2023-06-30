@@ -22,6 +22,7 @@ from app.modules.external.fakturia.deal import get_payments, get_payments2, get_
 from app.modules.external.fakturia.activity import generate_invoice
 from app.modules.external.smartme.powermeter_measurement import get_device_by_datetime
 from app.modules.external.bitrix24.drive import add_file, get_public_link, get_folder_id, create_folder_path
+from app.modules.external.odoo.payment import get_payments_by_contract
 from app.models import SherpaInvoice, ContractStatus, OfferV2, Contract, SherpaInvoiceItem, Survey, OfferV2Item
 from .annual_statement import generate_annual_statement_pdf
 from .calculation import cloud_offer_items_by_pv_offer, calculate_cloud, get_cloud_products
@@ -1186,7 +1187,7 @@ def get_annual_statement_data(data, year, manuell_data):
             statement[f"total_self_usage_{product}"] = statement[f"total_self_usage_{product}"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
             statement["total_self_usage"] = statement["total_self_usage"] + statement_config[product]["actual_usage"] - statement_config[product]["actual_usage_net"]
 
-    statement["pre_payments_total"] = statement["total_cloud_price_incl_refund"]
+    odoo_payment_amount = get_payments_by_contract(data.get("contract_number"), normalize_date(statement["delivery_begin"]), normalize_date(statement["delivery_end"]))
     if data.get("fakturia") is not None and data.get("fakturia").get("contractStatus") not in ["ENDED"]:
         statement["is_fakturia"] = True
         statement["payments"] = []
@@ -1195,6 +1196,13 @@ def get_annual_statement_data(data, year, manuell_data):
             if payment["date"][:4] == str(year) and payment["amountGross_normalized_prepay"] != 0:
                 statement["pre_payments_total"] = statement["pre_payments_total"] + payment["amountGross_normalized_prepay"]
                 statement["payments"].append(payment)
+        if odoo_payment_amount is not None:
+            statement["pre_payments_total"] = statement["pre_payments_total"] + odoo_payment_amount
+            statement["payments"] = None
+    else:
+        statement["pre_payments_total"] = statement["total_cloud_price_incl_refund"]
+        if odoo_payment_amount is not None:
+            statement["pre_payments_total"] = odoo_payment_amount
     statement["extra_credit_value"] = 0
     statement["extra_credit_label"] = ""
     if manuell_data.get("extra_credit_value") not in [None, "", 0]:
@@ -1430,12 +1438,18 @@ def generate_annual_report_pdf(contract_number, year):
             print(deal_id, {
                 # "stage_id": "C126:UC_WT48N4",
                 "annual_statement_link": statement["pdf_link"],
-                "opportunity": round(statement["to_pay"], 2)
+                "opportunity": round(statement["to_pay"], 2),
+                "annual_report_amount": round(statement["to_pay"], 2),
+                "annual_report_begin": normalize_date(statement["delivery_begin"]),
+                "annual_report_end": normalize_date(statement["delivery_begin"])
             })
             update_deal(deal_id, {
                 # "stage_id": "C126:UC_WT48N4",
                 "annual_statement_link": statement["pdf_link"],
-                "opportunity": round(statement["to_pay"], 2)
+                "opportunity": round(statement["to_pay"], 2),
+                "annual_report_amount": round(statement["to_pay"], 2),
+                "annual_report_begin": normalize_date(statement["delivery_begin"]),
+                "annual_report_end": normalize_date(statement["delivery_begin"])
             })
     db.session.commit()
     return data

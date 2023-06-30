@@ -618,7 +618,10 @@ def get_settings(section=None, domain_raw=None):
                     "upload_link_tab": "UF_CRM_1656489097",
                     "contract_managed_by": "UF_CRM_1682334663",
                     "contract_transfered_at": "UF_CRM_1682413256",
-                    "enbw_contract_number": "UF_CRM_1683013392"
+                    "enbw_contract_number": "UF_CRM_1683013392",
+                    "annual_report_amount": "UF_CRM_1684325234216",
+                    "annual_report_begin": "UF_CRM_1684315105898",
+                    "annual_report_end": "UF_CRM_1684315481585"
                 }
             },
             "invoice": {
