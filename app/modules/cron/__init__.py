@@ -227,7 +227,7 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "cron_transfer_fakturia_annual_invoice":
+    if section == "obsolete-fakturia" or section == "cron_transfer_fakturia_annual_invoice":  # fakturia was replaced by odoo
         from app.modules.cloud.services.contract import cron_transfer_fakturia_annual_invoice
         try:
             cron_transfer_fakturia_annual_invoice()
