@@ -104,14 +104,14 @@ def cron(section=None):
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "fakturia_customer_export":
+    if section == "obsolete-fakturia" or section == "fakturia_customer_export":  # fakturia was replaced by odoo
         from app.modules.external.fakturia.customer import run_cron_export
         try:
             run_cron_export()
         except Exception as e:
             error_handler()
 
-    if section == "productive" or section == "fakturia_deal_export":
+    if section == "obsolete-fakturia" or section == "fakturia_deal_export":  # fakturia was replaced by odoo
         from app.modules.external.fakturia.deal import run_cron_export
         try:
             run_cron_export()

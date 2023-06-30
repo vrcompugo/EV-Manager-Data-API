@@ -948,6 +948,7 @@ def get_export_data_cloud(deal, contact):
 
 
 def export_deal(deal_id):
+    return # fakturia was replaced by odoo, no export allowed anymore
     print("export deal:", deal_id)
     deal = get_contract_data_by_deal(deal_id)
     contact = get_contact(deal.get("contact_id"))
