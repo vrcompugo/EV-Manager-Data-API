@@ -1213,7 +1213,7 @@ def quote_calculator_contract_summary_pdf4(lead_id):
     history = db.session.query(QuoteHistory).filter(QuoteHistory.lead_id == lead_id).order_by(QuoteHistory.datetime.desc()).first()
     data = json.loads(json.dumps(history.data))
 
-    pdf = generate_synergy_pdf(lead_id, data)
+    pdf = generate_synergy_pdf(lead_id, data, [13, 14, 15])
 
     return Response(pdf,
         status=200,
