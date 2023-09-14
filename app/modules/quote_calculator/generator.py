@@ -379,7 +379,8 @@ def generate_datasheet_pdf(lead_id, data):
                     add_pdf_by_drive_id(merger, 436158, cached=True)
                 else:
                     add_pdf_by_drive_id(merger, 436128, cached=True)
-            pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec lithium speicher") == 0), None)
+            # pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec lithium speicher") == 0), None)
+            pv_module = next((item for item in data["products"] if item["NAME"].lower().find("moderne solarstrom speicher") == 0), None)
             if pv_module is not None:
                 add_pdf_by_drive_id(merger, 2341368, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2341368/?&ncc=1&filename=Senec+Home+Datenbla%CC%88tter+v2.1.pdf
             pv_module = next((item for item in data["products"] if item["NAME"].lower().find("senec v3") == 0), None)
@@ -394,8 +395,9 @@ def generate_datasheet_pdf(lead_id, data):
                 add_pdf_by_drive_id(merger, 5621739, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/5621739/?&ncc=1&filename=TD220-048.11_SENEC-H-21-C-1_Technisches_Datenblatt_de_1.1-1.pdf
                 add_pdf_by_drive_id(merger, 7928401, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/7928401/?&ncc=1&filename=CD030-037.10_SENEC.Home_4_Bedingungen_fu%CC%88r_Hardwareschutz_de_1+%281%29.0.pdf
         add_pdf_by_drive_id(merger, 436112, cached=True)  # zebra_zertifgikat
-        add_pdf_by_drive_id(merger, 436106, cached=True)  # Testsieger Garantiebedingunegn
-        add_pdf_by_drive_id(merger, 436102, cached=True)  # Kapazitätsversprechen
+        ## Remove PDF pages 5, 6, 7 for pdf 'Datenblaetter'
+        #add_pdf_by_drive_id(merger, 436106, cached=True)  # Testsieger Garantiebedingunegn
+        #add_pdf_by_drive_id(merger, 436102, cached=True)  # Kapazitätsversprechen
         if "solaredge" in data["data"]["extra_options"]:
             add_pdf_by_drive_id(merger, 2332216, cached=True)  # https://keso.bitrix24.de/disk/downloadFile/2332216/?&ncc=1&filename=Solaredge+gesamt.pdf
             if data["data"].get("pv_kwp", 0) > 30:

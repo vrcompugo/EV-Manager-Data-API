@@ -2,25 +2,29 @@ import json
 import math
 from app.modules.external.bitrix24.products import get_product
 
-
 def add_product(data):
     size = 0
+
     if data["data"].get("power_usage") not in [None, "", 0, "0"]:
         size = size + math.ceil(float(data["data"].get("power_usage")) / 2500) * 2.5
     if data["data"].get("heater_usage") not in [None, "", 0, "0"]:
         size = size + math.ceil(float(data["data"].get("heater_usage")) / 6100) * 2.5
+
     is_overwrite = False
+
     if "overwrite_storage_size" in data["data"] and int(data["data"]["overwrite_storage_size"]) > 0:
         size = int(data["data"]["overwrite_storage_size"])
         is_overwrite = True
+
     if "overwrite_storage_size" in data["data"] and str(data["data"]["overwrite_storage_size"]) in ["5", "7.5", "10"]:
-        version = "Senec Lithium Speicher"
+        # todo: check!
+        version = "Moderne Solarstrom Speicher"
         stack_count = math.ceil((size - 2.5) / 2.5)
         if stack_count < 1:
             stack_count = 1
         product = get_product(label=version, category="Stromspeicher")
         product["quantity"] = 1
-        stack = get_product(label=f"{version} Akku Stack", category="Stromspeicher")
+        stack = get_product(label=f"Moderne Solarstrom Speicher Akku Stack", category="Stromspeicher")
         product["NAME"] = f"{version} {stack_count * 2.5 + 2.5} LI"
         product["PRICE"] = float(product["PRICE"]) + float(stack["PRICE"]) * stack_count
         data["products"].append(product)
@@ -66,6 +70,7 @@ def add_product(data):
         else:
             version = "SENEC Home 4 AC"
             product = get_product(label="SENEC Home 4 AC (Gehäuse)", category="Stromspeicher")
+
         product["quantity"] = 1
         stack_count = math.ceil(size / 4.2)
         stack = get_product(label="SENEC Home 4 Batteriemodul 4,2 kW", category="Stromspeicher")
@@ -80,6 +85,7 @@ def add_product(data):
         product = get_product(label="Home 4 Kit", category="Stromspeicher")
         product["quantity"] = 1
         data["products"].append(product)
+
         return return_product
 
     return return_product

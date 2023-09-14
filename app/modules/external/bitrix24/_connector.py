@@ -200,18 +200,24 @@ def list_request_tasks(url, payload, result, convert_config_values, force_reload
     payload["start"] = -1
     payload['ORDER[ID]'] = "ASC"
     counter = 0
+
     while counter < 20:
         data = post(url, payload, force_reload=True)
         if "result" in data:
             for item in data["result"]["tasks"]:
                 last_id = item["id"]
                 result.append(convert_config_values(item))
+
             if len(data["result"]["tasks"]) < 50:
                 return result
+
             payload["filter[>id]"] = last_id
+
         else:
             print("error3:", data)
             payload["start"] = None
             return None
+
         counter = counter + 1
+
     return result

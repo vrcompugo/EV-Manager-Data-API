@@ -91,7 +91,9 @@ def get_settings(section=None, domain_raw=None):
                     "4056": "enpal_verbau",
                     "4074": "additional_electric",
                     "8749": "aufmass_wp",
-                    "8845": "logistic"
+                    "8845": "logistic",
+                    "9291": "wartung_waermepumpe",
+                    "9295": "vde_pruefung_elektrisch"
                 },
                 "cloud_type": {
                     "234": "Zero",

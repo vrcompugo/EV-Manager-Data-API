@@ -72,7 +72,9 @@ def get_tasks(payload, force_reload=False):
         for index, field in enumerate(config["task"]["fields"]):
             payload[f"select[{index + 1}]"] = "UF_AUTO_" + config["task"]["fields"][field].replace("ufAuto", "")
     result = []
-    list_request_tasks("tasks.task.list", payload, result, convert_config_values, force_reload=force_reload)
+
+    result = list_request_tasks("tasks.task.list", payload, result, convert_config_values, force_reload=force_reload)
+
     return result
 
 

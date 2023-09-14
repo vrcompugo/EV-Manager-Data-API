@@ -56,8 +56,9 @@ def post(url, post_data=None, files=None, type=None):
         if type is not None and type == "mfr":
             base_url = base_url.replace("/odata", "/mfr")
         if files is not None:
+            base_url = base_url + url
             response = requests.post(
-                base_url + url,
+                base_url,
                 files=files,
                 headers={
                     'Authorization': "Basic {}".format(token),
@@ -65,8 +66,9 @@ def post(url, post_data=None, files=None, type=None):
                 }
             )
         else:
+            base_url = base_url + url
             response = requests.post(
-                base_url + url,
+                base_url,
                 json=post_data,
                 headers={
                     'Authorization': "Basic {}".format(token),
@@ -88,8 +90,11 @@ def put(url, post_data=None, files=None, type=None):
     if token is not None:
         if type is not None and type == "mfr":
             base_url = base_url.replace("/odata", "/mfr")
+
+        base_url = base_url + url
+
         response = requests.put(
-            base_url + url,
+            base_url,
             json=post_data,
             headers={
                 'Authorization': "Basic {}".format(token),

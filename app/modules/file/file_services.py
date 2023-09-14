@@ -33,12 +33,15 @@ def add_item(data):
             folder_id = create_folder_path(446126, f"{new_item.uuid}")
         else:
             folder_id = create_folder_path(446126, f"{data['prepend_path']}")
-    print("add file2")
+    print("1 - folder_id: ", folder_id)
+    print("add file2: ")
     bitrix_file_id = add_file(folder_id, data)
+    print("2 - bitrix_file_id: ", bitrix_file_id)
     print("add file3")
     if bitrix_file_id is None:
         raise ApiException("upload-failed", "file upload failed", 500)
     new_item.bitrix_file_id = bitrix_file_id
+    print("3 - bitrix_file_id: ", bitrix_file_id)
     db.session.add(new_item)
     db.session.commit()
 

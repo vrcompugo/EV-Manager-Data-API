@@ -235,31 +235,32 @@ def import_by_id(service_request_id):
 
 def run_cron_export():
     config = get_settings("external/mfr")
-    print("export task mfr")
+    print("<< BEGIN run cron export task mfr >>")
     if config is None:
-        print("no config for export task mfr")
+        print("<< no config for export task mfr >>")
         return None
     last_task_export_time = config.get("last_task_export_time", "2021-01-01")
     tasks = get_tasks({
         "select": "full",
         "filter[>ACTIVITY_DATE]": last_task_export_time,
-        "filter[TITLE]": "%[mfr]%"
+        "filter[%TITLE]": "[mfr]"
     }, force_reload=True)
     if tasks is None:
-        print("tasks could not be loaded")
+        print("<< tasks could not be loaded >>")
         return
     tasks2 = get_tasks({
         "select": "full",
         "filter[>CHANGED_DATE]": last_task_export_time,
-        "filter[TITLE]": "%[mfr]%"
+        "filter[%TITLE]": "[mfr]"
     }, force_reload=True)
     if tasks2 is not None:
         for task in tasks2:
             found = next((item for item in tasks if item.get("id") == task.get("id")), None)
             if found is None:
                 tasks.append(task)
-    print("time: ", last_task_export_time)
+    print("<< time: ", last_task_export_time, " >>")
     last_task_export_time = datetime.now()
+
     for task in tasks:
         comments = post_bitrix("task.commentitem.getlist", {
             "taskId": task.get("id")
@@ -277,11 +278,11 @@ def run_cron_export():
 
 def export_by_bitrix_id(bitrix_id=None, task_data=None):
     if task_data is None:
-        print("export mfr task ", bitrix_id)
+        print(">> BEGIN run export mfr task", bitrix_id, " <<")
         task_data = get_task(bitrix_id, force_reload=True)
     else:
         bitrix_id = task_data.get("id")
-        print("export mfr task ", task_data.get("id"))
+        print(">> export mfr task ", bitrix_id, " <<")
     task_buffer = MfrExportBuffer.query.filter(MfrExportBuffer.task_id == str(bitrix_id)).first()
     if task_buffer is None:
         task_buffer = MfrExportBuffer(task_id=bitrix_id)
@@ -297,10 +298,10 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
                 changes_found = True
                 break
     if changes_found is False:
-        print("no_change")
+        print(">> no_change <<")
         return
     else:
-        print("change detected")
+        print(">> change detected <<")
     task_buffer.last_change = datetime.now()
     task_buffer.data = task_data
     db.session.commit()
@@ -314,7 +315,7 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
             export_company_by_bitrix_id(company_data["id"])
             company_data = get_company(company_data["id"])
     if contact_data is None and company_data is None:
-        print("no contact", bitrix_id)
+        print(">> no contact", bitrix_id, " <<")
         return
     post_data = get_export_data(task_data, contact_data, deal_data, company_data)
     documents = None
@@ -346,7 +347,6 @@ def export_by_bitrix_id(bitrix_id=None, task_data=None):
         })
         for document in documents:
             if document["TYPE"] != "file":
-                print("wrong type: ", document["TYPE"])
                 continue
             existing_document = next((item for item in response.get("Documents", []) if item["FileName"] == str(document["NAME"])), None)
             if existing_document is None:
@@ -447,7 +447,9 @@ def get_template_id_by_deal(deal_data):
         "enpal_verbau": "18214387721",
         "additional_electric": "18511986693",
         "aufmass_wp": "42852253735",
-        "logistic": "43163254799"
+        "logistic": "43163254799",
+        "wartung_waermepumpe": "47134933037",
+        "vde_pruefung_elektrisch": "47134933038"
     }
     if deal_data is None:
         return config["default"]

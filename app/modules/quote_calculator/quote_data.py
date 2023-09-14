@@ -77,7 +77,7 @@ def calculate_quote(lead_id, data=None, create_quote=False):
         "datetime": str(datetime.datetime.now()),
         "data": {
             "status_id": lead_data.get("status_id"),
-            "cloud_quote_type": "synergy",
+            "cloud_quote_type": "standard",
             "emove_tarif": "none",
             "bluegen_cell_count": 1,
             "power_increase_rate": 3.9,
@@ -234,10 +234,40 @@ def calculate_products(data):
         kwp_special_roof = round(kwp_special_roof, 2)
         kwp_normal_roof = round(kwp_normal_roof, 2)
     taxrate = config["taxrate"]
+
+    cloudQuoteType = data["data"].get("cloud_quote_type")
+    print("cloud_quote_type: ", cloudQuoteType)
+
     if kwp < 30:
         taxrate = 0
     if kwp == 0:
         return data
+
+    # set standard tax rate to 0% for MwSt. for Cloud Options
+    STANDARD_TAX_RATE           = 0
+
+    # set taxrate, depending on cloud option
+    if cloudQuoteType == 'standard':
+        # 'Standard'
+        taxrate = STANDARD_TAX_RATE
+    if cloudQuoteType == 'no-pv':
+        # 'Standard ohne PV'
+        taxrate = STANDARD_TAX_RATE
+    if cloudQuoteType == 'synergy':
+        # 'Standard mit Synergy'
+        # Brutto == Netto
+        taxrate = STANDARD_TAX_RATE
+    if cloudQuoteType == 'no-cloud':
+        # 'Keine Cloud'
+        taxrate = STANDARD_TAX_RATE
+    if cloudQuoteType == 'combination_quote':
+        # 'Cloud Kombinationsvertrag (nur 2 Jahre Laufzeit)'
+        taxrate = STANDARD_TAX_RATE
+
+    # OTHERS (not in cloudQuoteType):
+    # 'followup_quote'
+    # 'interim_quote'
+
     try:
 
         add_product_pv_module(data)
@@ -562,14 +592,16 @@ def calculate_products(data):
                 products=data["products"]
             )
 
-        if storage_product is not None and storage_product["NAME"].find("Senec Lithium Speicher") >= 0 and data["data"].get("cloud_quote_type") in [None, "", 0]:
+        if storage_product is not None and storage_product["NAME"].find("Moderne Solarstrom Speicher") >= 0 and data["data"].get("cloud_quote_type") in [None, "", 0, "standard"]:
+            # grenzwerte für den Akkustack
             if data["calculated"]["power_usage"] in [3000, 4000, 5000, 6000, 7500, 9000, 11000] and data["calculated"]["heater_usage"] == 0:
                 product = get_product(label="Paket Aktion CLOUD", category="Extra Pakete")
                 if product is not None:
                     product["quantity"] = 1
-                    product["PRICE"] = -1666.66666667
+                    product["PRICE"] = -4444.44444444
                     data["products"].append(product)
 
+    	# intersolar bonus obsolet, da synergy nicht mehr auswählbar ist
         if str(data["assigned_user"]["UF_DEPARTMENT"]) not in ["523", "525", "529", "270", "527"]:
             if data["data"].get("cloud_quote_type") in ["synergy"] and data["data"].get("pv_quote_discount_euro") not in [None, "", 0]:
                 data["subtotal_net"] = 0
@@ -626,6 +658,7 @@ def calculate_products(data):
     data["total_tax"] = data["total_net"] * (taxrate / 100)
     data["total"] = data["total_net"] + data["total_tax"]
     data["tax_rate"] = taxrate
+
     if data.get("data").get("investment_type") == 'financing' and data.get("data").get("financing_bank") in ["energie360"]:
         if data.get("data").get("loan_runtime") in [None, "", "0", 0]:
             data["data"]["loan_runtime"] = 240

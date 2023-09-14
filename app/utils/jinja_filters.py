@@ -13,6 +13,7 @@ def apply_filters(app):
     app.jinja_env.filters['addressblock2'] = addressblock2
     app.jinja_env.filters['numberformat'] = numberformat
     app.jinja_env.filters['currencyformat'] = currencyformat
+    # app.jinja_env.filters['calculategross'] = calculategross
     app.jinja_env.filters['percentformat'] = percentformat
     app.jinja_env.filters['nl2br'] = nl2br
 
@@ -80,6 +81,10 @@ def currencyformat(value, format='de', digits=2):
     value = round(float(value), 2)
     return numberformat(value, format, digits=digits) + u" \N{euro sign}"
 
+# def calculategross(value, tax_rate=19):
+#     TAX_BASE = 100
+#     gross = float(value) * (1 + (tax_rate / TAX_BASE))
+#     return currencyformat(gross)
 
 def percentformat(value, format='de', digits=0):
     return numberformat(value, format, digits=digits) + "%"
